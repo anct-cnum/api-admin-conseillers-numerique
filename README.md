@@ -2,7 +2,7 @@
 # api-admin-conseillers-numerique
 Serveur d'api de gestion du tableau de bord
 =======
-# api-admin-conseiller-numerique-v-2
+# api-admin-conseiller-numerique
 
 > 
 
@@ -18,7 +18,7 @@ Getting up and running is as easy as 1, 2, 3.
 2. Install your dependencies
 
     ```
-    cd path/to/api-admin-conseiller-numerique-v-2
+    cd path/to/api-admin-conseiller-numerique
     npm install
     ```
 
