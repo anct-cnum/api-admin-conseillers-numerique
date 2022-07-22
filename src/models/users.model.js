@@ -9,7 +9,7 @@ module.exports = function (app) {
 
 			roles: { type: Array },
 
-			entity,
+			// entity,
 
 			token: { type: String },
 
