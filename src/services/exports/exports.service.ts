@@ -6,21 +6,21 @@ import hooks from './exports.hooks';
 
 // Add this service to the service type index
 declare module '../../declarations' {
-	interface ServiceTypes {
-		exports: Exports & ServiceAddons<any>;
-	}
+  interface ServiceTypes {
+    exports: Exports & ServiceAddons<any>;
+  }
 }
 
 export default function (app: Application): void {
-	const options = {
-		paginate: app.get('paginate'),
-	};
+  const options = {
+    paginate: app.get('paginate'),
+  };
 
-	// Initialize our service with any options it requires
-	app.use('exports', new Exports(options, app));
+  // Initialize our service with any options it requires
+  app.use('exports', new Exports(options, app));
 
-	// Get our initialized service so that we can register hooks
-	const service = app.service('exports');
+  // Get our initialized service so that we can register hooks
+  const service = app.service('exports');
 
-	service.hooks(hooks);
+  service.hooks(hooks);
 }

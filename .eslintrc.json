@@ -1,17 +1,24 @@
 {
-	"extends": ["airbnb-base","airbnb-typescript/base", "plugin:prettier/recommended","plugin:import/recommended"],
-	"plugins": ["@typescript-eslint","prettier","import"],
-	"parserOptions": {
-		"project": "./tsconfig.json",
-		"ecmaVersion": "latest"
-	},
-	"rules": {
-		"prettier/prettier": "error",
-		"no-unused-vars": "warn",
-		"func-names": "off",
-		"no-process-exit": "off",
-		"object-shorthand": "off",
-		"no-underscore-dangle":  ["error", { "allow": ["_id"] }],
-		"import/no-cycle": [2, { "maxDepth": 1 }]
-	}
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "plugin:prettier/recommended",
+    "plugin:import/recommended"
+  ],
+  "plugins": ["@typescript-eslint", "prettier", "import"],
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "indent": "off",
+    "no-underscore-dangle": "off",
+    "import/no-cycle": [2, { "maxDepth": 1 }],
+    "no-restricted-syntax": [
+      "error",
+      "ForInStatement",
+      "LabeledStatement",
+      "WithStatement"
+    ]
+  }
 }

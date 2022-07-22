@@ -2,25 +2,29 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import { generateCsvStructure } from '../exports.repository';
+import { action } from '../../../helpers/accessControl/accessList';
 
-const getStructures =
+const getExportStructuresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
+    let structures: IStructures[];
     try {
-      const structures: IStructures[] | IStructures = await app
+      structures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .find();
-
-      res.status(200).json(structures);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
+        res.statusMessage = 'Accès refusé';
+        res.status(403).end();
         return;
       }
-      res.status(500).json(error.message);
+      res.statusMessage = error.message;
+      res.status(500).end();
+      return;
     }
+    generateCsvStructure(structures, res, app);
   };
 
-export default getStructures;
+export default getExportStructuresCsv;
