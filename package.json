@@ -54,7 +54,6 @@
 		"feathers-hooks-common": "^6.1.3",
 		"feathers-mongoose": "^8.5.1",
 		"helmet": "^5.1.0",
-		"husky": "^8.0.1",
 		"mongodb": "^4.8.0",
 		"mongodb-core": "^3.2.7",
 		"mongoose": "^6.4.4",
@@ -73,13 +72,14 @@
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-node": "^11.1.0",
 		"eslint-plugin-prettier": "^4.2.1",
+		"husky": "^8.0.1",
 		"jest": "^28.1.1",
 		"nodemon": "^2.0.19",
 		"prettier": "^2.7.1"
 	},
 	"husky": {
 		"hooks": {
-		  "pre-push": "npm run lint"
+			"pre-push": "npm run lint"
 		}
-	  }
+	}
 }
