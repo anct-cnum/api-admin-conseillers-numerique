@@ -1,17 +1,17 @@
 const { AbilityBuilder, Ability } = require('@casl/ability');
+const { adminRules, structureRules, superAdminRules } = require('./rules');
 
 function defineAbilitiesFor(user) {
 	const { can, cannot, build } = new AbilityBuilder(Ability);
-	if (user && user.roles.includes('superAdmin')) {
-		can('manage', 'all');
+	if (user?.roles.includes('superAdmin')) {
+		superAdminRules(can);
+	} else if (user?.roles.includes('admin')) {
+		adminRules(can);
 	} else if (user?.roles.includes('structure')) {
-		can(['read', 'update'], 'users', {
-			'entity.$id': user?.entity.oid,
-		});
-		can('send', 'email');
+		structureRules(user, can, cannot);
 	}
 
-	cannot('delete', 'Post', { published: true });
+	cannot('delete', 'users', { published: true });
 
 	return build();
 }

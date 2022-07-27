@@ -1,6 +1,13 @@
+const mongoose = require('mongoose');
+const dbref = require('mongoose-dbref');
+
+// eslint-disable-next-line no-unused-vars
+const loaded = dbref.install(mongoose);
+
 module.exports = function (app) {
 	const modelName = 'users';
 	const mongooseClient = app.get('mongooseClient');
+	const { DBRef } = mongoose.SchemaTypes;
 	const schema = new mongooseClient.Schema(
 		{
 			name: { type: String, unique: true, lowercase: true, required: true },
@@ -9,7 +16,7 @@ module.exports = function (app) {
 
 			roles: { type: Array },
 
-			// entity,
+			entity: { type: DBRef },
 
 			token: { type: String },
 

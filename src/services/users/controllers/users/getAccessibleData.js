@@ -1,6 +1,6 @@
 const {
 	mailSendingPermission,
-} = require('../../../../helpers/verifyPermissions');
+} = require('../../../../helpers/accessControl/verifyPermissions');
 
 const getAccessibleData = (app) => async (req, res) => {
 	try {

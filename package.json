@@ -26,7 +26,7 @@
 	"scripts": {
 		"test": "npm run lint && npm run jest",
 		"lint": "eslint ./ --ignore-path .gitignore",
-		"dev": "nodemon src/",
+		"dev": "NODE_ENV=development nodemon src/",
 		"start": "node src/",
 		"jest": "jest --forceExit"
 	},
@@ -72,14 +72,8 @@
 		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-node": "^11.1.0",
 		"eslint-plugin-prettier": "^4.2.1",
-		"husky": "^8.0.1",
 		"jest": "^28.1.1",
 		"nodemon": "^2.0.19",
 		"prettier": "^2.7.1"
-	},
-	"husky": {
-		"hooks": {
-			"pre-push": "npm run lint"
-		}
 	}
 }
