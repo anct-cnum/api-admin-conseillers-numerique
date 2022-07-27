@@ -32,27 +32,27 @@ describe("'users' service", () => {
 			}
 		});
 
-		// it('authenticates a structure and creates accessToken', async () => {
-		// 	const { accessToken } = await app.service('authentication').create({
-		// 		strategy: 'local',
-		// 		...userInfo,
-		// 	});
-		// 	const { body, statusCode } = await request(app)
-		// 		.get('/custom-route-get-aggregate')
-		// 		.set('Authorization', 'Bearer ' + accessToken);
-		// 	console.log(body, statusCode);
-		// });
-		it('update a structure', async () => {
+		it('authenticates a structure and creates accessToken', async () => {
 			const { accessToken } = await app.service('authentication').create({
 				strategy: 'local',
 				...userInfo,
 			});
-			const id = '62d426a3173db91a679dc9d6';
 			const { body, statusCode } = await request(app)
-				.patch(`/custom-route-update/${id}`)
-				.send({ name: 'updatedMailv3@example.fr' })
+				.get('/custom-route-get')
 				.set('Authorization', `Bearer ${accessToken}`);
-			console.log(body, statusCode);
+			console.log('INTEST', body, statusCode);
 		});
+		// it('update a structure', async () => {
+		// 	const { accessToken } = await app.service('authentication').create({
+		// 		strategy: 'local',
+		// 		...userInfo,
+		// 	});
+		// 	const id = '62d426a3173db91a679dc9d6';
+		// 	const { body, statusCode } = await request(app)
+		// 		.patch(`/custom-route-update/${id}`)
+		// 		.send({ name: 'updatedMailv3@example.fr' })
+		// 		.set('Authorization', `Bearer ${accessToken}`);
+		// 	console.log(body, statusCode);
+		// });
 	});
 });

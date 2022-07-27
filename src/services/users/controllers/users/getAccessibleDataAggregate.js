@@ -1,7 +1,7 @@
 // const { ForbiddenError } = require('@casl/ability') ;
 const {
 	mailSendingPermission,
-} = require('../../../../helpers/verifyPermissions');
+} = require('../../../../helpers/accessControl/verifyPermissions');
 
 const getAccessibleDataAggregate = (app) => async (req, res) => {
 	try {

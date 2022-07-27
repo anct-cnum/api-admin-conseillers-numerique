@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const logger = require('./logger');
 
 mongoose.plugin(accessibleRecordsPlugin);
+if (process.env.NODE_ENV === 'development') {
+	mongoose.set('debug', true);
+}
 
 module.exports = function (app) {
 	mongoose.connect(app.get('mongodb')).catch((err) => {
