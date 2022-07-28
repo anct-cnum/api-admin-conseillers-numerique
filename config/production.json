@@ -1,4 +1,16 @@
 {
-	"host": "api-admin-conseiller-numerique-app.feathersjs.com",
-	"port": "PORT"
+	"host": "HOST",
+	"port": "PORT",
+	"public": "PUBLIC_HOSTNAME",
+	"paginate": {
+    "default": "PAGINATE_DEFAULT",
+    "max": "PAGINATE_MAX"
+	},
+	"authentication": {
+    "secret": "AUTHENTICATION_SECRET",
+    "jwtOptions": {
+      "audience": "AUTHENTICATION_JWTOPTIONS_AUDIENCE"
+		}
+	},
+	"mongodb": "MONGODB_ADDON_URI"
 }
