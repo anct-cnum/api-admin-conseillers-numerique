@@ -28,7 +28,7 @@ const ANONYMOUS_ABILITY = defineAbilitiesFor(null);
 
 module.exports = function createAbilities(req, res, next) {
 	req.ability = req.user?.name
-		? defineAbilitiesFor(req.user, req.body.choosenRole)
+		? defineAbilitiesFor(req.user, req.body.roleActivated)
 		: ANONYMOUS_ABILITY;
 	next();
 };

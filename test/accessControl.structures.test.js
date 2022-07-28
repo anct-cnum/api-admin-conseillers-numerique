@@ -39,7 +39,7 @@ describe("'users' service", () => {
 			});
 			const { body, statusCode } = await request(app)
 				.get('/custom-route-get')
-				.send({ choosenRole: 'structure' })
+				.send({ roleActivated: 'structure' })
 				.set('Authorization', `Bearer ${accessToken}`);
 			console.log('INTEST', body, statusCode);
 		});
