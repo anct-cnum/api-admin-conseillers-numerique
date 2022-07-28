@@ -19,7 +19,7 @@ function defineAbilitiesFor(user) {
 const ANONYMOUS_ABILITY = defineAbilitiesFor(null);
 
 module.exports = function createAbilities(req, res, next) {
-	req.ability = req.user.name
+	req.ability = req.user?.name
 		? defineAbilitiesFor(req.user)
 		: ANONYMOUS_ABILITY;
 	next();
