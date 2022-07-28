@@ -1,17 +1,25 @@
 const { AbilityBuilder, Ability } = require('@casl/ability');
 const { adminRules, structureRules, superAdminRules } = require('./rules');
 
-function defineAbilitiesFor(user) {
+function defineAbilitiesFor(user, role) {
 	const { can, cannot, build } = new AbilityBuilder(Ability);
-	if (user?.roles.includes('superAdmin')) {
-		superAdminRules(can);
-	} else if (user?.roles.includes('admin')) {
-		adminRules(can);
-	} else if (user?.roles.includes('structure')) {
-		structureRules(user, can, cannot);
+
+	switch (role) {
+		case 'superAdmin':
+			superAdminRules(can);
+			break;
+		case 'admin':
+			adminRules(can);
+			break;
+		case 'structure':
+			structureRules(user, can, cannot);
+			break;
+
+		default:
+			break;
 	}
 
-	cannot('delete', 'users', { published: true });
+	cannot('delete', 'users', { activated: true });
 
 	return build();
 }
@@ -20,7 +28,7 @@ const ANONYMOUS_ABILITY = defineAbilitiesFor(null);
 
 module.exports = function createAbilities(req, res, next) {
 	req.ability = req.user?.name
-		? defineAbilitiesFor(req.user)
+		? defineAbilitiesFor(req.user, req.body.choosenRole)
 		: ANONYMOUS_ABILITY;
 	next();
 };

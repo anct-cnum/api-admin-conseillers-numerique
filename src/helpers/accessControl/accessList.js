@@ -11,7 +11,6 @@ const ressource = {
 	all: 'all',
 	users: 'users',
 	structures: 'structures',
-	mail: 'mail',
 };
 
 const functionnality = {
