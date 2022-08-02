@@ -9,15 +9,11 @@ const { DBRef } = mongoose.SchemaTypes;
 export interface IUser {
 	name: string;
 
-	unique: true;
-
-	lowercase: true;
-
-	required: true;
-
 	password: string;
 
 	roles: string[];
+
+	roleActivated: string;
 
 	entity: typeof DBRef;
 

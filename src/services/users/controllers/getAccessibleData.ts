@@ -6,6 +6,7 @@ import mailSendingPermission from '../../../helpers/accessControl/verifyPermissi
 
 const getAccessibleData =
 	(app: Application) => async (req: IRequest, res: Response) => {
+		console.log('ok');
 		try {
 			mailSendingPermission(req.ability);
 		} catch (error) {
