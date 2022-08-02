@@ -1,21 +1,9 @@
-interface Functionnality {
-	email: string;
-}
+import {
+	Action,
+	Ressource,
+	Functionnality,
+} from '../../ts/interfaces/global.interfaces';
 
-interface Action {
-	manage: string;
-	create: string;
-	read: string;
-	update: string;
-	delete: string;
-	send: string;
-}
-
-interface Ressource {
-	all: string;
-	users: string;
-	structures: string;
-}
 const action: Action = {
 	manage: 'manage',
 	create: 'create',

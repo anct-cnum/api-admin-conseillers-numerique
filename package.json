@@ -26,7 +26,7 @@
 	"scripts": {
 		"test": "npm run jest",
 		"lint": "eslint ./ --ignore-path .gitignore",
-		"dev": "NODE_ENV=development nodemon src/",
+		"dev": "NODE_ENV=development nodemon src/index.ts",
 		"start": "npm run build && node dist/",
 		"jest": "jest --forceExit",
 		"build": "shx rm -rf dist/ && tsc"
