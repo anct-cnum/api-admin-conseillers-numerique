@@ -1,12 +1,13 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import service from '../../../helpers/services';
+import { action } from '../../../helpers/accessControl/accessList';
 
 import mailSendingPermission from '../../../helpers/accessControl/verifyPermissions';
 
 const getAccessibleData =
 	(app: Application) => async (req: IRequest, res: Response) => {
-		console.log('ok');
 		try {
 			mailSendingPermission(req.ability);
 		} catch (error) {
@@ -15,8 +16,8 @@ const getAccessibleData =
 
 		try {
 			const user = await app
-				.service('users')
-				.Model.accessibleBy(req.ability, 'read');
+				.service(service.users)
+				.Model.accessibleBy(req.ability, action.read);
 
 			res.json(user);
 		} catch (error) {

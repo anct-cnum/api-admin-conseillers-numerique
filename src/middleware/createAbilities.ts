@@ -1,4 +1,7 @@
 import { AbilityBuilder, Ability } from '@casl/ability';
+import { IUser } from '../ts/interfaces/db.interfaces';
+import { Roles } from '../ts/types';
+import { IRequest } from '../ts/interfaces/global.interfaces';
 
 import {
 	adminRules,
@@ -6,7 +9,7 @@ import {
 	superAdminRules,
 } from '../helpers/accessControl/rules';
 
-function defineAbilitiesFor(user, role) {
+function defineAbilitiesFor(user: IUser, role: Roles) {
 	const { can, cannot, build } = new AbilityBuilder(Ability);
 
 	switch (role) {
@@ -31,7 +34,7 @@ function defineAbilitiesFor(user, role) {
 
 const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null);
 
-export default function createAbilities(req, res, next) {
+export default function createAbilities(req: IRequest, next) {
 	req.ability = req.user?.name
 		? defineAbilitiesFor(req.user, req.body.roleActivated)
 		: ANONYMOUS_ABILITY;

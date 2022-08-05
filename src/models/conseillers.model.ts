@@ -1,8 +1,19 @@
-export default function (app) {
+import { Model, Mongoose } from 'mongoose';
+import { Application } from '../declarations';
+import { IConseillers } from '../ts/interfaces/db.interfaces';
+
+const mongoose = require('mongoose');
+const dbref = require('mongoose-dbref');
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const loaded = dbref.install(mongoose);
+
+export default function (app: Application): Model<any> {
 	const modelName = 'conseillers';
-	const mongooseClient = app.get('mongooseClient');
+	const mongooseClient: Mongoose = app.get('mongooseClient');
+	const { DBRef } = mongoose.SchemaTypes;
 	const { Schema } = mongooseClient;
-	const schema = new Schema(
+	const schema = new Schema<IConseillers>(
 		{
 			idPG: { type: Number, required: true },
 
@@ -15,8 +26,6 @@ export default function (app) {
 			email: { type: String },
 
 			telephone: { type: String },
-
-			roles: { type: Array },
 
 			distanceMax: { type: Number },
 
@@ -43,7 +52,7 @@ export default function (app) {
 				coordinates: { type: String },
 			},
 
-			// entity: { type: Mixed },
+			entity: { type: DBRef },
 
 			nomCommune: { type: String },
 
@@ -62,9 +71,7 @@ export default function (app) {
 				required: false,
 			},
 
-			unsubscribeExtras: {
-				// structure: {},
-			},
+			unsubscribeExtras: { type: Object },
 
 			userCreated: { type: Boolean },
 
@@ -154,7 +161,7 @@ export default function (app) {
 
 			sexe: { type: String },
 
-			historique: { type: Array },
+			historique: [Object],
 
 			cv: {
 				structure: {
@@ -178,7 +185,7 @@ export default function (app) {
 
 			estCoordinateur: { type: Boolean },
 
-			groupeCRAHistorique: { type: Array },
+			groupeCRAHistorique: [Object],
 		},
 
 		{

@@ -1,10 +1,14 @@
 import { Application } from '../declarations';
 import users from './users/users.service';
-// import structures from './structures/structures.service';
-// import conseillers from './conseillers/conseillers.service';
-// eslint-disable-next-line no-unused-vars
+import Exports from './exports/exports.service';
+import miseEnRelation from './miseEnRelation/miseEnRelation.service';
+import conseillers from './conseillers/conseillers.service';
+import structures from './structures/structures.service';
+
 export default function (app: Application): void {
 	app.configure(users);
-	// app.configure(structures);
-	// app.configure(conseillers);
+	app.configure(Exports);
+	app.configure(miseEnRelation);
+	app.configure(conseillers);
+	app.configure(structures);
 }
