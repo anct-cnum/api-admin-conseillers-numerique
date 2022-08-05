@@ -1,8 +1,18 @@
-export default function (app) {
+import { Model, Mongoose } from 'mongoose';
+import { Application } from '../declarations';
+import { IStructures } from '../ts/interfaces/db.interfaces';
+
+const mongoose = require('mongoose');
+const dbref = require('mongoose-dbref');
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const loaded = dbref.install(mongoose);
+
+export default function (app: Application): Model<any> {
 	const modelName = 'structures';
-	const mongooseClient = app.get('mongooseClient');
+	const mongooseClient: Mongoose = app.get('mongooseClient');
 	const { Schema } = mongooseClient;
-	const schema = new Schema({
+	const schema = new Schema<IStructures>({
 		idPG: { type: Number },
 
 		type: { type: String },

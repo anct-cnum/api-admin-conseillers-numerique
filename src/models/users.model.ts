@@ -12,7 +12,8 @@ export default function (app: Application): Model<any> {
 	const modelName = 'users';
 	const mongooseClient: Mongoose = app.get('mongooseClient');
 	const { DBRef } = mongoose.SchemaTypes;
-	const schema = new mongooseClient.Schema<IUser>(
+	const { Schema } = mongooseClient;
+	const schema = new Schema<IUser>(
 		{
 			name: { type: String, unique: true, lowercase: true, required: true },
 
