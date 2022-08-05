@@ -1,4 +1,5 @@
 import { AbilityBuilder, Ability } from '@casl/ability';
+import { Response } from 'express';
 import { IUser } from '../ts/interfaces/db.interfaces';
 import { Roles } from '../ts/types';
 import { IRequest } from '../ts/interfaces/global.interfaces';
@@ -34,7 +35,7 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 
 const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null);
 
-export default function createAbilities(req: IRequest, next) {
+export default function createAbilities(req: IRequest, res: Response, next) {
 	req.ability = req.user?.name
 		? defineAbilitiesFor(req.user, req.body.roleActivated)
 		: ANONYMOUS_ABILITY;
