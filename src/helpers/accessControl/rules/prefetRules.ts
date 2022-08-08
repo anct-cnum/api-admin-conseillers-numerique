@@ -6,4 +6,8 @@ export default function prefetRules(user: IUser, can) {
 	can([action.read], ressource.structures, {
 		codeDepartement: user?.departement,
 	});
+	// Restreindre les permissions : les prefets ne peuvent voir que les conseillers de leur departement
+	can([action.read], ressource.conseillers, {
+		codeDepartement: user?.departement,
+	});
 }
