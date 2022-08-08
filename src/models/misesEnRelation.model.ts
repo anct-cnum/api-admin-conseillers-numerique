@@ -1,6 +1,6 @@
 import { Model, Mongoose } from 'mongoose';
 import { Application } from '../declarations';
-import { IMiseEnRelation } from '../ts/interfaces/db.interfaces';
+import { IMisesEnRelation } from '../ts/interfaces/db.interfaces';
 
 const mongoose = require('mongoose');
 const dbref = require('mongoose-dbref');
@@ -9,10 +9,10 @@ const dbref = require('mongoose-dbref');
 const loaded = dbref.install(mongoose);
 
 export default function (app: Application): Model<any> {
-	const modelName = 'miseEnRelation';
+	const modelName = 'misesEnRelation';
 	const mongooseClient: Mongoose = app.get('mongooseClient');
 	const { DBRef } = mongoose.SchemaTypes;
-	const schema = new mongooseClient.Schema<IMiseEnRelation>(
+	const schema = new mongooseClient.Schema<IMisesEnRelation>(
 		{
 			conseiller: { type: DBRef },
 
@@ -30,7 +30,7 @@ export default function (app: Application): Model<any> {
 
 			structureObj: { type: Object },
 		},
-		{ strict: false },
+		{ strict: false, collection: 'misesEnRelation' },
 	);
 
 	if (mongooseClient.modelNames().includes(modelName)) {

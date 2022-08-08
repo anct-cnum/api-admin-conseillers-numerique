@@ -1,3 +1,1 @@
-type Roles = 'superAdmin' | 'admin' | 'structure';
-
-export { Roles };
+export type Roles = 'superAdmin' | 'admin' | 'structure';

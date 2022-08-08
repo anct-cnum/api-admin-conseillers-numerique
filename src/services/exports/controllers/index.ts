@@ -1,3 +1,14 @@
-import getExportCandidatsCsv from './getExportCandidatsCsv';
+import {
+	getExportCandidatsCsv,
+	getExportCandidatsValideStructure,
+	getExportCandidatsByStructure,
+} from './getExportCandidatsCsv';
 
-export { getExportCandidatsCsv };
+import getExportConseillersWithoutCRA from './getExportConseillersCsv';
+
+export {
+	getExportCandidatsCsv,
+	getExportCandidatsValideStructure,
+	getExportCandidatsByStructure,
+	getExportConseillersWithoutCRA,
+};

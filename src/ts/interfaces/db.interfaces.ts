@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 /* eslint-disable no-unused-vars */
 const mongoose = require('mongoose');
 const dbref = require('mongoose-dbref');
@@ -37,7 +39,7 @@ export interface IUser {
 
 	timestamps?: boolean;
 }
-export interface IMiseEnRelation {
+export interface IMisesEnRelation {
 	conseiller: typeof DBRef;
 
 	structure: typeof DBRef;
@@ -55,6 +57,10 @@ export interface IMiseEnRelation {
 	structureObj: object;
 
 	dateRecrutement: Date;
+
+	dateRupture: Date | undefined;
+
+	motifRupture: string | undefined;
 }
 export interface IConseillers {
 	idPG: number;
@@ -156,10 +162,7 @@ export interface IConseillers {
 	};
 
 	emailCN: {
-		structure: {
-			address: string;
-			deleteMailboxCNError: boolean;
-		};
+		address: string;
 	};
 
 	emailCNError: boolean;
@@ -220,6 +223,8 @@ export interface IConseillers {
 }
 
 export interface IStructures {
+	_id: ObjectId;
+
 	idPG: number;
 
 	type: string;
@@ -286,4 +291,46 @@ export interface IStructures {
 
 		telephone: string;
 	};
+	insee: {
+		etablissement: IEtablissement;
+		entreprise: IEntreprise;
+	};
+	estZRR: boolean;
+	qpvStatut: string;
+	qpvListe: Array<object>;
+	reseau: boolean;
+}
+
+interface IEtablissement {
+	siege_social: boolean;
+	siret: string;
+	naf: string;
+	libelle_naf: string;
+	date_mise_a_jour: number;
+	commune_implantation: {
+		code: string;
+		value: string;
+	};
+	adresse: {
+		l1: string;
+		l2: string;
+		l3: string;
+		l4: string;
+		l5: string;
+		l6: string;
+		l7: string;
+		numero_voie: string;
+		type_voie: string;
+		nom_voie: string;
+		complement_adresse: string;
+		code_postal: string;
+		localite: string;
+	};
+}
+
+interface IEntreprise {
+	siren: string;
+	numero_tva_intracommunautaire: string;
+	forme_juridique: string;
+	raison_sociale: string;
 }

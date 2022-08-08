@@ -1,7 +1,7 @@
 import { Application } from '../declarations';
 import users from './users/users.service';
 import Exports from './exports/exports.service';
-import miseEnRelation from './miseEnRelation/miseEnRelation.service';
+import miseEnRelation from './misesEnRelation/misesEnRelation.service';
 import conseillers from './conseillers/conseillers.service';
 import structures from './structures/structures.service';
 

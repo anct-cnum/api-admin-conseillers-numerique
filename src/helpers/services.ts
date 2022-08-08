@@ -1,5 +1,5 @@
 const service = {
-	miseEnRelation: 'miseEnRelation',
+	misesEnRelation: 'misesEnRelation',
 	users: 'users',
 	conseillers: 'conseillers',
 	structures: 'structures',
