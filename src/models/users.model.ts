@@ -15,7 +15,7 @@ export default function (app: Application): Model<any> {
 	const { Schema } = mongooseClient;
 	const schema = new Schema<IUser>(
 		{
-			name: { type: String, unique: true, lowercase: true, required: true },
+			name: { type: String, required: true },
 
 			password: { type: String },
 
@@ -24,6 +24,8 @@ export default function (app: Application): Model<any> {
 			entity: { type: DBRef },
 
 			token: { type: String },
+
+			departement: { type: String },
 
 			resend: { type: Boolean },
 

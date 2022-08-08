@@ -2,16 +2,9 @@ import { Model, Mongoose } from 'mongoose';
 import { Application } from '../declarations';
 import { IConseillers } from '../ts/interfaces/db.interfaces';
 
-const mongoose = require('mongoose');
-const dbref = require('mongoose-dbref');
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const loaded = dbref.install(mongoose);
-
 export default function (app: Application): Model<any> {
 	const modelName = 'conseillers';
 	const mongooseClient: Mongoose = app.get('mongooseClient');
-	const { DBRef } = mongoose.SchemaTypes;
 	const { Schema } = mongooseClient;
 	const schema = new Schema<IConseillers>(
 		{
@@ -52,8 +45,6 @@ export default function (app: Application): Model<any> {
 				coordinates: { type: String },
 			},
 
-			entity: { type: DBRef },
-
 			nomCommune: { type: String },
 
 			codeCommune: { type: String },
@@ -93,31 +84,7 @@ export default function (app: Application): Model<any> {
 				required: false,
 			},
 
-			structureId: {
-				foreignKey: true,
-				references: String,
-				key: true,
-				type: Object,
-			},
-
-			token: { type: String },
-
-			mailSentDate: {
-				ype: Date,
-			},
-
-			passwordCreated: { type: Boolean },
-
-			resend: { type: Boolean },
-
-			tokenCreatedAt: {
-				type: Date,
-				required: false,
-			},
-
-			mailAModifier: { type: String },
-
-			mailCoopSent: { type: Boolean },
+			structureId: { type: 'ObjectId' },
 
 			codeCom: {
 				type: Date,
@@ -188,9 +155,7 @@ export default function (app: Application): Model<any> {
 			groupeCRAHistorique: [Object],
 		},
 
-		{
-			timestamps: true,
-		},
+		{ strict: false },
 	);
 
 	if (mongooseClient.modelNames().includes(modelName)) {

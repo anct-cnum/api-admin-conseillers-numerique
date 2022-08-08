@@ -6,7 +6,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import generateCsv from '../exports.repository';
 
-const getExportCandidatsCsv =
+const getExportJeRecruteCsv =
 	(app: Application) => async (req: IRequest, res: Response) => {
 		let miseEnRelations: IMiseEnRelation[];
 		try {
@@ -22,9 +22,10 @@ const getExportCandidatsCsv =
 				.sort({ 'miseEnrelation.structure.oid': 1 });
 		} catch (error) {
 			res.status(401).json(error.message);
+			return;
 		}
 
 		generateCsv(miseEnRelations, res, app);
 	};
 
-export default getExportCandidatsCsv;
+export default getExportJeRecruteCsv;

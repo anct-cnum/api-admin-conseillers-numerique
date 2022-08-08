@@ -1,7 +1,7 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
-import getExportCandidatsCsv from './controllers/getExportCandidatsCsv';
+import getExportJeRecruteCsv from './controllers/getExportJeRecruteCsv';
 import createAbilities from '../../middleware/createAbilities';
 
 export default class Exports extends Service {
@@ -11,7 +11,7 @@ export default class Exports extends Service {
 			'/exports/candidats-csv',
 			authenticate('jwt'),
 			createAbilities,
-			getExportCandidatsCsv(app),
+			getExportJeRecruteCsv(app),
 		);
 	}
 }
