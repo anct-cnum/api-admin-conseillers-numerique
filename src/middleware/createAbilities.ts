@@ -12,7 +12,7 @@ import {
 } from '../helpers/accessControl/rules';
 
 function defineAbilitiesFor(user: IUser, role: Roles) {
-	const { can, cannot, build } = new AbilityBuilder(Ability);
+	const { can, build } = new AbilityBuilder(Ability);
 
 	switch (role) {
 		case 'admin':
@@ -24,7 +24,7 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 		case 'prefet':
 			prefetRules(user, can);
 			break;
-		case 'conseillers':
+		case 'conseiller':
 			conseillerRules(user, can);
 			break;
 		default:

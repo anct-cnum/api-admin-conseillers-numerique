@@ -1,10 +1,10 @@
 type Roles =
 	| 'admin'
 	| 'structure'
-	| 'conseillers'
+	| 'conseiller'
 	| 'prefet'
 	| 'grandReseau'
-	| 'hub'
-	| 'coordinateur';
+	| 'hub_coop'
+	| 'coordinateur_coop';
 
 export { Roles };
