@@ -1,3 +1,3 @@
-import getExportCandidatsCsv from './getExportCandidatsCsv';
+import getExportJeRecruteCsv from './getExportJeRecruteCsv';
 
-export { getExportCandidatsCsv };
+export { getExportJeRecruteCsv };
