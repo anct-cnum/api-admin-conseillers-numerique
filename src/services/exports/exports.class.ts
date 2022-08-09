@@ -9,6 +9,7 @@ import {
 	getExportJeRecruteCsv,
 	getExportRupturesCsv,
 	getExportStructuresCsv,
+	getExportEmbauchesCsv,
 } from './controllers';
 
 export default class Exports extends Service {
@@ -30,7 +31,7 @@ export default class Exports extends Service {
 			'/exports/embauches-csv',
 			authenticate('jwt'),
 			createAbilities,
-			getExportCandidatsValideStructureCsv(app),
+			getExportEmbauchesCsv(app),
 		);
 		app.post(
 			'/exports/candidatsByStructure-csv',

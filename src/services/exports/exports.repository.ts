@@ -37,10 +37,10 @@ const generateCsvCandidat = async (
 			const coselec = getCoselec(structure);
 
 			res.write(
-				`${dayjs(conseiller?.createdAt).format('DD/MM/YYYY')};${
+				`${formatDate(conseiller?.createdAt)};${
 					miseEnrelation.dateRecrutement === null
 						? 'non renseignée'
-						: dayjs(miseEnrelation.dateRecrutement).format('DD/MM/YYYY')
+						: formatDate(miseEnrelation.dateRecrutement)
 				};${conseiller?.prenom};${conseiller?.nom};${
 					conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
 				};${conseiller?.telephone};${conseiller?.email};${
