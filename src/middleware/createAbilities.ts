@@ -7,28 +7,29 @@ import { IRequest } from '../ts/interfaces/global.interfaces';
 import {
 	adminRules,
 	structureRules,
-	superAdminRules,
+	conseillerRules,
+	prefetRules,
 } from '../helpers/accessControl/rules';
 
 function defineAbilitiesFor(user: IUser, role: Roles) {
-	const { can, cannot, build } = new AbilityBuilder(Ability);
+	const { can, build } = new AbilityBuilder(Ability);
 
 	switch (role) {
-		case 'superAdmin':
-			superAdminRules(can);
-			break;
 		case 'admin':
 			adminRules(can);
 			break;
 		case 'structure':
 			structureRules(user, can);
 			break;
-
+		case 'prefet':
+			prefetRules(user, can);
+			break;
+		case 'conseiller':
+			conseillerRules(user, can);
+			break;
 		default:
 			break;
 	}
-
-	cannot('delete', 'users', { activated: true });
 
 	return build();
 }

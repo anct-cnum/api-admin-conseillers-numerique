@@ -1,9 +1,10 @@
 import { ObjectId } from 'mongodb';
 
 /* eslint-disable no-unused-vars */
+import { Types } from 'mongoose';
+
 const mongoose = require('mongoose');
 const dbref = require('mongoose-dbref');
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const loaded = dbref.install(mongoose);
 const { DBRef } = mongoose.SchemaTypes;
@@ -28,6 +29,8 @@ export interface IUser {
 	mailConfirmError: string;
 
 	mailConfirmErrorDetail: string;
+
+	departement: string;
 
 	mailCoopSent: boolean;
 
@@ -75,8 +78,6 @@ export interface IConseillers {
 
 	telephone: string;
 
-	roles: string[];
-
 	distanceMax: number;
 
 	disponible: boolean;
@@ -104,8 +105,6 @@ export interface IConseillers {
 		coordinates: string;
 	};
 
-	entity: typeof DBRef;
-
 	nomCommune: string;
 
 	codeCommune: string;
@@ -126,39 +125,18 @@ export interface IConseillers {
 
 	sondageSentAt: Date;
 
-	structureId: {
-		foreignKey: true;
-		references: String;
-		key: true;
-		type: Object;
-	};
-
-	token: string;
-
-	mailSentDate: Date;
-
-	passwordCreated: boolean;
-
-	resend: boolean;
-
-	tokenCreatedAt: Date;
-
-	mailAModifier: string;
-
-	mailCoopSent: boolean;
+	structureId?: Types.ObjectId;
 
 	codeCom: Date;
 
 	mattermost: {
-		structure: {
-			error: boolean;
-			login: {
-				type: String;
-			};
-			id: string;
-			errorResetPassword: boolean;
-			errorPatchLogin: boolean;
-		};
+		error: boolean;
+
+		login: String;
+
+		id: string;
+
+		hubJoined: boolean;
 	};
 
 	emailCN: {

@@ -23,6 +23,7 @@ const getExportJeRecruteCsv =
 				.sort({ 'miseEnrelation.structure.oid': 1 });
 		} catch (error) {
 			res.status(401).json(error.message);
+			return;
 		}
 
 		generateCsvCandidat(miseEnRelations, res, app);

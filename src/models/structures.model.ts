@@ -12,65 +12,68 @@ export default function (app: Application): Model<any> {
 	const modelName = 'structures';
 	const mongooseClient: Mongoose = app.get('mongooseClient');
 	const { Schema } = mongooseClient;
-	const schema = new Schema<IStructures>({
-		idPG: { type: Number },
+	const schema = new Schema<IStructures>(
+		{
+			idPG: { type: Number },
 
-		type: { type: String },
+			type: { type: String },
 
-		statut: { type: String },
+			statut: { type: String },
 
-		nom: { type: String },
+			nom: { type: String },
 
-		siret: { type: String },
+			siret: { type: String },
 
-		aIdentifieCandidat: { type: Boolean },
+			aIdentifieCandidat: { type: Boolean },
 
-		dateDebutMission: { type: Date },
+			dateDebutMission: { type: Date },
 
-		nombreConseillersSouhaites: { type: Number },
+			nombreConseillersSouhaites: { type: Number },
 
-		estLabelliseFranceServices: { type: String },
+			estLabelliseFranceServices: { type: String },
 
-		codePostal: { type: String },
+			codePostal: { type: String },
 
-		location: {
-			structure: { type: String },
-			coordinates: { type: String },
+			location: {
+				structure: { type: String },
+				coordinates: { type: String },
+			},
+
+			nomCommune: { type: String },
+
+			codeCommune: { type: String },
+
+			codeDepartement: { type: String },
+
+			codeRegion: { type: String },
+
+			emailConfirmedAt: { type: Date },
+
+			emailConfirmationKey: { type: String },
+
+			unsubscribedAt: { type: Date },
+
+			unsubscribeExtras: {
+				type: Object,
+				structure: {},
+			},
+
+			createdAt: { type: Date },
+
+			updatedAt: { type: Date },
+
+			validatedAt: { type: Date },
+
+			importedAt: { type: Date },
+
+			deleted_at: { type: Date },
+
+			userCreated: { type: Boolean },
+
+			coselecAt: { type: Date },
 		},
-
-		nomCommune: { type: String },
-
-		codeCommune: { type: String },
-
-		codeDepartement: { type: String },
-
-		codeRegion: { type: String },
-
-		emailConfirmedAt: { type: Date },
-
-		emailConfirmationKey: { type: String },
-
-		unsubscribedAt: { type: Date },
-
-		unsubscribeExtras: {
-			type: Object,
-			structure: {},
-		},
-
-		createdAt: { type: Date },
-
-		updatedAt: { type: Date },
-
-		validatedAt: { type: Date },
-
-		importedAt: { type: Date },
-
-		deleted_at: { type: Date },
-
-		userCreated: { type: Boolean },
-
-		coselecAt: { type: Date },
-	});
+		{ strict: false },
+	);
 
 	if (mongooseClient.modelNames().includes(modelName)) {
 		mongooseClient.deleteModel(modelName);

@@ -1,10 +1,8 @@
-import { action, ressource, functionnality } from '../accessList';
+import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 
 export default function structureRules(user: IUser, can) {
-	can([action.read, action.update], ressource.users, {
-		'entity.$id': user?.entity.oid,
-	});
+	// Restreindre les permissions : les structures ne peuvent voir que les informations les concernant
 	can([action.read], ressource.structures, {
 		_id: user?.entity.oid,
 	});

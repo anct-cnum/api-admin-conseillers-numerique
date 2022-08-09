@@ -1,5 +1,6 @@
 import adminRules from './adminRules';
 import structureRules from './structureRules';
-import superAdminRules from './superAdminRules';
+import conseillerRules from './conseillerRules';
+import prefetRules from './prefetRules';
 
-export { adminRules, structureRules, superAdminRules };
+export { adminRules, structureRules, conseillerRules, prefetRules };
