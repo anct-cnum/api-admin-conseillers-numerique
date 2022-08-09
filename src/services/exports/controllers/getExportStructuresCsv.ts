@@ -6,7 +6,7 @@ import service from '../../../helpers/services';
 import { generateCsvStructure } from '../exports.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 
-const getExportStructure =
+const getExportStructuresCsv =
 	(app: Application) => async (req: IRequest, res: Response) => {
 		let structures: IStructures[];
 		try {
@@ -21,4 +21,4 @@ const getExportStructure =
 		generateCsvStructure(structures, res, app);
 	};
 
-export default getExportStructure;
+export default getExportStructuresCsv;

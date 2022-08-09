@@ -7,50 +7,9 @@ import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import Structures from '../../structures/structures.class';
-import {
-	generateCsvCandidat,
-	generateCsvCandidatByStructure,
-} from '../exports.repository';
+import { generateCsvCandidatByStructure } from '../exports.repository';
 
-const getExportCandidatsCsv =
-	(app: Application) => async (req: IRequest, res: Response) => {
-		let miseEnRelations: IMisesEnRelation[];
-		try {
-			miseEnRelations = await app
-				.service(service.misesEnRelation)
-				.Model.accessibleBy(req.ability, action.read)
-				.find({
-					$or: [
-						{ statut: { $eq: 'recrutee' } },
-						{ statut: { $eq: 'finalisee' } },
-						{ statut: { $eq: 'nouvelle_rupture' } },
-					],
-				})
-				.sort({ 'miseEnrelation.structure.oid': 1 });
-		} catch (error) {
-			res.status(401).json(error.message);
-		}
-
-		generateCsvCandidat(miseEnRelations, res, app);
-	};
-
-const getExportCandidatsValideStructure =
-	(app: Application) => async (req: IRequest, res: Response) => {
-		let miseEnRelations: IMisesEnRelation[];
-		try {
-			miseEnRelations = await app
-				.service(service.misesEnRelation)
-				.Model.accessibleBy(req.ability, action.read)
-				.find({ statut: { $eq: 'recrutee' } })
-				.sort({ 'miseEnrelation.structure.oid': 1 });
-		} catch (error) {
-			res.status(401).json(error.message);
-		}
-
-		generateCsvCandidat(miseEnRelations, res, app);
-	};
-
-const getExportCandidatsByStructure =
+const getExportCandidatsByStructureCsv =
 	(app: Application) => async (req: IRequest, res: Response) => {
 		const { user } = req;
 		let miseEnRelation: IMisesEnRelation[];
@@ -84,8 +43,4 @@ const getExportCandidatsByStructure =
 		generateCsvCandidatByStructure(miseEnRelation, res, app);
 	};
 
-export {
-	getExportCandidatsCsv,
-	getExportCandidatsValideStructure,
-	getExportCandidatsByStructure,
-};
+export default getExportCandidatsByStructureCsv;
