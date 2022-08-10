@@ -18,6 +18,7 @@ const ressource: Ressource = {
 	users: 'users',
 	structures: 'structures',
 	misesEnRelation: 'misesEnRelation',
+	conseillers: 'conseillers',
 };
 
 const functionnality: Functionnality = {

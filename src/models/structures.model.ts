@@ -35,8 +35,8 @@ export default function (app: Application): Model<any> {
 			codePostal: { type: String },
 
 			location: {
-				structure: { type: String },
-				coordinates: { type: String },
+				type: String,
+				coordinates: Array,
 			},
 
 			nomCommune: { type: String },
@@ -53,10 +53,7 @@ export default function (app: Application): Model<any> {
 
 			unsubscribedAt: { type: Date },
 
-			unsubscribeExtras: {
-				type: Object,
-				structure: {},
-			},
+			unsubscribeExtras: { type: Object },
 
 			createdAt: { type: Date },
 

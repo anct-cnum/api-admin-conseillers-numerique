@@ -1,21 +1,19 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
-const updateStructure =
+const getConseillers =
 	(app: Application) => async (req: IRequest, res: Response) => {
-		const filter = { _id: req.params.id };
-		const update = { contact: req.body.contact };
 		try {
-			const structure: IStructures = await app
-				.service(service.structures)
-				.Model.accessibleBy(req.ability, action.update)
-				.findOneAndUpdate(filter, update);
+			const conseillers: IConseillers[] | IConseillers = await app
+				.service(service.conseillers)
+				.Model.accessibleBy(req.ability, action.read)
+				.find();
 
-			res.status(200).json(structure);
+			res.status(200).json(conseillers);
 		} catch (error) {
 			if (error.name === 'ForbiddenError') {
 				res.status(401).json('Accès refusé');
@@ -25,4 +23,4 @@ const updateStructure =
 		}
 	};
 
-export default updateStructure;
+export default getConseillers;

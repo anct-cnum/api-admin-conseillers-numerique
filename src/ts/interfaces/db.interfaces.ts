@@ -32,6 +32,8 @@ export interface IUser {
 
 	departement: string;
 
+	region: string;
+
 	mailCoopSent: boolean;
 
 	mailSentDate?: Date;
@@ -142,6 +144,8 @@ export interface IConseillers {
 	emailCN: {
 		address: string;
 	};
+
+  deleteMailboxCNError: boolean;
 
 	emailCNError: boolean;
 

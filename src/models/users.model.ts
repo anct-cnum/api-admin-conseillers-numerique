@@ -27,6 +27,8 @@ export default function (app: Application): Model<any> {
 
 			departement: { type: String },
 
+			region: { type: String },
+
 			resend: { type: Boolean },
 
 			mailAModifier: { type: String },

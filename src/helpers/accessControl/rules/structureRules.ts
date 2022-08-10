@@ -9,5 +9,8 @@ export default function structureRules(user: IUser, can) {
 	can([action.read], ressource.misesEnRelation, {
 		'structure.$id': user?.entity.oid,
 	});
-	can(action.send, functionnality.email);
+	// Restreindre les permissions : les structures ne peuvent voir que les conseillers appartenant à leur organisation
+	can([action.read, action.update], ressource.conseillers, {
+		structureId: user?.entity.oid,
+	});
 }

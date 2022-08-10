@@ -25,4 +25,5 @@ export interface Ressource {
 	users: string;
 	structures: string;
 	misesEnRelation: string;
+	conseillers: string;
 }
