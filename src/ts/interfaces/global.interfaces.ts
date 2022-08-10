@@ -24,4 +24,5 @@ export interface Ressource {
 	all: string;
 	users: string;
 	structures: string;
+	conseillers: string;
 }
