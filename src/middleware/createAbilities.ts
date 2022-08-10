@@ -9,6 +9,7 @@ import {
 	structureRules,
 	conseillerRules,
 	prefetRules,
+	grandReseauRules,
 } from '../helpers/accessControl/rules';
 
 function defineAbilitiesFor(user: IUser, role: Roles) {
@@ -26,6 +27,9 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 			break;
 		case 'conseiller':
 			conseillerRules(user, can);
+			break;
+		case 'grandReseau':
+			grandReseauRules(user, can);
 			break;
 		default:
 			break;

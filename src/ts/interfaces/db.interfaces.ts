@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Types } from 'mongoose';
+import { Reseau } from '../types';
 
 const mongoose = require('mongoose');
 const dbref = require('mongoose-dbref');
@@ -31,6 +32,8 @@ export interface IUser {
 	departement: string;
 
 	region: string;
+
+	reseau: Reseau;
 
 	mailCoopSent: boolean;
 
