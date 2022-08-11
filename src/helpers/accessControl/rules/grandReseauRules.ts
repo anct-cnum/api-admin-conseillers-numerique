@@ -19,6 +19,11 @@ export default function grandReseauRules(user: IUser, can) {
 				reseau: 'Groupe SOS',
 			});
 			break;
+		case 'La Poste':
+			can([action.read], ressource.structures, {
+				reseau: 'La Poste',
+			});
+			break;
 		default:
 			break;
 	}

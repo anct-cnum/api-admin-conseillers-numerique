@@ -9,6 +9,8 @@ const loaded = dbref.install(mongoose);
 const { DBRef } = mongoose.SchemaTypes;
 
 export interface IUser {
+	_id?: string;
+
 	name: string;
 
 	password: string;
@@ -197,6 +199,10 @@ export interface IConseillers {
 		competence2: boolean;
 
 		competence3: boolean;
+	};
+	listeSubordonnes: {
+		type: string;
+		liste: string[];
 	};
 }
 
