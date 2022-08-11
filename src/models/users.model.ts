@@ -29,6 +29,8 @@ export default function (app: Application): Model<any> {
 
 			region: { type: String },
 
+			reseau: { type: String },
+
 			resend: { type: Boolean },
 
 			mailAModifier: { type: String },

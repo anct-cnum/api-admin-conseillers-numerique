@@ -7,4 +7,6 @@ type Roles =
 	| 'hub_coop'
 	| 'coordinateur_coop';
 
-export { Roles };
+type Reseau = 'Croix-Rouge' | 'Emmaüs Connect' | 'Groupe SOS';
+
+export { Roles, Reseau };
