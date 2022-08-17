@@ -1,6 +1,6 @@
 // const { ForbiddenError } = require('@casl/ability') ;
 import { Application } from '@feathersjs/express';
-import mailSendingPermission from '../../../helpers/accessControl/verifyPermissions';
+import { mailSendingPermission } from '../../../helpers/accessControl/verifyPermissions';
 
 const getAccessibleDataAggregate = (app: Application) => async (req, res) => {
 	try {

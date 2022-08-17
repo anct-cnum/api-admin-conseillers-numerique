@@ -9,6 +9,7 @@ export interface IRequest extends Request {
 
 export interface Functionnality {
 	email: string;
+	exportHub: string;
 }
 
 export interface Action {

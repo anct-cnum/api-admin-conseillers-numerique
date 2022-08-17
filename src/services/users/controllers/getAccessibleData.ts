@@ -3,8 +3,7 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
-
-import mailSendingPermission from '../../../helpers/accessControl/verifyPermissions';
+import { mailSendingPermission } from '../../../helpers/accessControl/verifyPermissions';
 
 const getAccessibleData =
 	(app: Application) => async (req: IRequest, res: Response) => {

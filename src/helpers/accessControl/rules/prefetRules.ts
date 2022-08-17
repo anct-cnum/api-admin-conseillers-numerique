@@ -16,4 +16,11 @@ export default function prefetRules(user: IUser, can) {
 	can([action.read], ressource.conseillers, {
 		codeRegion: user?.region,
 	});
+	// Restreindre les permissions : les prefets ne peuvent voir que les misesEnRelation de leur departement ou région
+	can([action.read], ressource.misesEnRelation, {
+		'structureObj.codeDepartement': user?.departement,
+	});
+	can([action.read], ressource.misesEnRelation, {
+		'structureObj.codeRegion': user?.region,
+	});
 }

@@ -1,10 +1,8 @@
-type Roles =
+export type Roles =
 	| 'admin'
 	| 'structure'
 	| 'conseiller'
 	| 'prefet'
 	| 'grandReseau'
-	| 'hub_coop'
+	| 'hub'
 	| 'coordinateur_coop';
-
-export { Roles };

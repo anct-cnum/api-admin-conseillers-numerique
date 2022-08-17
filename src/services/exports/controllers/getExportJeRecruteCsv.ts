@@ -29,7 +29,6 @@ const getExportJeRecruteCsv =
 			res.status(500).json(error.message);
 			return;
 		}
-
 		generateCsvCandidat(miseEnRelations, res, app);
 	};
 

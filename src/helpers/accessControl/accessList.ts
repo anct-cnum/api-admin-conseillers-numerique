@@ -23,6 +23,7 @@ const ressource: Ressource = {
 
 const functionnality: Functionnality = {
 	email: 'email',
+	exportHub: 'exportHub',
 };
 
 export { action, ressource, functionnality };

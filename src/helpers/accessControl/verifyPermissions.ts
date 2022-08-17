@@ -5,4 +5,9 @@ const mailSendingPermission = (ability) =>
 		.setMessage("Accès à l'envoi de mails refusé")
 		.throwUnlessCan('send', 'email');
 
-export default mailSendingPermission;
+const exportsCnfsHubPermission = (ability) =>
+	ForbiddenError.from(ability)
+		.setMessage("Accès à l'export des cnfs refusé")
+		.throwUnlessCan('read', 'exportHub');
+
+export { mailSendingPermission, exportsCnfsHubPermission };

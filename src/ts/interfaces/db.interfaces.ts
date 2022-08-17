@@ -10,6 +10,8 @@ const loaded = dbref.install(mongoose);
 const { DBRef } = mongoose.SchemaTypes;
 
 export interface IUser {
+	_id: ObjectId;
+
 	name: string;
 
 	password: string;
@@ -43,6 +45,8 @@ export interface IUser {
 	passwordCreated?: boolean;
 
 	timestamps?: boolean;
+
+	hub?: string;
 }
 export interface IMisesEnRelation {
 	conseiller: typeof DBRef;
@@ -145,7 +149,7 @@ export interface IConseillers {
 		address: string;
 	};
 
-  deleteMailboxCNError: boolean;
+	deleteMailboxCNError: boolean;
 
 	emailCNError: boolean;
 

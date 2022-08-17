@@ -13,8 +13,12 @@ import {
 	IUser,
 } from '../../ts/interfaces/db.interfaces';
 
-const formatDate = (date) =>
-	dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+const formatDate = (date: Date) => {
+	if (date !== undefined) {
+		return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+	}
+	return 'non renseignée';
+};
 
 const generateCsvCandidat = async (
 	miseEnRelations: IMisesEnRelation[],
@@ -62,7 +66,10 @@ const generateCsvCandidat = async (
 		}
 		res.end();
 	} catch (error) {
-		res.status(400).json(error);
+		res.destroy();
+		res
+			.status(400)
+			.json("Une erreur s'est produite au niveau de la création du csv");
 	}
 };
 
@@ -101,9 +108,52 @@ const generateCsvCandidatByStructure = async (
 		await Promise.all(promises);
 		res.end();
 	} catch (error) {
-		res.status(400).json(error);
+		res.destroy();
+		res
+			.status(400)
+			.json("Une erreur s'est produite au niveau de la création du csv");
 	}
 };
+
+const formatAdresseStructure = (insee) => {
+	const adresse = `${insee?.etablissement?.adresse?.numero_voie ?? ''} ${
+		insee?.etablissement?.adresse?.type_voie ?? ''
+	} ${insee?.etablissement?.adresse?.nom_voie ?? ''} ${
+		insee?.etablissement?.adresse?.complement_adresse
+			? `${insee.etablissement.adresse.complement_adresse} `
+			: ' '
+	}${insee?.etablissement?.adresse?.code_postal ?? ''} ${
+		insee?.etablissement?.adresse?.localite ?? ''
+	}`;
+
+	return adresse.replace(/["']/g, '');
+};
+
+const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
+	res.write(
+		'Nom;Prénom;Email @conseiller-numerique.fr;Nom de la Structure;Email de la structure;Adresse de la structure;Code région de la structure\n',
+	);
+	try {
+		for (const exportHub of exportsHub) {
+			res.write(
+				`${exportHub.conseiller.nom};${exportHub.conseiller.prenom};${
+					exportHub.conseiller?.mattermost?.id
+						? exportHub.conseiller?.emailCN?.address
+						: 'compte COOP non créé'
+				};${exportHub.nom};${exportHub.contact?.email};${formatAdresseStructure(
+					exportHub.insee,
+				)};${exportHub.codeRegion};\n`,
+			);
+		}
+		res.end();
+	} catch (error) {
+		res.destroy();
+		res
+			.status(400)
+			.json("Une erreur s'est produite au niveau de la création du csv");
+	}
+};
+
 const getFormatHistoriqueGroupeCRA = (nbSlice, groupeCRAHistorique) =>
 	groupeCRAHistorique.slice(nbSlice);
 
@@ -161,7 +211,10 @@ const generateCsvConseillersWithoutCRA = async (
 		);
 		res.end();
 	} catch (error) {
-		res.status(400).json(error);
+		res.destroy();
+		res
+			.status(400)
+			.json("Une erreur s'est produite au niveau de la création du csv");
 	}
 };
 
@@ -252,7 +305,10 @@ const generateCsvStructure = async (
 		}
 		res.end();
 	} catch (error) {
-		res.status(400).json(error);
+		res.destroy();
+		res
+			.status(400)
+			.json("Une erreur s'est produite au niveau de la création du csv");
 	}
 };
 
@@ -284,7 +340,10 @@ const generateCsvRupture = async (
 		}
 		res.end();
 	} catch (error) {
-		res.status(400).json(error);
+		res.destroy();
+		res
+			.status(400)
+			.json("Une erreur s'est produite au niveau de la création du csv");
 	}
 };
 
@@ -294,4 +353,5 @@ export {
 	generateCsvConseillersWithoutCRA,
 	generateCsvStructure,
 	generateCsvRupture,
+	generateCsvConseillersHub,
 };

@@ -15,8 +15,12 @@ const getExportStructuresCsv =
 				.Model.accessibleBy(req.ability, action.read)
 				.find();
 		} catch (error) {
-			res.status(401).json(error.message);
-			app.get('sentry').captureException(error);
+			if (error.name === 'ForbiddenError') {
+				res.status(401).json('Accès refusé');
+				return;
+			}
+			res.status(500).json(error.message);
+			return;
 		}
 		generateCsvStructure(structures, res, app);
 	};

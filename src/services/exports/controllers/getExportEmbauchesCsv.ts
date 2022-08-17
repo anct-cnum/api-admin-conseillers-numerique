@@ -16,7 +16,12 @@ const getExportEmbauchesCsv =
 				.find({ statut: { $eq: 'finalisee' } })
 				.sort({ 'miseEnrelation.structure.oid': 1 });
 		} catch (error) {
-			res.status(401).json(error.message);
+			if (error.name === 'ForbiddenError') {
+				res.status(401).json('Accès refusé');
+				return;
+			}
+			res.status(500).json(error.message);
+			return;
 		}
 
 		generateCsvCandidat(miseEnRelations, res, app);
