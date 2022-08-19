@@ -16,7 +16,7 @@ const getStructures =
 			res.status(200).json(structures);
 		} catch (error) {
 			if (error.name === 'ForbiddenError') {
-				res.status(401).json('Accès refusé');
+				res.status(403).json('Accès refusé');
 				return;
 			}
 			res.status(500).json(error.message);

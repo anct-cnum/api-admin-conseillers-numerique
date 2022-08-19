@@ -1,4 +1,4 @@
-export type Roles =
+type Roles =
 	| 'admin'
 	| 'structure'
 	| 'conseiller'
@@ -6,3 +6,7 @@ export type Roles =
 	| 'grandReseau'
 	| 'hub_coop'
 	| 'coordinateur_coop';
+
+type Reseau = 'Croix-Rouge' | 'Emmaüs Connect' | 'Groupe SOS';
+
+export { Roles, Reseau };
