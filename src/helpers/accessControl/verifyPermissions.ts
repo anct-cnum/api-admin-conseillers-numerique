@@ -7,7 +7,7 @@ const mailSendingPermission = (ability) =>
 
 const exportsCnfsHubPermission = (ability) =>
 	ForbiddenError.from(ability)
-		.setMessage("Accès à l'export des cnfs refusé")
+		.setMessage("Accès à l'export des cnfs pour les hubs refusé")
 		.throwUnlessCan('read', 'exportHub');
 
 export { mailSendingPermission, exportsCnfsHubPermission };

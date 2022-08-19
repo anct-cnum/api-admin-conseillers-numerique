@@ -5,6 +5,7 @@ import getExportRupturesCsv from './getExportRupturesCsv';
 import getExportStructuresCsv from './getExportStructuresCsv';
 import getExportConseillersWithoutCRACsv from './getExportConseillersWithoutCRACsv';
 import getExportEmbauchesCsv from './getExportEmbauchesCsv';
+import getExportConseillersHubCsv from './getExportConseillersHubCsv';
 
 export {
 	getExportCandidatsByStructureCsv,
@@ -14,4 +15,5 @@ export {
 	getExportStructuresCsv,
 	getExportConseillersWithoutCRACsv,
 	getExportEmbauchesCsv,
+	getExportConseillersHubCsv,
 };

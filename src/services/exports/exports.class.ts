@@ -10,8 +10,8 @@ import {
 	getExportRupturesCsv,
 	getExportStructuresCsv,
 	getExportEmbauchesCsv,
+	getExportConseillersHubCsv,
 } from './controllers';
-import getExportConseillersCsv from './controllers/getExportConseillersCsv';
 
 export default class Exports extends Service {
 	constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -62,7 +62,7 @@ export default class Exports extends Service {
 			'/exports/cnfs-hub-csv',
 			authenticate('jwt'),
 			createAbilities,
-			getExportConseillersCsv(app),
+			getExportConseillersHubCsv(app),
 		);
 	}
 }

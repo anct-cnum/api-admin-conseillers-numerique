@@ -31,7 +31,7 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 			break;
 		case 'hub_coop':
 			hubRules(user, can);
-      break;
+			break;
 		case 'grandReseau':
 			grandReseauRules(user, can);
 			break;

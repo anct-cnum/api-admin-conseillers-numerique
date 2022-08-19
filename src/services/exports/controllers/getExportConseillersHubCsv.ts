@@ -115,7 +115,7 @@ const getStructureAndConseillerByDepartementHubAntillesGuyane =
 			},
 		]);
 
-const getExportConseillersCsv =
+const getExportConseillersHubCsv =
 	(app: Application) => async (req: IRequest, res: Response) => {
 		let conseillers: any;
 		try {
@@ -150,4 +150,4 @@ const getExportConseillersCsv =
 		generateCsvConseillersHub(conseillers, res);
 	};
 
-export default getExportConseillersCsv;
+export default getExportConseillersHubCsv;

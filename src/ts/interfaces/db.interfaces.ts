@@ -150,9 +150,8 @@ export interface IConseillers {
 
 	emailCN: {
 		address: string;
+		deleteMailboxCNError: boolean;
 	};
-
-	deleteMailboxCNError: boolean;
 
 	emailCNError: boolean;
 
