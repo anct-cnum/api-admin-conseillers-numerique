@@ -4,5 +4,5 @@ export type Roles =
 	| 'conseiller'
 	| 'prefet'
 	| 'grandReseau'
-	| 'hub'
+	| 'hub_coop'
 	| 'coordinateur_coop';

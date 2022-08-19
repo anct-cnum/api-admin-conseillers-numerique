@@ -28,7 +28,7 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 		case 'conseiller':
 			conseillerRules(user, can);
 			break;
-		case 'hub':
+		case 'hub_coop':
 			hubRules(user, can);
 			break;
 		default:
