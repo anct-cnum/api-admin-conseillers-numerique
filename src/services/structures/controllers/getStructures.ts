@@ -6,21 +6,21 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
 const getStructures =
-	(app: Application) => async (req: IRequest, res: Response) => {
-		try {
-			const structures: IStructures[] | IStructures = await app
-				.service(service.structures)
-				.Model.accessibleBy(req.ability, action.read)
-				.find();
+  (app: Application) => async (req: IRequest, res: Response) => {
+    try {
+      const structures: IStructures[] | IStructures = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .find();
 
-			res.status(200).json(structures);
-		} catch (error) {
-			if (error.name === 'ForbiddenError') {
-				res.status(403).json('Accès refusé');
-				return;
-			}
-			res.status(500).json(error.message);
-		}
-	};
+      res.status(200).json(structures);
+    } catch (error) {
+      if (error.name === 'ForbiddenError') {
+        res.status(403).json('Accès refusé');
+        return;
+      }
+      res.status(500).json(error.message);
+    }
+  };
 
 export default getStructures;

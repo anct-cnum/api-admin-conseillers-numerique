@@ -7,24 +7,24 @@ import service from '../../../helpers/services';
 import { generateCsvCandidat } from '../exports.repository';
 
 const getExportEmbauchesCsv =
-	(app: Application) => async (req: IRequest, res: Response) => {
-		let miseEnRelations: IMisesEnRelation[];
-		try {
-			miseEnRelations = await app
-				.service(service.misesEnRelation)
-				.Model.accessibleBy(req.ability, action.read)
-				.find({ statut: { $eq: 'finalisee' } })
-				.sort({ 'miseEnrelation.structure.oid': 1 });
-		} catch (error) {
-			if (error.name === 'ForbiddenError') {
-				res.status(401).json('Accès refusé');
-				return;
-			}
-			res.status(500).json(error.message);
-			return;
-		}
+  (app: Application) => async (req: IRequest, res: Response) => {
+    let miseEnRelations: IMisesEnRelation[];
+    try {
+      miseEnRelations = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({ statut: { $eq: 'finalisee' } })
+        .sort({ 'miseEnrelation.structure.oid': 1 });
+    } catch (error) {
+      if (error.name === 'ForbiddenError') {
+        res.status(401).json('Accès refusé');
+        return;
+      }
+      res.status(500).json(error.message);
+      return;
+    }
 
-		generateCsvCandidat(miseEnRelations, res, app);
-	};
+    generateCsvCandidat(miseEnRelations, res, app);
+  };
 
 export default getExportEmbauchesCsv;

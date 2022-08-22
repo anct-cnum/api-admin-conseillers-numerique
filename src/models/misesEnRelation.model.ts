@@ -9,32 +9,32 @@ const dbref = require('mongoose-dbref');
 const loaded = dbref.install(mongoose);
 
 export default function (app: Application): Model<any> {
-	const modelName = 'misesEnRelation';
-	const mongooseClient: Mongoose = app.get('mongooseClient');
-	const { DBRef } = mongoose.SchemaTypes;
-	const schema = new mongooseClient.Schema<IMisesEnRelation>(
-		{
-			conseiller: { type: DBRef },
+  const modelName = 'misesEnRelation';
+  const mongooseClient: Mongoose = app.get('mongooseClient');
+  const { DBRef } = mongoose.SchemaTypes;
+  const schema = new mongooseClient.Schema<IMisesEnRelation>(
+    {
+      conseiller: { type: DBRef },
 
-			structure: { type: DBRef },
+      structure: { type: DBRef },
 
-			conseillerCreatedAt: { type: Date },
+      conseillerCreatedAt: { type: Date },
 
-			createdAt: { type: Date },
+      createdAt: { type: Date },
 
-			distance: { type: Number },
+      distance: { type: Number },
 
-			statut: { type: String },
+      statut: { type: String },
 
-			conseillerObj: { type: Object },
+      conseillerObj: { type: Object },
 
-			structureObj: { type: Object },
-		},
-		{ strict: false, collection: 'misesEnRelation' },
-	);
+      structureObj: { type: Object },
+    },
+    { strict: false, collection: 'misesEnRelation' },
+  );
 
-	if (mongooseClient.modelNames().includes(modelName)) {
-		mongooseClient.deleteModel(modelName);
-	}
-	return mongooseClient.model(modelName, schema);
+  if (mongooseClient.modelNames().includes(modelName)) {
+    mongooseClient.deleteModel(modelName);
+  }
+  return mongooseClient.model(modelName, schema);
 }

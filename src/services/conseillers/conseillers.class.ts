@@ -6,19 +6,19 @@ import getConseillersGrandsReseaux from './controllers/getConseillersGrandsResea
 import createAbilities from '../../middleware/createAbilities';
 
 export default class Conseillers extends Service {
-	constructor(options: Partial<MongooseServiceOptions>, app: Application) {
-		super(options);
-		app.get(
-			'/conseillers',
-			authenticate('jwt'),
-			createAbilities,
-			getConseillers(app),
-		);
-		app.get(
-			'/conseillers-grands-reseaux',
-			authenticate('jwt'),
-			createAbilities,
-			getConseillersGrandsReseaux(app),
-		);
-	}
+  constructor(options: Partial<MongooseServiceOptions>, app: Application) {
+    super(options);
+    app.get(
+      '/conseillers',
+      authenticate('jwt'),
+      createAbilities,
+      getConseillers(app),
+    );
+    app.get(
+      '/conseillers-grands-reseaux',
+      authenticate('jwt'),
+      createAbilities,
+      getConseillersGrandsReseaux(app),
+    );
+  }
 }

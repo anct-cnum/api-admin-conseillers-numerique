@@ -6,10 +6,10 @@ import hubRules from './hubRules';
 import grandReseauRules from './grandReseauRules';
 
 export {
-	adminRules,
-	structureRules,
-	conseillerRules,
-	prefetRules,
-	grandReseauRules,
-	hubRules,
+  adminRules,
+  structureRules,
+  conseillerRules,
+  prefetRules,
+  grandReseauRules,
+  hubRules,
 };
