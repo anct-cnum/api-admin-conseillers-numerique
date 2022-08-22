@@ -8,13 +8,15 @@ import { generateCsvCandidatByStructure } from '../exports.repository';
 
 const getExportCandidatsByStructureCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let miseEnRelation: IMisesEnRelation[];
+    let misesEnRelation: IMisesEnRelation[];
 
     try {
-      miseEnRelation = await app
+      misesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
-        .find({ statut: { $ne: 'finalisee_non_disponible' } })
+        .find({
+          statut: { $nin: ['finalisee_non_disponible', 'non_disponible'] },
+        })
         .collation({ locale: 'fr' })
         .sort({ 'conseillerObj.nom': 1, 'conseillerObj.prenom': 1 });
     } catch (error) {
@@ -25,7 +27,7 @@ const getExportCandidatsByStructureCsv =
       res.status(500).json(error.message);
       return;
     }
-    generateCsvCandidatByStructure(miseEnRelation, res, app);
+    generateCsvCandidatByStructure(misesEnRelation, res, app);
   };
 
 export default getExportCandidatsByStructureCsv;

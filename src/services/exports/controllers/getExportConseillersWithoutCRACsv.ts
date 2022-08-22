@@ -59,7 +59,7 @@ const getExportConseillersWithoutCRACsv =
         },
       ]);
       if (conseillers.length < 1) {
-        res.status(404).send(new NotFound('Aucun conseillers'));
+        res.status(404).send(new NotFound('Aucun conseiller'));
         return;
       }
     } catch (error) {

@@ -22,7 +22,7 @@ const findNumDepartementsByRegion = (hubRegion: string[]): Array<string> => {
 };
 
 const getStructureAndConseillerByDepartement =
-  (app) => async (departementsHub: Array<string>) =>
+  (app: Application) => async (departementsHub: Array<string>) =>
     app.service(service.structures).Model.aggregate([
       {
         $match: {
@@ -62,7 +62,7 @@ const getStructureAndConseillerByDepartement =
     ]);
 
 const getStructureAndConseillerByDepartementHubAntillesGuyane =
-  (app) => async (departementsHub: Array<string>) =>
+  (app: Application) => async (departementsHub: Array<string>) =>
     app.service(service.structures).Model.aggregate([
       {
         $match: {

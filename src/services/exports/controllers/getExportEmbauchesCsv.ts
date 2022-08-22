@@ -8,12 +8,12 @@ import { generateCsvCandidat } from '../exports.repository';
 
 const getExportEmbauchesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let miseEnRelations: IMisesEnRelation[];
+    let misesEnRelations: IMisesEnRelation[];
     try {
-      miseEnRelations = await app
+      misesEnRelations = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
-        .find({ statut: { $eq: 'finalisee' } })
+        .find({ statut: { $in: ['finalisee', 'nouvelle_rupture'] } })
         .sort({ 'miseEnrelation.structure.oid': 1 });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
@@ -24,7 +24,7 @@ const getExportEmbauchesCsv =
       return;
     }
 
-    generateCsvCandidat(miseEnRelations, res, app);
+    generateCsvCandidat(misesEnRelations, res, app);
   };
 
 export default getExportEmbauchesCsv;

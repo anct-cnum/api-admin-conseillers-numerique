@@ -73,6 +73,8 @@ export interface IMisesEnRelation {
   dateRupture: Date | undefined;
 
   motifRupture: string | undefined;
+
+  emetteurRupture: string | undefined;
 }
 export interface IConseillers {
   idPG: number;

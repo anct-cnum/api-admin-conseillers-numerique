@@ -29,7 +29,7 @@ const structureByMisesEnRelation = async (
 ) => app.service(service.structures).Model.findOne({ _id: idStructure });
 
 const generateCsvCandidat = async (
-  miseEnRelations: IMisesEnRelation[],
+  misesEnRelations: IMisesEnRelation[],
   res: Response,
   app: Application,
 ) => {
@@ -38,7 +38,7 @@ const generateCsvCandidat = async (
   );
   try {
     await Promise.all(
-      miseEnRelations.map(async (miseEnrelation) => {
+      misesEnRelations.map(async (miseEnrelation) => {
         const conseiller: IConseillers = await conseillerByMisesEnRelation(
           miseEnrelation.conseiller.oid,
           app,
@@ -83,14 +83,14 @@ const generateCsvCandidat = async (
 };
 
 const generateCsvCandidatByStructure = async (
-  miseEnRelations: IMisesEnRelation[],
+  misesEnRelations: IMisesEnRelation[],
   res: Response,
   app: Application,
 ) => {
   const promises = [];
   res.write('Nom;Prénom;Email;Code postal;Expérience;Test PIX;CV\n');
   try {
-    for (const miseEnrelation of miseEnRelations) {
+    for (const miseEnrelation of misesEnRelations) {
       promises.push(
         new Promise<void>((resolve) => {
           conseillerByMisesEnRelation(miseEnrelation.conseiller.oid, app).then(
@@ -300,7 +300,7 @@ const generateCsvStructure = async (
               : ''
           };"${adresse}";${
             structure?.insee?.entreprise?.forme_juridique ?? ''
-          };${structure?.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''}\n`,
+          };${structure.reseau ? 'oui' : 'non'};${structure.reseau ?? ''}\n`,
         );
       }),
     );
@@ -314,7 +314,7 @@ const generateCsvStructure = async (
 };
 
 const generateCsvRupture = async (
-  miseEnRelations: IMisesEnRelation[],
+  misesEnRelations: IMisesEnRelation[],
   res: Response,
   app: Application,
 ) => {
@@ -323,7 +323,7 @@ const generateCsvRupture = async (
   );
   try {
     await Promise.all(
-      miseEnRelations.map(async (miseEnrelation) => {
+      misesEnRelations.map(async (miseEnrelation) => {
         const conseiller: IConseillers = await conseillerByMisesEnRelation(
           miseEnrelation.conseiller.oid,
           app,

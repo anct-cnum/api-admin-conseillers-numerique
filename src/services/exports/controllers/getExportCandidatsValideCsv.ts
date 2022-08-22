@@ -8,9 +8,9 @@ import { generateCsvCandidat } from '../exports.repository';
 
 const getExportCandidatsValideStructureCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let miseEnRelations: IMisesEnRelation[];
+    let misesEnRelations: IMisesEnRelation[];
     try {
-      miseEnRelations = await app
+      misesEnRelations = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .find({ statut: { $eq: 'recrutee' } })
@@ -24,7 +24,7 @@ const getExportCandidatsValideStructureCsv =
       return;
     }
 
-    generateCsvCandidat(miseEnRelations, res, app);
+    generateCsvCandidat(misesEnRelations, res, app);
   };
 
 export default getExportCandidatsValideStructureCsv;
