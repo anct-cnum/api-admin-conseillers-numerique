@@ -46,7 +46,7 @@ const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null);
 
 export default function createAbilities(req: IRequest, res: Response, next) {
   req.ability = req.user?.name
-    ? defineAbilitiesFor(req.user, req.body.roleActivated)
+    ? defineAbilitiesFor(req.user, req.query.role as Roles)
     : ANONYMOUS_ABILITY;
   next();
 }
