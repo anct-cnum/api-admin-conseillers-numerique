@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import dayjs from 'dayjs';
-import { NotFound } from '@feathersjs/errors';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
@@ -59,15 +58,18 @@ const getExportConseillersWithoutCRACsv =
         },
       ]);
       if (conseillers.length < 1) {
-        res.status(404).send(new NotFound('Aucun conseiller'));
+        res.statusMessage = 'Aucun conseiller';
+        res.status(404).end();
         return;
       }
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(401).json('Accès refusé');
+        res.statusMessage = 'Accès refusé';
+        res.status(403).end();
         return;
       }
-      res.status(500).json(error.message);
+      res.statusMessage = error.message;
+      res.status(500).end();
       return;
     }
     generateCsvConseillersWithoutCRA(conseillers, res);

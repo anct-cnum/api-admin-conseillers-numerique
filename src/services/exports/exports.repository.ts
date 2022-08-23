@@ -75,10 +75,9 @@ const generateCsvCandidat = async (
     );
     res.end();
   } catch (error) {
-    res.destroy();
-    res
-      .status(400)
-      .json("Une erreur s'est produite au niveau de la création du csv");
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(400).end();
   }
 };
 
@@ -111,10 +110,9 @@ const generateCsvCandidatByStructure = async (
     await Promise.all(promises);
     res.end();
   } catch (error) {
-    res.destroy();
-    res
-      .status(400)
-      .json("Une erreur s'est produite au niveau de la création du csv");
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(400).end();
   }
 };
 
@@ -129,7 +127,7 @@ const formatAdresseStructure = (insee) => {
     insee?.etablissement?.adresse?.localite ?? ''
   }`;
 
-  return adresse.replace(/["']/g, '');
+  return adresse.replace(/["',]/g, '');
 };
 
 const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
@@ -150,10 +148,9 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
     }
     res.end();
   } catch (error) {
-    res.destroy();
-    res
-      .status(400)
-      .json("Une erreur s'est produite au niveau de la création du csv");
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(400).end();
   }
 };
 
@@ -213,10 +210,9 @@ const generateCsvConseillersWithoutCRA = async (
     );
     res.end();
   } catch (error) {
-    res.destroy();
-    res
-      .status(400)
-      .json("Une erreur s'est produite au niveau de la création du csv");
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(400).end();
   }
 };
 
@@ -264,15 +260,15 @@ const generateCsvStructure = async (
           structure?.insee?.etablissement?.adresse?.localite ?? ''
         }`;
 
-        adresse = adresse.replace(/["']/g, '');
+        adresse = adresse.replace(/["',]/g, '');
         res.write(
           `${structure.siret};${structure.idPG};${structure.nom};${
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
           };${structure.statut};${structure.codePostal};${
             structure.codeCommune
           };${structure.codeDepartement};${structure.codeRegion};${
-            structure?.contact?.telephone
-          };${structure?.contact?.email};${
+            structure.contact?.telephone
+          };${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${
             user !== null && user.passwordCreated ? 'oui' : 'non'
@@ -287,29 +283,28 @@ const generateCsvStructure = async (
           };${structure.estZRR ? 'oui' : 'non'};${
             structure.qpvStatut ?? 'Non défini'
           };${structure?.qpvListe ? structure.qpvListe.length : 0};${label};${
-            structure?.insee?.entreprise?.raison_sociale
-              ? structure?.insee?.entreprise?.raison_sociale
+            structure.insee?.entreprise?.raison_sociale
+              ? structure.insee?.entreprise?.raison_sociale
               : ''
           };${
-            structure?.insee?.etablissement?.commune_implantation?.value
-              ? structure?.insee?.etablissement?.commune_implantation?.value
+            structure.insee?.etablissement?.commune_implantation?.value
+              ? structure.insee?.etablissement?.commune_implantation?.value
               : ''
           };${
-            structure?.insee?.etablissement?.commune_implantation?.code
-              ? structure?.insee?.etablissement?.commune_implantation?.code
+            structure.insee?.etablissement?.commune_implantation?.code
+              ? structure.insee?.etablissement?.commune_implantation?.code
               : ''
           };"${adresse}";${
-            structure?.insee?.entreprise?.forme_juridique ?? ''
+            structure.insee?.entreprise?.forme_juridique ?? ''
           };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''}\n`,
         );
       }),
     );
     res.end();
   } catch (error) {
-    res.destroy();
-    res
-      .status(400)
-      .json("Une erreur s'est produite au niveau de la création du csv");
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(400).end();
   }
 };
 
@@ -343,10 +338,9 @@ const generateCsvRupture = async (
     );
     res.end();
   } catch (error) {
-    res.destroy();
-    res
-      .status(400)
-      .json("Une erreur s'est produite au niveau de la création du csv");
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(400).end();
   }
 };
 

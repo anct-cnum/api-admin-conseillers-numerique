@@ -16,10 +16,12 @@ const getExportStructuresCsv =
         .find();
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(401).json('Accès refusé');
+        res.statusMessage = 'Accès refusé';
+        res.status(403).end();
         return;
       }
-      res.status(500).json(error.message);
+      res.statusMessage = error.message;
+      res.status(500).end();
       return;
     }
     generateCsvStructure(structures, res, app);
