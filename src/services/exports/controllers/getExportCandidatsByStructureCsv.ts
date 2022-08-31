@@ -4,23 +4,21 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { generateCsvCandidat } from '../exports.repository';
+import { generateCsvCandidatByStructure } from '../exports.repository';
 
-const getExportJeRecruteCsv =
+const getExportCandidatsByStructureCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let miseEnRelations: IMisesEnRelation[];
+    let misesEnRelation: IMisesEnRelation[];
+
     try {
-      miseEnRelations = await app
+      misesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .find({
-          $or: [
-            { statut: { $eq: 'recrutee' } },
-            { statut: { $eq: 'finalisee' } },
-            { statut: { $eq: 'nouvelle_rupture' } },
-          ],
+          statut: { $nin: ['finalisee_non_disponible', 'non_disponible'] },
         })
-        .sort({ 'miseEnrelation.structure.oid': 1 });
+        .collation({ locale: 'fr' })
+        .sort({ 'conseillerObj.nom': 1, 'conseillerObj.prenom': 1 });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.statusMessage = 'Accès refusé';
@@ -31,7 +29,7 @@ const getExportJeRecruteCsv =
       res.status(500).end();
       return;
     }
-    generateCsvCandidat(miseEnRelations, res, app);
+    generateCsvCandidatByStructure(misesEnRelation, res, app);
   };
 
-export default getExportJeRecruteCsv;
+export default getExportCandidatsByStructureCsv;

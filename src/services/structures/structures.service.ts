@@ -6,17 +6,17 @@ import Structures from './structures.class';
 
 // Add this service to the service type index
 declare module '../../declarations' {
-	interface ServiceTypes {
-		structures: Structures & ServiceAddons<any>;
-	}
+  interface ServiceTypes {
+    structures: Structures & ServiceAddons<any>;
+  }
 }
 
 export default function (app: Application): void {
-	const options = {
-		Model: createModel(app),
-		paginate: app.get('paginate'),
-	};
+  const options = {
+    Model: createModel(app),
+    paginate: app.get('paginate'),
+  };
 
-	// Initialize our service with any options it requires
-	app.use('structures', new Structures(options, app));
+  // Initialize our service with any options it requires
+  app.use('structures', new Structures(options, app));
 }
