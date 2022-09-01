@@ -1,9 +1,8 @@
-import { AnyMongoAbility } from '@casl/ability';
 import { Request } from 'express';
 import { IUser } from './db.interfaces';
 
 export interface IRequest extends Request {
-	ability: AnyMongoAbility;
+	ability: any;
 	user?: IUser;
 }
 

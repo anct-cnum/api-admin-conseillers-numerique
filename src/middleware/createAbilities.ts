@@ -13,7 +13,7 @@ import {
 	coordinateurRules,
 } from '../helpers/accessControl/rules';
 
-function defineAbilitiesFor(user: IUser, role: Roles) {
+async function defineAbilitiesFor(user: IUser, role: Roles) {
 	const { can, build } = new AbilityBuilder(Ability);
 
 	switch (role) {
@@ -30,10 +30,10 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 			conseillerRules(user, can);
 			break;
 		case 'grandReseau':
-			grandReseauRules(user, can);
+			await grandReseauRules(user, can);
 			break;
 		case 'coordinateur_coop':
-			coordinateurRules(user, can);
+			await coordinateurRules(user, can);
 			break;
 		default:
 			break;
@@ -44,9 +44,13 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 
 const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null);
 
-export default function createAbilities(req: IRequest, res: Response, next) {
+export default async function createAbilities(
+	req: IRequest,
+	res: Response,
+	next,
+) {
 	req.ability = req.user?.name
-		? defineAbilitiesFor(req.user, req.body.roleActivated)
+		? await defineAbilitiesFor(req.user, req.body.roleActivated)
 		: ANONYMOUS_ABILITY;
 	next();
 }

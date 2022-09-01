@@ -1,15 +1,34 @@
 import { action, ressource } from '../accessList';
-import { IUser } from '../../../ts/interfaces/db.interfaces';
+import { IUser, IConseillers } from '../../../ts/interfaces/db.interfaces';
+import app from '../../../app';
 
-export default function coordinateurRules(user: IUser, can) {
-	// Restreindre les permissions : les coordinateurs ne peuvent voir que les informations correspondant à leur profil conseiller
-	switch (user.entity.collection) {
-		case 'conseillers':
-			can([action.read], ressource.conseillers, {
-				_id: user.entity.oid,
-			});
-			break;
-		default:
-			break;
+const getConseillers = async (userId: string): Promise<IConseillers> => {
+	let conseiller: IConseillers;
+
+	try {
+		conseiller = await app
+			.service('conseillers')
+			.Model.findOne({ _id: userId });
+	} catch (error) {
+		throw new Error(error);
 	}
+	return conseiller;
+};
+
+export default async function coordinateurRules(
+	user: IUser,
+	can,
+): Promise<any> {
+	// Restreindre les permissions : les coordinateurs ne peuvent voir que les informations correspondant à leur profil conseiller
+	let listeSubordonnesIds: string[];
+	let conseiller: IConseillers;
+	try {
+		conseiller = await getConseillers(user.entity.oid);
+		listeSubordonnesIds = conseiller.listeSubordonnes.liste;
+	} catch (error) {
+		throw new Error(error);
+	}
+	can([action.read], ressource.conseillers, {
+		_id: { $in: listeSubordonnesIds },
+	});
 }
