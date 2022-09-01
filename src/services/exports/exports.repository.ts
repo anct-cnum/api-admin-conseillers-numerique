@@ -13,7 +13,7 @@ import {
 
 const formatDate = (date: Date) => {
   if (date !== undefined) {
-    return dayjs(date).format('DD/MM/YYYY');
+    return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
 };
