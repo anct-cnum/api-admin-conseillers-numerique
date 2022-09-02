@@ -1,25 +1,21 @@
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+import service from '../../services';
+import app from '../../../app';
 
-export default function grandReseauRules(user: IUser, can) {
+export default async function grandReseauRules(user: IUser, can): Promise<any> {
   // Restreindre les permissions : les grands réseau ne peuvent voir que les informations des structures appartenant à leur organisation
-  switch (user.reseau) {
-    case 'Croix-Rouge':
-      can([action.read], ressource.structures, {
-        reseau: 'Croix-Rouge',
-      });
-      break;
-    case 'Emmaüs Connect':
-      can([action.read], ressource.structures, {
-        reseau: 'Emmaüs Connect',
-      });
-      break;
-    case 'Groupe SOS':
-      can([action.read], ressource.structures, {
-        reseau: 'Groupe SOS',
-      });
-      break;
-    default:
-      break;
+  let structuresIds: string[];
+  try {
+    structuresIds = await app
+      .service(service.structures)
+      .Model.find({ reseau: user.reseau })
+      .distinct('_id');
+  } catch (error) {
+    throw new Error(error);
   }
+
+  can([action.read], ressource.conseillers, {
+    structureId: { $in: structuresIds },
+  });
 }

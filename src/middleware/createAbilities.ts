@@ -11,9 +11,10 @@ import {
   prefetRules,
   hubRules,
   grandReseauRules,
+  coordinateurRules,
 } from '../helpers/accessControl/rules';
 
-function defineAbilitiesFor(user: IUser, role: Roles) {
+async function defineAbilitiesFor(user: IUser, role: Roles) {
   const { can, build } = new AbilityBuilder(Ability);
 
   switch (role) {
@@ -33,7 +34,10 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
       hubRules(user, can);
       break;
     case 'grandReseau':
-      grandReseauRules(user, can);
+      await grandReseauRules(user, can);
+      break;
+    case 'coordinateur_coop':
+      await coordinateurRules(user, can);
       break;
     default:
       break;
@@ -44,9 +48,13 @@ function defineAbilitiesFor(user: IUser, role: Roles) {
 
 const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null);
 
-export default function createAbilities(req: IRequest, res: Response, next) {
+export default async function createAbilities(
+  req: IRequest,
+  res: Response,
+  next,
+) {
   req.ability = req.user?.name
-    ? defineAbilitiesFor(req.user, req.query.role as Roles)
+    ? await defineAbilitiesFor(req.user, req.query.role as Roles)
     : ANONYMOUS_ABILITY;
   next();
 }
