@@ -195,6 +195,11 @@ export interface IConseillers {
 
   groupeCRAHistorique: object[];
 
+  listeSubordonnes: {
+    type: string;
+    liste: ObjectId[];
+  };
+
   unsubscribeExtras: object;
 
   pix: {
