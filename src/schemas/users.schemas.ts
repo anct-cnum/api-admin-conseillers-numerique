@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi');
 
-const updateCandidate = Joi.object({
+export const updateCandidate = Joi.object({
 	prenom: Joi.string().required().messages({
 		'string.empty': 'champ "prénom" requis',
 	}),
@@ -18,6 +18,8 @@ const updateCandidate = Joi.object({
 	}),
 });
 
-module.exports = {
-	updateCandidate,
-};
+export const createUserPrefet = Joi.object({
+		email: Joi.string().required().email().error(new Error("Le format de l'email est invalide")),
+    departement: Joi.string().max(3).error(new Error('Le code département est invalide')),
+    region: Joi.string().max(3).error(new Error('Le code région est invalide'))
+  }).min(2);

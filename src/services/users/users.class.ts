@@ -5,6 +5,7 @@ import getAccessibleData from './controllers/getAccessibleData';
 import getAccessibleDataAggregate from './controllers/getAccessibleDataAggregate';
 import updateAccessibleData from './controllers/updateAccessibleData';
 import createAbilities from '../../middleware/createAbilities';
+import postInvitation from './controllers/postInvitationPrefet';
 
 export default class Users extends Service {
 	constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -26,6 +27,12 @@ export default class Users extends Service {
 			authenticate('jwt'),
 			createAbilities,
 			updateAccessibleData(app),
+		);
+    app.post(
+			'/inviteAccountsPrefet',
+			authenticate('jwt'),
+      createAbilities,
+      postInvitation(app)
 		);
 	}
 }
