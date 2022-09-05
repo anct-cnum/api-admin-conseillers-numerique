@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 /* eslint-disable no-unused-vars */
 import { Types } from 'mongoose';
 import { Reseau } from '../types';
@@ -9,262 +11,321 @@ const loaded = dbref.install(mongoose);
 const { DBRef } = mongoose.SchemaTypes;
 
 export interface IUser {
-	name: string;
+  _id: ObjectId;
 
-	password: string;
+  name: string;
 
-	roles: string[];
+  password: string;
 
-	roleActivated: string;
+  roles: string[];
 
-	entity: typeof DBRef;
+  roleActivated: string;
 
-	token: string;
+  entity: typeof DBRef;
 
-	resend: boolean;
+  token: string;
 
-	mailAModifier: string;
+  resend: boolean;
 
-	mailConfirmError: string;
+  mailAModifier: string;
 
-	mailConfirmErrorDetail: string;
+  mailConfirmError: string;
 
-	departement: string;
+  mailConfirmErrorDetail: string;
 
-	region: string;
+  departement: string;
 
-	reseau: Reseau;
+  region: string;
 
-	mailCoopSent: boolean;
+  reseau: Reseau;
 
-	mailSentDate?: Date;
+  mailCoopSent: boolean;
 
-	tokenCreatedAt?: Date;
+  mailSentDate?: Date;
 
-	passwordCreated?: boolean;
+  tokenCreatedAt?: Date;
 
-	timestamps?: boolean;
+  passwordCreated?: boolean;
+
+  timestamps?: boolean;
+
+  hub?: string;
 }
-export interface IMiseEnRelation {
-	conseiller: typeof DBRef;
+export interface IMisesEnRelation {
+  conseiller: typeof DBRef;
 
-	structure: typeof DBRef;
+  structure: typeof DBRef;
 
-	conseillerCreatedAt: Date;
+  conseillerCreatedAt: Date;
 
-	createdAt: Date;
+  createdAt: Date;
 
-	distance: number;
+  distance: number;
 
-	statut: string;
+  statut: string;
 
-	conseillerObj: object;
+  conseillerObj: object;
 
-	structureObj: object;
+  structureObj: object;
 
-	dateRecrutement: Date;
+  dateRecrutement: Date;
+
+  dateRupture: Date | undefined;
+
+  motifRupture: string | undefined;
+
+  emetteurRupture: string | undefined;
 }
 export interface IConseillers {
-	idPG: number;
+  idPG: number;
 
-	password: string;
+  password: string;
 
-	prenom: string;
+  prenom: string;
 
-	nom: string;
+  nom: string;
 
-	email: string;
+  email: string;
 
-	telephone: string;
+  telephone: string;
 
-	distanceMax: number;
+  distanceMax: number;
 
-	disponible: boolean;
+  disponible: boolean;
 
-	createdAt: Date;
+  createdAt: Date;
 
-	dateDisponibilite: Date;
+  dateDisponibilite: Date;
 
-	estDemandeurEmploi: boolean;
+  estDemandeurEmploi: boolean;
 
-	estEnEmploi: boolean;
+  estEnEmploi: boolean;
 
-	estEnFormation: boolean;
+  estEnFormation: boolean;
 
-	estDiplomeMedNum: boolean;
+  estDiplomeMedNum: boolean;
 
-	nomDiplomeMedNum: string;
+  nomDiplomeMedNum: string;
 
-	aUneExperienceMedNum: boolean;
+  aUneExperienceMedNum: boolean;
 
-	codePostal: string;
+  codePostal: string;
 
-	location: {
-		structure: string;
-		coordinates: string;
-	};
+  location: {
+    structure: string;
+    coordinates: string;
+  };
 
-	nomCommune: string;
+  nomCommune: string;
 
-	codeCommune: string;
+  codeCommune: string;
 
-	codeDepartement: string;
+  codeDepartement: string;
 
-	codeRegion: string;
+  codeRegion: string;
 
-	emailConfirmedAt: Date;
+  emailConfirmedAt: Date;
 
-	emailConfirmationKey: string;
+  emailConfirmationKey: string;
 
-	unsubscribedAt: Date;
+  unsubscribedAt: Date;
 
-	userCreated: boolean;
+  userCreated: boolean;
 
-	sondageToken: string;
+  sondageToken: string;
 
-	sondageSentAt: Date;
+  sondageSentAt: Date;
 
-	structureId?: Types.ObjectId;
+  structureId?: Types.ObjectId;
 
-	codeCom: Date;
+  codeCom: Date;
 
-	mattermost: {
-		error: boolean;
+  mattermost: {
+    error: boolean;
 
-		login: String;
+    login: String;
 
-		id: string;
+    id: string;
 
-		hubJoined: boolean;
-	};
+    hubJoined: boolean;
+  };
 
-	emailCN: {
-		address: string;
-		deleteMailboxCNError: boolean;
-	};
+  emailCN: {
+    address: string;
+    deleteMailboxCNError: boolean;
+  };
 
-	emailCNError: boolean;
+  emailCNError: boolean;
 
-	resetPasswordCNError: boolean;
+  resetPasswordCNError: boolean;
 
-	statut: string;
+  statut: string;
 
-	datePrisePoste: Date;
+  datePrisePoste: Date;
 
-	dateFinFormation: Date;
+  dateFinFormation: Date;
 
-	dateDeNaissance: string;
+  dateDeNaissance: string;
 
-	sexe: string;
+  sexe: string;
 
-	historique: object[];
+  historique: object[];
 
-	cv: {
-		structure: {
-			file: string;
-			extension: string;
-			date: Date;
-		};
-	};
+  cv: {
+    structure: {
+      file: string;
+      extension: string;
+      date: Date;
+    };
+  };
 
-	telephonePro: number;
+  telephonePro: number;
 
-	emailPro: string;
+  emailPro: string;
 
-	groupeCRA: number;
+  groupeCRA: number;
 
-	mailProAModifier: string;
+  mailProAModifier: string;
 
-	tokenChangementMailPro: string;
+  tokenChangementMailPro: string;
 
-	tokenChangementMailProCreatedAt: Date;
+  tokenChangementMailProCreatedAt: Date;
 
-	estCoordinateur: boolean;
+  estCoordinateur: boolean;
 
-	groupeCRAHistorique: object[];
+  groupeCRAHistorique: object[];
 
-	unsubscribeExtras: object;
+  listeSubordonnes: {
+    type: string;
+    liste: ObjectId[];
+  };
 
-	pix: {
-		partage: boolean;
+  unsubscribeExtras: object;
 
-		datePartage: Date;
+  pix: {
+    partage: boolean;
 
-		palier: number;
+    datePartage: Date;
 
-		competence1: boolean;
+    palier: number;
 
-		competence2: boolean;
+    competence1: boolean;
 
-		competence3: boolean;
-	};
+    competence2: boolean;
+
+    competence3: boolean;
+  };
 }
 
 export interface IStructures {
-	idPG: number;
+  _id: ObjectId;
 
-	type: string;
+  idPG: number;
 
-	statut: string;
+  type: string;
 
-	nom: string;
+  statut: string;
 
-	siret: string;
+  nom: string;
 
-	aIdentifieCandidat: boolean;
+  siret: string;
 
-	dateDebutMission: Date;
+  aIdentifieCandidat: boolean;
 
-	nombreConseillersSouhaites: number;
+  dateDebutMission: Date;
 
-	estLabelliseFranceServices: string;
+  nombreConseillersSouhaites: number;
 
-	codePostal: string;
+  estLabelliseFranceServices: string;
 
-	location: {
-		structure: string;
-		coordinates: string;
-	};
+  codePostal: string;
 
-	nomCommune: string;
+  location: {
+    structure: string;
+    coordinates: string;
+  };
 
-	codeCommune: string;
+  nomCommune: string;
 
-	codeDepartement: string;
+  codeCommune: string;
 
-	codeRegion: string;
+  codeDepartement: string;
 
-	emailConfirmedAt: Date;
+  codeRegion: string;
 
-	emailConfirmationKey: string;
+  emailConfirmedAt: Date;
 
-	unsubscribedAt: Date;
+  emailConfirmationKey: string;
 
-	unsubscribeExtras: object;
+  unsubscribedAt: Date;
 
-	createdAt: Date;
+  unsubscribeExtras: object;
 
-	updatedAt: Date;
+  createdAt: Date;
 
-	validatedAt: Date;
+  updatedAt: Date;
 
-	importedAt: Date;
+  validatedAt: Date;
 
-	deleted_at: Date;
+  importedAt: Date;
 
-	userCreated: boolean;
+  deleted_at: Date;
 
-	coselecAt: Date;
+  userCreated: boolean;
 
-	contact: {
-		prenom: string;
+  coselecAt: Date;
 
-		nom: string;
+  contact: {
+    prenom: string;
 
-		fonction: string;
+    nom: string;
 
-		email: string;
+    fonction: string;
 
-		telephone: string;
-	};
+    email: string;
+
+    telephone: string;
+  };
+  insee: {
+    etablissement: IEtablissement;
+    entreprise: IEntreprise;
+  };
+  estZRR: boolean;
+  qpvStatut: string;
+  qpvListe: Array<object>;
+  reseau: boolean;
+}
+
+interface IEtablissement {
+  siege_social: boolean;
+  siret: string;
+  naf: string;
+  libelle_naf: string;
+  date_mise_a_jour: number;
+  commune_implantation: {
+    code: string;
+    value: string;
+  };
+  adresse: {
+    l1: string;
+    l2: string;
+    l3: string;
+    l4: string;
+    l5: string;
+    l6: string;
+    l7: string;
+    numero_voie: string;
+    type_voie: string;
+    nom_voie: string;
+    complement_adresse: string;
+    code_postal: string;
+    localite: string;
+  };
+}
+
+interface IEntreprise {
+  siren: string;
+  numero_tva_intracommunautaire: string;
+  forme_juridique: string;
+  raison_sociale: string;
 }

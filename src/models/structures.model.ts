@@ -9,71 +9,71 @@ const dbref = require('mongoose-dbref');
 const loaded = dbref.install(mongoose);
 
 export default function (app: Application): Model<any> {
-	const modelName = 'structures';
-	const mongooseClient: Mongoose = app.get('mongooseClient');
-	const { Schema } = mongooseClient;
-	const schema = new Schema<IStructures>(
-		{
-			idPG: { type: Number },
+  const modelName = 'structures';
+  const mongooseClient: Mongoose = app.get('mongooseClient');
+  const { Schema } = mongooseClient;
+  const schema = new Schema<IStructures>(
+    {
+      idPG: { type: Number },
 
-			type: { type: String },
+      type: { type: String },
 
-			statut: { type: String },
+      statut: { type: String },
 
-			nom: { type: String },
+      nom: { type: String },
 
-			siret: { type: String },
+      siret: { type: String },
 
-			aIdentifieCandidat: { type: Boolean },
+      aIdentifieCandidat: { type: Boolean },
 
-			dateDebutMission: { type: Date },
+      dateDebutMission: { type: Date },
 
-			nombreConseillersSouhaites: { type: Number },
+      nombreConseillersSouhaites: { type: Number },
 
-			estLabelliseFranceServices: { type: String },
+      estLabelliseFranceServices: { type: String },
 
-			codePostal: { type: String },
+      codePostal: { type: String },
 
-			location: {
-				type: String,
-				coordinates: Array,
-			},
+      location: {
+        type: String,
+        coordinates: Array,
+      },
 
-			nomCommune: { type: String },
+      nomCommune: { type: String },
 
-			codeCommune: { type: String },
+      codeCommune: { type: String },
 
-			codeDepartement: { type: String },
+      codeDepartement: { type: String },
 
-			codeRegion: { type: String },
+      codeRegion: { type: String },
 
-			emailConfirmedAt: { type: Date },
+      emailConfirmedAt: { type: Date },
 
-			emailConfirmationKey: { type: String },
+      emailConfirmationKey: { type: String },
 
-			unsubscribedAt: { type: Date },
+      unsubscribedAt: { type: Date },
 
-			unsubscribeExtras: { type: Object },
+      unsubscribeExtras: { type: Object },
 
-			createdAt: { type: Date },
+      createdAt: { type: Date },
 
-			updatedAt: { type: Date },
+      updatedAt: { type: Date },
 
-			validatedAt: { type: Date },
+      validatedAt: { type: Date },
 
-			importedAt: { type: Date },
+      importedAt: { type: Date },
 
-			deleted_at: { type: Date },
+      deleted_at: { type: Date },
 
-			userCreated: { type: Boolean },
+      userCreated: { type: Boolean },
 
-			coselecAt: { type: Date },
-		},
-		{ strict: false },
-	);
+      coselecAt: { type: Date },
+    },
+    { strict: false },
+  );
 
-	if (mongooseClient.modelNames().includes(modelName)) {
-		mongooseClient.deleteModel(modelName);
-	}
-	return mongooseClient.model(modelName, schema);
+  if (mongooseClient.modelNames().includes(modelName)) {
+    mongooseClient.deleteModel(modelName);
+  }
+  return mongooseClient.model(modelName, schema);
 }

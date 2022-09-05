@@ -9,49 +9,49 @@ const dbref = require('mongoose-dbref');
 const loaded = dbref.install(mongoose);
 
 export default function (app: Application): Model<any> {
-	const modelName = 'users';
-	const mongooseClient: Mongoose = app.get('mongooseClient');
-	const { DBRef } = mongoose.SchemaTypes;
-	const { Schema } = mongooseClient;
-	const schema = new Schema<IUser>(
-		{
-			name: { type: String, required: true },
+  const modelName = 'users';
+  const mongooseClient: Mongoose = app.get('mongooseClient');
+  const { DBRef } = mongoose.SchemaTypes;
+  const { Schema } = mongooseClient;
+  const schema = new Schema<IUser>(
+    {
+      name: { type: String, required: true },
 
-			password: { type: String },
+      password: { type: String },
 
-			roles: [String],
+      roles: [String],
 
-			entity: { type: DBRef },
+      entity: { type: DBRef },
 
-			token: { type: String },
+      token: { type: String },
 
-			departement: { type: String },
+      departement: { type: String },
 
-			region: { type: String },
+      region: { type: String },
 
-			reseau: { type: String },
+      reseau: { type: String },
 
-			resend: { type: Boolean },
+      resend: { type: Boolean },
 
-			mailAModifier: { type: String },
+      mailAModifier: { type: String },
 
-			mailConfirmError: { type: String },
+      mailConfirmError: { type: String },
 
-			mailConfirmErrorDetail: { type: String },
+      mailConfirmErrorDetail: { type: String },
 
-			mailCoopSent: { type: Boolean },
+      mailCoopSent: { type: Boolean },
 
-			mailSentDate: { type: Date },
+      mailSentDate: { type: Date },
 
-			tokenCreatedAt: { type: Date },
+      tokenCreatedAt: { type: Date },
 
-			passwordCreated: { type: Boolean },
-		},
-		{ strict: false },
-	);
+      passwordCreated: { type: Boolean },
+    },
+    { strict: false },
+  );
 
-	if (mongooseClient.modelNames().includes(modelName)) {
-		mongooseClient.deleteModel(modelName);
-	}
-	return mongooseClient.model(modelName, schema);
+  if (mongooseClient.modelNames().includes(modelName)) {
+    mongooseClient.deleteModel(modelName);
+  }
+  return mongooseClient.model(modelName, schema);
 }
