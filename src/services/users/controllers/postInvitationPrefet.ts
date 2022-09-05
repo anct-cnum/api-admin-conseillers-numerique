@@ -11,6 +11,7 @@ const postInvitationPrefet =
 		try {
 			let body = req.body;
 			delete body.roleActivated;
+      const { email, ...localite } = body;
 			const canCreate = req.ability.can(action.create, ressource.users);
 			if (!canCreate) {
 				res
@@ -34,6 +35,7 @@ const postInvitationPrefet =
 				mailSentDate: null,
 				passwordCreated: false,
 				createdAt: new Date(),
+        ...localite,
 			});
 			// partie envoie de l'email
 			res.status(200).json(`Le préfet ${body.email} a bien été invité `);
