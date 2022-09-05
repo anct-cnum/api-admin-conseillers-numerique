@@ -3,163 +3,163 @@ import { Application } from '../declarations';
 import { IConseillers } from '../ts/interfaces/db.interfaces';
 
 export default function (app: Application): Model<any> {
-	const modelName = 'conseillers';
-	const mongooseClient: Mongoose = app.get('mongooseClient');
-	const { Schema } = mongooseClient;
-	const schema = new Schema<IConseillers>(
-		{
-			idPG: { type: Number, required: true },
+  const modelName = 'conseillers';
+  const mongooseClient: Mongoose = app.get('mongooseClient');
+  const { Schema } = mongooseClient;
+  const schema = new Schema<IConseillers>(
+    {
+      idPG: { type: Number, required: true },
 
-			password: { type: String },
+      password: { type: String },
 
-			prenom: { type: String },
+      prenom: { type: String },
 
-			nom: { type: String },
+      nom: { type: String },
 
-			email: { type: String },
+      email: { type: String },
 
-			telephone: { type: String },
+      telephone: { type: String },
 
-			distanceMax: { type: Number },
+      distanceMax: { type: Number },
 
-			disponible: { type: Boolean },
+      disponible: { type: Boolean },
 
-			dateDisponibilite: { type: Date },
+      dateDisponibilite: { type: Date },
 
-			estDemandeurEmploi: { type: Boolean },
+      estDemandeurEmploi: { type: Boolean },
 
-			estEnEmploi: { type: Boolean },
+      estEnEmploi: { type: Boolean },
 
-			estEnFormation: { type: Boolean },
+      estEnFormation: { type: Boolean },
 
-			estDiplomeMedNum: { type: Boolean },
+      estDiplomeMedNum: { type: Boolean },
 
-			nomDiplomeMedNum: { type: String },
+      nomDiplomeMedNum: { type: String },
 
-			aUneExperienceMedNum: { type: Boolean },
+      aUneExperienceMedNum: { type: Boolean },
 
-			codePostal: { type: String },
+      codePostal: { type: String },
 
-			location: {
-				structure: { type: String },
-				coordinates: { type: String },
-			},
+      location: {
+        structure: { type: String },
+        coordinates: { type: String },
+      },
 
-			nomCommune: { type: String },
+      nomCommune: { type: String },
 
-			codeCommune: { type: String },
+      codeCommune: { type: String },
 
-			codeDepartement: { type: String },
+      codeDepartement: { type: String },
 
-			codeRegion: { type: String },
+      codeRegion: { type: String },
 
-			emailConfirmedAt: { type: Date },
+      emailConfirmedAt: { type: Date },
 
-			emailConfirmationKey: { type: String },
+      emailConfirmationKey: { type: String },
 
-			unsubscribedAt: {
-				type: Date,
-				required: false,
-			},
+      unsubscribedAt: {
+        type: Date,
+        required: false,
+      },
 
-			unsubscribeExtras: { type: Object },
+      unsubscribeExtras: { type: Object },
 
-			userCreated: { type: Boolean },
+      userCreated: { type: Boolean },
 
-			pix: {
-				structure: {
-					partage: { type: Boolean },
-					datePartage: { type: Date },
-					palier: { type: Number },
-					competence1: { type: Boolean },
-					competence2: { type: Boolean },
-					competence3: { type: Boolean },
-				},
-			},
+      pix: {
+        structure: {
+          partage: { type: Boolean },
+          datePartage: { type: Date },
+          palier: { type: Number },
+          competence1: { type: Boolean },
+          competence2: { type: Boolean },
+          competence3: { type: Boolean },
+        },
+      },
 
-			sondageToken: { type: String },
+      sondageToken: { type: String },
 
-			sondageSentAt: {
-				type: Date,
-				required: false,
-			},
+      sondageSentAt: {
+        type: Date,
+        required: false,
+      },
 
-			structureId: { type: 'ObjectId' },
+      structureId: { type: 'ObjectId' },
 
-			codeCom: {
-				type: Date,
-				required: false,
-			},
+      codeCom: {
+        type: Date,
+        required: false,
+      },
 
-			mattermost: {
-				structure: {
-					error: { type: Boolean },
-					login: {
-						type: String,
-					},
-					id: { type: String },
-					errorResetPassword: { type: Boolean },
-					errorPatchLogin: { type: Boolean },
-				},
-			},
+      mattermost: {
+        structure: {
+          error: { type: Boolean },
+          login: {
+            type: String,
+          },
+          id: { type: String },
+          errorResetPassword: { type: Boolean },
+          errorPatchLogin: { type: Boolean },
+        },
+      },
 
-			emailCN: {
-				structure: {
-					address: {
-						type: String,
-					},
-					deleteMailboxCNError: {
-						type: Boolean,
-					},
-				},
-			},
+      emailCN: {
+        structure: {
+          address: {
+            type: String,
+          },
+          deleteMailboxCNError: {
+            type: Boolean,
+          },
+        },
+      },
 
-			emailCNError: { type: Boolean },
+      emailCNError: { type: Boolean },
 
-			resetPasswordCNError: { type: Boolean },
+      resetPasswordCNError: { type: Boolean },
 
-			statut: { type: String },
+      statut: { type: String },
 
-			datePrisePoste: { type: Date },
+      datePrisePoste: { type: Date },
 
-			dateFinFormation: { type: Date },
+      dateFinFormation: { type: Date },
 
-			dateDeNaissance: { type: String },
+      dateDeNaissance: { type: String },
 
-			sexe: { type: String },
+      sexe: { type: String },
 
-			historique: [Object],
+      historique: [Object],
 
-			cv: {
-				structure: {
-					file: { type: String },
-					extension: { type: String },
-					date: { type: Date },
-				},
-			},
+      cv: {
+        structure: {
+          file: { type: String },
+          extension: { type: String },
+          date: { type: Date },
+        },
+      },
 
-			telephonePro: { type: Number },
+      telephonePro: { type: Number },
 
-			emailPro: { type: String },
+      emailPro: { type: String },
 
-			groupeCRA: { type: Number },
+      groupeCRA: { type: Number },
 
-			mailProAModifier: { type: String },
+      mailProAModifier: { type: String },
 
-			tokenChangementMailPro: { type: String },
+      tokenChangementMailPro: { type: String },
 
-			tokenChangementMailProCreatedAt: { type: Date },
+      tokenChangementMailProCreatedAt: { type: Date },
 
-			estCoordinateur: { type: Boolean },
+      estCoordinateur: { type: Boolean },
 
-			groupeCRAHistorique: [Object],
-		},
+      groupeCRAHistorique: [Object],
+    },
 
-		{ strict: false },
-	);
+    { strict: false },
+  );
 
-	if (mongooseClient.modelNames().includes(modelName)) {
-		mongooseClient.deleteModel(modelName);
-	}
-	return mongooseClient.model(modelName, schema);
+  if (mongooseClient.modelNames().includes(modelName)) {
+    mongooseClient.deleteModel(modelName);
+  }
+  return mongooseClient.model(modelName, schema);
 }

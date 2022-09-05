@@ -18,9 +18,9 @@ const app = express(feathers());
 app.configure(configuration());
 // Enable security, CORS, compression, favicon and body parsing
 app.use(
-	helmet({
-		contentSecurityPolicy: false,
-	}),
+  helmet({
+    contentSecurityPolicy: false,
+  }),
 );
 app.use(cors());
 app.use(compress());
