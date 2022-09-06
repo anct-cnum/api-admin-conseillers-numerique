@@ -18,6 +18,9 @@ const updateCandidate = Joi.object({
   }),
 });
 
-module.exports = {
-  updateCandidate,
-};
+const updateEmail = Joi.string()
+  .email()
+  .required()
+  .error(new Error("Le format de l'email est invalide"));
+
+export { updateCandidate, updateEmail };

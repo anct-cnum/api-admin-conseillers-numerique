@@ -6,18 +6,14 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
-
-const Joi = require('joi');
+import { updateEmail } from '../../../schemas/users.schemas';
 
 const updateEmailAccount =
   (app: Application) => async (req: IRequest, res: Response) => {
     const nouveauEmail: string = req.body.name;
     const idUser: string = req.params.id;
-    const emailValidation = Joi.string()
-      .email()
-      .required()
-      .error(new Error("Le format de l'email est invalide"))
-      .validate(nouveauEmail);
+    const emailValidation = updateEmail.validate(nouveauEmail);
+
     try {
       const verificationEmail = await app
         .service(service.users)

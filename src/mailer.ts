@@ -40,7 +40,7 @@ export default function (app: Application) {
 
   transporter.use('compile', htmlToText({ ignoreImage: true }));
 
-  const getDashboardUrl = (pathUrl) =>
+  const getDashboardUrl = (pathUrl: string) =>
     `${app.get('dashboard_hostname')}${pathUrl}`;
 
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;

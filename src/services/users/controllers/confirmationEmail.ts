@@ -22,17 +22,15 @@ const confirmationEmail =
         res.status(400).end();
         return;
       }
-      const apresEmailConfirmer = await app
-        .service(service.users)
-        .Model.findOneAndUpdate(
-          { _id: userInfo._id },
-          {
-            $set: { name: userInfo.mailAModifier, token: uuidv4() },
-            $unset: { mailAModifier: userInfo.mailAModifier },
-          },
-          { returnOriginal: false },
-        );
-      res.send(apresEmailConfirmer);
+      const user = await app.service(service.users).Model.findOneAndUpdate(
+        { _id: userInfo._id },
+        {
+          $set: { name: userInfo.mailAModifier, token: uuidv4() },
+          $unset: { mailAModifier: userInfo.mailAModifier },
+        },
+        { returnOriginal: false },
+      );
+      res.send(user);
     } catch (error) {
       res.statusMessage = error.message;
       res.status(500).end();

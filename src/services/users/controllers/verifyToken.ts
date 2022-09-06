@@ -12,7 +12,7 @@ const verifyToken =
         .service(service.users)
         .Model.findOne({ token });
       if (user === null) {
-        res.statusMessage = 'User not found';
+        res.statusMessage = 'Utilisateur introuvable';
         res.status(404).end();
         return;
       }
