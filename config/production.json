@@ -1,5 +1,6 @@
 {
 	"host": "HOST",
+  "dashboard_hostname": "DASHBOARD_HOSTNAME",
 	"port": "PORT",
 	"public": "PUBLIC_HOSTNAME",
 	"paginate": {
