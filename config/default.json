@@ -32,12 +32,6 @@
     "secure": false,
     "hostname": "localhost",
     "greetingTimeout": 300000,
-    "user": {
-      "auth": {
-        "user": "users",
-        "pass": "password"
-      }
-    },
     "from": "communication@email.conseiller-numerique.gouv.fr",
     "replyTo": "conseiller-numerique@anct.gouv.fr"
   },

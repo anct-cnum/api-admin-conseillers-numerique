@@ -12,5 +12,16 @@
       "audience": "AUTHENTICATION_JWTOPTIONS_AUDIENCE"
 		}
 	},
+  "smtp": {
+    "host": "SMTP_HOST",
+    "port": "SMTP_PORT",
+    "secure": "SMTP_SECURE",
+    "hostname": "SMTP_HOSTNAME",
+    "user": "SMTP_USER",
+    "password": "SMTP_PASSWORD",
+    "greetingTimeout": "SMTP_GREETINGTIMEOUT",
+    "from": "SMTP_FROM",
+    "replyTo": "SMTP_REPLYTO"
+  },
 	"mongodb": "MONGODB_ADDON_URI"
 }
