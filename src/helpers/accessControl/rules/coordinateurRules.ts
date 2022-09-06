@@ -23,12 +23,10 @@ export default async function coordinateurRules(
   // Restreindre les permissions : les coordinateurs ne peuvent voir que les informations correspondant à leur profil conseiller
   let listeSubordonnesIds: ObjectId[];
   let conseiller: IConseillers;
-  try {
-    conseiller = await getConseillers(user.entity.oid);
-    listeSubordonnesIds = conseiller.listeSubordonnes.liste;
-  } catch (error) {
-    throw new Error(error);
-  }
+
+  conseiller = await getConseillers(user.entity.oid);
+  listeSubordonnesIds = conseiller.listeSubordonnes.liste;
+
   can([action.read], ressource.conseillers, {
     _id: { $in: listeSubordonnesIds },
   });

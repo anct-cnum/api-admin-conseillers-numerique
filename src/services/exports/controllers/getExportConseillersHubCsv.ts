@@ -3,24 +3,15 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { exportsCnfsHubPermission } from '../../../helpers/accessControl/verifyPermissions';
-import { Hub, Departement } from '../../../ts/interfaces/json.interface';
+import { IHub } from '../../../ts/interfaces/json.interface';
 import { generateCsvConseillersHub } from '../exports.repository';
+import {
+  findDepartementOrRegion,
+  findNumDepartementsByRegion,
+} from '../../../helpers/commonQueriesFunctions';
 
-const hubs = require('../../../../data/imports/hubs.json');
-const departements = require('../../../../data/imports/departements-region.json');
-
-const findDepartementOrRegion = (nomHub: string) => {
-  return hubs.find((hub: Hub) => `${hub.name}` === nomHub);
-};
-
-const findNumDepartementsByRegion = (hubRegion: string[]): Array<string> => {
-  return departements
-    .filter((departement: Departement) =>
-      hubRegion.includes(departement.region_name),
-    )
-    .map((departement: Departement) => departement.num_dep);
-};
-
+//Récuperation des conseiller par le tableau de numéros departements(s)
+//récupérés dans departements-région.json créer par la fonction findNumDepartementsByRegion
 const getStructureAndConseillerByDepartement =
   (app: Application) => async (departementsHub: Array<string>) =>
     app.service(service.structures).Model.aggregate([
@@ -125,13 +116,13 @@ const getExportConseillersHubCsv =
       res.status(401).end();
       return;
     }
-    const hub: Hub = findDepartementOrRegion(req.user?.hub);
+    const hub: IHub = findDepartementOrRegion(req.user?.hub);
     try {
       if (hub.region_names) {
         conseillers = await getStructureAndConseillerByDepartement(app)(
           findNumDepartementsByRegion(hub.region_names),
         );
-      } else if (hub.name === 'Hub Antilles-Guyane') {
+      } else if (hub.name === 'IHub Antilles-Guyane') {
         conseillers =
           await getStructureAndConseillerByDepartementHubAntillesGuyane(app)(
             hub.departements,
