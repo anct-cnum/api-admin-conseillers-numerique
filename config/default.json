@@ -1,5 +1,6 @@
 {
 	"host": "localhost",
+  "dashboard_hostname": "http://localhost:3000",
 	"port": 8080,
 	"public": "https://www.conseiller-numerique.gouv.fr",
 	"paginate": {
@@ -25,5 +26,20 @@
 			"passwordField": "password"
 		}
 	},
+  "smtp": {
+    "host": "localhost",
+    "port": "1025",
+    "secure": false,
+    "hostname": "localhost",
+    "greetingTimeout": 300000,
+    "user": {
+      "auth": {
+        "user": "users",
+        "pass": "password"
+      }
+    },
+    "from": "communication@email.conseiller-numerique.gouv.fr",
+    "replyTo": "conseiller-numerique@anct.gouv.fr"
+  },
 	"mongodb": "mongodb://localhost:27017/api_admin_conseiller_numerique"
 }

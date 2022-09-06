@@ -2,7 +2,6 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import service from '../../../helpers/services';
-
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
@@ -35,11 +34,6 @@ const confirmationEmail =
         );
       res.send(apresEmailConfirmer);
     } catch (error) {
-      if (error.name === 'ForbiddenError') {
-        res.statusMessage = 'Accès refusé';
-        res.status(403).end();
-        return;
-      }
       res.statusMessage = error.message;
       res.status(500).end();
     }
