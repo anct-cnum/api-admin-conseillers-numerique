@@ -16,7 +16,6 @@ import {
 
 async function defineAbilitiesFor(user: IUser, role: Roles) {
   const { can, build } = new AbilityBuilder(Ability);
-
   switch (role) {
     case 'admin':
       adminRules(can);

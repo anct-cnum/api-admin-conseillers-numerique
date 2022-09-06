@@ -1,7 +1,7 @@
+import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser, IConseillers } from '../../../ts/interfaces/db.interfaces';
 import app from '../../../app';
-import { ObjectId } from 'mongodb';
 
 const getConseillers = async (userId: string): Promise<IConseillers> => {
   let conseiller: IConseillers;
