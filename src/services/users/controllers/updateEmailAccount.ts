@@ -18,21 +18,21 @@ const updateEmailAccount =
       .required()
       .error(new Error("Le format de l'email est invalide"))
       .validate(nouveauEmail);
-    const verificationEmail = await app
-      .service('users')
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments({ name: nouveauEmail });
-    if (verificationEmail !== 0) {
-      res.statusMessage = `Erreur: l'email ${nouveauEmail} est déjà utilisé`;
-      res.status(409).end();
-      return;
-    }
-    if (emailValidation.error) {
-      res.statusMessage = emailValidation.error;
-      res.status(400).end();
-      return;
-    }
     try {
+      const verificationEmail = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({ name: nouveauEmail });
+      if (verificationEmail !== 0) {
+        res.statusMessage = `l'email ${nouveauEmail} est déjà utilisé`;
+        res.status(409).end();
+        return;
+      }
+      if (emailValidation.error) {
+        res.statusMessage = emailValidation.error.message;
+        res.status(400).end();
+        return;
+      }
       const user = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)
@@ -49,7 +49,13 @@ const updateEmailAccount =
       await message.send(user);
       res.send(user);
     } catch (error) {
-      res.status(401).json(error.message);
+      if (error.name === 'ForbiddenError') {
+        res.statusMessage = 'Accès refusé';
+        res.status(403).end();
+        return;
+      }
+      res.statusMessage = error.message;
+      res.status(500).end();
     }
   };
 

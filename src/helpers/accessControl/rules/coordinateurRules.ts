@@ -32,4 +32,7 @@ export default async function coordinateurRules(
   can([action.read], ressource.conseillers, {
     _id: { $in: listeSubordonnesIds },
   });
+  can([action.read, action.update], ressource.users, {
+    _id: user?._id,
+  });
 }
