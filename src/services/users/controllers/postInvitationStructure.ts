@@ -5,14 +5,13 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserAdminAndStructure } from '../../../schemas/users.schemas';
 const { v4: uuidv4 } = require('uuid');
-const mongoose = require('mongoose');
-const { DBRef, ObjectId } = mongoose.SchemaTypes;
+const { DBRef, ObjectId } = require('mongodb');
 
 const postInvitationMulticompte =
 	(app: Application) => async (req: IRequest, res: Response) => {
 		try {
 			let body = req.body;
-			console.log('req:', req.user.entity);
+      const { structureId, ...validation } = body;
 			const canCreate = req.ability.can(action.create, ressource.users);
 			if (!canCreate) {
 				res
@@ -22,9 +21,9 @@ const postInvitationMulticompte =
 					});
 				return;
 			}
-			const errorJoi = await createUserAdminAndStructure.validate(body);
+			const errorJoi = await createUserAdminAndStructure.validate(validation);
 			if (errorJoi?.error) {
-				res.status(400).json(String(errorJoi?.error));
+				res.status(400).json({ message: String(errorJoi?.error) });
 				return;
 			}
       const connect = app.get('mongodb');
@@ -33,6 +32,7 @@ const postInvitationMulticompte =
 				name: body.email.toLowerCase(),
         roles: ['structure', 'structure_coop'],
         entity: new DBRef("structures", new ObjectId(req.body.structureId), database),
+        password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),
         passwordCreated: false,
