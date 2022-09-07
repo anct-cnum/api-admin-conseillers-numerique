@@ -122,7 +122,7 @@ const getExportConseillersHubCsv =
         conseillers = await getStructureAndConseillerByDepartement(app)(
           findNumDepartementsByRegion(hub.region_names),
         );
-      } else if (hub.name === 'IHub Antilles-Guyane') {
+      } else if (hub.name === 'Hub Antilles-Guyane') {
         conseillers =
           await getStructureAndConseillerByDepartementHubAntillesGuyane(app)(
             hub.departements,
