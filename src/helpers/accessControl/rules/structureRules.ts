@@ -13,4 +13,8 @@ export default function structureRules(user: IUser, can) {
   can([action.read, action.update], ressource.conseillers, {
     structureId: user?.entity.oid,
   });
+
+  can([action.read, action.create], ressource.users, {
+    'entity.$id': user?.entity.oid,
+  });
 }

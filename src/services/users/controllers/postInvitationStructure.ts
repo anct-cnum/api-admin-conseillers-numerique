@@ -3,42 +3,44 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { createUserPrefet } from '../../../schemas/users.schemas';
+import { createUserAdminAndStructure } from '../../../schemas/users.schemas';
 const { v4: uuidv4 } = require('uuid');
+const mongoose = require('mongoose');
+const { DBRef, ObjectId } = mongoose.SchemaTypes;
 
-const postInvitationPrefet =
+const postInvitationMulticompte =
 	(app: Application) => async (req: IRequest, res: Response) => {
 		try {
 			let body = req.body;
-      const { email, ...localite } = body;
+			console.log('req:', req.user.entity);
 			const canCreate = req.ability.can(action.create, ressource.users);
 			if (!canCreate) {
 				res
 					.status(403)
 					.json({
-						message: `Accès refusé, vous n'êtes pas autorisé à inviter un préfet`,
+						message: `Accès refusé, vous n'êtes pas autorisé à inviter un compte structure multicompte`,
 					});
 				return;
 			}
-			const errorJoi = await createUserPrefet.validate(body);
+			const errorJoi = await createUserAdminAndStructure.validate(body);
 			if (errorJoi?.error) {
 				res.status(400).json(String(errorJoi?.error));
 				return;
 			}
-
+      const connect = app.get('mongodb');
+      const database = connect.substr(connect.lastIndexOf('/') + 1);
 			await app.service(service.users).create({
 				name: body.email.toLowerCase(),
-				roles: Array('prefet'),
-				password: uuidv4(),
-				token: uuidv4(),
-				tokenCreatedAt: new Date(),
-				mailSentDate: null,
-				passwordCreated: false,
-				createdAt: new Date(),
-        ...localite,
+        roles: ['structure', 'structure_coop'],
+        entity: new DBRef("structures", new ObjectId(req.body.structureId), database),
+        token: uuidv4(),
+        tokenCreatedAt: new Date(),
+        passwordCreated: false,
+        createdAt: new Date(),
+        resend: false
 			});
 			// partie envoie de l'email
-			res.status(200).json(`Le préfet ${body.email} a bien été invité `);
+			res.status(200).json(`${body.email} a bien été invité à votre compte structure`);
 		} catch (error) {
 			if (error?.code === 409) {
 				res
@@ -53,4 +55,4 @@ const postInvitationPrefet =
 		}
 	};
 
-export default postInvitationPrefet;
+export default postInvitationMulticompte;

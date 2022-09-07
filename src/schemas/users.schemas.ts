@@ -23,3 +23,7 @@ export const createUserPrefet = Joi.object({
     departement: Joi.string().max(3).error(new Error('Le code département est invalide')),
     region: Joi.string().max(3).error(new Error('Le code région est invalide'))
   }).min(2);
+
+export const createUserAdminAndStructure = Joi.object({
+		email: Joi.string().required().email().error(new Error("Le format de l'email est invalide"))
+  });
