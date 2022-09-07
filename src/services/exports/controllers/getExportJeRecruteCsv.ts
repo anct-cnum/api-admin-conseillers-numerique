@@ -47,6 +47,7 @@ const getExportJeRecruteCsv =
           },
           {
             $project: {
+              _id: 0,
               dateRecrutement: 1,
               'conseiller.createdAt': 1,
               'conseiller.prenom': 1,
