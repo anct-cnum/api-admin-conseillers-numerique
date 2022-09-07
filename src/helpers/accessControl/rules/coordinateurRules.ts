@@ -25,7 +25,7 @@ export default async function coordinateurRules(
   let conseiller: IConseillers;
 
   conseiller = await getConseillers(user.entity.oid);
-  listeSubordonnesIds = conseiller.listeSubordonnes.liste;
+  listeSubordonnesIds = conseiller.listeSubordonnes?.liste;
 
   can([action.read], ressource.conseillers, {
     _id: { $in: listeSubordonnesIds },
