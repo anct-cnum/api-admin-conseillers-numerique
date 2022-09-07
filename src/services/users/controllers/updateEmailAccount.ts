@@ -39,9 +39,11 @@ const updateEmailAccount =
         );
       user.nouveauEmail = nouveauEmail;
       const mailerInstance = mailer(app);
-      const message = emails(app, mailerInstance).getEmailMessageByTemplateName(
-        'confirmeNouveauEmail',
-      );
+      const message = emails(
+        app,
+        mailerInstance,
+        req,
+      ).getEmailMessageByTemplateName('confirmeNouveauEmail');
       await message.send(user);
       res.send(user);
     } catch (error) {
