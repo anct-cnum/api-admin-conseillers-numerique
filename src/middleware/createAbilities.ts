@@ -31,7 +31,7 @@ async function defineAbilitiesFor(user: IUser, role: Roles) {
       conseillerRules(user, can);
       break;
     case 'hub_coop':
-      hubRules(user, can);
+      await hubRules(user, can);
       break;
     case 'grandReseau':
       await grandReseauRules(user, can);
