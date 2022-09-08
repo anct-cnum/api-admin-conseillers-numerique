@@ -42,6 +42,7 @@ export default function (app: Application): Model<any> {
         codePostal: { type: String },
         nomCommune: { type: String },
         dateAccompagnement: { type: Date },
+        organisme: { type: String, default: null },
       },
       conseiller: { type: DBRef },
     },

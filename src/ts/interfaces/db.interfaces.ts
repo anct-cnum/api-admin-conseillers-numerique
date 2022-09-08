@@ -331,6 +331,7 @@ interface IEntreprise {
 }
 
 export interface ICras {
+  _id: ObjectId;
   cra: {
     canal: string;
     activite: string;
@@ -359,6 +360,8 @@ export interface ICras {
     codePostal: string;
     nomCommune: string;
     dateAccompagnement: Date;
+    organisme: string | null;
   };
   conseiller: typeof DBRef;
+  createdAt: Date;
 }
