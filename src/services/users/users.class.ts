@@ -8,6 +8,7 @@ import createAbilities from '../../middleware/createAbilities';
 import postInvitation from './controllers/postInvitationPrefet';
 import postInvitationAdmin from './controllers/postInvitationAdmin';
 import postInvitationStructure from './controllers/postInvitationStructure';
+import getVerifToken from './controllers/getVerifToken';
 
 export default class Users extends Service {
 	constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -47,6 +48,10 @@ export default class Users extends Service {
 			authenticate('jwt'),
       createAbilities,
       postInvitationStructure(app)
+		);
+    app.get(
+			'/verifyToken/:token',
+      getVerifToken(app)
 		);
 	}
 }
