@@ -3,6 +3,7 @@ const service = {
   users: 'users',
   conseillers: 'conseillers',
   structures: 'structures',
+  cras: 'cras',
 };
 
 export default service;
