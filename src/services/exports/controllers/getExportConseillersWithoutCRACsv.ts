@@ -13,7 +13,7 @@ const getExportConseillersWithoutCRACsv =
     const dateMoins15jours = dayjs(Date.now()).subtract(15, 'day').toDate();
     try {
       const query = await app
-        .service('users')
+        .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
       conseillers = await app.service(service.conseillers).Model.aggregate([
