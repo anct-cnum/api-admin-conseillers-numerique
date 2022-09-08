@@ -6,6 +6,9 @@ export default function structureRules(user: IUser, can) {
   can([action.read], ressource.structures, {
     _id: user?.entity.oid,
   });
+  can([action.read, action.update], ressource.users, {
+    _id: user?._id,
+  });
   can([action.read], ressource.misesEnRelation, {
     'structure.$id': user?.entity.oid,
   });

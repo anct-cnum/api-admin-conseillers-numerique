@@ -28,46 +28,46 @@ const structureByMisesEnRelation = async (
   app: Application,
 ) => app.service(service.structures).Model.findOne({ _id: idStructure });
 
-const generateCsvCandidat = async (
-  misesEnRelations: IMisesEnRelation[],
-  res: Response,
-  app: Application,
-) => {
+const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
     'Date candidature;Date prévisionnelle de recrutement;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection\n',
   );
   try {
     await Promise.all(
       misesEnRelations.map(async (miseEnrelation) => {
-        const conseiller: IConseillers = await conseillerByMisesEnRelation(
-          miseEnrelation.conseiller.oid,
-          app,
-        );
-        const structure: IStructures = await structureByMisesEnRelation(
-          miseEnrelation.structure.oid,
-          app,
-        );
-        const coselec = getCoselec(structure);
+        const coselec = getCoselec(miseEnrelation.structure);
         res.write(
-          `${formatDate(conseiller?.createdAt)};${
+          `${formatDate(miseEnrelation.conseiller?.createdAt)};${
             miseEnrelation.dateRecrutement === null
               ? 'non renseignée'
               : formatDate(miseEnrelation.dateRecrutement)
-          };${conseiller?.prenom};${conseiller?.nom};${
-            conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${conseiller?.telephone};${conseiller?.email};${
-            conseiller?.codePostal
-          };${conseiller?.nomCommune};${conseiller?.codeDepartement};${
-            conseiller?.estDiplomeMedNum ? 'oui' : 'non'
-          };${conseiller?.pix ? conseiller?.pix.palier : ''};${
-            structure?.siret
-          };${structure?.idPG};${structure?.nom};${structure?.type};${
-            structure?.codePostal
-          };${structure?.codeCommune};${structure?.codeDepartement};${
-            structure?.codeRegion
-          };${structure?.contact?.prenom};${structure?.contact?.nom};${
-            structure?.contact?.telephone
-          };${structure?.contact?.email};${conseiller?.idPG};${
+          };${miseEnrelation.conseiller?.prenom};${
+            miseEnrelation.conseiller?.nom
+          };${
+            miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
+          };${miseEnrelation.conseiller?.telephone};${
+            miseEnrelation.conseiller?.email
+          };${miseEnrelation.conseiller?.codePostal};${
+            miseEnrelation.conseiller?.nomCommune
+          };${miseEnrelation.conseiller?.codeDepartement};${
+            miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
+          };${
+            miseEnrelation.conseiller?.pix
+              ? miseEnrelation.conseiller?.pix.palier
+              : ''
+          };${miseEnrelation.structure?.siret};${
+            miseEnrelation.structure?.idPG
+          };${miseEnrelation.structure?.nom};${
+            miseEnrelation.structure?.type
+          };${miseEnrelation.structure?.codePostal};${
+            miseEnrelation.structure?.codeCommune
+          };${miseEnrelation.structure?.codeDepartement};${
+            miseEnrelation.structure?.codeRegion
+          };${miseEnrelation.structure?.contact?.prenom};${
+            miseEnrelation.structure?.contact?.nom
+          };${miseEnrelation.structure?.contact?.telephone};${
+            miseEnrelation.structure?.contact?.email
+          };${miseEnrelation.structure?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${coselec !== null ? coselec?.nombreConseillersCoselec : 0};\n`,
         );

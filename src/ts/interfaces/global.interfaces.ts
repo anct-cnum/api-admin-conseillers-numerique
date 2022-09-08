@@ -1,5 +1,6 @@
 import { Request } from 'express';
-import { IUser } from './db.interfaces';
+import { ObjectId } from 'mongodb';
+import { IUser, IConseillers } from './db.interfaces';
 
 export interface IRequest extends Request {
   ability: any;
@@ -26,4 +27,8 @@ export interface Ressource {
   structures: string;
   misesEnRelation: string;
   conseillers: string;
+}
+export interface IStructuresConseillers {
+  _id: ObjectId;
+  conseiller: ObjectId[];
 }
