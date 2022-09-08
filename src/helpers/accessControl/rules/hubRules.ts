@@ -1,7 +1,9 @@
+/* eslint-disable prefer-const */
+import { ObjectId } from 'mongodb';
 import { action, functionnality, ressource } from '../accessList';
-import { IConseillers, IUser } from '../../../ts/interfaces/db.interfaces';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { IStructuresConseillers } from '../../../ts/interfaces/global.interfaces';
-import service from '../../../helpers/services';
+import service from '../../services';
 import {
   findDepartementOrRegion,
   findNumDepartementsByRegion,
@@ -9,7 +11,6 @@ import {
 import { IHub } from '../../../ts/interfaces/json.interface';
 
 import app from '../../../app';
-import { ObjectId } from 'mongodb';
 
 const getStructureAndConseillerByDepartement = async (
   departementsHub: Array<string>,
@@ -129,6 +130,7 @@ export default async function hubRules(user: IUser, can) {
   can(action.read, functionnality.exportHub);
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
+  });
   can([action.read], ressource.conseillers, {
     _id: { $in: conseillersIds },
   });
