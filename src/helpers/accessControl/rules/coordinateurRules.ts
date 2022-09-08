@@ -1,7 +1,7 @@
+import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser, IConseillers } from '../../../ts/interfaces/db.interfaces';
 import app from '../../../app';
-import { ObjectId } from 'mongodb';
 
 const getConseillers = async (userId: string): Promise<IConseillers> => {
   let conseiller: IConseillers;
@@ -29,5 +29,8 @@ export default async function coordinateurRules(
 
   can([action.read], ressource.conseillers, {
     _id: { $in: listeSubordonnesIds },
+  });
+  can([action.read, action.update], ressource.users, {
+    _id: user?._id,
   });
 }
