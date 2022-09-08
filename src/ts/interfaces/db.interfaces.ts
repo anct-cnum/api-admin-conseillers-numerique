@@ -143,7 +143,7 @@ export interface IConseillers {
   mattermost: {
     error: boolean;
 
-    login: String;
+    login: string;
 
     id: string;
 
@@ -328,4 +328,37 @@ interface IEntreprise {
   numero_tva_intracommunautaire: string;
   forme_juridique: string;
   raison_sociale: string;
+}
+
+export interface ICras {
+  cra: {
+    canal: string;
+    activite: string;
+    nbParticipants: number;
+    age: {
+      moins12ans: number;
+      de12a18ans: number;
+      de18a35ans: number;
+      de35a60ans: number;
+      plus60ans: number;
+    };
+    statut: {
+      etudiant: number;
+      sansEmploi: number;
+      enEmploi: number;
+      retraite: number;
+      heterogene: number;
+    };
+    themes: string[];
+    duree: string;
+    accompagnement: {
+      individuel: number;
+      atelier: number;
+      redirection: number;
+    };
+    codePostal: string;
+    nomCommune: string;
+    dateAccompagnement: Date;
+  };
+  conseiller: typeof DBRef;
 }
