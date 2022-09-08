@@ -67,7 +67,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.structure?.contact?.nom
           };${miseEnrelation.structure?.contact?.telephone};${
             miseEnrelation.structure?.contact?.email
-          };${miseEnrelation.structure?.idPG};${
+          };${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${coselec !== null ? coselec?.nombreConseillersCoselec : 0};\n`,
         );
