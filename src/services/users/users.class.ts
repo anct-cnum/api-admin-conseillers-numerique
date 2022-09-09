@@ -8,6 +8,7 @@ import createAbilities from '../../middleware/createAbilities';
 import postInvitation from './controllers/postInvitationPrefet';
 import postInvitationAdmin from './controllers/postInvitationAdmin';
 import postInvitationStructure from './controllers/postInvitationStructure';
+import patchChoosePassword from './controllers/patchChoosePassword';
 
 import updateEmailAccount from './controllers/updateEmailAccount';
 import verifyToken from './controllers/verifyToken';
@@ -60,5 +61,6 @@ export default class Users extends Service {
     );
     app.patch('/confirmation-email/:token', confirmationEmail(app));
     app.get('/users/verifyToken/:token', verifyToken(app));
+    app.patch('/users/choosePassword/:token', patchChoosePassword(app));
   }
 }

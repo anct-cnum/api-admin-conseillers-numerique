@@ -39,7 +39,6 @@ const postInvitationMulticompte =
         token: uuidv4(),
         tokenCreatedAt: new Date(),
         passwordCreated: false,
-        createdAt: new Date(),
         resend: false,
       });
       // partie envoie de l'email

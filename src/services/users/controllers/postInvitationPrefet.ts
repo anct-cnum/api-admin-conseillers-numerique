@@ -33,7 +33,6 @@ const postInvitationPrefet =
         tokenCreatedAt: new Date(),
         mailSentDate: null,
         passwordCreated: false,
-        createdAt: new Date(),
         ...localite,
       });
       // partie envoie de l'email

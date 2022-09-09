@@ -24,7 +24,6 @@ const postInvitationAdmin =
         res.status(400).json(String(errorJoi?.error));
         return;
       }
-
       await app.service(service.users).create({
         name: body.email.toLowerCase(),
         roles: ['admin', 'admin_coop'],
@@ -33,7 +32,6 @@ const postInvitationAdmin =
         tokenCreatedAt: new Date(),
         mailSentDate: null,
         passwordCreated: false,
-        createdAt: new Date(),
       });
       // partie envoie de l'email
       res.status(200).json(`L'admin ${body.email} a bien été invité `);
