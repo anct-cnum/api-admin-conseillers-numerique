@@ -10,8 +10,8 @@ import {
   findNumDepartementsByRegion,
 } from '../../../helpers/commonQueriesFunctions';
 
-//Récuperation des conseiller par le tableau de numéros departements(s)
-//récupérés dans departements-région.json créer par la fonction findNumDepartementsByRegion
+// Récuperation des conseiller par le tableau de numéros departements(s)
+// récupérés dans departements-région.json créer par la fonction findNumDepartementsByRegion
 const getStructureAndConseillerByDepartement =
   (app: Application) => async (departementsHub: Array<string>) =>
     app.service(service.structures).Model.aggregate([
