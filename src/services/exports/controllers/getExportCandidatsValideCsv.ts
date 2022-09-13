@@ -10,7 +10,7 @@ const getExportCandidatsValideStructureCsv =
     let misesEnRelations;
     try {
       const query = await app
-        .service(service.users)
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
       misesEnRelations = await app
