@@ -25,7 +25,7 @@
 	},
 	"scripts": {
 		"test": "npm run jest",
-		"lint": "eslint src/. --ignore-path .gitignore --ext .ts",
+		"lint": "tsc --project tsconfig.json --noEmit && eslint src/. --ignore-path .gitignore",
 		"dev": "NODE_ENV=development nodemon src/index.ts",
 		"start": "npm run build && node dist/",
 		"jest": "jest --forceExit",
