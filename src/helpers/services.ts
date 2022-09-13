@@ -1,0 +1,9 @@
+const service = {
+  misesEnRelation: 'misesEnRelation',
+  users: 'users',
+  conseillers: 'conseillers',
+  structures: 'structures',
+  cras: 'cras',
+};
+
+export default service;
