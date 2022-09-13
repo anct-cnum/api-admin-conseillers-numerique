@@ -1,3 +1,3 @@
 import getStatsNationales from './getStatsNationales';
 
-export { getStatsNationales };
+export default { getStatsNationales };
