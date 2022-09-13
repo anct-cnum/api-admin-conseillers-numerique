@@ -1,3 +1,8 @@
-import { Service } from 'feathers-mongoose';
+import { Service, MongooseServiceOptions  } from 'feathers-mongoose';
 
-export default class MisesEnRelation extends Service {}
+export default class MisesEnRelation extends Service {
+  constructor(options: Partial<MongooseServiceOptions>) {
+    super(options);
+
+  }
+}
