@@ -365,3 +365,16 @@ export interface ICras {
   conseiller: typeof DBRef;
   createdAt: Date;
 }
+
+export interface IStatsTerritoires {
+  date: string;
+  nombreConseillersCoselec: number;
+  cnfsActives: number;
+  cnfsInactives: number;
+  conseillerIds: [ObjectId];
+  codeDepartement: string;
+  codeRegion: string;
+  nomDepartement: string;
+  nomRegion: string;
+  tauxActivation: number;
+}
