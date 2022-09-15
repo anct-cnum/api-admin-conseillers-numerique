@@ -1,9 +1,9 @@
 import { IDepartement, IHub } from '../ts/interfaces/json.interface';
 
-const hubs = require('../../data/imports/hubs');
+const hubs = require('../../data/imports/hubs.json');
 const departements = require('../../data/imports/departements-region.json');
 
-//Récupération du hub correspondant (département ou région) dans la liste des hubs (fichier hub.json)
+// Récupération du hub correspondant (département ou région) dans la liste des hubs (fichier hub.json)
 const findDepartementOrRegion = (nomHub: string) => {
   return hubs.find((hub: IHub) => `${hub.name}` === nomHub);
 };

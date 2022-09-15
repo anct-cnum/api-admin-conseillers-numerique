@@ -10,7 +10,7 @@ const getExportJeRecruteCsv =
     let miseEnRelations;
     try {
       const query = await app
-        .service(service.users)
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
       miseEnRelations = await app
@@ -102,7 +102,7 @@ const getExportJeRecruteCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
     generateCsvCandidat(miseEnRelations, res);
   };

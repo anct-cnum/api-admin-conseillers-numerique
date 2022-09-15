@@ -21,11 +21,8 @@ export default async function coordinateurRules(
   can,
 ): Promise<any> {
   // Restreindre les permissions : les coordinateurs ne peuvent voir que les informations correspondant à leur profil conseiller
-  let listeSubordonnesIds: ObjectId[];
-  let conseiller: IConseillers;
-
-  conseiller = await getConseillers(user.entity.oid);
-  listeSubordonnesIds = conseiller.listeSubordonnes?.liste;
+  const conseiller: IConseillers = await getConseillers(user.entity.oid);
+  const listeSubordonnesIds: ObjectId[] = conseiller.listeSubordonnes?.liste;
 
   can([action.read], ressource.conseillers, {
     _id: { $in: listeSubordonnesIds },

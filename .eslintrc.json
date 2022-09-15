@@ -19,6 +19,7 @@
       "ForInStatement",
       "LabeledStatement",
       "WithStatement"
-    ]
+    ],
+    "func-names": "off"
   }
 }
