@@ -72,9 +72,9 @@ if (config().sentry.enabled === 'true') {
   // The error handler must be before any other error middleware and after all controllers
   app.use(
     Sentry.Handlers.errorHandler({
-      shouldHandleError(error) {
-        // Capture all 404 and 500 errors
-        if (error.status === 404 || error.status === 401) {
+      shouldHandleError(error: any) {
+        // No capture 401 (invalid login) and 404 (not found de feathers)
+        if (error.code === 401 || error.code === 404) {
           return false;
         }
         return true;
