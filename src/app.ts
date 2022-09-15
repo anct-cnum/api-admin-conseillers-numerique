@@ -37,8 +37,6 @@ if (config().sentry.enabled === 'true') {
   app.use(Sentry.Handlers.requestHandler());
   // TracingHandler creates a trace for every incoming request
   app.use(Sentry.Handlers.tracingHandler());
-  // The error handler must be before any other error middleware and after all controllers
-  app.use(Sentry.Handlers.errorHandler());
 }
 
 // Load app configuration
@@ -69,6 +67,11 @@ app.configure(channels);
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
+
+if (config().sentry.enabled === 'true') {
+  // The error handler must be before any other error middleware and after all controllers
+  app.use(Sentry.Handlers.errorHandler());
+}
 app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);
