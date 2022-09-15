@@ -14,7 +14,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.15.1] # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.15.1]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v2
@@ -23,6 +24,7 @@ jobs:
     - uses: 47ng/actions-clever-cloud@v1
       with:
         appID: ${{ secrets.CLEVER_APP_ADMIN_API_RECETTE_ID }}
+        timeout: 300 #5 minutes before move on (in case of never exit even though a deployment is successful)
       env:
         CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
         CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
