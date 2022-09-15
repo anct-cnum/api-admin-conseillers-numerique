@@ -22,7 +22,7 @@ const getExportStructuresCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
     generateCsvStructure(structures, res, app);
   };

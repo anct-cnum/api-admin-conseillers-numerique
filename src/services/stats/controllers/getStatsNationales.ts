@@ -167,13 +167,14 @@ const getStatsNationales =
         totalParticipants,
       );
       console.log(donneesStats);
-      res.status(200).json({ donneesStats });
+      res.status(200).json(donneesStats);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json('Accès refusé');
         return;
       }
       res.status(500).json(error.message);
+      throw new Error(error);
     }
   };
 

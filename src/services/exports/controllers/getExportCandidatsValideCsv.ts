@@ -10,7 +10,7 @@ const getExportCandidatsValideStructureCsv =
     let misesEnRelations;
     try {
       const query = await app
-        .service(service.users)
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
       misesEnRelations = await app
@@ -102,7 +102,7 @@ const getExportCandidatsValideStructureCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
 
     generateCsvCandidat(misesEnRelations, res);

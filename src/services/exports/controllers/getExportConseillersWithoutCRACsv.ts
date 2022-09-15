@@ -13,7 +13,7 @@ const getExportConseillersWithoutCRACsv =
     const dateMoins15jours = dayjs(Date.now()).subtract(15, 'day').toDate();
     try {
       const query = await app
-        .service(service.users)
+        .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
       conseillers = await app.service(service.conseillers).Model.aggregate([
@@ -70,7 +70,7 @@ const getExportConseillersWithoutCRACsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
     generateCsvConseillersWithoutCRA(conseillers, res);
   };

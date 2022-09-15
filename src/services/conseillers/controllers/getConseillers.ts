@@ -20,6 +20,7 @@ const getConseillers =
         return;
       }
       res.status(500).json(error.message);
+      throw new Error(error);
     }
   };
 

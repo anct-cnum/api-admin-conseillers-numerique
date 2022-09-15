@@ -22,7 +22,7 @@ const getExportRupturesCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
     generateCsvRupture(miseEnRelations, res, app);
   };

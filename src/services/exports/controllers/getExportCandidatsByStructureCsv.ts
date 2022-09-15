@@ -27,7 +27,7 @@ const getExportCandidatsByStructureCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
     generateCsvCandidatByStructure(misesEnRelation, res, app);
   };
