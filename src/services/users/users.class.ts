@@ -38,5 +38,10 @@ export default class Users extends Service {
     );
     app.patch('/confirmation-email/:token', confirmationEmail(app));
     app.get('/users/verifyToken/:token', verifyToken(app));
+
+    // Sentry test
+    app.get('/debug-sentry', function mainHandler() {
+      throw new Error('My first Sentry error!');
+    });
   }
 }

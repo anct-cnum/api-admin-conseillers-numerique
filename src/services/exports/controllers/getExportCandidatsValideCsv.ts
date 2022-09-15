@@ -102,7 +102,7 @@ const getExportCandidatsValideStructureCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
 
     generateCsvCandidat(misesEnRelations, res);
