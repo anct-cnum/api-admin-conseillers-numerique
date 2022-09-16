@@ -35,7 +35,7 @@ const patchChoosePassword =
       await message.send(user);
       res.status(200).json('Compte bien activé');
     } catch (error) {
-      res.status(500).json(error);
+      throw new Error(error);
     }
   };
 

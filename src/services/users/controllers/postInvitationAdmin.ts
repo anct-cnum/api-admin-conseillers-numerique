@@ -53,7 +53,7 @@ const postInvitationAdmin =
 
         return;
       }
-      res.status(500).json(error);
+      throw new Error(error);
     }
   };
 
