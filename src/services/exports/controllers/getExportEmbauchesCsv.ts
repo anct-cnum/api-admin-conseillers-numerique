@@ -70,6 +70,8 @@ const getExportEmbauchesCsv =
                 'conseiller.nomCommune': 1,
                 'conseiller.codePostal': 1,
                 'conseiller.codeDepartement': 1,
+                'conseiller.dateFinFormation': 1,
+                'conseiller.datePrisePoste': 1,
                 'conseiller.pix': 1,
                 'structure.idPG': 1,
                 'structure.siret': 1,
