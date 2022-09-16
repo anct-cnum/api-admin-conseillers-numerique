@@ -4,7 +4,9 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserPrefet } from '../../../schemas/users.schemas';
-
+import mailer from '../../../mailer';
+import emails from '../../../emails/emails';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 const { v4: uuidv4 } = require('uuid');
 
 const postInvitationPrefet =
@@ -25,7 +27,7 @@ const postInvitationPrefet =
         return;
       }
 
-      await app.service(service.users).create({
+      const user: IUser = await app.service(service.users).create({
         name: body.email.toLowerCase(),
         roles: Array('prefet'),
         password: uuidv4(),
@@ -35,17 +37,22 @@ const postInvitationPrefet =
         passwordCreated: false,
         ...localite,
       });
-      // partie envoie de l'email
+      const mailerInstance = mailer(app);
+      const message = emails(
+        app,
+        mailerInstance,
+        req,
+      ).getEmailMessageByTemplateName('invitationActiveCompte');
+      await message.send(user);
       res.status(200).json(`Le préfet ${body.email} a bien été invité `);
     } catch (error) {
       if (error?.code === 409) {
         res.status(409).json({
           message: `Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail`,
         });
-
         return;
       }
-      res.status(401).json(error);
+      res.status(500).json(error);
     }
   };
 

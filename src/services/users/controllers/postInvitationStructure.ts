@@ -4,7 +4,9 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserAdminAndStructure } from '../../../schemas/users.schemas';
-
+import mailer from '../../../mailer';
+import emails from '../../../emails/emails';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
 
@@ -27,7 +29,7 @@ const postInvitationMulticompte =
       }
       const connect = app.get('mongodb');
       const database = connect.substr(connect.lastIndexOf('/') + 1);
-      await app.service(service.users).create({
+      const user: IUser = await app.service(service.users).create({
         name: body.email.toLowerCase(),
         roles: ['structure', 'structure_coop'],
         entity: new DBRef(
@@ -41,7 +43,13 @@ const postInvitationMulticompte =
         passwordCreated: false,
         resend: false,
       });
-      // partie envoie de l'email
+      const mailerInstance = mailer(app);
+      const message = emails(
+        app,
+        mailerInstance,
+        req,
+      ).getEmailMessageByTemplateName('invitationActiveCompte');
+      await message.send(user);
       res
         .status(200)
         .json(`${body.email} a bien été invité à votre compte structure`);
@@ -50,10 +58,9 @@ const postInvitationMulticompte =
         res.status(409).json({
           message: `Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail`,
         });
-
         return;
       }
-      res.status(401).json(error);
+      res.status(500).json(error);
     }
   };
 

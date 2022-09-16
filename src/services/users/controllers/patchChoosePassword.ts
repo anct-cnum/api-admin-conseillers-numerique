@@ -3,6 +3,8 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+import mailer from '../../../mailer';
+import emails from '../../../emails/emails';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -24,23 +26,16 @@ const patchChoosePassword =
         passwordCreatedAt: new Date(),
         tokenCreatedAt: new Date(),
       });
-      switch (user.roles[0]) {
-        case 'admin':
-          // envoie mail admin
-          break;
-        case 'structure':
-          // envoie mail structure
-          break;
-        case 'prefet':
-          // envoie mail prefet
-          break;
-        default:
-          break;
-      }
+      const mailerInstance = mailer(app);
+      const message = emails(
+        app,
+        mailerInstance,
+        req,
+      ).getEmailMessageByTemplateName('bienvenueCompteActive');
+      await message.send(user);
       res.status(200).json('Compte bien activé');
     } catch (error) {
       res.status(500).json(error);
-      return;
     }
   };
 

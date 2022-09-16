@@ -4,6 +4,9 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserAdminAndStructure } from '../../../schemas/users.schemas';
+import mailer from '../../../mailer';
+import emails from '../../../emails/emails';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -24,7 +27,7 @@ const postInvitationAdmin =
         res.status(400).json(String(errorJoi?.error));
         return;
       }
-      await app.service(service.users).create({
+      const user: IUser = await app.service(service.users).create({
         name: body.email.toLowerCase(),
         roles: ['admin', 'admin_coop'],
         password: uuidv4(),
@@ -33,8 +36,15 @@ const postInvitationAdmin =
         mailSentDate: null,
         passwordCreated: false,
       });
-      // partie envoie de l'email
+      const mailerInstance = mailer(app);
+      const message = emails(
+        app,
+        mailerInstance,
+        req,
+      ).getEmailMessageByTemplateName('invitationActiveCompte');
+      await message.send(user);
       res.status(200).json(`L'admin ${body.email} a bien été invité `);
+      return;
     } catch (error) {
       if (error?.code === 409) {
         res.status(409).json({
@@ -43,7 +53,7 @@ const postInvitationAdmin =
 
         return;
       }
-      res.status(401).json(error);
+      res.status(500).json(error);
     }
   };
 
