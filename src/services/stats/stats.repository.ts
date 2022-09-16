@@ -1,6 +1,24 @@
 import dayjs from 'dayjs';
 import service from '../../helpers/services';
 
+const labelsCorrespondance = require('../../../data/themesCorrespondances.json');
+
+const sortByValueThenName = (a, b) => {
+  if (a.valeur > b.valeur) {
+    return -1;
+  }
+  if (a.valeur < b.valeur) {
+    return 1;
+  }
+  const libelle1 =
+    labelsCorrespondance.find((label) => label.nom === a.nom)?.correspondance ??
+    a.nom;
+  const libelle2 =
+    labelsCorrespondance.find((label) => label.nom === b.nom)?.correspondance ??
+    b.nom;
+  return libelle1.localeCompare(libelle2, 'fr');
+};
+
 const getNombreCra = async (query, ability, read, app) =>
   app.service(service.cras).Model.countDocuments(query);
 
@@ -116,7 +134,8 @@ const getStatsThemes = async (query, ability, read, app) => {
       (theme1) => themes.find((theme2) => theme1.nom === theme2.nom) || theme1,
     );
   }
-  return statsThemes;
+
+  return statsThemes.sort(sortByValueThenName);
 };
 
 const getStatsLieux = async (query, ability, read, app) => {
