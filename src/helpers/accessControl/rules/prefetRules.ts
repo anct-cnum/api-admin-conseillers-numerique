@@ -23,6 +23,12 @@ export default function prefetRules(user: IUser, can) {
   can([action.read], ressource.misesEnRelation, {
     'structureObj.codeRegion': user?.region,
   });
+  can([action.read], ressource.statsTerritoires, {
+    codeDepartement: user?.departement,
+  });
+  can([action.read], ressource.statsTerritoires, {
+    codeRegion: user?.region,
+  });
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });

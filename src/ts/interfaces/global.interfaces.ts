@@ -27,6 +27,7 @@ export interface Ressource {
   structures: string;
   misesEnRelation: string;
   conseillers: string;
+  statsTerritoires: string;
 }
 export interface IStructuresConseillers {
   _id: ObjectId;
