@@ -29,21 +29,9 @@ const createUserPrefet = Joi.object({
   region: Joi.string().max(3).error(new Error('Le code région est invalide')),
 }).min(2);
 
-const createUserAdminAndStructure = Joi.object({
-  email: Joi.string()
-    .required()
-    .email()
-    .error(new Error("Le format de l'email est invalide")),
-});
-
-const updateEmail = Joi.string()
+const validationEmail = Joi.string()
   .email()
   .required()
   .error(new Error("Le format de l'email est invalide"));
 
-export {
-  updateCandidate,
-  createUserPrefet,
-  createUserAdminAndStructure,
-  updateEmail,
-};
+export { updateCandidate, createUserPrefet, validationEmail };

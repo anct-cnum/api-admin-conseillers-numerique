@@ -6,13 +6,13 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
-import { updateEmail } from '../../../schemas/users.schemas';
+import { validationEmail } from '../../../schemas/users.schemas';
 
 const updateEmailAccount =
   (app: Application) => async (req: IRequest, res: Response) => {
     const nouveauEmail: string = req.body.name;
     const idUser: string = req.params.id;
-    const emailValidation = updateEmail.validate(nouveauEmail);
+    const emailValidation = validationEmail.validate(nouveauEmail);
 
     try {
       const verificationEmail = await app

@@ -3,14 +3,14 @@ import { Response } from 'express';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { createUserAdminAndStructure } from '../../../schemas/users.schemas';
+import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
 
-const postInvitationMulticompte =
+const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
       const { body } = req;
@@ -22,7 +22,7 @@ const postInvitationMulticompte =
         });
         return;
       }
-      const errorJoi = await createUserAdminAndStructure.validate(validation);
+      const errorJoi = await validationEmail.validate(validation);
       if (errorJoi?.error) {
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
@@ -64,4 +64,4 @@ const postInvitationMulticompte =
     }
   };
 
-export default postInvitationMulticompte;
+export default postInvitationStructure;
