@@ -19,7 +19,7 @@ const sortByValueThenName = (a, b) => {
   return libelle1.localeCompare(libelle2, 'fr');
 };
 
-const getNombreCra = async (query, ability, read, app) =>
+const getNombreCra = async (query, app) =>
   app.service(service.cras).Model.countDocuments(query);
 
 const getPersonnesRecurrentes = async (query, ability, read, app) => {

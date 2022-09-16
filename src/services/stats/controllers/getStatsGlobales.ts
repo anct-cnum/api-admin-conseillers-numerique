@@ -18,7 +18,7 @@ import {
 
 const getStatsGlobales = async (query, ability, action, app, res) => {
   try {
-    const nbAccompagnement = await getNombreCra(query, ability, action, app);
+    const nbAccompagnement = await getNombreCra(query, app);
 
     const statsAccompagnements = await getStatsAccompagnements(
       query,
