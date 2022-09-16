@@ -12,7 +12,7 @@ import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 // eslint-disable-next-line import/named
-import { getStatsNationales } from './controllers';
+import { getStatsNationales, getStatsStructure } from './controllers';
 
 interface Data {}
 
@@ -31,6 +31,13 @@ export class Stats implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getStatsNationales(app),
+    );
+
+    app.get(
+      '/stats/structure/cras',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsStructure(app),
     );
   }
 
