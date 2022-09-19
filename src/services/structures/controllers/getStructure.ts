@@ -12,8 +12,9 @@ const getStructure =
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne(new ObjectId(String(req.query.id)));
-
+        .findOne({
+          _id: new ObjectId(String(req.query.id)),
+        });
       res.status(200).json(structure);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
