@@ -5,31 +5,12 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { validTerritoires } from '../../../schemas/territoires.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
-
-const checkAccessRequestStatsTerritoires = async (
-  app: Application,
-  req: IRequest,
-) =>
-  app
-    .service(service.statsTerritoires)
-    .Model.accessibleBy(req.ability, action.read)
-    .getQuery();
-
-const checkAccessRequestCras = async (app: Application, req: IRequest) =>
-  app
-    .service(service.cras)
-    .Model.accessibleBy(req.ability, action.read)
-    .getQuery();
-
-const getPersonnesAccompagnees =
-  (app: Application, checkRoleAccessStatsTerritoires) => (query: object) =>
-    app
-      .service(service.cras)
-      .Model.aggregate([
-        { $match: { ...query, $and: [checkRoleAccessStatsTerritoires] } },
-        { $group: { _id: null, count: { $sum: '$cra.nbParticipants' } } },
-        { $project: { valeur: '$count' } },
-      ]);
+import {
+  checkAccessRequestStatsTerritoires,
+  countPersonnesAccompagnees,
+  getTauxActivation,
+} from '../../statsTerritoires/statsTerritoires.repository';
+import checkAccessRequestCras from '../../cras/cras.repository';
 
 const getTotalDepartements =
   (app: Application, req: IRequest) => async (date: string) =>
@@ -62,19 +43,29 @@ const getPersonnesRecurrentes =
       {
         $group: { _id: null, count: { $sum: '$cra.nbParticipantsRecurrents' } },
       },
-      { $project: { valeur: '$count' } },
+      { $project: { count: '$count' } },
     ]);
 
 const getDepartement =
-  (app: Application, req: IRequest) =>
+  (app: Application, checkRoleAccessStatsTerritoires) =>
   async (date: string, ordre: string, page: number, limit: number) =>
-    app
-      .service(service.statsTerritoires)
-      .Model.accessibleBy(req.ability, action.read)
-      .find({ date })
-      .sort(ordre)
-      .skip(page)
-      .limit(limit);
+    app.service(service.statsTerritoires).Model.aggregate([
+      { $match: { date, $and: [checkRoleAccessStatsTerritoires] } },
+      {
+        $project: {
+          _id: 0,
+          codeDepartement: 1,
+          nomDepartement: 1,
+          nombreConseillersCoselec: 1,
+          cnfsActives: 1,
+          cnfsInactives: 1,
+          conseillerIds: 1,
+        },
+      },
+      { $sort: ordre },
+      { $skip: page },
+      { $limit: limit },
+    ]);
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -123,12 +114,12 @@ const getRegion =
 
 const getStatsTerritoires =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, typeTerritoire, nomOrdre, ordre } = req.query;
+    const { page, territoire, nomOrdre, ordre } = req.query;
     const dateFin: Date = new Date(req.query.dateFin as string);
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
     const emailValidation = validTerritoires.validate({
-      typeTerritoire,
+      territoire,
       page,
       nomOrdre,
       ordre,
@@ -154,8 +145,11 @@ const getStatsTerritoires =
       const checkRoleAccessStatsTerritoires =
         await checkAccessRequestStatsTerritoires(app, req);
       const checkRoleAccessCras = await checkAccessRequestCras(app, req);
-      if (typeTerritoire === 'codeDepartement') {
-        statsTerritoires = await getDepartement(app, req)(
+      if (territoire === 'codeDepartement') {
+        statsTerritoires = await getDepartement(
+          app,
+          checkRoleAccessStatsTerritoires,
+        )(
           dateFinFormat,
           ordreColonne,
           Number(page) > 0
@@ -164,7 +158,7 @@ const getStatsTerritoires =
           Number(options.paginate.default),
         );
         items.total = await getTotalDepartements(app, req)(dateFinFormat);
-      } else if (typeTerritoire === 'codeRegion') {
+      } else if (territoire === 'codeRegion') {
         statsTerritoires = await getRegion(
           app,
           checkRoleAccessStatsTerritoires,
@@ -182,18 +176,15 @@ const getStatsTerritoires =
         )(dateFinFormat);
       }
 
-      await Promise.all(
+      statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
           const item = { ...ligneStats };
           item.personnesAccompagnees = 0;
           item.CRAEnregistres = 0;
-          item.tauxActivation =
-            item?.nombreConseillersCoselec && item?.nombreConseillersCoselec > 0
-              ? Math.round(
-                  // eslint-disable-next-line no-unsafe-optional-chaining
-                  (item?.cnfsActives * 100) / item?.nombreConseillersCoselec,
-                )
-              : 0;
+          item.tauxActivation = getTauxActivation(
+            item.nombreConseillersCoselec,
+            item.cnfsActives,
+          );
 
           if (item.conseillerIds?.length > 0) {
             const query = {
@@ -203,17 +194,16 @@ const getStatsTerritoires =
                 $lte: dateFin,
               },
             };
-            const countAccompagnees = await getPersonnesAccompagnees(
+            item.personnesAccompagnees = await countPersonnesAccompagnees(
               app,
-              checkRoleAccessCras,
-            )(query);
+              req,
+              query,
+            );
             const countRecurrentes = await getPersonnesRecurrentes(
               app,
               checkRoleAccessCras,
             )(query);
 
-            item.personnesAccompagnees =
-              countAccompagnees.length > 0 ? countAccompagnees[0]?.count : 0;
             item.personnesRecurrentes =
               countRecurrentes.length > 0 ? countRecurrentes[0]?.count : 0;
             item.CRAEnregistres = await getNombreCra(app, req)(query);
@@ -222,6 +212,7 @@ const getStatsTerritoires =
             item.CRAEnregistres = 0;
             item.personnesRecurrentes = 0;
           }
+
           return item;
         }),
       );

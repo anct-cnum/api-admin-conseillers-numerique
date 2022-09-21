@@ -4,7 +4,23 @@ const validTerritoires = Joi.object({
   page: Joi.number()
     .required()
     .error(new Error('Le numéro de page est invalide')),
-  typeTerritoire: Joi.string()
+  territoire: Joi.string()
+    .required()
+    .error(new Error('Le type de territoire est invalide')),
+  dateDebut: Joi.date()
+    .required()
+    .error(new Error('La date de début est invalide')),
+  dateFin: Joi.date()
+    .required()
+    .error(new Error('La date de fin est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error("Le nom de l'ordre est invalide")),
+  ordre: Joi.number().required().error(new Error("L'ordre est invalide")),
+});
+
+const validExportTerritoires = Joi.object({
+  territoire: Joi.string()
     .required()
     .error(new Error('Le type de territoire est invalide')),
   dateDebut: Joi.date()
@@ -33,4 +49,22 @@ const validTerritoireDetails = Joi.object({
     .error(new Error('La date de fin est invalide')),
 });
 
-export { validTerritoires, validTerritoireDetails };
+const validTerritoireCra = Joi.object({
+  conseillerIds: Joi.array()
+    .items(Joi.string())
+    .required()
+    .error(new Error('Le tableau des conseillers est invalide')),
+  dateDebut: Joi.date()
+    .required()
+    .error(new Error('La date de début est invalide')),
+  dateFin: Joi.date()
+    .required()
+    .error(new Error('La date de fin est invalide')),
+});
+
+export {
+  validTerritoires,
+  validTerritoireDetails,
+  validTerritoireCra,
+  validExportTerritoires,
+};

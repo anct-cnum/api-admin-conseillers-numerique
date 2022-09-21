@@ -30,4 +30,6 @@ export default async function coordinateurRules(
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });
+  can([action.read], ressource.statsTerritoires);
+  can([action.read], ressource.cras);
 }

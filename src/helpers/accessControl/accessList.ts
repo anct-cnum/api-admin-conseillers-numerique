@@ -20,6 +20,7 @@ const ressource: Ressource = {
   misesEnRelation: 'misesEnRelation',
   conseillers: 'conseillers',
   statsTerritoires: 'statsTerritoires',
+  cras: 'cras',
 };
 
 const functionnality: Functionnality = {

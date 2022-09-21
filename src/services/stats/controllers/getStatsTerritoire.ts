@@ -5,15 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { validTerritoireDetails } from '../../../schemas/territoires.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
-
-const checkAccessRequestStatsTerritoires = async (
-  app: Application,
-  req: IRequest,
-) =>
-  app
-    .service(service.statsTerritoires)
-    .Model.accessibleBy(req.ability, action.read)
-    .getQuery();
+import { checkAccessRequestStatsTerritoires } from '../../statsTerritoires/statsTerritoires.repository';
 
 const getDepartement =
   (app: Application, req: IRequest) =>
@@ -65,7 +57,7 @@ const getRegion =
       },
     ]);
 
-const getStatsTerritoireDetail =
+const getStatsTerritoire =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { typeTerritoire, idTerritoire } = req.query;
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -98,7 +90,7 @@ const getStatsTerritoireDetail =
           String(idTerritoire),
         );
       }
-      res.send(territoire[0]);
+      res.send(territoire);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json('Accès refusé');
@@ -108,4 +100,4 @@ const getStatsTerritoireDetail =
     }
   };
 
-export default getStatsTerritoireDetail;
+export default getStatsTerritoire;

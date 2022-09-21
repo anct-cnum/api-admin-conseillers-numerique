@@ -16,4 +16,6 @@ export default function structureRules(user: IUser, can) {
   can([action.read, action.update], ressource.conseillers, {
     structureId: user?.entity.oid,
   });
+  can([action.read], ressource.statsTerritoires);
+  can([action.read], ressource.cras);
 }

@@ -11,7 +11,12 @@ import {
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
-import { getStatsNationales, getStatsTerritoires } from './controllers';
+import {
+  getStatsNationales,
+  getStatsTerritoires,
+  getStatsTerritoire,
+  getStatsTerritoireCra,
+} from './controllers';
 
 interface Data {}
 
@@ -39,6 +44,18 @@ export class Stats implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getStatsTerritoires(app, options),
+    );
+    app.get(
+      '/stats/territoire',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsTerritoire(app),
+    );
+    app.get(
+      '/stats/territoire/cra',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsTerritoireCra(app),
     );
   }
 
