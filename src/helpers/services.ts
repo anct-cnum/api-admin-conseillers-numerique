@@ -5,6 +5,7 @@ const service = {
   structures: 'structures',
   cras: 'cras',
   statsTerritoires: 'statsTerritoires',
+  statsConseillersCras: 'stats_conseillers_cras',
 };
 
 export default service;
