@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { createUserAdminAndStructure } from '../../../schemas/users.schemas';
+import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
@@ -12,8 +12,8 @@ const { v4: uuidv4 } = require('uuid');
 
 const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
+    const { body } = req;
     try {
-      const { body } = req;
       delete body.roleActivated;
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -22,7 +22,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      const errorJoi = await createUserAdminAndStructure.validate(body);
+      const errorJoi = await validationEmail.validate(body);
       if (errorJoi?.error) {
         res.status(400).json(String(errorJoi?.error));
         return;
@@ -50,9 +50,9 @@ const postInvitationAdmin =
         res.status(409).json({
           message: `Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail`,
         });
-
         return;
       }
+      app.service(service.users).delete({ name: body.email.toLowerCase() });
       throw new Error(error);
     }
   };

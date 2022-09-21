@@ -53,7 +53,6 @@ export default async function createAbilities(
   res: Response,
   next,
 ) {
-
   req.ability = req.user?.name
     ? await defineAbilitiesFor(req.user, req.query.role as Roles)
     : ANONYMOUS_ABILITY;

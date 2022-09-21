@@ -13,6 +13,7 @@ import patchChoosePassword from './controllers/patchChoosePassword';
 import updateEmailAccount from './controllers/updateEmailAccount';
 import verifyToken from './controllers/verifyToken';
 import confirmationEmail from './controllers/confirmationEmail';
+import getUsersByStructure from './controllers/getUsersByStructure';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -62,5 +63,11 @@ export default class Users extends Service {
     app.patch('/confirmation-email/:token', confirmationEmail(app));
     app.get('/users/verifyToken/:token', verifyToken(app));
     app.patch('/users/choosePassword/:token', patchChoosePassword(app));
+    app.get(
+      '/users/listByIdStructure/:id',
+      authenticate('jwt'),
+      createAbilities,
+      getUsersByStructure(app),
+    );
   }
 }

@@ -7,13 +7,14 @@ import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
 
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
+    const { body } = req;
     try {
-      const { body } = req;
       const { structureId, ...validation } = body;
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -60,6 +61,7 @@ const postInvitationStructure =
         });
         return;
       }
+      app.service(service.users).delete({ name: body.email.toLowerCase() });
       throw new Error(error);
     }
   };

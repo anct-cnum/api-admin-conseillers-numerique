@@ -7,12 +7,13 @@ import { createUserPrefet } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+
 const { v4: uuidv4 } = require('uuid');
 
 const postInvitationPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
+    const { body } = req;
     try {
-      const { body } = req;
       const { email, ...localite } = body;
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -52,6 +53,7 @@ const postInvitationPrefet =
         });
         return;
       }
+      app.service(service.users).delete({ name: body.email.toLowerCase() });
       throw new Error(error);
     }
   };
