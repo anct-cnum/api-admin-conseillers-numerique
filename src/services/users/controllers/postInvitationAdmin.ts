@@ -13,7 +13,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { body } = req;
+    const { email } = req.body;
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -22,13 +22,13 @@ const postInvitationAdmin =
         });
         return;
       }
-      const errorJoi = await validationEmail.validate(body);
+      const errorJoi = await validationEmail.validate(email);
       if (errorJoi?.error) {
-        res.status(400).json(String(errorJoi?.error));
+        res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
       const user: IUser = await app.service(service.users).create({
-        name: body.email.toLowerCase(),
+        name: email.toLowerCase(),
         roles: ['admin', 'admin_coop'],
         password: uuidv4(),
         token: uuidv4(),
@@ -43,7 +43,7 @@ const postInvitationAdmin =
         req,
       ).getEmailMessageByTemplateName('invitationActiveCompte');
       await message.send(user);
-      res.status(200).json(`L'admin ${body.email} a bien été invité `);
+      res.status(200).json(`L'admin ${email} a bien été invité `);
       return;
     } catch (error) {
       if (error?.code === 409) {
@@ -52,8 +52,15 @@ const postInvitationAdmin =
         });
         return;
       }
-      await deleteUser(app, service, req, body);
-      throw new Error(error);
+      try {
+        await deleteUser(app, service, req, action, email);
+        res.status(500).json({
+          message: `Une erreur est survenue lors de l'envoi, veuillez réessayez dans quelques minutes`,
+          error,
+        });
+      } catch (err) {
+        throw new Error(err);
+      }
     }
   };
 

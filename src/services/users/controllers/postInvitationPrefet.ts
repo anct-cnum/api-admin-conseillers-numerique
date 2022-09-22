@@ -54,8 +54,15 @@ const postInvitationPrefet =
         });
         return;
       }
-      await deleteUser(app, service, req, body);
-      throw new Error(error);
+      try {
+        await deleteUser(app, service, req, action, body.email);
+        res.status(500).json({
+          message: `Une erreur est survenue lors de l'envoi, veuillez réessayez dans quelques minutes`,
+          error,
+        });
+      } catch (err) {
+        throw new Error(err);
+      }
     }
   };
 

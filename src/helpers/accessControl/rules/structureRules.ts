@@ -20,4 +20,8 @@ export default function structureRules(user: IUser, can) {
   can([action.read, action.create], ressource.users, {
     'entity.$id': user?.entity.oid,
   });
+
+  can([action.read, action.delete], ressource.users, {
+    'entity.$id': user?.entity.oid,
+  });
 }
