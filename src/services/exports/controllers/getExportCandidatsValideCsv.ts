@@ -10,7 +10,7 @@ const getExportCandidatsValideStructureCsv =
     let misesEnRelations;
     try {
       const query = await app
-        .service(service.users)
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
       misesEnRelations = await app
@@ -60,6 +60,7 @@ const getExportCandidatsValideStructureCsv =
               $project: {
                 _id: 0,
                 dateRecrutement: 1,
+                'conseiller.idPG': 1,
                 'conseiller.createdAt': 1,
                 'conseiller.prenom': 1,
                 'conseiller.nom': 1,
@@ -74,6 +75,7 @@ const getExportCandidatsValideStructureCsv =
                 'structure.siret': 1,
                 'structure.nom': 1,
                 'structure.contact': 1,
+                'structure.codePostal': 1,
                 'structure.codeCommune': 1,
                 'structure.codeRegion': 1,
                 'structure.type': 1,
@@ -100,7 +102,7 @@ const getExportCandidatsValideStructureCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
 
     generateCsvCandidat(misesEnRelations, res);

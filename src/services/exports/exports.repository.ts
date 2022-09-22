@@ -67,7 +67,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.structure?.contact?.nom
           };${miseEnrelation.structure?.contact?.telephone};${
             miseEnrelation.structure?.contact?.email
-          };${miseEnrelation.structure?.idPG};${
+          };${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${coselec !== null ? coselec?.nombreConseillersCoselec : 0};\n`,
         );
@@ -77,7 +77,8 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   } catch (error) {
     res.statusMessage =
       "Une erreur s'est produite au niveau de la création du csv";
-    res.status(400).end();
+    res.status(500).end();
+    throw new Error(error);
   }
 };
 
@@ -112,7 +113,8 @@ const generateCsvCandidatByStructure = async (
   } catch (error) {
     res.statusMessage =
       "Une erreur s'est produite au niveau de la création du csv";
-    res.status(400).end();
+    res.status(500).end();
+    throw new Error(error);
   }
 };
 
@@ -150,7 +152,8 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
   } catch (error) {
     res.statusMessage =
       "Une erreur s'est produite au niveau de la création du csv";
-    res.status(400).end();
+    res.status(500).end();
+    throw new Error(error);
   }
 };
 
@@ -212,7 +215,8 @@ const generateCsvConseillersWithoutCRA = async (
   } catch (error) {
     res.statusMessage =
       "Une erreur s'est produite au niveau de la création du csv";
-    res.status(400).end();
+    res.status(500).end();
+    throw new Error(error);
   }
 };
 
@@ -304,7 +308,8 @@ const generateCsvStructure = async (
   } catch (error) {
     res.statusMessage =
       "Une erreur s'est produite au niveau de la création du csv";
-    res.status(400).end();
+    res.status(500).end();
+    throw new Error(error);
   }
 };
 
@@ -340,7 +345,8 @@ const generateCsvRupture = async (
   } catch (error) {
     res.statusMessage =
       "Une erreur s'est produite au niveau de la création du csv";
-    res.status(400).end();
+    res.status(500).end();
+    throw new Error(error);
   }
 };
 

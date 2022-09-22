@@ -54,6 +54,7 @@ const updateEmailAccount =
       }
       res.statusMessage = error.message;
       res.status(500).end();
+      throw new Error(error);
     }
   };
 

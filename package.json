@@ -25,12 +25,13 @@
 	},
 	"scripts": {
 		"test": "npm run jest",
-		"lint": "eslint src/. --ignore-path .gitignore",
+		"lint": "tsc --project tsconfig.json --noEmit && eslint src/. --ignore-path .gitignore",
 		"dev": "NODE_ENV=development nodemon src/index.ts",
 		"copy-files": "copyfiles -u 1 src/**/*.mjml.ejs dist/",
 		"start": "npm run build && npm run copy-files && node dist/",
 		"jest": "jest --forceExit",
-		"build": "shx rm -rf dist/ && tsc"
+		"copy-files": "copyfiles -u 1 src/**/*.mjml.ejs dist/",
+		"build": "shx rm -rf dist/ && tsc && npm run copy-files"
 	},
 	"standard": {
 		"env": [
@@ -51,7 +52,8 @@
 		"@feathersjs/socketio": "^4.5.15",
 		"@feathersjs/transport-commons": "^4.5.15",
 		"@hapi/joi": "^17.1.1",
-		"@sentry/node": "^7.11.1",
+		"@sentry/node": "^7.12.1",
+		"@sentry/tracing": "^7.12.1",
 		"@types/express": "^4.17.13",
 		"@types/supertest": "^2.0.12",
 		"compression": "^1.7.4",

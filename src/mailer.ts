@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 import { Application } from './declarations';
 
 const lodash = require('lodash');
@@ -15,7 +17,6 @@ const renderFile = promisify(ejs.renderFile);
 const configuration = require('@feathersjs/configuration');
 
 const config = configuration();
-const Sentry = require('@sentry/node');
 
 export default function (app: Application) {
   const configurationSmtp = app.get('smtp');
@@ -45,25 +46,27 @@ export default function (app: Application) {
 
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
 
-  const setSentryError = (err) => {
+  const initSentry = () => {
     if (config().sentry.enabled === 'true') {
       Sentry.init({
         dsn: config().sentry.dsn,
         environment: config().sentry.environment,
+        integrations: [
+          new Sentry.Integrations.Http({ tracing: true }),
+          new Tracing.Integrations.Express({ app }),
+        ],
         tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
       });
       app.use(Sentry.Handlers.requestHandler());
+      app.use(Sentry.Handlers.tracingHandler());
       app.use(Sentry.Handlers.errorHandler());
-      app.set('sentry', Sentry);
-
-      app.get('sentry').captureException(err);
     }
   };
 
   const utils = {
     getPublicUrl,
     getDashboardUrl,
-    setSentryError,
+    initSentry,
   };
 
   return {
@@ -101,8 +104,8 @@ export default function (app: Application) {
               {
                 to: emailAddress,
                 subject,
-                from: `Conseiller Numérique France Services <${configuration.from}>`,
-                replyTo: `Conseiller Numérique France Services <${configuration.replyTo}>`,
+                from: `Conseiller Numérique France Services <${configurationSmtp.from}>`,
+                replyTo: `Conseiller Numérique France Services <${configurationSmtp.replyTo}>`,
                 list: {
                   help: getPublicUrl('/faq'),
                 },

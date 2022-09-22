@@ -69,5 +69,9 @@ export default class Users extends Service {
       createAbilities,
       getUsersByStructure(app),
     );
+    // Sentry test
+    app.get('/debug-sentry', function mainHandler() {
+      throw new Error('My first Sentry error!');
+    });
   }
 }

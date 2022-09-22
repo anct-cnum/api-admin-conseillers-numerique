@@ -1,19 +1,19 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { IConseillers } from '../../../ts/interfaces/db.interfaces';
+import { ICras } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
-const getConseillers =
+const getStatsNationales =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const conseillers: IConseillers[] | IConseillers = await app
-        .service(service.conseillers)
+      const cras: ICras[] | ICras = await app
+        .service(service.cras)
         .Model.accessibleBy(req.ability, action.read)
         .find();
 
-      res.status(200).json(conseillers);
+      res.status(200).json(cras);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json('Accès refusé');
@@ -24,4 +24,4 @@ const getConseillers =
     }
   };
 
-export default getConseillers;
+export default getStatsNationales;
