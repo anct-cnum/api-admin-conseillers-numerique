@@ -7,6 +7,7 @@ import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+import { deleteUser } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -14,7 +15,6 @@ const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { body } = req;
     try {
-      delete body.roleActivated;
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
         res.status(403).json({
@@ -52,7 +52,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      app.service(service.users).delete({ name: body.email.toLowerCase() });
+      await deleteUser(app, service, req, body);
       throw new Error(error);
     }
   };

@@ -50,4 +50,11 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
-export { getCoselecPositif, getLastCoselec, getCoselec };
+const deleteUser = async (app, service, req, body) => {
+  await app
+    .service(service.users)
+    .Model.accessibleBy(req.ability)
+    .delete({ name: body.email.toLowerCase() });
+};
+
+export { getCoselecPositif, getLastCoselec, getCoselec, deleteUser };
