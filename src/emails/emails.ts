@@ -8,7 +8,7 @@ export default function (app: Application, mailer, req: IRequest) {
   const emails = [
     confirmeNouveauEmail(app, mailer, req),
     invitationActiveCompte(app, mailer, req),
-    bienvenueCompteActive(app, mailer, req),
+    bienvenueCompteActive(app, mailer),
   ];
   return {
     getEmailMessageByTemplateName: (name: string) => {

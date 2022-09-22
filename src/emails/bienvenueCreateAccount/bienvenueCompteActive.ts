@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
-import { IRequest } from '../../ts/interfaces/global.interfaces';
 
-export default function (app: Application, mailer, req: IRequest) {
+export default function (app: Application, mailer) {
   const templateName = 'bienvenueCompteActive';
   const { utils } = mailer;
 
