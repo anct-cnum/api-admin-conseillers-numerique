@@ -83,14 +83,17 @@ const getStatsTerritoire =
           typeTerritoire,
           String(idTerritoire),
         );
+        res.send(territoire);
       } else if (typeTerritoire === 'codeRegion') {
         territoire = await getRegion(app, checkRoleAccessStatsTerritoires)(
           dateFinFormat,
           typeTerritoire,
           String(idTerritoire),
         );
+        res.send(territoire[0]);
+      } else {
+        res.status(400).json('le type de territoire est invalide');
       }
-      res.send(territoire);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json('Accès refusé');

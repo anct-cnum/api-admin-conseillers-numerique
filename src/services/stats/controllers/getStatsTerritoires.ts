@@ -170,10 +170,11 @@ const getStatsTerritoires =
             : 0,
           Number(options.paginate.default),
         );
-        items.total = await getTotalRegions(
+        const totalRegion = await getTotalRegions(
           app,
           checkRoleAccessStatsTerritoires,
         )(dateFinFormat);
+        items.total = totalRegion.length === 0 ? 0 : totalRegion.length;
       }
 
       statsTerritoires = await Promise.all(
