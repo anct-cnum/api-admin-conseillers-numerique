@@ -30,7 +30,7 @@ const structureByMisesEnRelation = async (
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date prévisionnelle de recrutement;Date d’entrée en formation;Date de sortie de formation;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection\n',
+    'Date candidature;Date prévisionnelle de recrutement;Date d’entrée en formation;Date de sortie de formation;prenom;nom;expérience;téléphone;email;email professionnel;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection\n',
   );
   try {
     await Promise.all(
@@ -55,6 +55,10 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${
             miseEnrelation.conseiller?.email
+          };${
+            miseEnrelation.conseiller?.emailCN
+              ? miseEnrelation.conseiller?.emailCN.address
+              : ''
           };${miseEnrelation.conseiller?.codePostal};${
             miseEnrelation.conseiller?.nomCommune
           };${miseEnrelation.conseiller?.codeDepartement};${

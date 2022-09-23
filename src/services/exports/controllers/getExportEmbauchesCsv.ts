@@ -66,6 +66,7 @@ const getExportEmbauchesCsv =
                 'conseiller.nom': 1,
                 'conseiller.aUneExperienceMedNum': 1,
                 'conseiller.email': 1,
+                'conseiller.emailCN': 1,
                 'conseiller.telephone': 1,
                 'conseiller.nomCommune': 1,
                 'conseiller.codePostal': 1,
