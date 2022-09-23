@@ -19,6 +19,7 @@ const ressource: Ressource = {
   structures: 'structures',
   misesEnRelation: 'misesEnRelation',
   conseillers: 'conseillers',
+  cras: 'cras',
 };
 
 const functionnality: Functionnality = {

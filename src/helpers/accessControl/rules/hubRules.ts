@@ -137,4 +137,9 @@ export default async function hubRules(user: IUser, can) {
   can([action.read], ressource.structures, {
     _id: { $in: structuresIds },
   });
+  can([action.read], ressource.cras, {
+    'conseiller.$id': {
+      $in: conseillersIds,
+    },
+  });
 }

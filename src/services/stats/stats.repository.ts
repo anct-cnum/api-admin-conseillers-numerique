@@ -478,6 +478,19 @@ const conversionPourcentage = async (datas, total) => {
   });
 };
 
+const getPersonnesAccompagnees = async (statsActivites) => {
+  const nbTotalParticipant =
+    statsActivites?.find((activite) => activite._id === 'collectif')
+      ?.nbParticipants ?? 0;
+  const nbAccompagnementPerso =
+    statsActivites?.find((activite) => activite._id === 'individuel')?.count ??
+    0;
+  const nbDemandePonctuel =
+    statsActivites?.find((activite) => activite._id === 'ponctuel')?.count ?? 0;
+
+  return nbTotalParticipant + nbAccompagnementPerso + nbDemandePonctuel;
+};
+
 export {
   getNombreCra,
   getPersonnesRecurrentes,
@@ -494,4 +507,5 @@ export {
   getStatsReorientations,
   getStatsEvolutions,
   conversionPourcentage,
+  getPersonnesAccompagnees,
 };

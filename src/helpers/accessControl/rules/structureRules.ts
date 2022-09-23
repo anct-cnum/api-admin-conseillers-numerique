@@ -1,7 +1,26 @@
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+import service from '../../services';
+import app from '../../../app';
 
-export default function structureRules(user: IUser, can) {
+const getConseillersIds = async (user: IUser) => {
+  const conseillersIds = [];
+  try {
+    const conseillersStructure = await app
+      .service(service.conseillers)
+      .Model.find({
+        structureId: user?.entity.oid,
+      });
+    conseillersStructure.forEach((conseiller) => {
+      conseillersIds.push(conseiller._id);
+    });
+    return conseillersIds;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+export default async function structureRules(user: IUser, can): Promise<any> {
+  const conseillersIds = await getConseillersIds(user);
   // Restreindre les permissions : les structures ne peuvent voir que les informations les concernant
   can([action.read], ressource.structures, {
     _id: user?.entity.oid,
@@ -15,5 +34,10 @@ export default function structureRules(user: IUser, can) {
   // Restreindre les permissions : les structures ne peuvent voir que les conseillers appartenant à leur organisation
   can([action.read, action.update], ressource.conseillers, {
     structureId: user?.entity.oid,
+  });
+  can([action.read], ressource.cras, {
+    'conseiller.$id': {
+      $in: conseillersIds,
+    },
   });
 }

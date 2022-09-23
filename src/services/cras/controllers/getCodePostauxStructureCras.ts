@@ -7,6 +7,7 @@ import {
   getConseillersIdsByStructure,
   getCodesPostauxStatistiquesCrasStructure,
 } from '../cras.repository';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getCodePostauxStructureCras =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -15,11 +16,15 @@ const getCodePostauxStructureCras =
 
       const conseillersIds = await getConseillersIdsByStructure(
         idStructure,
+        req.ability,
+        action.read,
         app,
       );
 
       const listCodePostaux = await getCodesPostauxStatistiquesCrasStructure(
         conseillersIds,
+        req.ability,
+        action.read,
         app,
       );
 

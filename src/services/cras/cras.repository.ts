@@ -1,6 +1,11 @@
 import service from '../../helpers/services';
 
-const getConseillersIdsByStructure = async (idStructure, app) => {
+const getConseillersIdsByStructure = async (
+  idStructure,
+  ability,
+  read,
+  app,
+) => {
   const miseEnRelations = await app.service(service.misesEnRelation).Model.find(
     {
       'structure.$id': idStructure,
@@ -15,16 +20,23 @@ const getConseillersIdsByStructure = async (idStructure, app) => {
   miseEnRelations.forEach((miseEnRelation) => {
     conseillerIds.push(miseEnRelation?.conseillerObj._id);
   });
-
   return conseillerIds;
 };
 
-const getCodesPostauxStatistiquesCrasStructure = async (conseillersId, app) =>
-  app.service(service.cras).Model.distinct('cra.codePostal', {
-    'conseiller.$id': {
-      $in: conseillersId,
-    },
-  });
+const getCodesPostauxStatistiquesCrasStructure = async (
+  conseillersId,
+  ability,
+  read,
+  app,
+) =>
+  app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .distinct('cra.codePostal', {
+      'conseiller.$id': {
+        $in: conseillersId,
+      },
+    });
 
 export {
   getConseillersIdsByStructure,
