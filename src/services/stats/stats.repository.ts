@@ -394,7 +394,7 @@ const getStatsReorientations = async (query, ability, read, app) => {
       // eslint-disable-next-line
       lieu.valeur =
         totalReorientations > 0
-          ? ~~((lieu.valeur / totalReorientations) * 100)
+          ? Math.round((lieu.valeur / totalReorientations) * 100)
           : 0;
       return lieu;
     });

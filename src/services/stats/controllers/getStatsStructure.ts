@@ -37,7 +37,6 @@ const getStatsStructure =
         req.ability,
         action.read,
         app,
-        res,
       );
 
       res.status(200).json(donneesStats);

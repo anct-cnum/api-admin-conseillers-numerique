@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
-import checkAccessRequestCras from '../cras/cras.repository';
+import { checkAccessRequestCras } from '../cras/cras.repository';
 
 const getTauxActivation = (nombreConseillersCoselec, cnfsActives) =>
   nombreConseillersCoselec

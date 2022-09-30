@@ -15,12 +15,13 @@ export default class Structures extends Service {
       createAbilities,
       getStructures(app),
     );
-    app.get
+    app.get(
       '/structure',
       authenticate('jwt'),
       createAbilities,
       getStructure(app),
     );
+    app.get(
       '/structure/:id',
       authenticate('jwt'),
       createAbilities,

@@ -9,11 +9,14 @@ import { getConseillersIdsByStructure } from '../../cras/cras.repository';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type, idType, codePostal } = req.query;
+    let { idType, codePostal } = req.query;
+    const { type } = req.query;
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
     const dateFin = new Date(String(req.query.dateFin));
     dateFin.setUTCHours(23, 59, 59, 59);
+    idType = idType === 'undefined' ? '' : idType;
+    codePostal = codePostal === 'undefined' ? '' : codePostal;
     let idStructure: ObjectId;
     let conseillerIds: ObjectId[];
     let query: Object;
@@ -33,7 +36,6 @@ const getExportStatistiquesCsv =
             req.ability,
             action.read,
             app,
-            res,
           );
           break;
         case 'structure':
@@ -59,7 +61,6 @@ const getExportStatistiquesCsv =
             req.ability,
             action.read,
             app,
-            res,
           );
           break;
         default:

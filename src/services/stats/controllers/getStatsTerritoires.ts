@@ -10,7 +10,7 @@ import {
   countPersonnesAccompagnees,
   getTauxActivation,
 } from '../../statsTerritoires/statsTerritoires.repository';
-import checkAccessRequestCras from '../../cras/cras.repository';
+import { checkAccessRequestCras } from '../../cras/cras.repository';
 
 const getTotalDepartements =
   (app: Application, req: IRequest) => async (date: string) =>

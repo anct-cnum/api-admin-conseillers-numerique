@@ -52,7 +52,7 @@ export class Stats implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getDatasStructures(app),
-      );
+    );
     app.get(
       '/stats/territoires',
       authenticate('jwt'),

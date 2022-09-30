@@ -88,6 +88,7 @@ export class Exports implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getExportStatistiquesCsv(app),
+    );
     app.get(
       '/exports/territoires-csv',
       authenticate('jwt'),
