@@ -3,8 +3,7 @@
     "airbnb-base",
     "airbnb-typescript/base",
     "plugin:prettier/recommended",
-    "plugin:import/recommended",
-    "prettier"
+    "plugin:import/recommended"
   ],
   "plugins": ["@typescript-eslint", "prettier", "import"],
   "parserOptions": {
