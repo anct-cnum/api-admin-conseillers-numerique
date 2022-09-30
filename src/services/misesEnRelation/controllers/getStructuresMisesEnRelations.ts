@@ -63,7 +63,7 @@ const getStructuresMisesEnRelations =
       }
 
       if (search) {
-        queryFilter.$text = { $search: `"${search}"` };
+        queryFilter['$text'] = { $search: `"${search}"` }; // eslint-disable-line @typescript-eslint/dot-notation
       }
 
       // User Filters
@@ -82,11 +82,11 @@ const getStructuresMisesEnRelations =
 
       const skip = req.query.$skip;
       if (skip) {
-        queryFilter.$skip = skip;
+        queryFilter['$skip'] = skip; // eslint-disable-line @typescript-eslint/dot-notation
       }
       const sort = req.query.$sort;
       if (sort) {
-        queryFilter.$sort = sort;
+        queryFilter['$sort'] = sort; // eslint-disable-line @typescript-eslint/dot-notation
       }
 
       const misesEnRelation = await app.service(service.misesEnRelation).find({
