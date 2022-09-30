@@ -6,6 +6,7 @@ import updateStructure from './controllers/updateStructure';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
 import createAbilities from '../../middleware/createAbilities';
+import getStructureById from './controllers/getStructureById';
 
 export default class Structures extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -15,6 +16,12 @@ export default class Structures extends Service {
       authenticate('jwt'),
       createAbilities,
       getStructures(app),
+    );
+    app.get(
+      '/structure/:id',
+      authenticate('jwt'),
+      createAbilities,
+      getStructureById(app),
     );
     app.patch(
       '/structure/:id',

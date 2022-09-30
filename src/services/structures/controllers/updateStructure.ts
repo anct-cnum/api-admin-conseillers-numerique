@@ -13,8 +13,11 @@ const updateStructure =
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .findOneAndUpdate(filter, update);
-
+        .findOneAndUpdate(
+          { _id: filter },
+          { $set: { contact: update.contact } },
+          { returnOriginal: false },
+        );
       res.status(200).json(structure);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
@@ -22,6 +25,7 @@ const updateStructure =
         return;
       }
       res.status(500).json(error.message);
+      throw new Error(error);
     }
   };
 

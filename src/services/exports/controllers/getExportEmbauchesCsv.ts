@@ -66,10 +66,13 @@ const getExportEmbauchesCsv =
                 'conseiller.nom': 1,
                 'conseiller.aUneExperienceMedNum': 1,
                 'conseiller.email': 1,
+                'conseiller.emailCN': 1,
                 'conseiller.telephone': 1,
                 'conseiller.nomCommune': 1,
                 'conseiller.codePostal': 1,
                 'conseiller.codeDepartement': 1,
+                'conseiller.dateFinFormation': 1,
+                'conseiller.datePrisePoste': 1,
                 'conseiller.pix': 1,
                 'structure.idPG': 1,
                 'structure.siret': 1,
@@ -102,7 +105,7 @@ const getExportEmbauchesCsv =
       }
       res.statusMessage = error.message;
       res.status(500).end();
-      return;
+      throw new Error(error);
     }
 
     generateCsvCandidat(misesEnRelations, res);

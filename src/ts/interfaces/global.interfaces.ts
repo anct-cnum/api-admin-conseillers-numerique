@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { IUser, IConseillers } from './db.interfaces';
+import { IUser } from './db.interfaces';
 
 export interface IRequest extends Request {
   ability: any;

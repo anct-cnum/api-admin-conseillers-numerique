@@ -44,7 +44,7 @@ export default function (app: Application, mailer, req: IRequest) {
               mailConfirmErrorDetail: err.message,
             },
           );
-        utils.setSentryError(err);
+        utils.initSentry();
         throw err;
       };
       return mailer
