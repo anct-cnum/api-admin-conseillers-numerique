@@ -71,7 +71,12 @@ export default async function prefetRules(user: IUser, can): Promise<any> {
   can([action.read], ressource.misesEnRelation, {
     'structureObj.codeRegion': String(user?.region),
   });
-
+  can([action.read], ressource.statsTerritoires, {
+    codeDepartement: user?.departement,
+  });
+  can([action.read], ressource.statsTerritoires, {
+    codeRegion: user?.region,
+  });
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });

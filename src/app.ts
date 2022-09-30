@@ -37,8 +37,6 @@ if (config().sentry.enabled === 'true') {
   app.use(Sentry.Handlers.requestHandler());
   // TracingHandler creates a trace for every incoming request
   app.use(Sentry.Handlers.tracingHandler());
-  // The error handler must be before any other error middleware and after all controllers
-  app.use(Sentry.Handlers.errorHandler());
 }
 
 // Load app configuration
@@ -69,6 +67,21 @@ app.configure(channels);
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
+
+if (config().sentry.enabled === 'true') {
+  // The error handler must be before any other error middleware and after all controllers
+  app.use(
+    Sentry.Handlers.errorHandler({
+      shouldHandleError(error: any) {
+        // No capture 401 (invalid login) and 404 (not found de feathers)
+        if (error.code === 401 || error.code === 404) {
+          return false;
+        }
+        return true;
+      },
+    }),
+  );
+}
 app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);

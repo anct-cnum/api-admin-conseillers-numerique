@@ -16,7 +16,7 @@ import {
   conversionPourcentage,
 } from '../stats.repository';
 
-const getStatsGlobales = async (query, ability, action, app, res) => {
+const getStatsGlobales = async (query, ability, action, app) => {
   try {
     const nbAccompagnement = await getNombreCra(query, app);
 
@@ -119,10 +119,6 @@ const getStatsGlobales = async (query, ability, action, app, res) => {
 
     return donneesStats;
   } catch (error) {
-    if (error.name === 'ForbiddenError') {
-      res.status(403).json('Accès refusé');
-    }
-    res.status(500).json(error.message);
     throw new Error(error);
   }
 };

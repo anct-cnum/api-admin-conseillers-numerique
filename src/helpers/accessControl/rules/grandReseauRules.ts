@@ -47,4 +47,5 @@ export default async function grandReseauRules(user: IUser, can): Promise<any> {
       $in: conseillersIds,
     },
   });
+  can([action.read], ressource.statsTerritoires);
 }

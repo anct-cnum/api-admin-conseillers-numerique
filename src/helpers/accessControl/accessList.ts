@@ -19,6 +19,7 @@ const ressource: Ressource = {
   structures: 'structures',
   misesEnRelation: 'misesEnRelation',
   conseillers: 'conseillers',
+  statsTerritoires: 'statsTerritoires',
   cras: 'cras',
 };
 

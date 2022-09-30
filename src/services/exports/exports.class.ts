@@ -18,6 +18,7 @@ import {
   getExportEmbauchesCsv,
   getExportConseillersHubCsv,
   getExportStatistiquesCsv,
+  getExportTerritoiresCsv,
 } from './controllers';
 
 interface Data {}
@@ -87,6 +88,11 @@ export class Exports implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getExportStatistiquesCsv(app),
+    app.get(
+      '/exports/territoires-csv',
+      authenticate('jwt'),
+      createAbilities,
+      getExportTerritoiresCsv(app),
     );
   }
 

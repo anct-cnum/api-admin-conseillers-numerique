@@ -40,4 +40,5 @@ export default async function structureRules(user: IUser, can): Promise<any> {
       $in: conseillersIds,
     },
   });
+  can([action.read], ressource.statsTerritoires);
 }
