@@ -20,7 +20,6 @@ const getConseillerById =
         res.status(403).json('Accès refusé');
         return;
       }
-      console.log(`ddfsfds ${error}`);
       res.status(500).json(error.message);
       throw new Error(error);
     }
