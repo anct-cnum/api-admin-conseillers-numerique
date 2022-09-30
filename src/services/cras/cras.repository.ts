@@ -9,7 +9,7 @@ const getConseillersIdsByStructure = async (
   const miseEnRelations = await app.service(service.misesEnRelation).Model.find(
     {
       'structure.$id': idStructure,
-      statut: { $in: ['finalisee', 'finalisee_rupture'] },
+      statut: { $in: ['finalisee', 'finalisee_rupture', 'nouvelle_rupture'] },
     },
     {
       'conseillerObj._id': 1,
