@@ -64,6 +64,7 @@ const getStructuresMisesEnRelationsStats =
       const candidatsValide = misesEnRelationValide.map((item: any) => {
         return item.conseillerObj;
       });
+      /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["item"] }] */
       res.send(
         statsDisponibles.map((item: any) => {
           item.statut = item._id;
