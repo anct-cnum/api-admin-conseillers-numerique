@@ -11,6 +11,19 @@ import {
   IUser,
 } from '../../ts/interfaces/db.interfaces';
 
+const csvCellSeparator = ';';
+const csvLineSeparator = '\n';
+
+const codeAndNomTerritoire = (territoire, statTerritoire) => {
+  if (territoire === 'codeRegion') {
+    return [statTerritoire.codeRegion, statTerritoire.nomRegion];
+  }
+  if (territoire === 'codeDepartement') {
+    return [statTerritoire.codeDepartement, statTerritoire.nomDepartement];
+  }
+  return ['Non renseignée', 'Non renseignée'];
+};
+
 const formatDate = (date: Date) => {
   if (date !== undefined) {
     return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
@@ -164,9 +177,6 @@ const generateCsvConseillersWithoutCRA = async (
   conseillers: IConseillers[] | IStructures[],
   res: Response,
 ) => {
-  const csvCellSeparator = ';';
-  const csvLineSeparator = '\n';
-
   try {
     const fileHeaders = [
       'Nom',
@@ -350,6 +360,45 @@ const generateCsvRupture = async (
   }
 };
 
+const generateCsvTerritoires = async (
+  statsTerritoires,
+  territoire,
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Code',
+      'Nom',
+      'Personnes accompagnées',
+      'Dotation de conseillers',
+      "CnFS activé sur l'espace coop",
+      "CnFS en attente d'activation",
+      "Taux d'activation",
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...statsTerritoires.map((statsTerritoire) =>
+          [
+            ...codeAndNomTerritoire(territoire, statsTerritoire),
+            statsTerritoire.personnesAccompagnees,
+            statsTerritoire.nombreConseillersCoselec,
+            statsTerritoire.cnfsActives,
+            statsTerritoire.cnfsInactives,
+            statsTerritoire.tauxActivation,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -357,4 +406,5 @@ export {
   generateCsvStructure,
   generateCsvRupture,
   generateCsvConseillersHub,
+  generateCsvTerritoires,
 };

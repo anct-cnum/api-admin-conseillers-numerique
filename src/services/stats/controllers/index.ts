@@ -1,4 +1,11 @@
 import getStatsNationales from './getStatsNationales';
+import getStatsTerritoires from './getStatsTerritoires';
+import getStatsTerritoire from './getStatsTerritoire';
+import getStatsTerritoireCra from './getStatsTerritoireCra';
 
-// eslint-disable-next-line import/prefer-default-export
-export { getStatsNationales };
+export {
+  getStatsNationales,
+  getStatsTerritoires,
+  getStatsTerritoire,
+  getStatsTerritoireCra,
+};

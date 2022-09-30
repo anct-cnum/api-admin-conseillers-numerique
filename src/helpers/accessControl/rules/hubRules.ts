@@ -128,6 +128,8 @@ export default async function hubRules(user: IUser, can) {
   structuresIds = conseillersAndStructures.map((structure) => structure._id);
 
   can(action.read, functionnality.exportHub);
+  can([action.read], ressource.statsTerritoires);
+  can([action.read], ressource.cras);
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });
