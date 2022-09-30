@@ -1,32 +1,32 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { IStructures, IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { ObjectId } from 'mongodb';
 import { BadRequest, NotFound, Forbidden } from '@feathersjs/errors';
+import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
 const getStructuresMisesEnRelations =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      //verify user role
-      const userId = req.user._id;
-      const user = await app.service(service.users).Model.findOne({ _id: new ObjectId(userId) });
-      const rolesUserAllowed = user?.roles.filter((role: string) => ['admin', 'structure', 'prefet'].includes(role));
-      if (rolesUserAllowed.length < 1) {
-        res.status(403).send(new Forbidden('User not authorized', {
-          userId: user
-        }).toJSON());
-        return;
-      }
-
-      const misesEnRelationService = app.service('misesEnRelation');
       let structureId = null;
       try {
-        structureId = new ObjectId(req.params.id);
+        structureId = req.params.id;
+        const structure: IStructures = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({ _id: structureId });
+        if (structure === null) {
+          res.status(404).json(new NotFound('Structure not found', {
+            id: req.params.id
+          }));
+          return;
+        }
       } catch (e) {
-        res.status(404).send(new NotFound('Structure not found', {
+        res.status(404).json(new NotFound('Structure not found', {
           id: req.params.id
-        }).toJSON());
+        }));
         return;
       }
       let queryFilter = {};
@@ -74,7 +74,8 @@ const getStructuresMisesEnRelations =
         queryFilter['$sort'] = sort;
       }
 
-      const misesEnRelation = await misesEnRelationService.find({ query: Object.assign({ 'structure.$id': structureId }, queryFilter) });
+      const misesEnRelation = await app.service(service.misesEnRelation).find({ query: Object.assign({ 'structure.$id': new ObjectId(structureId) }, queryFilter) });
+
       if (misesEnRelation.total === 0) {
         res.send(misesEnRelation);
         return;
