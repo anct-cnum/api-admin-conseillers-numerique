@@ -23,8 +23,7 @@ const getStatsTerritoireCra =
     }
     try {
       if (conseillerIds) {
-        let ids = [];
-        ids = conseillerIds.map((id) => new ObjectId(id));
+        const ids = conseillerIds.map((id: string) => new ObjectId(id));
         const query = {
           'cra.dateAccompagnement': {
             $gte: dateDebut,
@@ -37,11 +36,10 @@ const getStatsTerritoireCra =
           req.ability,
           action.read,
           app,
-          res,
         );
         res.status(200).json(stats);
       }
-      res.status(200).json({});
+      res.status(200).end();
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json('Accès refusé');

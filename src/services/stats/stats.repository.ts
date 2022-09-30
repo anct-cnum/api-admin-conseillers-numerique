@@ -392,7 +392,10 @@ const getStatsReorientations = async (query, ability, read, app) => {
   if (statsReorientations.length > 0) {
     return statsReorientations.map((lieu) => {
       // eslint-disable-next-line
-      lieu.valeur = totalReorientations > 0 ? ~~(lieu.valeur / totalReorientations * 100) : 0;
+      lieu.valeur =
+        totalReorientations > 0
+          ? ~~((lieu.valeur / totalReorientations) * 100)
+          : 0;
       return lieu;
     });
   }
@@ -435,7 +438,7 @@ const getStatsEvolutions = async (query, ability, read, app) => {
       },
       { $project: { mois: '$_id' } },
     ]);
-
+  aggregateEvol.push({ _id: 8, mois: 8 });
   statsEvolutions = JSON.parse(
     `{"${dateFinEvoYear.toString()}": ${JSON.stringify(aggregateEvol)}}`,
   );
@@ -471,9 +474,7 @@ const getStatsEvolutions = async (query, ability, read, app) => {
 const conversionPourcentage = async (datas, total) => {
   return datas.map((data) => {
     // eslint-disable-next-line
-    data.valeur = total > 0
-        ? Math.round((data.valeur / total) * 100)
-        : 0;
+    data.valeur = total > 0 ? Math.round((data.valeur / total) * 100) : 0;
     return data;
   });
 };
