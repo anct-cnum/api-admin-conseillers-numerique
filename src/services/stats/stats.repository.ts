@@ -19,7 +19,7 @@ const sortByValueThenName = (a, b) => {
   return libelle1.localeCompare(libelle2, 'fr');
 };
 
-const getNombreCra = async (query, ability, read, app) =>
+const getNombreCra = async (query, app) =>
   app.service(service.cras).Model.countDocuments(query);
 
 const getPersonnesRecurrentes = async (query, ability, read, app) => {
@@ -479,6 +479,19 @@ const conversionPourcentage = async (datas, total) => {
   });
 };
 
+const getPersonnesAccompagnees = async (statsActivites) => {
+  const nbTotalParticipant =
+    statsActivites?.find((activite) => activite._id === 'collectif')
+      ?.nbParticipants ?? 0;
+  const nbAccompagnementPerso =
+    statsActivites?.find((activite) => activite._id === 'individuel')?.count ??
+    0;
+  const nbDemandePonctuel =
+    statsActivites?.find((activite) => activite._id === 'ponctuel')?.count ?? 0;
+
+  return nbTotalParticipant + nbAccompagnementPerso + nbDemandePonctuel;
+};
+
 export {
   getNombreCra,
   getPersonnesRecurrentes,
@@ -495,4 +508,5 @@ export {
   getStatsReorientations,
   getStatsEvolutions,
   conversionPourcentage,
+  getPersonnesAccompagnees,
 };

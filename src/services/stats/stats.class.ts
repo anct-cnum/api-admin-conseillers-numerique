@@ -13,6 +13,8 @@ import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
   getStatsNationales,
+  getDatasStructures,
+  getStatsStructure,
   getStatsTerritoires,
   getStatsTerritoire,
   getStatsTerritoireCra,
@@ -39,6 +41,18 @@ export class Stats implements ServiceMethods<Data> {
       createAbilities,
       getStatsNationales(app),
     );
+    app.get(
+      '/stats/structure/cras',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsStructure(app),
+    );
+    app.get(
+      '/stats/datas/structures',
+      authenticate('jwt'),
+      createAbilities,
+      getDatasStructures(app),
+      );
     app.get(
       '/stats/territoires',
       authenticate('jwt'),

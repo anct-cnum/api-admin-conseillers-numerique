@@ -6,6 +6,7 @@ import getExportStructuresCsv from './getExportStructuresCsv';
 import getExportConseillersWithoutCRACsv from './getExportConseillersWithoutCRACsv';
 import getExportEmbauchesCsv from './getExportEmbauchesCsv';
 import getExportConseillersHubCsv from './getExportConseillersHubCsv';
+import getExportStatistiquesCsv from './getExportStatistiquesCsv';
 import getExportTerritoiresCsv from './getExportTerritoiresCsv';
 
 export {
@@ -17,5 +18,6 @@ export {
   getExportConseillersWithoutCRACsv,
   getExportEmbauchesCsv,
   getExportConseillersHubCsv,
+  getExportStatistiquesCsv,
   getExportTerritoiresCsv,
 };
