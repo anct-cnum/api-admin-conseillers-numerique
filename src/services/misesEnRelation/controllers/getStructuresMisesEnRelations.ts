@@ -1,8 +1,11 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { IStructures, IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { ObjectId } from 'mongodb';
+import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IStructures,
+  IMisesEnRelation,
+} from '../../../ts/interfaces/db.interfaces';
 import { BadRequest, NotFound, Forbidden } from '@feathersjs/errors';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
@@ -18,32 +21,46 @@ const getStructuresMisesEnRelations =
           .Model.accessibleBy(req.ability, action.read)
           .findOne({ _id: structureId });
         if (structure === null) {
-          res.status(404).json(new NotFound('Structure not found', {
-            id: req.params.id
-          }));
+          res.status(404).json(
+            new NotFound('Structure not found', {
+              id: req.params.id,
+            }),
+          );
           return;
         }
       } catch (e) {
-        res.status(404).json(new NotFound('Structure not found', {
-          id: req.params.id
-        }));
+        res.status(404).json(
+          new NotFound('Structure not found', {
+            id: req.params.id,
+          }),
+        );
         return;
       }
       let queryFilter = {};
       const { filter } = req.query;
       const search = req.query['$search'];
       if (filter) {
-        const allowedFilters = ['nouvelle', 'interessee', 'nonInteressee', 'recrutee', 'finalisee', 'nouvelle_rupture', 'toutes'];
+        const allowedFilters = [
+          'nouvelle',
+          'interessee',
+          'nonInteressee',
+          'recrutee',
+          'finalisee',
+          'nouvelle_rupture',
+          'toutes',
+        ];
         if (allowedFilters.includes(filter)) {
           if (filter !== 'toutes') {
             queryFilter = { statut: filter };
           } else {
-            queryFilter = { statut: { '$ne': 'non_disponible' } };
+            queryFilter = { statut: { $ne: 'non_disponible' } };
           }
         } else {
-          res.status(400).send(new BadRequest('Invalid filter', {
-            filter
-          }).toJSON());
+          res.status(400).send(
+            new BadRequest('Invalid filter', {
+              filter,
+            }).toJSON(),
+          );
           return;
         }
       }
@@ -59,10 +76,11 @@ const getStructuresMisesEnRelations =
         queryFilter['conseillerObj.pix.palier'] = { $in: pixInt };
       }
       if (diplome !== undefined) {
-        queryFilter['conseillerObj.estDiplomeMedNum'] = (diplome === 'true');
+        queryFilter['conseillerObj.estDiplomeMedNum'] = diplome === 'true';
       }
       if (cv !== undefined) {
-        queryFilter['conseillerObj.cv'] = (cv === 'true') ? { '$ne': null } : { $in: [null] };
+        queryFilter['conseillerObj.cv'] =
+          cv === 'true' ? { $ne: null } : { $in: [null] };
       }
 
       const skip = req.query['$skip'];
@@ -74,7 +92,14 @@ const getStructuresMisesEnRelations =
         queryFilter['$sort'] = sort;
       }
 
-      const misesEnRelation = await app.service(service.misesEnRelation).find({ query: Object.assign({ 'structure.$id': new ObjectId(structureId) }, queryFilter) });
+      const misesEnRelation = await app
+        .service(service.misesEnRelation)
+        .find({
+          query: Object.assign(
+            { 'structure.$id': new ObjectId(structureId) },
+            queryFilter,
+          ),
+        });
 
       if (misesEnRelation.total === 0) {
         res.send(misesEnRelation);
