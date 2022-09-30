@@ -1,12 +1,9 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
+import { BadRequest, NotFound } from '@feathersjs/errors';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import {
-  IStructures,
-  IMisesEnRelation,
-} from '../../../ts/interfaces/db.interfaces';
-import { BadRequest, NotFound, Forbidden } from '@feathersjs/errors';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
@@ -38,7 +35,7 @@ const getStructuresMisesEnRelations =
       }
       let queryFilter = {};
       const { filter } = req.query;
-      const search = req.query['$search'];
+      const search = req.query.$search;
       if (filter) {
         const allowedFilters = [
           'nouvelle',
@@ -66,13 +63,13 @@ const getStructuresMisesEnRelations =
       }
 
       if (search) {
-        queryFilter['$text'] = { $search: '"' + search + '"' };
+        queryFilter.$text = { $search: `"${search}"` };
       }
 
-      //User Filters
+      // User Filters
       const { pix, diplome, cv } = req.query;
       if (pix !== undefined) {
-        const pixInt = pix.split(',').map((k: string) => parseInt(k));
+        const pixInt = pix.split(',').map((k: string) => parseInt(k, 10));
         queryFilter['conseillerObj.pix.palier'] = { $in: pixInt };
       }
       if (diplome !== undefined) {
@@ -83,20 +80,20 @@ const getStructuresMisesEnRelations =
           cv === 'true' ? { $ne: null } : { $in: [null] };
       }
 
-      const skip = req.query['$skip'];
+      const skip = req.query.$skip;
       if (skip) {
-        queryFilter['$skip'] = skip;
+        queryFilter.$skip = skip;
       }
-      const sort = req.query['$sort'];
+      const sort = req.query.$sort;
       if (sort) {
-        queryFilter['$sort'] = sort;
+        queryFilter.$sort = sort;
       }
 
       const misesEnRelation = await app.service(service.misesEnRelation).find({
-        query: Object.assign(
-          { 'structure.$id': new ObjectId(structureId) },
-          queryFilter,
-        ),
+        query: {
+          'structure.$id': new ObjectId(structureId),
+          ...queryFilter,
+        },
       });
 
       if (misesEnRelation.total === 0) {
