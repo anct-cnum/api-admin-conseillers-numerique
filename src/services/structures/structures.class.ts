@@ -4,6 +4,7 @@ import { Application } from '../../declarations';
 import { getStructures, getStructure, updateStructure } from './controllers';
 
 import createAbilities from '../../middleware/createAbilities';
+import getStructureById from './controllers/getStructureById';
 
 export default class Structures extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -14,11 +15,16 @@ export default class Structures extends Service {
       createAbilities,
       getStructures(app),
     );
-    app.get(
+    app.get
       '/structure',
       authenticate('jwt'),
       createAbilities,
       getStructure(app),
+    );
+      '/structure/:id',
+      authenticate('jwt'),
+      createAbilities,
+      getStructureById(app),
     );
     app.patch(
       '/structure/:id',

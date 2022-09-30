@@ -22,7 +22,7 @@ const getConseillersIds = async (user: IUser) => {
 export default async function structureRules(user: IUser, can): Promise<any> {
   const conseillersIds = await getConseillersIds(user);
   // Restreindre les permissions : les structures ne peuvent voir que les informations les concernant
-  can([action.read], ressource.structures, {
+  can([action.read, action.update], ressource.structures, {
     _id: user?.entity.oid,
   });
   can([action.read, action.update], ressource.users, {
