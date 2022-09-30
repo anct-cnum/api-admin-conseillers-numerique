@@ -92,14 +92,12 @@ const getStructuresMisesEnRelations =
         queryFilter['$sort'] = sort;
       }
 
-      const misesEnRelation = await app
-        .service(service.misesEnRelation)
-        .find({
-          query: Object.assign(
-            { 'structure.$id': new ObjectId(structureId) },
-            queryFilter,
-          ),
-        });
+      const misesEnRelation = await app.service(service.misesEnRelation).find({
+        query: Object.assign(
+          { 'structure.$id': new ObjectId(structureId) },
+          queryFilter,
+        ),
+      });
 
       if (misesEnRelation.total === 0) {
         res.send(misesEnRelation);
