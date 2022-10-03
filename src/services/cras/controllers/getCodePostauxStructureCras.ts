@@ -16,8 +16,6 @@ const getCodePostauxStructureCras =
 
       const conseillersIds = await getConseillersIdsByStructure(
         idStructure,
-        req.ability,
-        action.read,
         app,
       );
 

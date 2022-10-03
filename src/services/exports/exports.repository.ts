@@ -412,13 +412,13 @@ const generateCsvSatistiques = async (
         statistiques.nbUsagersAtelierCollectif
       }\nRedirections vers une autre structure agréée${
         statistiques.nbReconduction
-      }\n`,
+      }`,
     ];
     const statsThemes = [
-      'Thèmes des accompagnements',
+      '\nThèmes des accompagnements',
       ...statistiques.statsThemes.map(
         (theme) =>
-          `${
+          `\n${
             labelsCorrespondance.find((label) => label.nom === theme.nom)
               ?.correspondance ?? theme.nom
           };${theme.valeur}`,
@@ -426,15 +426,15 @@ const generateCsvSatistiques = async (
       '',
     ];
     const statsLieux = [
-      `Lieux des accompagnements (en %)'`,
+      `\nLieux des accompagnements (en %)'`,
       ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
         (statLieux, index) =>
-          `${statLieux};${statistiques.statsLieux[index].valeur}`,
+          `\n${statLieux};${statistiques.statsLieux[index].valeur}`,
       ),
       '',
     ];
     const statsDurees = [
-      'Durée des accompagnements',
+      '\nDurée des accompagnements',
       ...[
         'Moins de 30 minutes',
         '30-60 minutes',
@@ -442,12 +442,12 @@ const generateCsvSatistiques = async (
         'Plus de 120 minutes',
       ].map(
         (statsDuree, index) =>
-          `${statsDuree};${statistiques.statsDurees[index].valeur}`,
+          `\n${statsDuree};${statistiques.statsDurees[index].valeur}`,
       ),
       '',
     ];
     const statsAges = [
-      'Tranches d’âge des usagers (en %)',
+      '\nTranches d’âge des usagers (en %)',
       ...[
         'Moins de 12 ans',
         '12-18 ans',
@@ -456,12 +456,12 @@ const generateCsvSatistiques = async (
         'Plus de 60 ans',
       ].map(
         (statsAge, index) =>
-          `${statsAge};${statistiques.statsAges[index].valeur}`,
+          `\n${statsAge};${statistiques.statsAges[index].valeur}`,
       ),
       '',
     ];
     const statsUsagers = [
-      'Statut des usagers (en %)',
+      '\nStatut des usagers (en %)',
       ...[
         'Scolarisé(e)',
         'Sans emploi',
@@ -470,7 +470,7 @@ const generateCsvSatistiques = async (
         'Non renseigné',
       ].map(
         (statsUsager, index) =>
-          `${statsUsager};${statistiques.statsUsagers[index].valeur}`,
+          `\n${statsUsager};${statistiques.statsUsagers[index].valeur}`,
       ),
       '',
     ];
@@ -489,10 +489,10 @@ const generateCsvSatistiques = async (
       'Décembre',
     ];
     const statsEvolutions = [
-      `"Évolution·des·comptes·rendus·d'activité"`,
+      `\nÉvolution·des·comptes·rendus·d'activité`,
       ...Object.keys(statistiques.statsEvolutions)
         .map((year) => [
-          year,
+          `\n${year}`,
           ...statistiques.statsEvolutions[year]
             .sort(
               (statEvolutionA, statEvolutionB) =>
@@ -500,18 +500,19 @@ const generateCsvSatistiques = async (
             )
             .map(
               (orderedStatEvolution) =>
-                `${mois[orderedStatEvolution.mois]};
-                ${orderedStatEvolution.totalCras}`,
+                `\n${mois[orderedStatEvolution.mois]};${
+                  orderedStatEvolution.totalCras
+                }`,
             ),
           '',
         ])
         .flat(),
     ];
     const statsReorientations = [
-      'Usager.ères réorienté.es',
+      '\nUsager.ères réorienté.es',
       ...statistiques.statsReorientations.map(
         (statReorientation) =>
-          `${statReorientation.nom};${statReorientation.valeur}`,
+          `\n${statReorientation.nom};${statReorientation.valeur}`,
       ),
     ];
 

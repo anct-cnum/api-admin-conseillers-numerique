@@ -17,8 +17,6 @@ const getStatsStructure =
       dateFin.setUTCHours(23, 59, 59, 59);
       const conseillerIds = await getConseillersIdsByStructure(
         idStructure,
-        req.ability,
-        action.read,
         app,
       );
       const query = {

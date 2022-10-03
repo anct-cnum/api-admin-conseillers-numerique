@@ -5,7 +5,10 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from '../../stats/controllers/getStatsGlobales';
 import { generateCsvSatistiques } from '../exports.repository';
-import { getConseillersIdsByStructure } from '../../cras/cras.repository';
+import {
+  getConseillersIdsByStructure,
+  getConseillersIdsByTerritoire,
+} from '../../cras/cras.repository';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -40,12 +43,7 @@ const getExportStatistiquesCsv =
           break;
         case 'structure':
           idStructure = new ObjectId(String(idType));
-          conseillerIds = await getConseillersIdsByStructure(
-            idStructure,
-            req.ability,
-            action.read,
-            app,
-          );
+          conseillerIds = await getConseillersIdsByStructure(idStructure, app);
           query = {
             'cra.dateAccompagnement': {
               $gte: dateDebut,
@@ -64,8 +62,37 @@ const getExportStatistiquesCsv =
           );
           break;
         default:
+          conseillerIds = await getConseillersIdsByTerritoire(
+            type,
+            idType,
+            app,
+          );
+
+          query = {
+            'cra.dateAccompagnement': {
+              $gte: dateDebut,
+              $lte: dateFin,
+            },
+            'conseiller.$id': { $in: conseillerIds },
+          };
+          statistiques = await getStatsGlobales(
+            query,
+            req.ability,
+            action.read,
+            app,
+          );
           break;
       }
+
+      generateCsvSatistiques(
+        statistiques,
+        dateDebut,
+        dateFin,
+        type,
+        idType,
+        codePostal,
+        res,
+      );
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.statusMessage = 'Accès refusé';
@@ -76,16 +103,6 @@ const getExportStatistiquesCsv =
       res.status(500).end();
       throw new Error(error);
     }
-
-    generateCsvSatistiques(
-      statistiques,
-      dateDebut,
-      dateFin,
-      type,
-      idType,
-      codePostal,
-      res,
-    );
   };
 
 export default getExportStatistiquesCsv;

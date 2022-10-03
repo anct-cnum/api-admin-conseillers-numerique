@@ -39,8 +39,6 @@ const getDatasStructures =
         structures.map(async (structure) => {
           const conseillerIds = await getConseillersIdsByStructure(
             structure._id,
-            req.ability,
-            action.read,
             app,
           );
           let CRAEnregistres = 0;
