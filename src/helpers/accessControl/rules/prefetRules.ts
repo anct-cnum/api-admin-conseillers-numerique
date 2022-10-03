@@ -85,4 +85,9 @@ export default async function prefetRules(user: IUser, can): Promise<any> {
       $in: conseillersIds,
     },
   });
+  can([action.read], ressource.statsConseillersCras, {
+    'conseiller.$id': {
+      $in: conseillersIds,
+    },
+  });
 }

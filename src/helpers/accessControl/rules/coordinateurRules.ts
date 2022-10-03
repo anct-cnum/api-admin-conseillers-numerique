@@ -33,5 +33,8 @@ export default async function coordinateurRules(
   can([action.read], ressource.cras, {
     'conseiller.$id': { $in: listeSubordonnesIds },
   });
+  can([action.read], ressource.statsConseillersCras, {
+    'conseiller.$id': { $in: listeSubordonnesIds },
+  });
   can([action.read], ressource.statsTerritoires);
 }

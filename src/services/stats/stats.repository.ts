@@ -422,6 +422,7 @@ const getStatsEvolutions = async (query, ability, read, app) => {
     const cnfsIds = query['conseiller.$id'];
     matchQuery = { 'conseiller.$id': cnfsIds };
   }
+
   aggregateEvol = await app
     .service(service.statsConseillersCras)
     .Model.aggregate([
@@ -436,9 +437,8 @@ const getStatsEvolutions = async (query, ability, read, app) => {
       {
         $addFields: { mois: '$_id', annee: dateFinEvoYear },
       },
-      { $project: { mois: '$_id' } },
     ]);
-  aggregateEvol.push({ _id: 8, mois: 8 });
+
   statsEvolutions = JSON.parse(
     `{"${dateFinEvoYear.toString()}": ${JSON.stringify(aggregateEvol)}}`,
   );
@@ -459,7 +459,6 @@ const getStatsEvolutions = async (query, ability, read, app) => {
         {
           $addFields: { mois: '$_id', annee: dateDebutEvoYear },
         },
-        { $project: { mois: '$_id' } },
       ]);
     statsEvolutions = JSON.parse(
       `{"${dateDebutEvoYear.toString()}": ${JSON.stringify(

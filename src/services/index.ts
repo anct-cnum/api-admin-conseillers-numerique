@@ -7,7 +7,7 @@ import structures from './structures/structures.service';
 import stats from './stats/stats.service';
 import cras from './cras/cras.service';
 import statsTerritoires from './statsTerritoires/statsTerritoires.service';
-import stats_conseillers_cras from './stats_conseillers_cras/stats_conseillers_cras.service';
+import statsConseillersCras from './statsConseillersCras/statsConseillersCras.service';
 
 export default function (app: Application): void {
   app.configure(users);
@@ -18,5 +18,5 @@ export default function (app: Application): void {
   app.configure(stats);
   app.configure(cras);
   app.configure(statsTerritoires);
-  app.configure(stats_conseillers_cras);
+  app.configure(statsConseillersCras);
 }
