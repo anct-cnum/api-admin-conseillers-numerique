@@ -3,7 +3,7 @@ import { action, ressource } from '../accessList';
 import {
   IUser,
   IConseillers,
-  isConseillers,
+  isConseiller,
 } from '../../../ts/interfaces/db.interfaces';
 import app from '../../../app';
 
@@ -30,7 +30,7 @@ export default async function coordinateurRules(
   const conseiller: IConseillers | Error = await getConseillers(
     user.entity.oid,
   );
-  if (isConseillers(conseiller)) {
+  if (isConseiller(conseiller)) {
     const listeSubordonnesIds: ObjectId[] = conseiller.listeSubordonnes?.liste;
     can([action.read], ressource.conseillers, {
       _id: { $in: listeSubordonnesIds },

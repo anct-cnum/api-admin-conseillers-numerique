@@ -379,6 +379,6 @@ export interface IStatsTerritoires {
   tauxActivation: number;
 }
 
-export function isConseillers(item: any): item is IConseillers {
+export function isConseiller(item: any): item is IConseillers {
   return item;
 }
