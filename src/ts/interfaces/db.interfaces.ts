@@ -378,3 +378,7 @@ export interface IStatsTerritoires {
   nomRegion: string;
   tauxActivation: number;
 }
+
+export function isConseiller(item: any): item is IConseillers {
+  return item;
+}

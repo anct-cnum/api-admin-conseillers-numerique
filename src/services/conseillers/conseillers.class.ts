@@ -3,6 +3,7 @@ import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import getConseillers from './controllers/getConseillers';
 import createAbilities from '../../middleware/createAbilities';
+import getConseillerById from './controllers/getConseillersById';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -12,6 +13,12 @@ export default class Conseillers extends Service {
       authenticate('jwt'),
       createAbilities,
       getConseillers(app),
+    );
+    app.get(
+      '/conseiller/:id',
+      authenticate('jwt'),
+      createAbilities,
+      getConseillerById(app),
     );
   }
 }
