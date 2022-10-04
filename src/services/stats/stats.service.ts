@@ -16,5 +16,5 @@ export default function (app: Application): void {
   };
 
   // Initialize our service with any options it requires
-  app.use('stats', new Stats(options, app));
+  app.use('stats', new Stats(app, options));
 }

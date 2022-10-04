@@ -14,7 +14,7 @@ import {
 } from '../stats.repository';
 
 const getDatasStructures =
-  (app: Application) => async (req: IRequest, res: Response) => {
+  (app: Application, options) => async (req: IRequest, res: Response) => {
     try {
       const dateDebut = new Date(String(req.query.dateDebut));
       const dateFin = new Date(String(req.query.dateFin));
@@ -24,12 +24,12 @@ const getDatasStructures =
         data: [],
         skip: page,
         total: 0,
-        limit: 50,
+        limit: options.paginate.default,
       };
       const count = await countStructures(req.ability, action.read, app);
       const structures = await getStructuresIds(
-        page > 0 ? (page - 1) * 50 : 0,
-        50,
+        page > 0 ? (page - 1) * options.paginate.default : 0,
+        options.paginate.default,
         req.ability,
         action.read,
         app,
@@ -43,7 +43,7 @@ const getDatasStructures =
           );
           let CRAEnregistres = 0;
           let personnesAccompagnees = 0;
-          if (conseillerIds !== undefined && conseillerIds.length > 0) {
+          if (conseillerIds?.length > 0) {
             try {
               const query = {
                 'conseiller.$id': {

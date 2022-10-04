@@ -11,7 +11,7 @@ import {
   IUser,
 } from '../../ts/interfaces/db.interfaces';
 
-const labelsCorrespondance = require('../../../data/themesCorrespondances.json');
+const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
 const csvCellSeparator = ';';
 const csvLineSeparator = '\n';

@@ -61,7 +61,7 @@ const getExportStatistiquesCsv =
             app,
           );
           break;
-        default:
+        case 'codeDepartement' || 'codeRegion':
           conseillerIds = await getConseillersIdsByTerritoire(
             type,
             idType,
@@ -81,6 +81,8 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          break;
+        default:
           break;
       }
 

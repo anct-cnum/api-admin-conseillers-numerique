@@ -7,16 +7,16 @@ const getConseillersIds = async (user) => {
   try {
     const conseillersIds = [];
     let query = {};
-    if (user?.departement === undefined) {
+    if (user?.region) {
       query = {
         codeRegion: {
-          $in: [String(user?.region)],
+          $in: [`${user?.region}`],
         },
       };
     } else {
       query = {
         codeDepartement: {
-          $in: [String(user?.departement)],
+          $in: [`${user?.departement}`],
         },
       };
     }

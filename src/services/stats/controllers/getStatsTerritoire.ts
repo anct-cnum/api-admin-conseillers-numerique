@@ -83,14 +83,14 @@ const getStatsTerritoire =
           typeTerritoire,
           String(idTerritoire),
         );
-        res.send(territoire);
+        res.status(200).json(territoire);
       } else if (typeTerritoire === 'codeRegion') {
         territoire = await getRegion(app, checkRoleAccessStatsTerritoires)(
           dateFinFormat,
           typeTerritoire,
           String(idTerritoire),
         );
-        res.send(territoire[0]);
+        res.status(200).json(territoire[0]);
       } else {
         res.status(400).json('le type de territoire est invalide');
       }

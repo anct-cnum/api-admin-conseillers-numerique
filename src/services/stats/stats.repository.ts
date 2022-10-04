@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import service from '../../helpers/services';
 
-const labelsCorrespondance = require('../../../data/themesCorrespondances.json');
+const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
 const sortByValueThenName = (a, b) => {
   if (a.valeur > b.valeur) {

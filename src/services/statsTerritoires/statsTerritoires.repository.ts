@@ -5,7 +5,7 @@ import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { checkAccessRequestCras } from '../cras/cras.repository';
 
 const getTauxActivation = (nombreConseillersCoselec, cnfsActives) =>
-  nombreConseillersCoselec
+  nombreConseillersCoselec > 0
     ? Math.round((cnfsActives * 100) / nombreConseillersCoselec)
     : 0;
 
