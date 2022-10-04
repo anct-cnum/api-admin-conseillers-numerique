@@ -15,8 +15,9 @@ export default function (app: Application): void {
   const options = {
     Model: createModel(app),
     paginate: app.get('paginate'),
+    whitelist: ['$text', '$search', '$language'], // fields used by feathers-mongodb-fuzzy-search
   };
 
   // Initialize our service with any options it requires
-  app.use('conseillers', new Conseillers(options, app));
+  app.use('conseillers', new Conseillers(options));
 }
