@@ -5,13 +5,4 @@ import getConseillers from './controllers/getConseillers';
 import createAbilities from '../../middleware/createAbilities';
 
 export default class Conseillers extends Service {
-  constructor(options: Partial<MongooseServiceOptions>, app: Application) {
-    super(options);
-    app.get(
-      '/conseillers',
-      authenticate('jwt'),
-      createAbilities,
-      getConseillers(app),
-    );
-  }
 }
