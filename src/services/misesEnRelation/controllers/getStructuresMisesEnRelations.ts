@@ -11,21 +11,12 @@ const getStructuresMisesEnRelations =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
       let structureId = null;
-      try {
-        structureId = req.params.id;
-        const structure: IStructures = await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.read)
-          .findOne({ _id: structureId });
-        if (structure === null) {
-          res.status(404).json(
-            new NotFound('Structure not found', {
-              id: req.params.id,
-            }),
-          );
-          return;
-        }
-      } catch (e) {
+      structureId = req.params.id;
+      const structure: IStructures = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: structureId });
+      if (structure === null) {
         res.status(404).json(
           new NotFound('Structure not found', {
             id: req.params.id,
@@ -96,10 +87,6 @@ const getStructuresMisesEnRelations =
         },
       });
 
-      if (misesEnRelation.total === 0) {
-        res.send(misesEnRelation);
-        return;
-      }
       res.send(misesEnRelation);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
