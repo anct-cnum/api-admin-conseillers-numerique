@@ -37,16 +37,18 @@ const getStructuresMisesEnRelationsStats =
         return;
       }
 
-      const statsDisponibles = await app.service(service.misesEnRelation).Model.aggregate([
-        {
-          $match: {
-            'structure.$id': structureId,
-            _id: { $ne: 'non_disponible' },
+      const statsDisponibles = await app
+        .service(service.misesEnRelation)
+        .Model.aggregate([
+          {
+            $match: {
+              'structure.$id': structureId,
+              _id: { $ne: 'non_disponible' },
+            },
           },
-        },
-        { $group: { _id: '$statut', count: { $sum: 1 } } },
-        { $sort: { _id: 1 } },
-      ]);
+          { $group: { _id: '$statut', count: { $sum: 1 } } },
+          { $sort: { _id: 1 } },
+        ]);
 
       /* ajout des candidats dont le recrutement est finalisé dans détails structure */
       const misesEnRelationFinalise = await app
