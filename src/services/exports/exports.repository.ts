@@ -11,6 +11,21 @@ import {
   IUser,
 } from '../../ts/interfaces/db.interfaces';
 
+const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
+
+const csvCellSeparator = ';';
+const csvLineSeparator = '\n';
+
+const codeAndNomTerritoire = (territoire, statTerritoire) => {
+  if (territoire === 'codeRegion') {
+    return [statTerritoire.codeRegion, statTerritoire.nomRegion];
+  }
+  if (territoire === 'codeDepartement') {
+    return [statTerritoire.codeDepartement, statTerritoire.nomDepartement];
+  }
+  return ['Non renseignée', 'Non renseignée'];
+};
+
 const formatDate = (date: Date) => {
   if (date !== undefined) {
     return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
@@ -176,9 +191,6 @@ const generateCsvConseillersWithoutCRA = async (
   conseillers: IConseillers[] | IStructures[],
   res: Response,
 ) => {
-  const csvCellSeparator = ';';
-  const csvLineSeparator = '\n';
-
   try {
     const fileHeaders = [
       'Nom',
@@ -362,6 +374,211 @@ const generateCsvRupture = async (
   }
 };
 
+const generateCsvSatistiques = async (
+  statistiques,
+  dateDebut,
+  dateFin,
+  type,
+  idType,
+  codePostal,
+  res: Response,
+) => {
+  try {
+    const general = [
+      `Général\nPersonnes totales accompagnées durant cette période;${
+        statistiques.nbTotalParticipant +
+        statistiques.nbAccompagnementPerso +
+        statistiques.nbDemandePonctuel -
+        statistiques.nbParticipantsRecurrents
+      }\nAccompagnements total enregistrés (dont récurrent);${
+        statistiques.nbTotalParticipant +
+        statistiques.nbAccompagnementPerso +
+        statistiques.nbDemandePonctuel
+      }\nAteliers réalisés;${
+        statistiques.nbAteliers
+      }\nTotal des participants aux ateliers;${
+        statistiques.nbTotalParticipant
+      }\nAccompagnements individuels;${
+        statistiques.nbAccompagnementPerso
+      }\nDemandes ponctuelles;${
+        statistiques.nbDemandePonctuel
+      }\nAccompagnements avec suivi;${
+        statistiques.nbUsagersBeneficiantSuivi
+      }\nPourcentage du total des usagers accompagnés sur cette période;${
+        statistiques.tauxTotalUsagersAccompagnes
+      }\nAccompagnements individuels;${
+        statistiques.nbUsagersAccompagnementIndividuel
+      }\nAccompagnements en atelier collectif;${
+        statistiques.nbUsagersAtelierCollectif
+      }\nRedirections vers une autre structure agréée${
+        statistiques.nbReconduction
+      }`,
+    ];
+    const statsThemes = [
+      '\nThèmes des accompagnements',
+      ...statistiques.statsThemes.map(
+        (theme) =>
+          `\n${
+            labelsCorrespondance.find((label) => label.nom === theme.nom)
+              ?.correspondance ?? theme.nom
+          };${theme.valeur}`,
+      ),
+      '',
+    ];
+    const statsLieux = [
+      `\nLieux des accompagnements (en %)'`,
+      ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
+        (statLieux, index) =>
+          `\n${statLieux};${statistiques.statsLieux[index].valeur}`,
+      ),
+      '',
+    ];
+    const statsDurees = [
+      '\nDurée des accompagnements',
+      ...[
+        'Moins de 30 minutes',
+        '30-60 minutes',
+        '60-120 minutes',
+        'Plus de 120 minutes',
+      ].map(
+        (statsDuree, index) =>
+          `\n${statsDuree};${statistiques.statsDurees[index].valeur}`,
+      ),
+      '',
+    ];
+    const statsAges = [
+      '\nTranches d’âge des usagers (en %)',
+      ...[
+        'Moins de 12 ans',
+        '12-18 ans',
+        '18-35 ans',
+        '35-60 ans',
+        'Plus de 60 ans',
+      ].map(
+        (statsAge, index) =>
+          `\n${statsAge};${statistiques.statsAges[index].valeur}`,
+      ),
+      '',
+    ];
+    const statsUsagers = [
+      '\nStatut des usagers (en %)',
+      ...[
+        'Scolarisé(e)',
+        'Sans emploi',
+        'En emploi',
+        'Retraité',
+        'Non renseigné',
+      ].map(
+        (statsUsager, index) =>
+          `\n${statsUsager};${statistiques.statsUsagers[index].valeur}`,
+      ),
+      '',
+    ];
+    const mois = [
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre',
+    ];
+    const statsEvolutions = [
+      `\nÉvolution·des·comptes·rendus·d'activité`,
+      ...Object.keys(statistiques.statsEvolutions)
+        .map((year) => [
+          `\n${year}`,
+          ...statistiques.statsEvolutions[year]
+            .sort(
+              (statEvolutionA, statEvolutionB) =>
+                statEvolutionA.mois - statEvolutionB.mois,
+            )
+            .map(
+              (orderedStatEvolution) =>
+                `\n${mois[orderedStatEvolution.mois]};${
+                  orderedStatEvolution.totalCras
+                }`,
+            ),
+          '',
+        ])
+        .flat(),
+    ];
+    const statsReorientations = [
+      '\nUsager.ères réorienté.es',
+      ...statistiques.statsReorientations.map(
+        (statReorientation) =>
+          `\n${statReorientation.nom};${statReorientation.valeur}`,
+      ),
+    ];
+
+    const buildExportStatistiquesCsvFileContent = [
+      `Statistiques ${type} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(
+        dateDebut,
+      ).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
+      general,
+      statsThemes,
+      statsLieux,
+      statsDurees,
+      statsAges,
+      statsUsagers,
+      statsEvolutions,
+      statsReorientations,
+    ].join(csvLineSeparator);
+
+    res.write(buildExportStatistiquesCsvFileContent);
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
+const generateCsvTerritoires = async (
+  statsTerritoires,
+  territoire,
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Code',
+      'Nom',
+      'Personnes accompagnées',
+      'Dotation de conseillers',
+      "CnFS activé sur l'espace coop",
+      "CnFS en attente d'activation",
+      "Taux d'activation",
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...statsTerritoires.map((statsTerritoire) =>
+          [
+            ...codeAndNomTerritoire(territoire, statsTerritoire),
+            statsTerritoire.personnesAccompagnees,
+            statsTerritoire.nombreConseillersCoselec,
+            statsTerritoire.cnfsActives,
+            statsTerritoire.cnfsInactives,
+            statsTerritoire.tauxActivation,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -369,4 +586,6 @@ export {
   generateCsvStructure,
   generateCsvRupture,
   generateCsvConseillersHub,
+  generateCsvSatistiques,
+  generateCsvTerritoires,
 };

@@ -1,5 +1,6 @@
 type Roles =
   | 'admin'
+  | 'anonyme'
   | 'structure'
   | 'conseiller'
   | 'prefet'

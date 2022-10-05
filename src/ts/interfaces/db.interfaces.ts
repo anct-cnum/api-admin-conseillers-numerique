@@ -379,6 +379,14 @@ export interface IStatsTerritoires {
   tauxActivation: number;
 }
 
+export interface IStatsConseillersCras {
+  conseiller: [ObjectId];
+  2021: [Object];
+  2022: [Object];
+  2023: [Object];
+  2024: [Object];
+}
+
 export function isConseiller(item: any): item is IConseillers {
   return item;
 }

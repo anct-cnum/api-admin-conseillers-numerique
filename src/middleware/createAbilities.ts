@@ -6,6 +6,7 @@ import { IRequest } from '../ts/interfaces/global.interfaces';
 
 import {
   adminRules,
+  anonymeRules,
   structureRules,
   conseillerRules,
   prefetRules,
@@ -21,11 +22,14 @@ async function defineAbilitiesFor(user: IUser, role: Roles) {
     case 'admin':
       adminRules(can);
       break;
+    case 'anonyme':
+      anonymeRules(can);
+      break;
     case 'structure':
-      structureRules(user, can);
+      await structureRules(user, can);
       break;
     case 'prefet':
-      prefetRules(user, can);
+      await prefetRules(user, can);
       break;
     case 'conseiller':
       conseillerRules(user, can);

@@ -1,13 +1,13 @@
-// Initializes the `cras` service on path `/cras`
+// Initializes the `users` service on path `/users`
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
-import Cras from './cras.class';
-import createModel from '../../models/cras.model';
+import StatsConseillersCras from './statsConseillersCras.class';
+import createModel from '../../models/statsConseillersCras.model';
 
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    Cras: Cras & ServiceAddons<any>;
+    statsConseillersCras: StatsConseillersCras & ServiceAddons<any>;
   }
 }
 
@@ -18,5 +18,5 @@ export default function (app: Application): void {
   };
 
   // Initialize our service with any options it requires
-  app.use('cras', new Cras(options, app));
+  app.use('statsConseillersCras', new StatsConseillersCras(options));
 }
