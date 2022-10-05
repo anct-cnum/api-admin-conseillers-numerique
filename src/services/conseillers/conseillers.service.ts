@@ -19,5 +19,5 @@ export default function (app: Application): void {
   };
 
   // Initialize our service with any options it requires
-  app.use('conseillers', new Conseillers(options));
+  app.use('conseillers', new Conseillers(options, app));
 }
