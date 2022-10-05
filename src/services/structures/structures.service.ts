@@ -16,7 +16,6 @@ export default function (app: Application): void {
     Model: createModel(app),
     paginate: app.get('paginate'),
   };
-  console.dir(options);
   // Initialize our service with any options it requires
   app.use('structures', new Structures(options, app));
 }
