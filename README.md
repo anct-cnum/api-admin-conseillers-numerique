@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # api-admin-conseillers-numerique
 Serveur d'api de gestion du tableau de bord
-=======
+
 # api-admin-conseiller-numerique
 
 > 
@@ -47,4 +46,3 @@ $ feathers help                           # Show all commands
 ## Help
 
 For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
->>>>>>> 04d135a (création du socle avec mongoose et express)

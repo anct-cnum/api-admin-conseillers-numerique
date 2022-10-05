@@ -1,13 +1,13 @@
 // Initializes the `users` service on path `/users`
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
-import Statsterritoires from './stats_territoires.class';
-import createModel from '../../models/stats_territoires.model';
+import createModel from '../../models/statsTerritoires.model';
+import StatsTerritoires from './statsTerritoires.class';
 
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    stats_territoires: Statsterritoires & ServiceAddons<any>;
+    statsTerritoires: StatsTerritoires & ServiceAddons<any>;
   }
 }
 
@@ -18,5 +18,5 @@ export default function (app: Application): void {
   };
 
   // Initialize our service with any options it requires
-  app.use('stats_territoires', new Statsterritoires(options));
+  app.use('statsTerritoires', new StatsTerritoires(options));
 }

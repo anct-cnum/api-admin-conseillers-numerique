@@ -35,7 +35,7 @@
     "from": "communication@email.conseiller-numerique.gouv.fr",
     "replyTo": "conseiller-numerique@anct.gouv.fr"
   },
-	"mongodb": "mongodb://localhost:27017/api_admin_conseiller_numerique",
+  "mongodb": "mongodb://localhost:27017/bwpnvys3yebazesqg4wh",
   "sentry": {
     "enabled": "false",
     "environment": "local",

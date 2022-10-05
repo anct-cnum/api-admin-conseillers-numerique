@@ -18,7 +18,7 @@ export default function (app: Application, mailer, req: IRequest) {
   return {
     templateName,
     render,
-    send: async (user) => {
+    send: async (user): Promise<void | Error> => {
       const onSuccess = () => {
         return app
           .service(service.users)
