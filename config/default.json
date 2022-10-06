@@ -1,31 +1,31 @@
 {
-	"host": "localhost",
+  "host": "localhost",
   "dashboard_hostname": "http://localhost:3000",
-	"port": 8080,
-	"public": "https://www.conseiller-numerique.gouv.fr",
-	"paginate": {
-		"default": 50,
-		"max": 100
-	},
-	"authentication": {
-		"entity": "user",
-		"service": "users",
-		"secret": "hEUdtqlm9De4GJ8H9qJklmaxraY=",
-		"authStrategies": ["jwt", "local"],
-		"jwtOptions": {
-			"header": {
-				"typ": "access"
-			},
-			"audience": "https://www.conseiller-numerique.gouv.fr",
-			"issuer": "feathers",
-			"algorithm": "HS256",
-			"expiresIn": "7d"
-		},
-		"local": {
-			"usernameField": "name",
-			"passwordField": "password"
-		}
-	},
+  "port": 8080,
+  "public": "https://www.conseiller-numerique.gouv.fr",
+  "paginate": {
+    "default": 50,
+    "max": 100
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "hEUdtqlm9De4GJ8H9qJklmaxraY=",
+                  "authStrategies": ["jwt", "local"],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://www.conseiller-numerique.gouv.fr",
+      "issuer": "feathers",
+      "algorithm": "HS256",
+      "expiresIn": "7d"
+    },
+    "local": {
+      "usernameField": "name",
+      "passwordField": "password"
+    }
+  },
   "smtp": {
     "host": "localhost",
     "port": "1025",
@@ -41,5 +41,13 @@
     "environment": "local",
     "dsn": "https://xxx@yyy.ingest.sentry.io/zzz",
     "traceSampleRate": "0"
+  },
+  "inclusionConnect": {
+    "keycloakIssuer": "https://userinfo/",
+    "accessTokenSecret": "JQS9+BQKGT+RiErsm+mMBk9KxpgrrxCidW1b2aZ1epJeLeCazkInFyW9L7gf5ZCiDiHLac+ukVX7wfobgg8uwCILkeLHXUPUUytIxDtGdlCV1AkS8lx9p02reGm2Cx68VzzYYwT8Rr84KXhUnJIMQRPCpPltcL12uuzNZWdIrJkFjDRqrh+4LPpSwGMeB6eO1rCcnZzfo3gadaKZK4SJAxMSAu/1lArloRMcocD/0a0IoNAx8F7TYk45aEDaoXn9Fae701/TcHmrUifpIOTV/amdE+sd957dO9enXRNIJt/HjDVym9TWHpZPvcCxzynBGjop0h8BtsxhZs8DBa+eGw==",
+    "refreshTokenSecret": "4L6dDtbUyA7llQwV2k0YmVn1iyNZbWh5cVkporpB1d7WK0bj+2WtYj+xAvvi2nft+OIAisqHqQYN7kLHqrbNTFGKZfByXjC/FSXL/hxVTv0kBPIAMYp2wk4pi49dEjwEOqcvYk0hinppgjyvwaXC0ZySTyucJYfqPJc0bH1Su3X0qKtcRjMkdbf+GbWpUIPQwcKDjvTjZoVLOGnW4iP3jLiqCuRrTVjpu3JiT4n9uLFZ5+lhcplcWLYclQpWcqctbAdJH3iIm9UD+FAnppaJMko6pCLqCvXZBBmb7P2lgI0KpoAXLAQ5gB0tuepEF2VnJT/JGOUHfnMaLIVWYhRcCQ==",
+    "refreshTokenKey": "refreshToken",
+    "accessTokenDuration": "30s",
+    "refreshTokenDuration": "120s"
   }
 }

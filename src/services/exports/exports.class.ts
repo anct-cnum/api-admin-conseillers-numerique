@@ -5,7 +5,7 @@ import {
   Params,
   ServiceMethods,
 } from '@feathersjs/feathers';
-import { authenticate } from '@feathersjs/express';
+import authenticate from '../../middleware/authenticate';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
@@ -37,61 +37,61 @@ export class Exports implements ServiceMethods<Data> {
 
     app.get(
       '/exports/candidats-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportJeRecruteCsv(app),
     );
     app.get(
       '/exports/candidatsValidesStructure-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportCandidatsValideStructureCsv(app),
     );
     app.get(
       '/exports/embauches-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportEmbauchesCsv(app),
     );
     app.get(
       '/exports/candidatsByStructure-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportCandidatsByStructureCsv(app),
     );
     app.get(
       '/exports/cnfs-without-cra-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportConseillersWithoutCRACsv(app),
     );
     app.get(
       '/exports/structures-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportStructuresCsv(app),
     );
     app.get(
       '/exports/ruptures-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportRupturesCsv(app),
     );
     app.get(
       '/exports/cnfs-hub-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportConseillersHubCsv(app),
     );
     app.get(
       '/exports/statistiques-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportStatistiquesCsv(app),
     );
     app.get(
       '/exports/territoires-csv',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getExportTerritoiresCsv(app),
     );

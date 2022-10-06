@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import { authenticate } from '@feathersjs/express';
+import authenticate from '../../middleware/authenticate';
 import { Application } from '../../declarations';
 import getConseillers from './controllers/getConseillers';
 import createAbilities from '../../middleware/createAbilities';
@@ -10,13 +10,13 @@ export default class Conseillers extends Service {
     super(options);
     app.get(
       '/conseillers',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getConseillers(app),
     );
     app.get(
       '/conseiller/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getConseillerById(app),
     );

@@ -1,18 +1,18 @@
 {
-	"host": "HOST",
+  "host": "HOST",
   "dashboard_hostname": "DASHBOARD_HOSTNAME",
-	"port": "PORT",
-	"public": "PUBLIC_HOSTNAME",
-	"paginate": {
+  "port": "PORT",
+  "public": "PUBLIC_HOSTNAME",
+  "paginate": {
     "default": "PAGINATE_DEFAULT",
     "max": "PAGINATE_MAX"
-	},
-	"authentication": {
+  },
+  "authentication": {
     "secret": "AUTHENTICATION_SECRET",
     "jwtOptions": {
       "audience": "AUTHENTICATION_JWTOPTIONS_AUDIENCE"
-		}
-	},
+    }
+  },
   "smtp": {
     "host": "SMTP_HOST",
     "port": "SMTP_PORT",
@@ -24,11 +24,20 @@
     "from": "SMTP_FROM",
     "replyTo": "SMTP_REPLYTO"
   },
+
 	"mongodb": "MONGODB_ADDON_URI",
   "sentry": {
     "enabled": "SENTRY_ENABLED",
     "environment": "SENTRY_ENVIRONMENT",
     "dsn": "SENTRY_DSN",
     "traceSampleRate": "SENTRY_TRACE_SAMPLE_RATE"
+  },
+  "inclusionConnect": {
+    "keycloakIssuer": "INCLUSIONCONNECT_ISSUER",
+    "accessTokenSecret": "INCLUSIONCONNECT_ACCESSTOKENSECRET",
+    "refreshTokenSecret": "INCLUSIONCONNECT_REFRESHTOKENSECRET",
+    "refreshTokenKey": "INCLUSIONCONNECT_REFRESHTOKENKEY",
+    "accessTokenDuration": "INCLUSIONCONNECT_ACCESSTOKENDURATION",
+    "refreshTokenDuration": "INCLUSIONCONNECT_REFRESHTOKENDURATION"
   }
 }

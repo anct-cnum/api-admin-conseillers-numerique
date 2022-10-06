@@ -7,6 +7,7 @@ import express from '@feathersjs/express';
 import socketio from '@feathersjs/socketio';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import cookieParser from 'cookie-parser';
 import logger from './logger';
 import services from './services';
 import appHooks from './app.hooks';
@@ -39,6 +40,7 @@ if (config().sentry.enabled === 'true') {
   app.use(Sentry.Handlers.tracingHandler());
 }
 
+app.use(cookieParser());
 // Load app configuration
 app.configure(configuration());
 
@@ -48,8 +50,8 @@ app.use(
     contentSecurityPolicy: false,
   }),
 );
-app.use(cors());
 app.use(compress());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -58,6 +60,7 @@ app.configure(express.rest());
 app.configure(socketio());
 
 app.configure(mongoose);
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 app.configure(authentication);
 // Set up our services (see `services/index.js`)

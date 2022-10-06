@@ -17,6 +17,10 @@ export interface IUser {
 
   password: string;
 
+  refreshToken: string;
+
+  sub: string;
+
   roles: string[];
 
   roleActivated: string;
@@ -45,11 +49,15 @@ export interface IUser {
 
   tokenCreatedAt?: Date;
 
+  lastLogin?: Date;
+
   passwordCreated?: boolean;
 
   timestamps?: boolean;
 
   hub?: string;
+
+  toJSON(): string | object | Buffer;
 }
 export interface IMisesEnRelation {
   conseiller: typeof DBRef;
