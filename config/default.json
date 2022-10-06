@@ -1,31 +1,31 @@
 {
-	"host": "localhost",
+  "host": "localhost",
   "dashboard_hostname": "http://localhost:3000",
-	"port": 8080,
-	"public": "https://www.conseiller-numerique.gouv.fr",
-	"paginate": {
-		"default": 50,
-		"max": 100
-	},
-	"authentication": {
-		"entity": "user",
-		"service": "users",
-		"secret": "hEUdtqlm9De4GJ8H9qJklmaxraY=",
-		"authStrategies": ["jwt", "local"],
-		"jwtOptions": {
-			"header": {
-				"typ": "access"
-			},
-			"audience": "https://www.conseiller-numerique.gouv.fr",
-			"issuer": "feathers",
-			"algorithm": "HS256",
-			"expiresIn": "7d"
-		},
-		"local": {
-			"usernameField": "name",
-			"passwordField": "password"
-		}
-	},
+  "port": 8080,
+  "public": "https://www.conseiller-numerique.gouv.fr",
+  "paginate": {
+    "default": 50,
+    "max": 100
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "hEUdtqlm9De4GJ8H9qJklmaxraY=",
+    "authStrategies": ["jwt", "local"],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://www.conseiller-numerique.gouv.fr",
+      "issuer": "feathers",
+      "algorithm": "HS256",
+      "expiresIn": "7d"
+    },
+    "local": {
+      "usernameField": "name",
+      "passwordField": "password"
+    }
+  },
   "smtp": {
     "host": "localhost",
     "port": "1025",
