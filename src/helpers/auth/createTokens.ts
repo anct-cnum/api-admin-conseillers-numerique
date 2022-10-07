@@ -4,7 +4,7 @@ import { Application } from '../../declarations';
 
 const createRefreshToken = (app: Application) => async (user: IUser) => {
   return sign(user.toJSON(), app.get('inclusionConnect').refreshTokenSecret, {
-    expiresIn: app.get('inclusionConnect').refreshTokenDuration,
+    expiresIn: app.get('inclusion_connect').refresh_token_duration,
   });
 };
 
