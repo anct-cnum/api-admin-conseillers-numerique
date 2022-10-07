@@ -39,7 +39,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             res
               .status(403)
               .json(
-                'Utilisateur non existant dans notre base de données accès refusé',
+                'Accès refusé : utilisateur non existant dans notre base de données',
               );
           }
         } catch (error) {
