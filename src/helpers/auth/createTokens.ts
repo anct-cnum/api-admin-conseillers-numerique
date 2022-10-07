@@ -9,7 +9,7 @@ const createRefreshToken = (app: Application) => async (user: IUser) => {
 };
 
 const createAccessToken = (app: Application) => async (user: IUser) => {
-  return sign(user.toJSON(), app.get('inclusionConnect').accessTokenSecret, {
+  return sign(user.toJSON(), app.get('inclusion_connect').access_token_secret, {
     expiresIn: app.get('inclusionConnect').accessTokenDuration,
   });
 };
