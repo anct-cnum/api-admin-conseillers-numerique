@@ -19,7 +19,7 @@ const getRefreshToken =
       verifyToken(app)(
         res,
         refreshToken,
-        app.get('inclusionConnect').refreshTokenSecret,
+        app.get('inclusion_connect').refresh_token_secret,
         user,
       );
     } catch (error) {
