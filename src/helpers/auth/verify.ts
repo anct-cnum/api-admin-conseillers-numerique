@@ -13,7 +13,7 @@ const verifyToken =
         user.toJSON(),
         app.get('inclusion_connect').access_token_secret,
         {
-          expiresIn: app.get('inclusionConnect').accessTokenDuration,
+          expiresIn: app.get('inclusion_connect').access_token_duration,
         },
       );
       return res.status(200).json({ user, accessToken });
