@@ -71,7 +71,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             .select({ _id: 0, password: 0, refreshToken: 0 });
           // envoi du refresh token dans un cookie
           res.cookie(
-            app.get('inclusionConnect').refreshTokenKey,
+            app.get('inclusion_connect').refresh_token_key,
             refreshToken,
             {
               httpOnly: true,
