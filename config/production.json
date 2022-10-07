@@ -32,7 +32,7 @@
     "dsn": "SENTRY_DSN",
     "traceSampleRate": "SENTRY_TRACE_SAMPLE_RATE"
   },
-  "inclusionConnect": {
+  "inclusion_connect": {
     "keycloakIssuer": "INCLUSIONCONNECT_ISSUER",
     "accessTokenSecret": "INCLUSIONCONNECT_ACCESSTOKENSECRET",
     "refreshTokenSecret": "INCLUSIONCONNECT_REFRESHTOKENSECRET",
