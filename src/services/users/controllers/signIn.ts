@@ -13,7 +13,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
   if (req.headers.authorization) {
     const options = {
       method: 'GET',
-      url: app.get('inclusionConnect').keycloakIssuer,
+      url: app.get('inclusion_connect').keycloak_issuer,
       headers: {
         Authorization: req.headers.authorization,
       },
