@@ -2,7 +2,7 @@ import { Service, MongooseServiceOptions } from 'feathers-mongoose';
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import getConseillers from './controllers/getConseillers';
-import getConseillersById from './controllers/getConseillersById';
+import getConseillerById from './controllers/getConseillerById';
 import createAbilities from '../../middleware/createAbilities';
 
 export default class Conseillers extends Service {
@@ -18,7 +18,7 @@ export default class Conseillers extends Service {
       '/conseiller/:id',
       authenticate('jwt'),
       createAbilities,
-      getConseillersById(app),
+      getConseillerById(app),
     );
   }
 }
