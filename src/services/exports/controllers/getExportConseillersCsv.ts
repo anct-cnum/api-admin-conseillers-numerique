@@ -3,31 +3,14 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { validConseillers } from '../../../schemas/conseillers.schemas';
+import { validExportConseillers } from '../../../schemas/conseillers.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
 import {
-  checkAccessReadRequestConseillers,
   filterIsCoordinateur,
   filterNom,
-} from '../conseillers.repository';
-
-const getTotalConseillers =
-  (app: Application, req: IRequest) =>
-  async (
-    dateDebut: Date,
-    dateFin: Date,
-    isCoordinateur: string,
-    search: string,
-  ) =>
-    app
-      .service(service.conseillers)
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments({
-        statut: 'RECRUTE',
-        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
-        ...filterIsCoordinateur(isCoordinateur as string),
-        ...filterNom(search as string),
-      });
+  checkAccessReadRequestConseillers,
+} from '../../conseillers/conseillers.repository';
+import { generateCsvConseillers } from '../exports.repository';
 
 const getNombreCra =
   (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
@@ -38,19 +21,17 @@ const getNombreCra =
         'conseiller.$id': conseillerId,
       });
 
-const getConseillers =
-  (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { skip, ordre, nomOrdre, coordinateur, isRupture, search } =
-      req.query;
+const getExportConseillersCsv =
+  (app: Application) => async (req: IRequest, res: Response) => {
+    const { ordre, nomOrdre, isCoordinateur, isRupture, search } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
-    const emailValidation = validConseillers.validate({
-      skip,
+    const emailValidation = validExportConseillers.validate({
       dateDebut,
       dateFin,
       ordre,
       nomOrdre,
-      coordinateur,
+      isCoordinateur,
       isRupture,
       search,
     });
@@ -60,13 +41,6 @@ const getConseillers =
       res.status(400).end();
       return;
     }
-    const items: { total: number; data: object; limit: number; skip: number } =
-      {
-        total: 0,
-        data: undefined,
-        limit: 0,
-        skip: 0,
-      };
     const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
     try {
       let conseillers: any[];
@@ -77,7 +51,7 @@ const getConseillers =
             statut: 'RECRUTE',
             datePrisePoste: { $gt: dateDebut, $lt: dateFin },
             $and: [checkAccess],
-            ...filterIsCoordinateur(coordinateur as string),
+            ...filterIsCoordinateur(isCoordinateur as string),
             ...filterNom(search as string),
           },
         },
@@ -94,13 +68,6 @@ const getConseillers =
           },
         },
         { $sort: sortColonne },
-        {
-          $skip:
-            Number(skip) > 0
-              ? (Number(skip) - 1) * Number(options.paginate.default)
-              : 0,
-        },
-        { $limit: Number(options.paginate.default) },
       ]);
       conseillers = await Promise.all(
         conseillers.map(async (ligneStats) => {
@@ -123,16 +90,7 @@ const getConseillers =
           return item;
         }),
       );
-      items.total = await getTotalConseillers(app, req)(
-        dateDebut,
-        dateFin,
-        coordinateur as string,
-        search as string,
-      );
-      items.data = conseillers;
-      items.limit = options.paginate.default;
-      items.skip = Number(skip);
-      res.status(200).json(items);
+      generateCsvConseillers(conseillers, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json('Accès refusé');
@@ -143,4 +101,4 @@ const getConseillers =
     }
   };
 
-export default getConseillers;
+export default getExportConseillersCsv;

@@ -579,6 +579,42 @@ const generateCsvTerritoires = async (
   }
 };
 
+const generateCsvConseillers = async (conseillers, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id',
+      'Nom',
+      'Prénom',
+      'Email Professionnelle',
+      'Rupture',
+      'Coordinateur',
+      'CRA Saisis',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...conseillers.map((conseiller) =>
+          [
+            conseiller.idPG,
+            conseiller.nom,
+            conseiller.prenom,
+            conseiller?.emailCN?.address ?? 'compte COOP non créé',
+            conseiller.rupture,
+            conseiller.estCoordinateur,
+            conseiller.craCount,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -588,4 +624,5 @@ export {
   generateCsvConseillersHub,
   generateCsvSatistiques,
   generateCsvTerritoires,
+  generateCsvConseillers,
 };
