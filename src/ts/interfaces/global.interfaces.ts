@@ -4,6 +4,7 @@ import { IUser } from './db.interfaces';
 
 export interface IRequest extends Request {
   ability: any;
+  query: any;
   user?: IUser;
 }
 

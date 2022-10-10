@@ -2,7 +2,8 @@ import { Service, MongooseServiceOptions } from 'feathers-mongoose';
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import { getStructures, getStructure, updateStructure } from './controllers';
-
+import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
+import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
 import createAbilities from '../../middleware/createAbilities';
 import getStructureById from './controllers/getStructureById';
 
@@ -32,6 +33,18 @@ export default class Structures extends Service {
       authenticate('jwt'),
       createAbilities,
       updateStructure(app),
+    );
+    app.get(
+      '/structures/:id/misesEnRelation',
+      authenticate('jwt'),
+      createAbilities,
+      getStructuresMisesEnRelations(app),
+    );
+    app.get(
+      '/structures/:id/misesEnRelation/stats',
+      authenticate('jwt'),
+      createAbilities,
+      getStructuresMisesEnRelationsStats(app),
     );
   }
 }
