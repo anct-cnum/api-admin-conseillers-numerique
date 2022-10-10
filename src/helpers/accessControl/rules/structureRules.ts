@@ -46,5 +46,6 @@ export default async function structureRules(user: IUser, can): Promise<any> {
     },
   });
   can([action.read], ressource.statsTerritoires);
+  // Les structures peuvent voir tous les candidats
   can([action.read], ressource.conseillers);
 }
