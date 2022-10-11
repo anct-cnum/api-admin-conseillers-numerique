@@ -16,7 +16,11 @@ const validConseillers = Joi.object({
   coordinateur: Joi.string().error(
     new Error('Le filtre coordinateur est invalide'),
   ),
-  isRupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
+  rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
+  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  structureId: Joi.string().error(
+    new Error('Le filtre sur la structure est invalide'),
+  ),
 });
 
 const validExportConseillers = Joi.object({
@@ -35,6 +39,7 @@ const validExportConseillers = Joi.object({
     new Error('Le filtre coordinateur est invalide'),
   ),
   isRupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
+  region: Joi.string().error(new Error('Le filtre region est invalide')),
 });
 
 export { validConseillers, validExportConseillers };

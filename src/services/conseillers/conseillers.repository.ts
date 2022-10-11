@@ -1,4 +1,6 @@
+/* eslint-disable prefer-template */
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -12,8 +14,14 @@ const checkAccessReadRequestConseillers = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const filterNom = (nom: string) =>
-  nom ? { $text: { $search: `"${nom}"` } } : {};
+const filterNom = (nom: string) => {
+  return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
+};
+
+const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
+
+const filterStructure = (structure: string) =>
+  structure ? { structureId: new ObjectId(structure) } : {};
 
 const filterIsCoordinateur = (coordinateur: string) => {
   if (coordinateur === 'true') {
@@ -28,13 +36,17 @@ const filterIsCoordinateur = (coordinateur: string) => {
 
 const filterIsRupture = (rupture: string) => {
   if (rupture === 'true') {
-    return { estCoordinateur: { $eq: true } };
+    return { $expr: { $eq: ['$statut', 'nouvelle_rupture'] } };
   }
   if (rupture === 'false') {
-    return { estCoordinateur: { $exists: false } };
+    return { $expr: { $eq: ['$statut', 'finalisee'] } };
   }
-
-  return {};
+  return {
+    $or: [
+      { $expr: { $eq: ['$statut', 'nouvelle_rupture'] } },
+      { $expr: { $eq: ['$statut', 'finalisee'] } },
+    ],
+  };
 };
 
 export {
@@ -42,4 +54,6 @@ export {
   filterIsCoordinateur,
   filterNom,
   filterIsRupture,
+  filterRegion,
+  filterStructure,
 };

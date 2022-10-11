@@ -9,6 +9,7 @@ import {
   filterIsCoordinateur,
   filterNom,
   checkAccessReadRequestConseillers,
+  filterRegion,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 
@@ -23,7 +24,8 @@ const getNombreCra =
 
 const getExportConseillersCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { ordre, nomOrdre, isCoordinateur, isRupture, search } = req.query;
+    const { ordre, nomOrdre, isCoordinateur, isRupture, search, region } =
+      req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
     const emailValidation = validExportConseillers.validate({
@@ -34,6 +36,7 @@ const getExportConseillersCsv =
       isCoordinateur,
       isRupture,
       search,
+      region,
     });
 
     if (emailValidation.error) {
@@ -53,6 +56,7 @@ const getExportConseillersCsv =
             $and: [checkAccess],
             ...filterIsCoordinateur(isCoordinateur as string),
             ...filterNom(search as string),
+            ...filterRegion(region as string),
           },
         },
         {
