@@ -4,6 +4,7 @@ import { IUser } from './db.interfaces';
 
 export interface IRequest extends Request {
   ability: any;
+  query: any;
   user?: IUser;
 }
 
@@ -27,6 +28,9 @@ export interface Ressource {
   structures: string;
   misesEnRelation: string;
   conseillers: string;
+  statsTerritoires: string;
+  cras: string;
+  statsConseillersCras: string;
 }
 export interface IStructuresConseillers {
   _id: ObjectId;

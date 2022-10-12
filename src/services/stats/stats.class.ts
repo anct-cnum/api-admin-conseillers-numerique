@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/default-param-last */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -11,8 +12,14 @@ import {
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
-// eslint-disable-next-line import/named
-import { getStatsNationales } from './controllers';
+import {
+  getStatsNationales,
+  getDatasStructures,
+  getStatsStructure,
+  getStatsTerritoires,
+  getStatsTerritoire,
+  getStatsTerritoireCra,
+} from './controllers';
 
 interface Data {}
 
@@ -23,6 +30,7 @@ export class Stats implements ServiceMethods<Data> {
   options: ServiceOptions;
 
   constructor(app: Application, options: ServiceOptions = {}) {
+    this.options = options;
     this.app = app;
     this.options = options;
 
@@ -32,14 +40,44 @@ export class Stats implements ServiceMethods<Data> {
       createAbilities,
       getStatsNationales(app),
     );
+    app.get(
+      '/stats/structure/cras',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsStructure(app),
+    );
+    app.get(
+      '/stats/datas/structures',
+      authenticate('jwt'),
+      createAbilities,
+      getDatasStructures(app, options),
+    );
+    app.get(
+      '/stats/territoires',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsTerritoires(app, options),
+    );
+    app.get(
+      '/stats/territoire',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsTerritoire(app),
+    );
+    app.get(
+      '/stats/territoire/cra',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsTerritoireCra(app),
+    );
   }
 
   // fonctions par default créées par feathers à la génération d'un service custom (non relié à une collection) ne pas prendre en compte
-  async find(params?: Params): Promise<Data[] | Paginated<Data>> {
+  async find(_params?: Params): Promise<Data[] | Paginated<Data>> {
     return [];
   }
 
-  async get(id: Id, params?: Params): Promise<Data> {
+  async get(id: Id, _params?: Params): Promise<Data> {
     return {
       id,
       text: `A new message with ID: ${id}!`,
@@ -54,15 +92,15 @@ export class Stats implements ServiceMethods<Data> {
     return data;
   }
 
-  async update(id: NullableId, data: Data, params?: Params): Promise<Data> {
+  async update(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
     return data;
   }
 
-  async patch(id: NullableId, data: Data, params?: Params): Promise<Data> {
+  async patch(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
     return data;
   }
 
-  async remove(id: NullableId, data: Data, params?: Params): Promise<Data> {
+  async remove(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
     return data;
   }
 }
