@@ -132,7 +132,7 @@ const getConseillersEnContrat =
       { $unwind: '$miseEnRelation' },
       {
         $project: {
-          _id: 0,
+          _id: 1,
           idPG: 1,
           prenom: 1,
           nom: 1,
@@ -208,6 +208,7 @@ const getConseillers =
           const item = { ...ligneStats };
           item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
           item.craCount = await getNombreCra(app, req)(item._id);
+
           return item;
         }),
       );
