@@ -7,9 +7,11 @@ import { validExportConseillers } from '../../../schemas/conseillers.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
 import {
   filterIsCoordinateur,
-  filterNom,
+  filterNomConseiller,
   checkAccessReadRequestConseillers,
   filterRegion,
+  filterNomStructure,
+  filterIsRupture,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 
@@ -24,8 +26,15 @@ const getNombreCra =
 
 const getExportConseillersCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { ordre, nomOrdre, isCoordinateur, isRupture, search, region } =
-      req.query;
+    const {
+      ordre,
+      nomOrdre,
+      coordinateur,
+      rupture,
+      searchByConseiller,
+      searchByStructure,
+      region,
+    } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
     const emailValidation = validExportConseillers.validate({
@@ -33,9 +42,10 @@ const getExportConseillersCsv =
       dateFin,
       ordre,
       nomOrdre,
-      isCoordinateur,
-      isRupture,
-      search,
+      coordinateur,
+      rupture,
+      searchByConseiller,
+      searchByStructure,
       region,
     });
 
@@ -54,11 +64,41 @@ const getExportConseillersCsv =
             statut: 'RECRUTE',
             datePrisePoste: { $gt: dateDebut, $lt: dateFin },
             $and: [checkAccess],
-            ...filterIsCoordinateur(isCoordinateur as string),
-            ...filterNom(search as string),
+            ...filterIsCoordinateur(coordinateur as string),
+            ...filterNomConseiller(searchByConseiller as string),
             ...filterRegion(region as string),
           },
         },
+        {
+          $lookup: {
+            from: 'structures',
+            let: { idStructure: '$structureId' },
+            as: 'structure',
+            pipeline: filterNomStructure(searchByStructure as string),
+          },
+        },
+        { $unwind: '$structure' },
+        {
+          $lookup: {
+            from: 'misesEnRelation',
+            let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
+            as: 'miseEnRelation',
+            pipeline: [
+              {
+                $match: {
+                  $and: [
+                    {
+                      $expr: { $eq: ['$$idConseiller', '$conseillerObj.idPG'] },
+                    },
+                    { $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] } },
+                    filterIsRupture(rupture as string),
+                  ],
+                },
+              },
+            ],
+          },
+        },
+        { $unwind: '$miseEnRelation' },
         {
           $project: {
             _id: 1,
@@ -66,9 +106,8 @@ const getExportConseillersCsv =
             prenom: 1,
             nom: 1,
             'emailCN.address': 1,
+            'miseEnRelation.statut': 1,
             estCoordinateur: 1,
-            statut: 1,
-            structureId: 1,
           },
         },
         { $sort: sortColonne },
@@ -76,21 +115,9 @@ const getExportConseillersCsv =
       conseillers = await Promise.all(
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          const structure = await app
-            .service(service.structures)
-            .Model.findOne({ _id: new ObjectId(item.structureId) });
-          const miseEnRelation = await app
-            .service(service.misesEnRelation)
-            .Model.accessibleBy(req.ability, action.read)
-            .countDocuments({
-              statut: { $eq: 'nouvelle_rupture' },
-              'conseiller.$id': { $eq: new ObjectId(item._id) },
-              'structure.$id': { $eq: new ObjectId(item.structureId) },
-            });
-          item.rupture = miseEnRelation > 0 ? 'oui' : 'non';
-          if (structure) {
-            item.craCount = await getNombreCra(app, req)(item._id);
-          }
+          item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
+          item.craCount = await getNombreCra(app, req)(item._id);
+
           return item;
         }),
       );

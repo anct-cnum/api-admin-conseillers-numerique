@@ -12,15 +12,17 @@ const validConseillers = Joi.object({
   nomOrdre: Joi.string()
     .required()
     .error(new Error('Nom du sort est invalide')),
-  search: Joi.string().error(new Error('Le search est invalide')),
+  searchByConseiller: Joi.string().error(
+    new Error('Le search by conseiller est invalide'),
+  ),
+  searchByStructure: Joi.string().error(
+    new Error('Le search by structure est invalide'),
+  ),
   coordinateur: Joi.string().error(
     new Error('Le filtre coordinateur est invalide'),
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
   region: Joi.string().error(new Error('Le filtre region est invalide')),
-  structureId: Joi.string().error(
-    new Error('Le filtre sur la structure est invalide'),
-  ),
 });
 
 const validExportConseillers = Joi.object({

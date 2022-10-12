@@ -9,9 +9,9 @@ import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
   filterIsRupture,
-  filterNom,
+  filterNomConseiller,
+  filterNomStructure,
   filterRegion,
-  filterStructure,
 } from '../conseillers.repository';
 
 const getTotalConseillers =
@@ -20,10 +20,10 @@ const getTotalConseillers =
     dateDebut: Date,
     dateFin: Date,
     isCoordinateur: string,
-    search: string,
+    searchByConseiller: string,
     region: string,
     rupture: string,
-    structureId: string,
+    searchByStructure: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
@@ -32,17 +32,16 @@ const getTotalConseillers =
           datePrisePoste: { $gt: dateDebut, $lt: dateFin },
           $and: [checkAccess],
           ...filterIsCoordinateur(isCoordinateur as string),
-          ...filterNom(search as string),
+          ...filterNomConseiller(searchByConseiller as string),
           ...filterRegion(region as string),
-          ...filterStructure(structureId as string),
         },
       },
       {
         $lookup: {
-          localField: 'structureId',
           from: 'structures',
-          foreignField: '_id',
+          let: { idStructure: '$structureId' },
           as: 'structure',
+          pipeline: filterNomStructure(searchByStructure),
         },
       },
       { $unwind: '$structure' },
@@ -84,10 +83,10 @@ const getConseillersEnContrat =
     dateDebut: Date,
     dateFin: Date,
     isCoordinateur: string,
-    search: string,
+    searchByConseiller: string,
     region: string,
     rupture: string,
-    structureId: string,
+    searchByStructure: string,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -98,18 +97,17 @@ const getConseillersEnContrat =
           statut: 'RECRUTE',
           datePrisePoste: { $gt: dateDebut, $lt: dateFin },
           $and: [checkAccess],
-          ...filterIsCoordinateur(isCoordinateur as string),
-          ...filterNom(search as string),
-          ...filterRegion(region as string),
-          ...filterStructure(structureId as string),
+          ...filterIsCoordinateur(isCoordinateur),
+          ...filterNomConseiller(searchByConseiller),
+          ...filterRegion(region),
         },
       },
       {
         $lookup: {
-          localField: 'structureId',
           from: 'structures',
-          foreignField: '_id',
+          let: { idStructure: '$structureId' },
           as: 'structure',
+          pipeline: filterNomStructure(searchByStructure),
         },
       },
       { $unwind: '$structure' },
@@ -134,17 +132,13 @@ const getConseillersEnContrat =
       { $unwind: '$miseEnRelation' },
       {
         $project: {
-          _id: 1,
+          _id: 0,
           idPG: 1,
           prenom: 1,
           nom: 1,
           'emailCN.address': 1,
           'miseEnRelation.statut': 1,
-          'structure.nom': 1,
-          count_conseillers: 1,
           estCoordinateur: 1,
-          statut: 1,
-          structureId: 1,
         },
       },
       { $sort: sortColonne },
@@ -162,9 +156,9 @@ const getConseillers =
       nomOrdre,
       coordinateur,
       rupture,
-      search,
+      searchByConseiller,
+      searchByStructure,
       region,
-      structureId,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -176,9 +170,9 @@ const getConseillers =
       nomOrdre,
       coordinateur,
       rupture,
-      search,
+      searchByConseiller,
+      searchByStructure,
       region,
-      structureId,
     });
 
     if (emailValidation.error) {
@@ -201,10 +195,10 @@ const getConseillers =
         dateDebut,
         dateFin,
         coordinateur as string,
-        search as string,
+        searchByConseiller as string,
         region as string,
         rupture as string,
-        structureId as string,
+        searchByStructure as string,
         sortColonne,
         skip as string,
         options.paginate.default,
@@ -214,7 +208,6 @@ const getConseillers =
           const item = { ...ligneStats };
           item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
           item.craCount = await getNombreCra(app, req)(item._id);
-          item.nomStructure = item.structure.nom;
           return item;
         }),
       );
@@ -223,10 +216,10 @@ const getConseillers =
           dateDebut,
           dateFin,
           coordinateur as string,
-          search as string,
+          searchByConseiller as string,
           region as string,
           rupture as string,
-          structureId as string,
+          searchByStructure as string,
         );
         items.data = conseillers;
         items.total = totalConseillers[0]?.count_conseillers;

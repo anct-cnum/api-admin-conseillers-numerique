@@ -14,8 +14,22 @@ const checkAccessReadRequestConseillers = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const filterNom = (nom: string) => {
+const filterNomConseiller = (nom: string) => {
   return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
+};
+
+const filterNomStructure = (nom: string) => {
+  if (nom) {
+    return [
+      {
+        $match: {
+          nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' },
+        },
+      },
+      { $match: { $expr: { $eq: ['$$idStructure', '$_id'] } } },
+    ];
+  }
+  return [{ $match: { $expr: { $eq: ['$$idStructure', '$_id'] } } }];
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
@@ -36,23 +50,19 @@ const filterIsCoordinateur = (coordinateur: string) => {
 
 const filterIsRupture = (rupture: string) => {
   if (rupture === 'true') {
-    return { $expr: { $eq: ['$statut', 'nouvelle_rupture'] } };
+    return { statut: { $eq: 'nouvelle_rupture' } };
   }
   if (rupture === 'false') {
-    return { $expr: { $eq: ['$statut', 'finalisee'] } };
+    return { statut: { $eq: 'finalisee' } };
   }
-  return {
-    $or: [
-      { $expr: { $eq: ['$statut', 'nouvelle_rupture'] } },
-      { $expr: { $eq: ['$statut', 'finalisee'] } },
-    ],
-  };
+  return {};
 };
 
 export {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
-  filterNom,
+  filterNomConseiller,
+  filterNomStructure,
   filterIsRupture,
   filterRegion,
   filterStructure,

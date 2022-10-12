@@ -582,7 +582,8 @@ const generateCsvTerritoires = async (
 const generateCsvConseillers = async (conseillers, res: Response) => {
   try {
     const fileHeaders = [
-      'Id',
+      'ID long conseiller',
+      'ID conseiller',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -595,6 +596,7 @@ const generateCsvConseillers = async (conseillers, res: Response) => {
         fileHeaders.join(csvCellSeparator),
         ...conseillers.map((conseiller) =>
           [
+            conseiller._id,
             conseiller.idPG,
             conseiller.nom,
             conseiller.prenom,
