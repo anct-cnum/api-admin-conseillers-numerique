@@ -57,4 +57,20 @@ const deleteUser = async (app, service, req, action, email) => {
     .deleteOne({ name: email.toLowerCase() });
 };
 
-export { getCoselecPositif, getLastCoselec, getCoselec, deleteUser };
+const envoieEmailInvit = (app, req, mailer, emails, user) => {
+  const mailerInstance = mailer(app);
+  const message = emails(
+    app,
+    mailerInstance,
+    req,
+  ).getEmailMessageByTemplateName('invitationActiveCompte');
+  return message.send(user).catch((errSmtp: Error) => errSmtp);
+};
+
+export {
+  getCoselecPositif,
+  getLastCoselec,
+  getCoselec,
+  deleteUser,
+  envoieEmailInvit,
+};

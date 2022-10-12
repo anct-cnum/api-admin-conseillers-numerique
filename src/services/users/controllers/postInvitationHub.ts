@@ -3,42 +3,41 @@ import { Response } from 'express';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { validationEmail } from '../../../schemas/users.schemas';
+import { createUserHub } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { deleteUser, envoieEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
-const { DBRef, ObjectId } = require('mongodb');
 
-const postInvitationStructure =
+const postInvitationHub =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { email, structureId } = req.body;
+    const { email, nom, prenom, hub } = req.body;
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
         res.status(403).json({
-          message: `Accès refusé, vous n'êtes pas autorisé à inviter un compte structure multicompte`,
+          message: `Accès refusé, vous n'êtes pas autorisé à inviter un hub`,
         });
         return;
       }
-      const errorJoi = await validationEmail.validate(email);
+      const errorJoi = await createUserHub.validate(req.body);
       if (errorJoi?.error) {
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
-      const connect = app.get('mongodb');
-      const database = connect.substr(connect.lastIndexOf('/') + 1);
       const user: IUser = await app.service(service.users).create({
         name: email.toLowerCase(),
-        roles: ['structure', 'structure_coop'],
-        entity: new DBRef('structures', new ObjectId(structureId), database),
+        nom,
+        prenom,
+        hub,
+        roles: ['hub_coop'],
         password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),
+        mailSentDate: null,
         passwordCreated: false,
-        resend: false,
       });
       const errorSmtpMail = await envoieEmailInvit(
         app,
@@ -55,9 +54,7 @@ const postInvitationStructure =
         });
         return;
       }
-      res
-        .status(200)
-        .json(`${email} a bien été invité à votre compte structure`);
+      res.status(200).json(`Hub : ${email} a bien été invité `);
       return;
     } catch (error) {
       if (error?.code === 409) {
@@ -70,4 +67,4 @@ const postInvitationStructure =
     }
   };
 
-export default postInvitationStructure;
+export default postInvitationHub;

@@ -7,7 +7,7 @@ import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser } from '../../../utils/index';
+import { deleteUser, envoieEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -36,13 +36,21 @@ const postInvitationAdmin =
         mailSentDate: null,
         passwordCreated: false,
       });
-      const mailerInstance = mailer(app);
-      const message = emails(
+      const errorSmtpMail = await envoieEmailInvit(
         app,
-        mailerInstance,
         req,
-      ).getEmailMessageByTemplateName('invitationActiveCompte');
-      await message.send(user);
+        mailer,
+        emails,
+        user,
+      );
+      if (errorSmtpMail instanceof Error) {
+        await deleteUser(app, service, req, action, email);
+        res.status(503).json({
+          message:
+            "Une erreur est survenue lors de l'envoi, veuillez réessayez dans quelques minutes",
+        });
+        return;
+      }
       res.status(200).json(`L'admin ${email} a bien été invité `);
       return;
     } catch (error) {
@@ -52,15 +60,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      try {
-        await deleteUser(app, service, req, action, email);
-        res.status(500).json({
-          message: `Une erreur est survenue lors de l'envoi, veuillez réessayez dans quelques minutes`,
-          error,
-        });
-      } catch (err) {
-        throw new Error(err);
-      }
+      throw new Error(error);
     }
   };
 

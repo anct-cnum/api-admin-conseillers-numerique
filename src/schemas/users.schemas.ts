@@ -34,4 +34,14 @@ const validationEmail = Joi.string()
   .required()
   .error(new Error("Le format de l'email est invalide"));
 
-export { updateCandidate, createUserPrefet, validationEmail };
+const createUserHub = Joi.object({
+  email: Joi.string()
+    .required()
+    .email()
+    .error(new Error("Le format de l'email est invalide")),
+  nom: Joi.string().required().error(new Error('Le nom est invalide')),
+  prenom: Joi.string().required().error(new Error('Le prénom est invalide')),
+  hub: Joi.string().required().error(new Error('Le nom du hub est invalide')),
+});
+
+export { updateCandidate, createUserPrefet, validationEmail, createUserHub };

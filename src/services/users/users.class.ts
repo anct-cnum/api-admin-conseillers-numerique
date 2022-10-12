@@ -14,6 +14,7 @@ import updateEmailAccount from './controllers/updateEmailAccount';
 import verifyToken from './controllers/verifyToken';
 import confirmationEmail from './controllers/confirmationEmail';
 import getUsersByStructure from './controllers/getUsersByStructure';
+import postInvitationHub from './controllers/postInvitationHub';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -68,6 +69,12 @@ export default class Users extends Service {
       authenticate('jwt'),
       createAbilities,
       getUsersByStructure(app),
+    );
+    app.post(
+      '/inviteAccountHub',
+      authenticate('jwt'),
+      createAbilities,
+      postInvitationHub(app),
     );
     // Sentry test
     app.get('/debug-sentry', function mainHandler() {

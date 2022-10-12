@@ -18,7 +18,7 @@ export default function (app: Application, mailer) {
       const onSuccess = () => {};
 
       const onError = async (err) => {
-        utils.setSentryError(err);
+        utils.initSentry(err);
         throw err;
       };
 
