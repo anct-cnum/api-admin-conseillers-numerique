@@ -1,10 +1,8 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { validExportConseillers } from '../../../schemas/conseillers.schemas';
-import { action } from '../../../helpers/accessControl/accessList';
 import {
   filterIsCoordinateur,
   filterNomConseiller,
@@ -14,15 +12,7 @@ import {
   filterIsRupture,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
-
-const getNombreCra =
-  (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
-    app
-      .service(service.cras)
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments({
-        'conseiller.$id': conseillerId,
-      });
+import { getNombreCras } from '../../cras/cras.repository';
 
 const getExportConseillersCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -116,7 +106,7 @@ const getExportConseillersCsv =
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
           item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
-          item.craCount = await getNombreCra(app, req)(item._id);
+          item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
         }),

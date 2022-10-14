@@ -1,10 +1,8 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { validConseillers } from '../../../schemas/conseillers.schemas';
-import { action } from '../../../helpers/accessControl/accessList';
 import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
@@ -13,6 +11,7 @@ import {
   filterNomStructure,
   filterRegion,
 } from '../conseillers.repository';
+import { getNombreCras } from '../../cras/cras.repository';
 
 const getTotalConseillers =
   (app: Application, checkAccess) =>
@@ -67,15 +66,6 @@ const getTotalConseillers =
       { $group: { _id: null, count: { $sum: 1 } } },
       { $project: { _id: 0, count_conseillers: '$count' } },
     ]);
-
-const getNombreCra =
-  (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
-    app
-      .service(service.cras)
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments({
-        'conseiller.$id': conseillerId,
-      });
 
 const getConseillersEnContrat =
   (app: Application, checkAccess) =>
@@ -207,7 +197,7 @@ const getConseillers =
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
           item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
-          item.craCount = await getNombreCra(app, req)(item._id);
+          item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
         }),
