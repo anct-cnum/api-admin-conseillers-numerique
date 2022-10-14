@@ -32,7 +32,7 @@ const postInvitationStructure =
       const database = connect.substr(connect.lastIndexOf('/') + 1);
       const user: IUser = await app.service(service.users).create({
         name: email.toLowerCase(),
-        roles: ['structure', 'structure_coop'],
+        roles: ['structure'],
         entity: new DBRef('structures', new ObjectId(structureId), database),
         password: uuidv4(),
         token: uuidv4(),

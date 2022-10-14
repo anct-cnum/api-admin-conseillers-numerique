@@ -31,7 +31,7 @@ const postInvitationPrefet =
 
       const user: IUser = await app.service(service.users).create({
         name: body.email.toLowerCase(),
-        roles: Array('prefet'),
+        roles: ['prefet'],
         password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),

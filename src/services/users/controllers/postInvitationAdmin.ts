@@ -29,7 +29,7 @@ const postInvitationAdmin =
       }
       const user: IUser = await app.service(service.users).create({
         name: email.toLowerCase(),
-        roles: ['admin', 'admin_coop'],
+        roles: ['admin'],
         password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),
