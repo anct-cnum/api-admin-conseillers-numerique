@@ -47,7 +47,7 @@ const postInvitationAdmin =
         await deleteUser(app, service, req, action, email);
         res.status(503).json({
           message:
-            "Une erreur est survenue lors de l'envoi, veuillez réessayez dans quelques minutes",
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
         });
         return;
       }
