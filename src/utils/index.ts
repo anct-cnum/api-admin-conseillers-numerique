@@ -57,7 +57,7 @@ const deleteUser = async (app, service, req, action, email) => {
     .deleteOne({ name: email.toLowerCase() });
 };
 
-const envoieEmailInvit = (app, req, mailer, emails, user) => {
+const envoiEmailInvit = (app, req, mailer, emails, user) => {
   const mailerInstance = mailer(app);
   const message = emails(
     app,
@@ -72,5 +72,5 @@ export {
   getLastCoselec,
   getCoselec,
   deleteUser,
-  envoieEmailInvit,
+  envoiEmailInvit,
 };

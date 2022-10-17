@@ -7,7 +7,7 @@ import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser, envoieEmailInvit } from '../../../utils/index';
+import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
@@ -40,7 +40,7 @@ const postInvitationStructure =
         passwordCreated: false,
         resend: false,
       });
-      const errorSmtpMail = await envoieEmailInvit(
+      const errorSmtpMail = await envoiEmailInvit(
         app,
         req,
         mailer,

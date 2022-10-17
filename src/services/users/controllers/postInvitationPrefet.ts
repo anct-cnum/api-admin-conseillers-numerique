@@ -7,7 +7,7 @@ import { createUserPrefet } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser, envoieEmailInvit } from '../../../utils/index';
+import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -39,7 +39,7 @@ const postInvitationPrefet =
         passwordCreated: false,
         ...localite,
       });
-      const errorSmtpMail = await envoieEmailInvit(
+      const errorSmtpMail = await envoiEmailInvit(
         app,
         req,
         mailer,
