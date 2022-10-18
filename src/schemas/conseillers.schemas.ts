@@ -1,22 +1,22 @@
 const Joi = require('@hapi/joi');
 
 const validConseillers = Joi.object({
-  skip: Joi.number().required().error(new Error('Skip est invalide')),
+  skip: Joi.number().required().error(new Error('La pagination est invalide')),
   dateDebut: Joi.date()
     .required()
     .error(new Error('La date de début est invalide')),
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
-  ordre: Joi.number().required().error(new Error('Sort est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
   nomOrdre: Joi.string()
     .required()
-    .error(new Error('Nom du sort est invalide')),
+    .error(new Error('Le nom du tri est invalide')),
   searchByConseiller: Joi.string().error(
-    new Error('Le search by conseiller est invalide'),
+    new Error('La recherche par conseiller est invalide'),
   ),
   searchByStructure: Joi.string().error(
-    new Error('Le search by structure est invalide'),
+    new Error('La recherche par structure est invalide'),
   ),
   coordinateur: Joi.string().error(
     new Error('Le filtre coordinateur est invalide'),
@@ -37,10 +37,10 @@ const validExportConseillers = Joi.object({
     .required()
     .error(new Error('Nom du sort est invalide')),
   searchByConseiller: Joi.string().error(
-    new Error('Le search by conseiller est invalide'),
+    new Error('La recherche par conseiller est invalide'),
   ),
   searchByStructure: Joi.string().error(
-    new Error('Le search by structure est invalide'),
+    new Error('La recherche par structure est invalide'),
   ),
   coordinateur: Joi.string().error(
     new Error('Le filtre coordinateur est invalide'),

@@ -96,7 +96,12 @@ const getExportConseillersCsv =
             prenom: 1,
             nom: 1,
             'emailCN.address': 1,
-            'miseEnRelation.statut': 1,
+            'miseEnRelation.dateRecrutement': 1,
+            telephonePro: 1,
+            email: 1,
+            datePrisePoste: 1,
+            dateFinFormation: 1,
+            disponible: 1,
             estCoordinateur: 1,
           },
         },
@@ -105,7 +110,6 @@ const getExportConseillersCsv =
       conseillers = await Promise.all(
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
