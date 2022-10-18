@@ -584,6 +584,7 @@ const generateCsvConseillers = async (conseillers, res: Response) => {
     const fileHeaders = [
       'ID long conseiller',
       'ID conseiller',
+      'ID Structure',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -603,6 +604,7 @@ const generateCsvConseillers = async (conseillers, res: Response) => {
           [
             conseiller._id,
             conseiller.idPG,
+            conseiller.structure.idPG,
             conseiller.nom,
             conseiller.prenom,
             conseiller?.emailCN?.address ?? 'compte COOP non créé',
