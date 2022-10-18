@@ -98,6 +98,7 @@ const getExportConseillersCsv =
             'emailCN.address': 1,
             'miseEnRelation.dateRecrutement': 1,
             'structure.idPG': 1,
+            'structure._id': 1,
             telephonePro: 1,
             email: 1,
             datePrisePoste: 1,
