@@ -14,7 +14,7 @@ export default class Structures extends Service {
       '/structures',
       authenticate('jwt'),
       createAbilities,
-      getStructures(app),
+      getStructures(app, options),
     );
     app.get(
       '/structure',
