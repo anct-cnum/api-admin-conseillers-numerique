@@ -62,6 +62,7 @@ const getConseillerById =
               dateDeNaissance: 1,
               dateFinFormation: 1,
               datePrisePoste: 1,
+              userCreated: 1,
               sexe: 1,
               structureId: 1,
               certifie: 1,
