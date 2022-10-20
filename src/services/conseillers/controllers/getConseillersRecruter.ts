@@ -13,7 +13,7 @@ import {
 } from '../conseillers.repository';
 import { getNombreCras } from '../../cras/cras.repository';
 
-const getTotalConseillers =
+const getTotalConseillersRecruter =
   (app: Application, checkAccess) =>
   async (
     dateDebut: Date,
@@ -67,7 +67,7 @@ const getTotalConseillers =
       { $project: { _id: 0, count_conseillers: '$count' } },
     ]);
 
-const getConseillersEnContrat =
+const getConseillersRecruter =
   (app: Application, checkAccess) =>
   async (
     dateDebut: Date,
@@ -138,7 +138,7 @@ const getConseillersEnContrat =
       { $limit: Number(limit) },
     ]);
 
-const getConseillers =
+const getConseillersStatutRecrute =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const {
       skip,
@@ -181,7 +181,7 @@ const getConseillers =
     try {
       let conseillers: any[];
       const checkAccess = await checkAccessReadRequestConseillers(app, req);
-      conseillers = await getConseillersEnContrat(app, checkAccess)(
+      conseillers = await getConseillersRecruter(app, checkAccess)(
         dateDebut,
         dateFin,
         coordinateur as string,
@@ -203,7 +203,10 @@ const getConseillers =
         }),
       );
       if (conseillers.length > 0) {
-        const totalConseillers = await getTotalConseillers(app, checkAccess)(
+        const totalConseillers = await getTotalConseillersRecruter(
+          app,
+          checkAccess,
+        )(
           dateDebut,
           dateFin,
           coordinateur as string,
@@ -228,4 +231,4 @@ const getConseillers =
     }
   };
 
-export default getConseillers;
+export default getConseillersStatutRecrute;

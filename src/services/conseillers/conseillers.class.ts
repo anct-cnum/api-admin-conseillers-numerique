@@ -1,7 +1,7 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
-import getConseillers from './controllers/getConseillers';
+import getConseillersStatutRecrute from './controllers/getConseillersRecruter';
 import getConseillerById from './controllers/getConseillerById';
 import createAbilities from '../../middleware/createAbilities';
 
@@ -9,10 +9,10 @@ export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
     super(options);
     app.get(
-      '/conseillers',
+      '/conseillers-recruter',
       authenticate('jwt'),
       createAbilities,
-      getConseillers(app, options),
+      getConseillersStatutRecrute(app, options),
     );
     app.get(
       '/conseiller/:id',
