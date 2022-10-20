@@ -44,8 +44,15 @@ const updateEmailAccount =
         mailerInstance,
         req,
       ).getEmailMessageByTemplateName('confirmeNouveauEmail');
-      await message.send(user);
-      res.send(user);
+      const errorSmtpMail = await message.send(user).catch((errSmtp: Error) => {
+        return errSmtp;
+      });
+      if (errorSmtpMail instanceof Error) {
+        res.statusMessage = errorSmtpMail.message;
+        res.status(503).end();
+      } else {
+        res.send(user);
+      }
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.statusMessage = 'Accès refusé';

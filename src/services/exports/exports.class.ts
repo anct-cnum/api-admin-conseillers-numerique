@@ -17,7 +17,10 @@ import {
   getExportStructuresCsv,
   getExportEmbauchesCsv,
   getExportConseillersHubCsv,
+  getExportStatistiquesCsv,
+  getExportTerritoiresCsv,
 } from './controllers';
+import getExportConseillersCsv from './controllers/getExportConseillersCsv';
 
 interface Data {}
 
@@ -80,6 +83,24 @@ export class Exports implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getExportConseillersHubCsv(app),
+    );
+    app.get(
+      '/exports/statistiques-csv',
+      authenticate('jwt'),
+      createAbilities,
+      getExportStatistiquesCsv(app),
+    );
+    app.get(
+      '/exports/territoires-csv',
+      authenticate('jwt'),
+      createAbilities,
+      getExportTerritoiresCsv(app),
+    );
+    app.get(
+      '/exports/conseillers-csv',
+      authenticate('jwt'),
+      createAbilities,
+      getExportConseillersCsv(app),
     );
   }
 
