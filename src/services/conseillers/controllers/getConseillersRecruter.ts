@@ -178,11 +178,9 @@ const getConseillersStatutRecrute =
         skip: 0,
       };
     const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
-    // console.log(sortColonne);
     try {
       let conseillers: any[];
       const checkAccess = await checkAccessReadRequestConseillers(app, req);
-      console.log(checkAccess);
       conseillers = await getConseillersRecruter(app, checkAccess)(
         dateDebut,
         dateFin,
@@ -204,7 +202,6 @@ const getConseillersStatutRecrute =
           return item;
         }),
       );
-      // console.log(conseillers);
       if (conseillers.length > 0) {
         const totalConseillers = await getTotalConseillersRecruter(
           app,
