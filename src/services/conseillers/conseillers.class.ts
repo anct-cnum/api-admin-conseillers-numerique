@@ -12,7 +12,7 @@ export default class Conseillers extends Service {
       '/conseillers',
       authenticate('jwt'),
       createAbilities,
-      getConseillers(app),
+      getConseillers(app, options),
     );
     app.get(
       '/conseiller/:id',
