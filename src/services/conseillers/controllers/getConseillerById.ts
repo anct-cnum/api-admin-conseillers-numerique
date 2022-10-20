@@ -3,17 +3,8 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-
-const checkAccessReadRequestConseillers = async (
-  app: Application,
-  req: IRequest,
-) =>
-  app
-    .service(service.conseillers)
-    .Model.accessibleBy(req.ability, action.read)
-    .getQuery();
+import { checkAccessReadRequestConseillers } from '../conseillers.repository';
 
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -31,8 +22,17 @@ const getConseillerById =
           },
           {
             $lookup: {
+              localField: 'structureId',
+              from: 'structures',
+              foreignField: '_id',
+              as: 'structure',
+            },
+          },
+          { $unwind: '$structure' },
+          {
+            $lookup: {
               from: 'misesEnRelation',
-              let: { idConseiller: '$idPG' },
+              let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
               as: 'miseEnRelation',
               pipeline: [
                 {
@@ -43,7 +43,9 @@ const getConseillerById =
                           $eq: ['$$idConseiller', '$conseillerObj.idPG'],
                         },
                       },
-                      { statut: { $eq: 'finalisee' } },
+                      {
+                        $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] },
+                      },
                     ],
                   },
                 },
