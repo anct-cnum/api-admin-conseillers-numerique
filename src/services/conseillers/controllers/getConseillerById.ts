@@ -53,7 +53,6 @@ const getConseillerById =
           { $unwind: '$miseEnRelation' },
           {
             $project: {
-              _id: 1,
               idPG: 1,
               prenom: 1,
               nom: 1,
