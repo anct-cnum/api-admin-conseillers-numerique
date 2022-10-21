@@ -7,14 +7,17 @@ import verifyToken from '../../../helpers/auth/verify';
 const getRefreshToken =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { refreshToken } = req.cookies;
-    if (!refreshToken) return res.status(401).json('Unauthorized');
+    if (!refreshToken) return res.status(401).json('Accès refusé');
     let user: IUser;
     try {
-      user = await app.service('users').Model.findOne({ refreshToken });
+      user = await app
+        .service('users')
+        .Model.findOne({ refreshToken })
+        .select({ _id: 0, password: 0, refreshToken: 0 });
     } catch (error) {
       return res.status(409);
     }
-    if (!user) return res.status(403).json('Forbidden');
+    if (!user) return res.status(403).json('Accès refusé');
     try {
       verifyToken(app)(
         res,

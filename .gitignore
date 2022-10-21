@@ -7,4 +7,3 @@ data/exports/*
 .clever.json
 .idea/
 dist
-package-lock.json

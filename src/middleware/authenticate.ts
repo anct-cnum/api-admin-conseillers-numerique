@@ -13,9 +13,9 @@ const authenticate =
       jwt.verify(
         accessToken,
         app.get('inclusion_connect').access_token_secret,
-        (err, decoded: IUser) => {
+        (err, userDecoded: IUser) => {
           if (err) res.status(403).json('Jeton invalide');
-          req.user = decoded;
+          req.user = userDecoded;
         },
       );
       next();

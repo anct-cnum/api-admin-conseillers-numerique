@@ -1,5 +1,4 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-// import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import getAccessibleData from './controllers/getAccessibleData';
 import getAccessibleDataAggregate from './controllers/getAccessibleDataAggregate';

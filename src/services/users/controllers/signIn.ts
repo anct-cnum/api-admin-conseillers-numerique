@@ -21,9 +21,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     request(options, async (err, response, body) => {
       if (err) throw new Error(err);
       if (response.statusCode !== 200) {
-        res.status(401).json({
-          error: 'unauthorized',
-        });
+        res.status(401).json('Accès refusé');
       } else {
         // récuperation de l'utilisateur provenant du serveur d'authentification si le token est valide
         const keycloakUser = JSON.parse(body);
