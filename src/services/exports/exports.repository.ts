@@ -579,6 +579,58 @@ const generateCsvTerritoires = async (
   }
 };
 
+const generateCsvConseillers = async (conseillers, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id conseiller',
+      'Id long de la structure',
+      'Id de la structure',
+      'Nom',
+      'Prénom',
+      'Email Professionnelle',
+      'Téléphone professionnel',
+      'Email personnelle',
+      'Date de recrutement',
+      "Date d'entrée en formation",
+      'Date de sortie de formation',
+      'Disponibilité',
+      'Coordinateur',
+      'CRA Saisis',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...conseillers.map((conseiller) =>
+          [
+            conseiller.idPG,
+            conseiller.structure._id,
+            conseiller.structure.idPG,
+            conseiller.nom,
+            conseiller.prenom,
+            conseiller?.emailCN?.address ?? 'compte COOP non créé',
+            conseiller?.telephonePro,
+            conseiller?.email,
+            conseiller?.miseEnRelation?.dateRecrutement
+              ? formatDate(conseiller.miseEnRelation.dateRecrutement)
+              : '',
+            formatDate(conseiller?.datePrisePoste),
+            formatDate(conseiller?.dateFinFormation),
+            conseiller.disponible ? 'Oui' : 'Non',
+            conseiller.estCoordinateur ? 'Oui' : 'Non',
+            conseiller.craCount,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -588,4 +640,5 @@ export {
   generateCsvConseillersHub,
   generateCsvSatistiques,
   generateCsvTerritoires,
+  generateCsvConseillers,
 };
