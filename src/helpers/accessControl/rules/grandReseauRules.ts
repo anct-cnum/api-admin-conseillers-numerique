@@ -3,26 +3,6 @@ import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
 import app from '../../../app';
 
-const getConseillersIds = async (structuresIds) => {
-  let conseillersIds: String[];
-  try {
-    structuresIds.forEach(async (structureId) => {
-      const conseillersStructure = await app
-        .services(service.conseillers)
-        .Model.find({
-          structureId,
-        });
-      conseillersStructure.forEach((conseiller) => {
-        conseillersIds.push(conseiller._id);
-      });
-    });
-
-    return conseillersIds;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 export default async function grandReseauRules(user: IUser, can): Promise<any> {
   // Restreindre les permissions : les grands réseau ne peuvent voir que les informations des structures appartenant à leur organisation
   let structuresIds: string[];
@@ -34,7 +14,16 @@ export default async function grandReseauRules(user: IUser, can): Promise<any> {
   } catch (error) {
     throw new Error(error);
   }
-  const conseillersIds = await getConseillersIds(structuresIds);
+
+  let conseillersIds: string[];
+  try {
+    conseillersIds = await app
+      .service(service.conseillers)
+      .Model.find({ structureId: { $in: structuresIds } })
+      .distinct('_id');
+  } catch (error) {
+    throw new Error(error);
+  }
 
   can([action.read], ressource.conseillers, {
     structureId: { $in: structuresIds },
