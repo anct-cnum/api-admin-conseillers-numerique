@@ -1,11 +1,13 @@
+import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
 import app from '../../../app';
+import { getConseillersById } from '../../commonQueriesFunctions';
 
 export default async function grandReseauRules(user: IUser, can): Promise<any> {
   // Restreindre les permissions : les grands réseau ne peuvent voir que les informations des structures appartenant à leur organisation
-  let structuresIds: string[];
+  let structuresIds: ObjectId[];
   try {
     structuresIds = await app
       .service(service.structures)
@@ -15,15 +17,7 @@ export default async function grandReseauRules(user: IUser, can): Promise<any> {
     throw new Error(error);
   }
 
-  let conseillersIds: string[];
-  try {
-    conseillersIds = await app
-      .service(service.conseillers)
-      .Model.find({ structureId: { $in: structuresIds } })
-      .distinct('_id');
-  } catch (error) {
-    throw new Error(error);
-  }
+  const conseillersIds = await getConseillersById(app)(structuresIds);
 
   can([action.read], ressource.conseillers, {
     structureId: { $in: structuresIds },
