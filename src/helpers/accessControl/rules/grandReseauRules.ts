@@ -28,6 +28,9 @@ export default async function grandReseauRules(user: IUser, can): Promise<any> {
   can([action.read], ressource.conseillers, {
     structureId: { $in: structuresIds },
   });
+  can([action.read], ressource.structures, {
+    _id: { $in: structuresIds },
+  });
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });
