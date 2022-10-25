@@ -49,11 +49,11 @@ const filterIsCoordinateur = (coordinateur: string) => {
 };
 
 const filterIsRupture = (rupture: string) => {
-  if (rupture === 'true') {
-    return { statut: { $eq: 'nouvelle_rupture' } };
+  if (rupture && rupture !== 'no_rupture') {
+    return { statut: { $eq: rupture } };
   }
-  if (rupture === 'false') {
-    return { statut: { $eq: 'finalisee' } };
+  if (rupture && rupture === 'no_rupture') {
+    return { statut: { $nin: ['finalisee_rupture', 'nouvelle_rupture'] } };
   }
   return {};
 };

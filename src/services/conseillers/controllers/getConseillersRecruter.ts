@@ -196,9 +196,14 @@ const getConseillersStatutRecrute =
       conseillers = await Promise.all(
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
+          if (item.miseEnRelation.statut === 'nouvelle_rupture') {
+            item.rupture = 'En cours';
+          } else if (item.miseEnRelation.statut === 'finalisee_rupture') {
+            item.rupture = 'Oui';
+          } else {
+            item.rupture = 'Non';
+          }
           item.craCount = await getNombreCras(app, req)(item._id);
-
           return item;
         }),
       );
