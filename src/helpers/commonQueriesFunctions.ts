@@ -1,4 +1,7 @@
+import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import { IDepartement, IHub } from '../ts/interfaces/json.interface';
+import service from './services';
 
 const hubs = require('../../datas/imports/hubs.json');
 const departements = require('../../datas/imports/departements-region.json');
@@ -18,4 +21,22 @@ const findNumDepartementsByRegion = (hubRegion: string[]): Array<string> => {
     .map((departement: IDepartement) => departement.num_dep);
 };
 
-export { findDepartementOrRegion, findNumDepartementsByRegion };
+const getConseillersById =
+  (app: Application) => async (structuresIds: ObjectId[]) => {
+    try {
+      const conseillersIds: ObjectId[] = await app
+        .service(service.conseillers)
+        .Model.find({ structureId: { $in: structuresIds } })
+        .distinct('_id');
+
+      return conseillersIds;
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
+export {
+  findDepartementOrRegion,
+  findNumDepartementsByRegion,
+  getConseillersById,
+};
