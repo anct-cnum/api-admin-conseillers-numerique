@@ -10,7 +10,10 @@ import {
   IStructures,
   IUser,
 } from '../../ts/interfaces/db.interfaces';
-import { formatAdresseStructure, formatQpv } from '../structures/structures.repository';
+import {
+  formatAdresseStructure,
+  formatQpv,
+} from '../structures/structures.repository';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 

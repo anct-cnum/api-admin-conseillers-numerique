@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvListeStructures } from '../exports.repository';
@@ -14,6 +13,8 @@ import {
   filterStatut,
   filterType,
 } from '../../structures/structures.repository';
+import { getConseillersById } from '../../../helpers/commonQueriesFunctions';
+import { getNombreCrasByArrayConseillerId } from '../../cras/cras.repository';
 
 const getExportListeStructuresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -91,16 +92,12 @@ const getExportListeStructuresCsv =
       structures = await Promise.all(
         structures.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          const conseillersIds = await app
-            .service(service.conseillers)
-            .Model.find({ structureId: item._id })
-            .distinct('_id');
+          const conseillersIds = await getConseillersById(app)(item._id);
           if (conseillersIds.length > 0) {
-            item.craCount = await app
-              .service(service.cras)
-              .Model.countDocuments({
-                'conseiller.$id': { $in: conseillersIds },
-              });
+            item.craCount = await getNombreCrasByArrayConseillerId(
+              app,
+              req,
+            )(conseillersIds);
           } else {
             item.craCount = 0;
           }
