@@ -10,6 +10,7 @@ import {
   IStructures,
   IUser,
 } from '../../ts/interfaces/db.interfaces';
+import { formatAdresseStructure, formatQpv } from '../structures/structures.repository';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -143,20 +144,6 @@ const generateCsvCandidatByStructure = async (
     res.status(500).end();
     throw new Error(error);
   }
-};
-
-const formatAdresseStructure = (insee) => {
-  const adresse = `${insee?.etablissement?.adresse?.numero_voie ?? ''} ${
-    insee?.etablissement?.adresse?.type_voie ?? ''
-  } ${insee?.etablissement?.adresse?.nom_voie ?? ''} ${
-    insee?.etablissement?.adresse?.complement_adresse
-      ? `${insee.etablissement.adresse.complement_adresse} `
-      : ' '
-  }${insee?.etablissement?.adresse?.code_postal ?? ''} ${
-    insee?.etablissement?.adresse?.localite ?? ''
-  }`;
-
-  return adresse.replace(/["',]/g, '');
 };
 
 const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
@@ -631,6 +618,56 @@ const generateCsvConseillers = async (conseillers, res: Response) => {
   }
 };
 
+const generateCsvListeStructures = async (structures, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom',
+      'Prénom',
+      'Fonction',
+      'Email',
+      'Téléphone',
+      'Siret',
+      "Date d'inscription",
+      'Adresse',
+      'Code postal',
+      'Type',
+      'Zone rurale',
+      'Nombre de CRA total cumulés',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...structures.map((structure) =>
+          [
+            structure.idPG,
+            structure.nom,
+            structure.contact?.nom,
+            structure.contact?.prenom,
+            structure.contact?.fonction,
+            structure.contact?.email,
+            structure.contact?.telephone,
+            structure.siret,
+            formatDate(structure?.createdAt),
+            structure?.insee ? formatAdresseStructure(structure.insee) : '',
+            structure.codePostal,
+            structure.type,
+            formatQpv(structure?.qpvStatut),
+            structure.craCount,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -641,4 +678,5 @@ export {
   generateCsvSatistiques,
   generateCsvTerritoires,
   generateCsvConseillers,
+  generateCsvListeStructures,
 };

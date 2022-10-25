@@ -40,18 +40,40 @@ const filterDepartement = (departement: string) =>
   departement ? { codeDepartement: departement } : {};
 
 const filterType = (type: string) => {
-  if (type === 'Privée') {
+  if (type === 'PRIVATE') {
     return { type: { $eq: 'PRIVATE' } };
   }
-  if (type === 'Publique') {
+  if (type === 'PUBLIC') {
     return { type: { $ne: 'PRIVATE' } };
   }
 
   return {};
 };
 
-const filterStatut = (statut: string) =>
-  statut ? { statut: statut.toUpperCase() } : {};
+const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
+
+const filterStatut = (statut: string) => (statut ? { statut } : {});
+
+const formatAdresseStructure = (insee) => {
+  const adresse = `${insee?.etablissement?.adresse?.numero_voie ?? ''} ${
+    insee?.etablissement?.adresse?.type_voie ?? ''
+  } ${insee?.etablissement?.adresse?.nom_voie ?? ''} ${
+    insee?.etablissement?.adresse?.complement_adresse
+      ? `${insee.etablissement.adresse.complement_adresse} `
+      : ' '
+  }${insee?.etablissement?.adresse?.code_postal ?? ''} ${
+    insee?.etablissement?.adresse?.localite ?? ''
+  }`;
+
+  return adresse.replace(/["']/g, '');
+};
+
+const formatQpv = (qpv: string) => {
+  if (qpv === 'Oui') {
+    return 'Oui';
+  }
+  return 'Non';
+};
 
 export {
   checkAccessReadRequestStructures,
@@ -62,4 +84,7 @@ export {
   filterStatut,
   countStructures,
   getStructuresIds,
+  filterComs,
+  formatAdresseStructure,
+  formatQpv,
 };

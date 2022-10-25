@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
-import validStructures from '../../../schemas/structures.schemas';
+import { validStructures } from '../../../schemas/structures.schemas';
 import {
   filterDepartement,
   filterRegion,
@@ -11,6 +11,7 @@ import {
   filterType,
   filterNomStructure,
   checkAccessReadRequestStructures,
+  filterComs,
 } from '../structures.repository';
 
 const getTotalStructures =
@@ -22,6 +23,7 @@ const getTotalStructures =
     statut: string,
     region: string,
     departement: string,
+    coms: string,
     searchByName: string,
   ) =>
     app.service(service.structures).Model.aggregate([
@@ -33,6 +35,7 @@ const getTotalStructures =
           ...filterStatut(statut),
           ...filterRegion(region),
           ...filterDepartement(departement),
+          ...filterComs(coms),
           ...filterNomStructure(searchByName),
         },
       },
@@ -49,6 +52,7 @@ const getStructuresAvecFiltre =
     statut: string,
     region: string,
     departement: string,
+    coms: string,
     searchByName: string,
     sortColonne: object,
     skip: string,
@@ -63,6 +67,7 @@ const getStructuresAvecFiltre =
           ...filterStatut(statut),
           ...filterRegion(region),
           ...filterDepartement(departement),
+          ...filterComs(coms),
           ...filterNomStructure(searchByName),
         },
       },
@@ -95,6 +100,7 @@ const getStructures =
       searchByNom,
       departement,
       region,
+      coms,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -109,6 +115,7 @@ const getStructures =
       searchByNom,
       departement,
       region,
+      coms,
     });
 
     if (emailValidation.error) {
@@ -136,6 +143,7 @@ const getStructures =
         statut as string,
         region as string,
         departement as string,
+        coms as string,
         searchByNom as string,
         sortColonne,
         skip as string,
@@ -149,6 +157,7 @@ const getStructures =
           statut as string,
           region as string,
           departement as string,
+          coms as string,
           searchByNom as string,
         );
         items.data = structures;

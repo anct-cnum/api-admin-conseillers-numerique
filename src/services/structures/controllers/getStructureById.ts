@@ -7,12 +7,11 @@ import service from '../../../helpers/services';
 
 const getStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const idStructure = { _id: req.params.id };
     try {
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: idStructure });
+        .findOne();
       res.status(200).json(structure);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
