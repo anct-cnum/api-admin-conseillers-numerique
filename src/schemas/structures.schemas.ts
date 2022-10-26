@@ -16,11 +16,11 @@ const validStructures = Joi.object({
     new Error('La recherche par nom est invalide'),
   ),
   departement: Joi.string().error(
-    new Error('Le filtre departement est invalide'),
+    new Error('Le filtre département est invalide'),
   ),
   type: Joi.string().error(new Error('Le filtre type est invalide')),
   statut: Joi.string().error(new Error('Le filtre statut est invalide')),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
   coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 
@@ -39,11 +39,11 @@ const validExportStructures = Joi.object({
     new Error('La recherche par nom est invalide'),
   ),
   departement: Joi.string().error(
-    new Error('Le filtre departement est invalide'),
+    new Error('Le filtre département est invalide'),
   ),
   type: Joi.string().error(new Error('Le filtre type est invalide')),
   statut: Joi.string().error(new Error('Le filtre statut est invalide')),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
   coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 

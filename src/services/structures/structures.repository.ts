@@ -68,12 +68,7 @@ const formatAdresseStructure = (insee) => {
   return adresse.replace(/["']/g, '');
 };
 
-const formatQpv = (qpv: string) => {
-  if (qpv === 'Oui') {
-    return 'Oui';
-  }
-  return 'Non';
-};
+const formatQpv = (qpv: string) => (qpv === 'Oui' ? 'Oui' : 'Non');
 
 export {
   checkAccessReadRequestStructures,
