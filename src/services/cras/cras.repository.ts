@@ -38,6 +38,15 @@ const getNombreCras =
         'conseiller.$id': conseillerId,
       });
 
+const getNombreCrasByArrayConseillerId =
+  (app: Application, req: IRequest) => async (conseillersIds: ObjectId[]) =>
+    app
+      .service(service.cras)
+      .Model.accessibleBy(req.ability, action.read)
+      .countDocuments({
+        'conseiller.$id': { $in: conseillersIds },
+      });
+
 const getConseillersIdsByTerritoire = async (type, idType, app) => {
   const conseillersIds = [];
   const query = {
@@ -92,4 +101,5 @@ export {
   getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCrasStructure,
   getNombreCras,
+  getNombreCrasByArrayConseillerId,
 };

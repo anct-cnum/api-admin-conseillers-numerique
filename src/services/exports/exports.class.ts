@@ -19,6 +19,7 @@ import {
   getExportConseillersHubCsv,
   getExportStatistiquesCsv,
   getExportTerritoiresCsv,
+  getExportListeStructuresCsv,
 } from './controllers';
 import getExportConseillersCsv from './controllers/getExportConseillersCsv';
 
@@ -101,6 +102,12 @@ export class Exports implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getExportConseillersCsv(app),
+    );
+    app.get(
+      '/exports/liste-structures-csv',
+      authenticate('jwt'),
+      createAbilities,
+      getExportListeStructuresCsv(app),
     );
   }
 
