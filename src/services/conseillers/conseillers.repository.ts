@@ -1,6 +1,5 @@
 /* eslint-disable prefer-template */
 import { Application } from '@feathersjs/express';
-import { ObjectId } from 'mongodb';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -15,34 +14,26 @@ const checkAccessReadRequestConseillers = async (
     .getQuery();
 
 const filterNomConseiller = (nom: string) => {
-  return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
+  return nom
+    ? { 'conseillerObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
+    : {};
 };
 
 const filterNomStructure = (nom: string) => {
-  if (nom) {
-    return [
-      {
-        $match: {
-          nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' },
-        },
-      },
-      { $match: { $expr: { $eq: ['$$idStructure', '$_id'] } } },
-    ];
-  }
-  return [{ $match: { $expr: { $eq: ['$$idStructure', '$_id'] } } }];
+  return nom
+    ? { 'structureObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
+    : {};
 };
 
-const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
-
-const filterStructure = (structure: string) =>
-  structure ? { structureId: new ObjectId(structure) } : {};
+const filterRegion = (region: string) =>
+  region ? { 'conseillerObj.codeRegion': region } : {};
 
 const filterIsCoordinateur = (coordinateur: string) => {
   if (coordinateur === 'true') {
-    return { estCoordinateur: { $eq: true } };
+    return { 'conseillerObj.estCoordinateur': { $eq: true } };
   }
   if (coordinateur === 'false') {
-    return { estCoordinateur: { $exists: false } };
+    return { 'conseillerObj.estCoordinateur': { $exists: false } };
   }
 
   return {};
@@ -52,10 +43,12 @@ const filterIsRupture = (rupture: string) => {
   if (rupture && rupture !== 'no_rupture') {
     return { statut: { $eq: rupture } };
   }
-  if (rupture && rupture === 'no_rupture') {
-    return { statut: { $nin: ['finalisee_rupture', 'nouvelle_rupture'] } };
+  if (rupture === 'no_rupture') {
+    return { statut: { $eq: 'finalisee' } };
   }
-  return {};
+  return {
+    statut: { $in: ['finalisee_rupture', 'nouvelle_rupture', 'finalisee'] },
+  };
 };
 
 export {
@@ -65,5 +58,4 @@ export {
   filterNomStructure,
   filterIsRupture,
   filterRegion,
-  filterStructure,
 };
