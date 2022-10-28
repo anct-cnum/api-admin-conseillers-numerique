@@ -40,10 +40,10 @@ const filterIsCoordinateur = (coordinateur: string) => {
 };
 
 const filterIsRupture = (rupture: string) => {
-  if (rupture && rupture !== 'no_rupture') {
+  if (rupture && rupture !== 'contrat') {
     return { statut: { $eq: rupture } };
   }
-  if (rupture === 'no_rupture') {
+  if (rupture === 'contrat') {
     return { statut: { $eq: 'finalisee' } };
   }
   return {
