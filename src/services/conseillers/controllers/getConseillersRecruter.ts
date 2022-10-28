@@ -126,7 +126,7 @@ const getConseillersStatutRecrute =
       };
     const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
     try {
-      let conseillers: any;
+      let conseillers: any[];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       conseillers = await getConseillersRecruter(app, checkAccess)(
         dateDebut,
@@ -157,6 +157,7 @@ const getConseillersStatutRecrute =
           item.address = item.conseillerObj.emailCN.address;
           item.estCoordinateur = item.conseillerObj.estCoordinateur;
           item.craCount = await getNombreCras(app, req)(item._id);
+
           return item;
         }),
       );
