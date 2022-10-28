@@ -156,7 +156,7 @@ const getConseillersStatutRecrute =
           item.prenom = item.conseillerObj.prenom;
           item.address = item.conseillerObj.emailCN.address;
           item.estCoordinateur = item.conseillerObj.estCoordinateur;
-          item.craCount = await getNombreCras(app, req)(item.conseillerObj._id);
+          item.craCount = await getNombreCras(app, req)(item._id);
           return item;
         }),
       );

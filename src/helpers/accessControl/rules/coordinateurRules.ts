@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser, IConseillers } from '../../../ts/interfaces/db.interfaces';
 import app from '../../../app';
+import service from '../../services';
 
 const getConseillers = async (userId: string): Promise<ObjectId[] | Error> => {
   let conseiller: IConseillers;
@@ -9,13 +10,13 @@ const getConseillers = async (userId: string): Promise<ObjectId[] | Error> => {
   let query;
   try {
     conseiller = await app
-      .service('conseillers')
+      .service(service.conseillers)
       .Model.findOne({ _id: userId });
   } catch (error) {
     throw new Error(error);
   }
   if (conseiller?.estCoordinateur === true) {
-    switch (conseiller.listeSubordonnes.type) {
+    switch (conseiller.listeSubordonnes?.type) {
       case 'codeDepartement':
         query = { codeDepartement: { $in: conseiller.listeSubordonnes.liste } };
         break;
@@ -27,7 +28,7 @@ const getConseillers = async (userId: string): Promise<ObjectId[] | Error> => {
     if (query) {
       try {
         conseillersIds = await app
-          .service('conseillers')
+          .service(service.conseillers)
           .Model.find(query)
           .distinct('_id');
       } catch (error) {

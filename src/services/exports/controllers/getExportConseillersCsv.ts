@@ -6,13 +6,13 @@ import { validExportConseillers } from '../../../schemas/conseillers.schemas';
 import {
   filterIsCoordinateur,
   filterNomConseiller,
-  checkAccessReadRequestConseillers,
   filterRegion,
   filterNomStructure,
   filterIsRupture,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
+import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
 
 const getExportConseillersCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -44,67 +44,39 @@ const getExportConseillersCsv =
       res.status(400).end();
       return;
     }
-    const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
+    const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
     try {
       let conseillers: any[];
-      const checkAccess = await checkAccessReadRequestConseillers(app, req);
-      conseillers = await app.service(service.conseillers).Model.aggregate([
+      const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
+      conseillers = await app.service(service.misesEnRelation).Model.aggregate([
         {
           $match: {
-            statut: 'RECRUTE',
-            datePrisePoste: { $gt: dateDebut, $lt: dateFin },
+            ...filterIsRupture(rupture),
+            ...filterIsCoordinateur(coordinateur),
+            ...filterNomConseiller(searchByConseiller),
+            ...filterRegion(region),
+            ...filterNomStructure(searchByStructure),
+            'conseillerObj.datePrisePoste': { $gt: dateDebut, $lt: dateFin },
             $and: [checkAccess],
-            ...filterIsCoordinateur(coordinateur as string),
-            ...filterNomConseiller(searchByConseiller as string),
-            ...filterRegion(region as string),
           },
         },
-        {
-          $lookup: {
-            from: 'structures',
-            let: { idStructure: '$structureId' },
-            as: 'structure',
-            pipeline: filterNomStructure(searchByStructure as string),
-          },
-        },
-        { $unwind: '$structure' },
-        {
-          $lookup: {
-            from: 'misesEnRelation',
-            let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
-            as: 'miseEnRelation',
-            pipeline: [
-              {
-                $match: {
-                  $and: [
-                    {
-                      $expr: { $eq: ['$$idConseiller', '$conseillerObj.idPG'] },
-                    },
-                    { $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] } },
-                    filterIsRupture(rupture as string),
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        { $unwind: '$miseEnRelation' },
         {
           $project: {
-            _id: 1,
-            idPG: 1,
-            prenom: 1,
-            nom: 1,
-            'emailCN.address': 1,
-            'miseEnRelation.dateRecrutement': 1,
-            'structure.idPG': 1,
-            'structure._id': 1,
-            telephonePro: 1,
-            email: 1,
-            datePrisePoste: 1,
-            dateFinFormation: 1,
-            disponible: 1,
-            estCoordinateur: 1,
+            _id: 0,
+            'conseillerObj._id': 1,
+            'conseillerObj.idPG': 1,
+            'conseillerObj.prenom': 1,
+            'conseillerObj.nom': 1,
+            'conseillerObj.emailCN.address': 1,
+            dateRecrutement: 1,
+            'structureObj.idPG': 1,
+            'structureObj._id': 1,
+            'conseillerObj.telephonePro': 1,
+            'conseillerObj.email': 1,
+            'conseillerObj.datePrisePoste': 1,
+            'conseillerObj.dateFinFormation': 1,
+            'conseillerObj.disponible': 1,
+            'conseillerObj.estCoordinateur': 1,
           },
         },
         { $sort: sortColonne },
@@ -112,11 +84,12 @@ const getExportConseillersCsv =
       conseillers = await Promise.all(
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.craCount = await getNombreCras(app, req)(item._id);
+          item.craCount = await getNombreCras(app, req)(item.conseillerObj._id);
 
           return item;
         }),
       );
+
       generateCsvConseillers(conseillers, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
