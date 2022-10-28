@@ -18,10 +18,14 @@ const getConseillers = async (userId: string): Promise<ObjectId[] | Error> => {
   if (conseiller?.estCoordinateur === true) {
     switch (conseiller.listeSubordonnes?.type) {
       case 'codeDepartement':
-        query = { codeDepartement: { $in: conseiller.listeSubordonnes.liste } };
+        query = {
+          codeDepartementStructure: { $in: conseiller.listeSubordonnes.liste },
+        };
         break;
       case 'codeRegion':
-        query = { codeRegion: { $in: conseiller.listeSubordonnes.liste } };
+        query = {
+          codeRegionStructure: { $in: conseiller.listeSubordonnes.liste },
+        };
         break;
       default:
     }
