@@ -151,6 +151,7 @@ const getConseillersStatutRecrute =
             item.rupture = 'Non';
           }
           item.idPG = item.conseillerObj.idPG;
+          item._id = item.conseillerObj._id;
           item.nom = item.conseillerObj.nom;
           item.prenom = item.conseillerObj.prenom;
           item.address = item.conseillerObj.emailCN.address;
