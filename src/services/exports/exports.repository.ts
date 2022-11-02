@@ -569,7 +569,7 @@ const generateCsvTerritoires = async (
   }
 };
 
-const generateCsvConseillers = async (conseillers, res: Response) => {
+const generateCsvConseillers = async (misesEnRelation, res: Response) => {
   try {
     const fileHeaders = [
       'Id conseiller',
@@ -590,24 +590,25 @@ const generateCsvConseillers = async (conseillers, res: Response) => {
     res.write(
       [
         fileHeaders.join(csvCellSeparator),
-        ...conseillers.map((conseiller) =>
+        ...misesEnRelation.map((miseEnRelation) =>
           [
-            conseiller.idPG,
-            conseiller.structure._id,
-            conseiller.structure.idPG,
-            conseiller.nom,
-            conseiller.prenom,
-            conseiller?.emailCN?.address ?? 'compte COOP non créé',
-            conseiller?.telephonePro,
-            conseiller?.email,
-            conseiller?.miseEnRelation?.dateRecrutement
-              ? formatDate(conseiller.miseEnRelation.dateRecrutement)
+            miseEnRelation.conseillerObj.idPG,
+            miseEnRelation.structureObj._id,
+            miseEnRelation.structureObj.idPG,
+            miseEnRelation.conseillerObj.nom,
+            miseEnRelation.conseillerObj.prenom,
+            miseEnRelation.conseillerObj?.emailCN?.address ??
+              'compte COOP non créé',
+            miseEnRelation.conseillerObj?.telephonePro,
+            miseEnRelation.conseillerObj?.email,
+            miseEnRelation?.dateRecrutement
+              ? formatDate(miseEnRelation.dateRecrutement)
               : '',
-            formatDate(conseiller?.datePrisePoste),
-            formatDate(conseiller?.dateFinFormation),
-            conseiller.disponible ? 'Oui' : 'Non',
-            conseiller.estCoordinateur ? 'Oui' : 'Non',
-            conseiller.craCount,
+            formatDate(miseEnRelation.conseillerObj.datePrisePoste),
+            formatDate(miseEnRelation.conseillerObj.dateFinFormation),
+            miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
+            miseEnRelation.conseillerObj.estCoordinateur ? 'Oui' : 'Non',
+            miseEnRelation.craCount,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
