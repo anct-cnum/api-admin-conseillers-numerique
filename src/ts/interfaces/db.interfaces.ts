@@ -77,6 +77,8 @@ export interface IMisesEnRelation {
   emetteurRupture: string | undefined;
 }
 export interface IConseillers {
+  _id: ObjectId;
+
   idPG: number;
 
   password: string;
@@ -387,6 +389,6 @@ export interface IStatsConseillersCras {
   2024: [Object];
 }
 
-export function isConseiller(item: any): item is IConseillers {
+export function isArrayConseillers(item: any): item is IConseillers[] {
   return item;
 }
