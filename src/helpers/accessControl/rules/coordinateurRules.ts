@@ -15,7 +15,7 @@ const getConseillers = async (
   let query;
   try {
     conseiller = await app
-      .service('conseillers')
+      .service(service.conseillers)
       .Model.findOne({ _id: userId });
   } catch (error) {
     throw new Error(error);
@@ -74,6 +74,9 @@ export default async function coordinateurRules(
     });
     can([action.read], ressource.conseillers, {
       _id: user?.entity.oid,
+    });
+    can([action.read], ressource.misesEnRelation, {
+      'conseiller.$id': { $in: conseillersIds },
     });
     can([action.read], ressource.cras, {
       'conseiller.$id': { $in: conseillersIds },
