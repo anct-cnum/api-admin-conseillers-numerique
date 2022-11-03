@@ -31,7 +31,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 };
 
 const formatDate = (date: Date) => {
-  if (date !== undefined) {
+  if (date !== undefined && date !== null) {
     return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
@@ -56,21 +56,13 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
       misesEnRelations.map(async (miseEnrelation) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
-          `${formatDate(miseEnrelation.conseiller?.createdAt)};${
-            miseEnrelation.dateRecrutement === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.dateRecrutement)
-          };${
-            miseEnrelation.conseiller.datePrisePoste === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.conseiller.datePrisePoste)
-          };${
-            miseEnrelation.conseiller.dateFinFormation === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.conseiller.dateFinFormation)
-          };${miseEnrelation.conseiller?.prenom};${
-            miseEnrelation.conseiller?.nom
-          };${
+          `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
+            miseEnrelation?.dateRecrutement,
+          )};${formatDate(
+            miseEnrelation.conseiller?.datePrisePoste,
+          )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
+            miseEnrelation.conseiller?.prenom
+          };${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${
             miseEnrelation.conseiller?.email
@@ -601,11 +593,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               'compte COOP non créé',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
-            miseEnRelation?.dateRecrutement
-              ? formatDate(miseEnRelation.dateRecrutement)
-              : '',
-            formatDate(miseEnRelation.conseillerObj.datePrisePoste),
-            formatDate(miseEnRelation.conseillerObj.dateFinFormation),
+            formatDate(miseEnRelation?.dateRecrutement),
+            formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
+            formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj.estCoordinateur ? 'Oui' : 'Non',
             miseEnRelation.craCount,

@@ -47,4 +47,9 @@ const validExportStructures = Joi.object({
   coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 
-export { validStructures, validExportStructures };
+const updateEmail = Joi.string()
+  .email()
+  .required()
+  .error(new Error("Le format de l'email est invalide"));
+
+export { validStructures, validExportStructures, updateEmail };
