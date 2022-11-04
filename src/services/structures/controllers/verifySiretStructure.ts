@@ -15,22 +15,19 @@ const verifySiretStructure =
         recipient: 'cnum',
         object: 'checkSiret',
       };
-      const result = await axios.get(urlSiret, { params: params });
+      const result = await axios.get(urlSiret, { params });
       if (result.status === 404) {
-        res.status(404).json({
-          message: `Le numéro de SIRET ( N° ${siret} ) que vous avez demandé n\'existe pas !`,
+        return res.status(404).json({
+          message: `Le numéro de SIRET ( N° ${siret} ) que vous avez demandé n'existe pas !`,
         });
-        return;
       }
       if (result.status === 200) {
         return res.send({ nomStructure: result.data.etablissement.adresse.l1 });
       }
-      res.status(result.status).json({ message: result.statusText });
-      return;
+      return res.status(result.status).json({ message: result.statusText });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
-        return;
+        return res.status(403).json('Accès refusé');
       }
       res.status(500).json(error.message);
       throw new Error(error);
