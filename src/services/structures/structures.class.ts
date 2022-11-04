@@ -38,13 +38,13 @@ export default class Structures extends Service {
       verifySiretStructure(app),
     );
     app.patch(
-      '/structure/:id/siret',
+      '/structure/siret/:id',
       authenticate('jwt'),
       createAbilities,
       updateSiretStructure(app),
     );
     app.patch(
-      '/structure/:id/email',
+      '/structure/email/:id',
       authenticate('jwt'),
       createAbilities,
       updateEmailStructure(app),

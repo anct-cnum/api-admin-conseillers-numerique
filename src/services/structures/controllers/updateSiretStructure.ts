@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const { Pool } = require('pg');
 
@@ -15,13 +16,12 @@ const updateSiretStructure =
     const pool = new Pool();
 
     try {
-      const structure = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
       if (!structure) {
-        res.statusMessage = "La strutucture n'existe pas";
-        res.status(404).end();
+        res.status(404).json({ message: "La strutucture n'existe pas" });
         return;
       }
       await pool.query(
@@ -31,10 +31,10 @@ const updateSiretStructure =
       WHERE id = $1`,
         [idStructure, siret],
       );
-      await app
+      const structureUpdated: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           { _id: new ObjectId(idStructure) },
           {
             $set: { siret },
@@ -53,14 +53,15 @@ const updateSiretStructure =
               },
             },
           },
+          { returnOriginal: false },
         );
-      res.send({ siretUpdated: true });
+      res.send({ siretUpdated: structureUpdated.siret });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.status(500).json(error.message);
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };

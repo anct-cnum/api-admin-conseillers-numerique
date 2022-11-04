@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { updateEmail } from '../../../schemas/structures.schemas';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const { Pool } = require('pg');
 
@@ -18,37 +19,35 @@ const updateEmailStructure =
     const emailValidation = updateEmail.validate(email);
 
     if (emailValidation.error) {
-      res.statusMessage = emailValidation.error.message;
-      res.status(400).end();
+      res.status(400).json({ message: emailValidation.error.message });
       return;
     }
     try {
-      const structure = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
       if (!structure) {
-        res.statusMessage = "La strutucture n'existe pas";
-        res.status(404).end();
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      const emailExists = await app
+      const emailExists: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email });
       if (emailExists !== null) {
-        res.statusMessage = `l'email ${email} est déjà utilisé`;
-        res.status(409).end();
+        res.status(409).json({ message: `l'email ${email} est déjà utilisé` });
         return;
       }
-      const emailExistStructure = await app
+      const emailExistStructure: number = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({ 'contact.email': email });
       if (emailExistStructure !== 0) {
-        res.statusMessage =
-          "L'adresse email que vous avez renseigné existe déjà dans une autre structure";
-        res.status(409).end();
+        res.status(409).json({
+          message:
+            "L'adresse email que vous avez renseigné existe déjà dans une autre structure",
+        });
         return;
       }
       await pool.query(
@@ -58,10 +57,10 @@ const updateEmailStructure =
       WHERE id = $1`,
         [idStructure, email],
       );
-      await app
+      const structureUpdated: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           { _id: new ObjectId(idStructure) },
           {
             $set: { 'contact.email': email },
@@ -77,6 +76,7 @@ const updateEmailStructure =
               },
             },
           },
+          { returnOriginal: false },
         );
       await app
         .service(service.users)
@@ -96,13 +96,13 @@ const updateEmailStructure =
           { 'structure.$id': new ObjectId(idStructure) },
           { $set: { 'structureObj.contact.email': email } },
         );
-      res.send({ emailUpdated: true });
+      res.send({ emailUpdated: structureUpdated.contact.email });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.status(500).json(error.message);
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
