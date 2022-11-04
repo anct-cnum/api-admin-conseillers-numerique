@@ -17,11 +17,9 @@ const verifySiretStructure =
       };
       const result = await axios.get(urlSiret, { params: params });
       if (result.status === 404) {
-        res
-          .status(404)
-          .json({
-            message: `Le numéro de SIRET ( N° ${siret} ) que vous avez demandé n\'existe pas !`,
-          });
+        res.status(404).json({
+          message: `Le numéro de SIRET ( N° ${siret} ) que vous avez demandé n\'existe pas !`,
+        });
         return;
       }
       if (result.status === 200) {
