@@ -27,9 +27,9 @@ const verifySiretStructure =
       return res.status(result.status).json({ message: result.statusText });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        return res.status(403).json('Accès refusé');
+        return res.status(403).json({ message: 'Accès refusé' });
       }
-      res.status(500).json(error.message);
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
