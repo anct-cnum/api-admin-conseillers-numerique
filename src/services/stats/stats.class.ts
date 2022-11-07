@@ -18,9 +18,9 @@ import {
   getStatsStructure,
   getStatsTerritoires,
   getStatsTerritoire,
+  getStatsConseiller,
   getStatsTerritoireCra,
 } from './controllers';
-import getStatsConseiller from './controllers/getStatsConseiller';
 
 interface Data {}
 
