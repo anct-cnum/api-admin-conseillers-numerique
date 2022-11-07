@@ -20,6 +20,7 @@ import {
   getStatsTerritoire,
   getStatsTerritoireCra,
 } from './controllers';
+import getStatsConseiller from './controllers/getStatsConseiller';
 
 interface Data {}
 
@@ -45,6 +46,12 @@ export class Stats implements ServiceMethods<Data> {
       authenticate('jwt'),
       createAbilities,
       getStatsStructure(app),
+    );
+    app.get(
+      '/stats/conseiller/cras',
+      authenticate('jwt'),
+      createAbilities,
+      getStatsConseiller(app),
     );
     app.get(
       '/stats/datas/structures',
