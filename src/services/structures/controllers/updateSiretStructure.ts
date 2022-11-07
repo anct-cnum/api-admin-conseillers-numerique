@@ -29,7 +29,7 @@ const updateSiretStructure =
       UPDATE djapp_hostorganization
       SET siret = $2
       WHERE id = $1`,
-        [idStructure, siret],
+        [structure.idPG, siret],
       );
       const structureUpdated: IStructures = await app
         .service(service.structures)

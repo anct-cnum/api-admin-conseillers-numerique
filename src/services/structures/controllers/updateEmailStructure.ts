@@ -55,7 +55,7 @@ const updateEmailStructure =
       UPDATE djapp_hostorganization
       SET contact_email = $2
       WHERE id = $1`,
-        [idStructure, email],
+        [structure.idPG, email],
       );
       const structureUpdated: IStructures = await app
         .service(service.structures)
