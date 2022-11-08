@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
+import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
@@ -12,7 +13,7 @@ const getCandidatById =
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: idConseiller });
+        .findOne({ _id: new ObjectId(idConseiller) });
 
       res.status(200).json(conseiller);
     } catch (error) {
