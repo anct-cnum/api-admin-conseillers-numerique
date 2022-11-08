@@ -73,6 +73,7 @@ const getConseillersRecruter =
           'conseillerObj.idPG': 1,
           'conseillerObj.prenom': 1,
           'conseillerObj.nom': 1,
+          'structureObj.nom': 1,
           'conseillerObj._id': 1,
           'conseillerObj.emailCN.address': 1,
           'conseillerObj.estCoordinateur': 1,
@@ -156,6 +157,7 @@ const getConseillersStatutRecrute =
           item.prenom = item.conseillerObj.prenom;
           item.address = item.conseillerObj.emailCN.address;
           item.estCoordinateur = item.conseillerObj.estCoordinateur;
+          item.nomStructure = item.structureObj.nom;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
