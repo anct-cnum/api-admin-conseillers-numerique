@@ -145,11 +145,11 @@ const getConseillersStatutRecrute =
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
           if (item.statut === 'nouvelle_rupture') {
-            item.rupture = 'En cours';
+            item.rupture = 'Rupture en cours';
           } else if (item.statut === 'finalisee_rupture') {
-            item.rupture = 'Oui';
+            item.rupture = 'Sans mission';
           } else {
-            item.rupture = 'Non';
+            item.rupture = 'En activité';
           }
           item.idPG = item.conseillerObj.idPG;
           item._id = item.conseillerObj._id;

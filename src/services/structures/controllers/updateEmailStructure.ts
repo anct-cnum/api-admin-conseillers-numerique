@@ -28,7 +28,9 @@ const updateEmailStructure =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
       if (!structure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
+        res
+          .status(404)
+          .json({ message: "La structure n'existe pas", statut: 404 });
         return;
       }
       const emailExists: IStructures = await app
@@ -36,7 +38,9 @@ const updateEmailStructure =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email });
       if (emailExists !== null) {
-        res.status(409).json({ message: `l'email ${email} est déjà utilisé` });
+        res
+          .status(409)
+          .json({ message: `l'email ${email} est déjà utilisé`, statut: 409 });
         return;
       }
       const emailExistStructure: number = await app
@@ -47,6 +51,7 @@ const updateEmailStructure =
         res.status(409).json({
           message:
             "L'adresse email que vous avez renseigné existe déjà dans une autre structure",
+          statut: 404,
         });
         return;
       }
@@ -99,10 +104,10 @@ const updateEmailStructure =
       res.send({ emailUpdated: structureUpdated.contact.email });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
+        res.status(403).json({ message: 'Accès refusé', statut: 403 });
         return;
       }
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message, statut: 500 });
       throw new Error(error);
     }
   };
