@@ -18,40 +18,43 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         Authorization: req.headers.authorization,
       },
     };
+    // eslint-disable-next-line consistent-return
     request(options, async (err, response, body) => {
-      if (err) throw new Error(err);
+      if (err) res.status(500).json(err);
       if (response.statusCode !== 200) {
         res.status(401).json('Accès refusé');
       } else {
         // récuperation de l'utilisateur provenant du serveur d'authentification si le token est valide
         const keycloakUser = JSON.parse(body);
-        const userEmail = keycloakUser.email;
+
         let userInDB: IUser;
+
         // verification de la présence de l'utilisateur du serveur d'authentification en base de données
         try {
           userInDB = await app
             .service('users')
-            .Model.findOne({ name: userEmail })
+            .Model.findOne({ sub: keycloakUser.sub })
             .select({ _id: 0, password: 0, refreshToken: 0 });
+
+          // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
           if (!userInDB) {
-            res
-              .status(403)
-              .json(
-                'Accès refusé : utilisateur non existant dans notre base de données',
+            try {
+              userInDB = await app.service('users').Model.findOneAndUpdate(
+                { token: req.query.verificationToken },
+                {
+                  sub: keycloakUser.sub,
+                  $set: { token: null, tokenCreatedAt: null },
+                },
               );
+              if (!userInDB) {
+                return res.status(403).json('Connexion refusée');
+              }
+            } catch (error) {
+              return res.status(500).json(error.message);
+            }
           }
         } catch (error) {
-          res.status(500).json(error.message);
-        }
-        // si il s'agit de la première connexion (utilisateur sans sub) nous mettons à jour l'utilisateur avec son identifiant unique (sub)
-        if (!userInDB.sub) {
-          try {
-            await app
-              .service('users')
-              .Model.findOneAndUpdate({ sub: keycloakUser.sub });
-          } catch (error) {
-            res.status(500).json(error.message);
-          }
+          return res.status(500).json(error.message);
         }
         try {
           // création de l'access token et du refresh token
@@ -67,6 +70,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               { new: true },
             )
             .select({ _id: 0, password: 0, refreshToken: 0 });
+
           // envoi du refresh token dans un cookie
           res.cookie(
             app.get('inclusion_connect').refresh_token_key,
@@ -75,10 +79,11 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               httpOnly: true,
             },
           );
+
           // envoi de l'access token
-          res.status(200).json({ user, accessToken });
+          return res.status(200).json({ user, accessToken });
         } catch (error) {
-          res.status(500).json(error.message);
+          return res.status(500).json(error.message);
         }
       }
     });
