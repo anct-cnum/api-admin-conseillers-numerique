@@ -25,14 +25,12 @@ const verifySiretStructure =
       if (result.status === 200) {
         return res.send({ nomStructure: result.data.etablissement.adresse.l1 });
       }
-      return res
-        .status(result.status)
-        .json({ message: result.statusText, statut: result.status });
+      return res.status(result.status).json({ message: result.statusText });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        return res.status(403).json({ message: 'Accès refusé', statut: 403 });
+        return res.status(403).json({ message: 'Accès refusé' });
       }
-      res.status(500).json({ message: error.message, statut: 500 });
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };

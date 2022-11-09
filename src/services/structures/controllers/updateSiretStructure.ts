@@ -21,9 +21,7 @@ const updateSiretStructure =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
       if (!structure) {
-        res
-          .status(404)
-          .json({ message: "La strutucture n'existe pas", statut: 404 });
+        res.status(404).json({ message: "La strutucture n'existe pas" });
         return;
       }
       await pool.query(
@@ -60,10 +58,10 @@ const updateSiretStructure =
       res.send({ siretUpdated: structureUpdated.siret });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé', statut: 403 });
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.status(500).json({ message: error.message, statut: 500 });
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
