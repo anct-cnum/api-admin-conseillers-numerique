@@ -1,25 +1,55 @@
-import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import {
   IUser,
   IConseillers,
-  isConseiller,
+  isArrayConseillers,
 } from '../../../ts/interfaces/db.interfaces';
 import app from '../../../app';
+import service from '../../services';
 
 const getConseillers = async (
   userId: string,
-): Promise<IConseillers | Error> => {
+): Promise<IConseillers[] | Error> => {
   let conseiller: IConseillers;
-
+  let conseillers: IConseillers[];
+  let query;
   try {
     conseiller = await app
-      .service('conseillers')
+      .service(service.conseillers)
       .Model.findOne({ _id: userId });
   } catch (error) {
     throw new Error(error);
   }
-  return conseiller;
+  if (conseiller?.estCoordinateur === true) {
+    switch (conseiller.listeSubordonnes?.type) {
+      case 'conseillers':
+        query = {
+          _id: { $in: conseiller.listeSubordonnes.liste },
+        };
+        break;
+      case 'codeDepartement':
+        query = {
+          codeDepartementStructure: { $in: conseiller.listeSubordonnes.liste },
+        };
+        break;
+      case 'codeRegion':
+        query = {
+          codeRegionStructure: { $in: conseiller.listeSubordonnes.liste },
+        };
+        break;
+      default:
+    }
+    try {
+      conseillers = await app
+        .service(service.conseillers)
+        .Model.find(query, { _id: 1, structureId: 1 });
+    } catch (error) {
+      throw new Error(error);
+    }
+
+    return conseillers;
+  }
+  throw new Error("Vous n'êtes pas un coordinateur");
 };
 
 export default async function coordinateurRules(
@@ -27,22 +57,32 @@ export default async function coordinateurRules(
   can,
 ): Promise<any> {
   // Restreindre les permissions : les coordinateurs ne peuvent voir que les informations correspondant à leur profil conseiller
-  const conseiller: IConseillers | Error = await getConseillers(
+  const conseillers: IConseillers[] | Error = await getConseillers(
     user.entity.oid,
   );
-  if (isConseiller(conseiller)) {
-    const listeSubordonnesIds: ObjectId[] = conseiller.listeSubordonnes?.liste;
+  if (isArrayConseillers(conseillers)) {
+    const conseillersIds = conseillers.map((conseiller) => conseiller._id);
+    const structuresIds = conseillers.map(
+      (conseiller) => conseiller.structureId,
+    );
+
     can([action.read], ressource.conseillers, {
-      _id: { $in: listeSubordonnesIds },
+      _id: { $in: conseillersIds },
+    });
+    can([action.read], ressource.structures, {
+      _id: { $in: structuresIds },
     });
     can([action.read], ressource.conseillers, {
       _id: user?.entity.oid,
     });
+    can([action.read], ressource.misesEnRelation, {
+      'conseiller.$id': { $in: conseillersIds },
+    });
     can([action.read], ressource.cras, {
-      'conseiller.$id': { $in: listeSubordonnesIds },
+      'conseiller.$id': { $in: conseillersIds },
     });
     can([action.read], ressource.statsConseillersCras, {
-      'conseiller.$id': { $in: listeSubordonnesIds },
+      'conseiller.$id': { $in: conseillersIds },
     });
   }
   can([action.read, action.update], ressource.users, {

@@ -41,5 +41,6 @@
     "environment": "local",
     "dsn": "https://xxx@yyy.ingest.sentry.io/zzz",
     "traceSampleRate": "0"
-  }
+  },
+  "api_entreprise": "API_ENTREPRISE_KEY"
 }

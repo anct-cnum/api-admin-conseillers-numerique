@@ -31,7 +31,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 };
 
 const formatDate = (date: Date) => {
-  if (date !== undefined) {
+  if (date !== undefined && date !== null) {
     return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
@@ -56,21 +56,13 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
       misesEnRelations.map(async (miseEnrelation) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
-          `${formatDate(miseEnrelation.conseiller?.createdAt)};${
-            miseEnrelation.dateRecrutement === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.dateRecrutement)
-          };${
-            miseEnrelation.conseiller.datePrisePoste === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.conseiller.datePrisePoste)
-          };${
-            miseEnrelation.conseiller.dateFinFormation === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.conseiller.dateFinFormation)
-          };${miseEnrelation.conseiller?.prenom};${
-            miseEnrelation.conseiller?.nom
-          };${
+          `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
+            miseEnrelation?.dateRecrutement,
+          )};${formatDate(
+            miseEnrelation.conseiller?.datePrisePoste,
+          )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
+            miseEnrelation.conseiller?.prenom
+          };${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${
             miseEnrelation.conseiller?.email
@@ -569,12 +561,13 @@ const generateCsvTerritoires = async (
   }
 };
 
-const generateCsvConseillers = async (conseillers, res: Response) => {
+const generateCsvConseillers = async (misesEnRelation, res: Response) => {
   try {
     const fileHeaders = [
       'Id conseiller',
       'Id long de la structure',
       'Id de la structure',
+      'Nom de la structure',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -590,24 +583,24 @@ const generateCsvConseillers = async (conseillers, res: Response) => {
     res.write(
       [
         fileHeaders.join(csvCellSeparator),
-        ...conseillers.map((conseiller) =>
+        ...misesEnRelation.map((miseEnRelation) =>
           [
-            conseiller.idPG,
-            conseiller.structure._id,
-            conseiller.structure.idPG,
-            conseiller.nom,
-            conseiller.prenom,
-            conseiller?.emailCN?.address ?? 'compte COOP non créé',
-            conseiller?.telephonePro,
-            conseiller?.email,
-            conseiller?.miseEnRelation?.dateRecrutement
-              ? formatDate(conseiller.miseEnRelation.dateRecrutement)
-              : '',
-            formatDate(conseiller?.datePrisePoste),
-            formatDate(conseiller?.dateFinFormation),
-            conseiller.disponible ? 'Oui' : 'Non',
-            conseiller.estCoordinateur ? 'Oui' : 'Non',
-            conseiller.craCount,
+            miseEnRelation.conseillerObj.idPG,
+            miseEnRelation.structureObj._id,
+            miseEnRelation.structureObj.idPG,
+            miseEnRelation.structureObj.nom,
+            miseEnRelation.conseillerObj.nom,
+            miseEnRelation.conseillerObj.prenom,
+            miseEnRelation.conseillerObj?.emailCN?.address ??
+              'compte COOP non créé',
+            miseEnRelation.conseillerObj?.telephonePro,
+            miseEnRelation.conseillerObj?.email,
+            formatDate(miseEnRelation?.dateRecrutement),
+            formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
+            formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
+            miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
+            miseEnRelation.conseillerObj.estCoordinateur ? 'Oui' : 'Non',
+            miseEnRelation.craCount,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
