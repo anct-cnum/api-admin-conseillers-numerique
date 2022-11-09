@@ -30,5 +30,6 @@
     "environment": "SENTRY_ENVIRONMENT",
     "dsn": "SENTRY_DSN",
     "traceSampleRate": "SENTRY_TRACE_SAMPLE_RATE"
-  }
+  },
+  "api_entreprise": "API_ENTREPRISE_KEY"
 }

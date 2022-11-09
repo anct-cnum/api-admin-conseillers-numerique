@@ -70,6 +70,8 @@ const formatAdresseStructure = (insee) => {
 
 const formatQpv = (qpv: string) => (qpv === 'Oui' ? 'Oui' : 'Non');
 
+const formatType = (type: string) => (type === 'PRIVATE' ? 'Privée' : 'Public');
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -82,4 +84,5 @@ export {
   filterComs,
   formatAdresseStructure,
   formatQpv,
+  formatType,
 };

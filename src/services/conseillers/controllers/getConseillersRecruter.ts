@@ -73,6 +73,7 @@ const getConseillersRecruter =
           'conseillerObj.idPG': 1,
           'conseillerObj.prenom': 1,
           'conseillerObj.nom': 1,
+          'structureObj.nom': 1,
           'conseillerObj._id': 1,
           'conseillerObj.emailCN.address': 1,
           'conseillerObj.estCoordinateur': 1,
@@ -144,11 +145,11 @@ const getConseillersStatutRecrute =
         conseillers.map(async (ligneStats) => {
           const item = { ...ligneStats };
           if (item.statut === 'nouvelle_rupture') {
-            item.rupture = 'En cours';
+            item.rupture = 'Rupture en cours';
           } else if (item.statut === 'finalisee_rupture') {
-            item.rupture = 'Oui';
+            item.rupture = 'Sans mission';
           } else {
-            item.rupture = 'Non';
+            item.rupture = 'En activité';
           }
           item.idPG = item.conseillerObj.idPG;
           item._id = item.conseillerObj._id;
@@ -156,6 +157,7 @@ const getConseillersStatutRecrute =
           item.prenom = item.conseillerObj.prenom;
           item.address = item.conseillerObj.emailCN.address;
           item.estCoordinateur = item.conseillerObj.estCoordinateur;
+          item.nomStructure = item.structureObj.nom;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
