@@ -17,6 +17,7 @@ export default async function structureRules(user: IUser, can): Promise<any> {
     'structure.$id': user?.entity.oid,
   });
   // Restreindre les permissions : les structures ne peuvent voir que les conseillers appartenant à leur organisation
+  // Attention ils doivent pouvoir voir tous les candidats
   can([action.read, action.update], ressource.conseillers, {
     structureId: user?.entity.oid,
   });
