@@ -3,17 +3,16 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
 const getCandidatById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     try {
+      // Attention : pas d'access control car tout le monde peut voir tous les candidats
       const conseiller: IConseillers = await app
         .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: new ObjectId(idConseiller) });
+        .Model.findOne({ _id: new ObjectId(idConseiller) });
 
       res.status(200).json(conseiller);
     } catch (error) {
