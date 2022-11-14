@@ -15,7 +15,6 @@ const getCandidatCV =
       const user = await app
         .service(service.users)
         .Model.findOne({ _id: new ObjectId(userId) });
-      // eslint-disable-next-line max-len
       if (
         !(
           user?.roles.includes('candidat') &&
@@ -68,7 +67,7 @@ const getCandidatCV =
       const params = {
         Bucket: awsConfig.cv_bucket,
         Key: conseiller.cv.file,
-      }; /*  */
+      };
       s3.getObject(params, function (error, data) {
         if (error) {
           app.get('sentry').captureException(error);
