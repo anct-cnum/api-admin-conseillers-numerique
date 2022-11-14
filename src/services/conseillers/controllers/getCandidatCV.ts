@@ -1,7 +1,7 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { NotFound, Forbidden, GeneralError } from '@feathersjs/errors';
+import { NotFound, Forbidden } from '@feathersjs/errors';
 import aws from 'aws-sdk';
 import crypto from 'crypto';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
