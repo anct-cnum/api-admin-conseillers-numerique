@@ -70,9 +70,7 @@ const getCandidatCV =
       };
       s3.getObject(params, function (error, data) {
         if (error) {
-          res
-            .status(500)
-            .send(new GeneralError('La récupération du cv a échoué.').toJSON());
+          res.status(500).json('La récupération du cv a échoué.');
         } else {
           // Dechiffrement du CV (le buffer se trouve dans data.Body)
           const cryptoConfig = app.get('crypto');
