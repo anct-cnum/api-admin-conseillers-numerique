@@ -70,7 +70,6 @@ const getCandidatCV =
       };
       s3.getObject(params, function (error, data) {
         if (error) {
-          app.get('sentry').captureException(error);
           res
             .status(500)
             .send(new GeneralError('La récupération du cv a échoué.').toJSON());
