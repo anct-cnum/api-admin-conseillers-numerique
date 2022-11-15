@@ -10,13 +10,13 @@ const getConseillersIds = async (user) => {
     let query = {};
     if (user?.region) {
       query = {
-        codeRegion: {
+        codeRegionStructure: {
           $in: [`${user?.region}`],
         },
       };
     } else {
       query = {
-        codeDepartement: {
+        codeDepartementStructure: {
           $in: [`${user?.departement}`],
         },
       };
