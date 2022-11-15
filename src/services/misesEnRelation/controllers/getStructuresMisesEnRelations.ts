@@ -35,6 +35,7 @@ const getStructuresMisesEnRelations =
           'recrutee',
           'finalisee',
           'nouvelle_rupture',
+          'finalisee_rupture',
           'toutes',
         ];
         if (allowedFilters.includes(filter)) {
