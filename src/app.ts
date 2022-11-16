@@ -60,7 +60,7 @@ app.configure(express.rest());
 app.configure(socketio());
 
 app.configure(mongoose);
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: config().dashboard_hostname, credentials: true }));
 
 app.configure(authentication);
 // Set up our services (see `services/index.js`)

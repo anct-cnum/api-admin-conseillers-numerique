@@ -33,9 +33,9 @@
     "traceSampleRate": "SENTRY_TRACE_SAMPLE_RATE"
   },
   "inclusion_connect": {
-    "keycloak_issuer": "INCLUSIONCONNECT_ISSUER",
-    "access_token_secret": "INCLUSIONCONNECT_ACCESSTOKENSECRET",
-    "refresh_token_secret": "INCLUSIONCONNECT_REFRESHTOKENSECRET",
+    "keycloak_issuer": "INCLUSION_CONNECT_ISSUER",
+    "access_token_secret": "INCLUSION_CONNECT_ACCESSTOKENSECRET",
+    "refresh_token_secret": "INCLUSION_CONNECT_REFRESHTOKENSECRET",
     "refresh_token_key": "INCLUSION_CONNECT_REFRESHTOKENKEY",
     "access_token_duration": "INCLUSION_CONNECT_ACCESSTOKENDURATION",
     "refresh_token_duration": "INCLUSION_CONNECT_REFRESHTOKENDURATION"
