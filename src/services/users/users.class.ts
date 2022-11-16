@@ -8,13 +8,8 @@ import createAbilities from '../../middleware/createAbilities';
 import postInvitation from './controllers/postInvitationPrefet';
 import postInvitationAdmin from './controllers/postInvitationAdmin';
 import postInvitationStructure from './controllers/postInvitationStructure';
-import patchChoosePassword from './controllers/patchChoosePassword';
-
-import updateEmailAccount from './controllers/updateEmailAccount';
-import verifyToken from './controllers/verifyToken';
-import confirmationEmail from './controllers/confirmationEmail';
-import getUsersByStructure from './controllers/getUsersByStructure';
 import postInvitationHub from './controllers/postInvitationHub';
+import getUsersByStructure from './controllers/getUsersByStructure';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -55,15 +50,6 @@ export default class Users extends Service {
       createAbilities,
       postInvitationStructure(app),
     );
-    app.patch(
-      '/users/sendEmailUpdate/:id',
-      authenticate('jwt'),
-      createAbilities,
-      updateEmailAccount(app),
-    );
-    app.patch('/confirmation-email/:token', confirmationEmail(app));
-    app.get('/users/verifyToken/:token', verifyToken(app));
-    app.patch('/users/choosePassword/:token', patchChoosePassword(app));
     app.get(
       '/users/listByIdStructure/:id',
       authenticate('jwt'),

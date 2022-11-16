@@ -11,7 +11,7 @@ export default function (app: Application, mailer, req: IRequest) {
   const render = async (user: IUser) => {
     return mailer.render(__dirname, templateName, {
       user,
-      link: utils.getDashboardUrl(`/inscription/${user.token}`),
+      link: utils.getDashboardUrl(`/login/${user.token}`),
     });
   };
 
@@ -56,7 +56,7 @@ export default function (app: Application, mailer, req: IRequest) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Créez votre compte sur le tableau de bord de Conseiller Numérique France services',
+            'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique France Services',
           body: await render(user),
         })
         .then(onSuccess)
