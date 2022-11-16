@@ -3,9 +3,7 @@ import { IRequest } from '../ts/interfaces/global.interfaces';
 import invitationActiveCompte from './invitationCreateAccount/invitationActiveCompte';
 
 export default function (app: Application, mailer, req: IRequest) {
-  const emails = [
-    invitationActiveCompte(app, mailer, req),
-  ];
+  const emails = [invitationActiveCompte(app, mailer, req)];
   return {
     getEmailMessageByTemplateName: (name: string) => {
       return emails.find(
