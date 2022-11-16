@@ -10,6 +10,10 @@ import {
   IStructures,
   IUser,
 } from '../../ts/interfaces/db.interfaces';
+import {
+  formatAdresseStructure,
+  formatQpv,
+} from '../structures/structures.repository';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -27,7 +31,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 };
 
 const formatDate = (date: Date) => {
-  if (date !== undefined) {
+  if (date !== undefined && date !== null) {
     return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
@@ -52,21 +56,13 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
       misesEnRelations.map(async (miseEnrelation) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
-          `${formatDate(miseEnrelation.conseiller?.createdAt)};${
-            miseEnrelation.dateRecrutement === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.dateRecrutement)
-          };${
-            miseEnrelation.conseiller.datePrisePoste === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.conseiller.datePrisePoste)
-          };${
-            miseEnrelation.conseiller.dateFinFormation === null
-              ? 'non renseignée'
-              : formatDate(miseEnrelation.conseiller.dateFinFormation)
-          };${miseEnrelation.conseiller?.prenom};${
-            miseEnrelation.conseiller?.nom
-          };${
+          `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
+            miseEnrelation?.dateRecrutement,
+          )};${formatDate(
+            miseEnrelation.conseiller?.datePrisePoste,
+          )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
+            miseEnrelation.conseiller?.prenom
+          };${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${
             miseEnrelation.conseiller?.email
@@ -143,20 +139,6 @@ const generateCsvCandidatByStructure = async (
     res.status(500).end();
     throw new Error(error);
   }
-};
-
-const formatAdresseStructure = (insee) => {
-  const adresse = `${insee?.etablissement?.adresse?.numero_voie ?? ''} ${
-    insee?.etablissement?.adresse?.type_voie ?? ''
-  } ${insee?.etablissement?.adresse?.nom_voie ?? ''} ${
-    insee?.etablissement?.adresse?.complement_adresse
-      ? `${insee.etablissement.adresse.complement_adresse} `
-      : ' '
-  }${insee?.etablissement?.adresse?.code_postal ?? ''} ${
-    insee?.etablissement?.adresse?.localite ?? ''
-  }`;
-
-  return adresse.replace(/["',]/g, '');
 };
 
 const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
@@ -579,6 +561,109 @@ const generateCsvTerritoires = async (
   }
 };
 
+const generateCsvConseillers = async (misesEnRelation, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id conseiller',
+      'Id long de la structure',
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom',
+      'Prénom',
+      'Email Professionnelle',
+      'Téléphone professionnel',
+      'Email personnelle',
+      'Date de recrutement',
+      "Date d'entrée en formation",
+      'Date de sortie de formation',
+      'Disponibilité',
+      'Coordinateur',
+      'CRA Saisis',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...misesEnRelation.map((miseEnRelation) =>
+          [
+            miseEnRelation.conseillerObj.idPG,
+            miseEnRelation.structureObj._id,
+            miseEnRelation.structureObj.idPG,
+            miseEnRelation.structureObj.nom,
+            miseEnRelation.conseillerObj.nom,
+            miseEnRelation.conseillerObj.prenom,
+            miseEnRelation.conseillerObj?.emailCN?.address ??
+              'compte COOP non créé',
+            miseEnRelation.conseillerObj?.telephonePro,
+            miseEnRelation.conseillerObj?.email,
+            formatDate(miseEnRelation?.dateRecrutement),
+            formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
+            formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
+            miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
+            miseEnRelation.conseillerObj.estCoordinateur ? 'Oui' : 'Non',
+            miseEnRelation.craCount,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
+const generateCsvListeStructures = async (structures, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom',
+      'Prénom',
+      'Fonction',
+      'Email',
+      'Téléphone',
+      'Siret',
+      "Date d'inscription",
+      'Adresse',
+      'Code postal',
+      'Type',
+      'Zone rurale',
+      'Nombre de CRA total cumulés',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...structures.map((structure) =>
+          [
+            structure.idPG,
+            structure.nom,
+            structure.contact?.nom,
+            structure.contact?.prenom,
+            structure.contact?.fonction,
+            structure.contact?.email,
+            structure.contact?.telephone,
+            structure.siret,
+            formatDate(structure?.createdAt),
+            structure?.insee ? formatAdresseStructure(structure.insee) : '',
+            structure.codePostal,
+            structure.type,
+            formatQpv(structure?.qpvStatut),
+            structure.craCount,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -588,4 +673,6 @@ export {
   generateCsvConseillersHub,
   generateCsvSatistiques,
   generateCsvTerritoires,
+  generateCsvConseillers,
+  generateCsvListeStructures,
 };

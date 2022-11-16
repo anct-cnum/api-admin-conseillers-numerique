@@ -131,11 +131,9 @@ export default function (app: Application): Model<any> {
       historique: [Object],
 
       cv: {
-        structure: {
-          file: { type: String },
-          extension: { type: String },
-          date: { type: Date },
-        },
+        file: { type: String },
+        extension: { type: String },
+        date: { type: Date },
       },
 
       telephonePro: { type: Number },

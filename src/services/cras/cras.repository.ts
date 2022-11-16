@@ -1,4 +1,5 @@
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
@@ -27,6 +28,24 @@ const getConseillersIdsByStructure = async (idStructure, app) => {
   });
   return conseillerIds;
 };
+
+const getNombreCras =
+  (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
+    app
+      .service(service.cras)
+      .Model.accessibleBy(req.ability, action.read)
+      .countDocuments({
+        'conseiller.$id': conseillerId,
+      });
+
+const getNombreCrasByArrayConseillerId =
+  (app: Application, req: IRequest) => async (conseillersIds: ObjectId[]) =>
+    app
+      .service(service.cras)
+      .Model.accessibleBy(req.ability, action.read)
+      .countDocuments({
+        'conseiller.$id': { $in: conseillersIds },
+      });
 
 const getConseillersIdsByTerritoire = async (type, idType, app) => {
   const conseillersIds = [];
@@ -81,4 +100,6 @@ export {
   getConseillersIdsByStructure,
   getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCrasStructure,
+  getNombreCras,
+  getNombreCrasByArrayConseillerId,
 };
