@@ -8,6 +8,15 @@ import {
   createRefreshToken,
 } from '../../../helpers/auth/createTokens';
 
+const allowedRoles = [
+  'admin',
+  'structure',
+  'prefet',
+  'hub_coop',
+  'grandReseau',
+  'coordinateur_coop',
+];
+
 const signIn = (app: Application) => async (req: IRequest, res: Response) => {
   // vérification du token provenant du frontend par le serveur d'authentification
   if (req.headers.authorization) {
@@ -40,7 +49,10 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           if (!userInDB) {
             try {
               userInDB = await app.service('users').Model.findOneAndUpdate(
-                { token: req.query.verificationToken },
+                {
+                  token: req.query.verificationToken,
+                  roles: { $in: allowedRoles },
+                },
                 {
                   sub: keycloakUser.sub,
                   $set: { token: null, tokenCreatedAt: null },
