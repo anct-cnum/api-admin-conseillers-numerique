@@ -38,6 +38,7 @@ const postInvitationStructure =
         token: uuidv4(),
         tokenCreatedAt: new Date(),
         passwordCreated: false,
+        mailSentDate: null,
         resend: false,
       });
       const errorSmtpMail = await envoiEmailInvit(

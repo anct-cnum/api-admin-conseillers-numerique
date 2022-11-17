@@ -11,7 +11,7 @@ export default function (app: Application, mailer, req: IRequest) {
   const render = async (user: IUser) => {
     return mailer.render(__dirname, templateName, {
       user,
-      link: utils.getDashboardUrl(`/login/${user.token}`),
+      link: utils.getDashboardUrl(`/invitation/${user.token}`),
     });
   };
 
@@ -19,8 +19,8 @@ export default function (app: Application, mailer, req: IRequest) {
     templateName,
     render,
     send: async (user) => {
-      const onSuccess = () => {
-        return app
+      const onSuccess = async () => {
+        await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
@@ -48,7 +48,6 @@ export default function (app: Application, mailer, req: IRequest) {
               mailErrorDetail: err.message,
             },
           );
-        utils.setSentryError(err);
         throw err;
       };
 

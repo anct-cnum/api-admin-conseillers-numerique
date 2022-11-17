@@ -9,6 +9,7 @@ import postInvitation from './controllers/postInvitationPrefet';
 import postInvitationAdmin from './controllers/postInvitationAdmin';
 import postInvitationStructure from './controllers/postInvitationStructure';
 import postInvitationHub from './controllers/postInvitationHub';
+import verifyToken from './controllers/verifyToken';
 import getUsersByStructure from './controllers/getUsersByStructure';
 
 export default class Users extends Service {
@@ -50,6 +51,7 @@ export default class Users extends Service {
       createAbilities,
       postInvitationStructure(app),
     );
+    app.get('/users/verifyToken/:token', verifyToken(app));
     app.get(
       '/users/listByIdStructure/:id',
       authenticate('jwt'),
