@@ -55,7 +55,11 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 },
                 {
                   sub: keycloakUser.sub,
-                  $set: { token: null, tokenCreatedAt: null },
+                  $set: {
+                    token: null,
+                    tokenCreatedAt: null,
+                    passwordCreated: true,
+                  },
                 },
               );
               if (!userInDB) {
