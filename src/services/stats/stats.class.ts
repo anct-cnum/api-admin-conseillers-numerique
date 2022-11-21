@@ -18,6 +18,7 @@ import {
   getStatsStructure,
   getStatsTerritoires,
   getStatsTerritoire,
+  getStatsConseiller,
   getStatsTerritoireCra,
 } from './controllers';
 
@@ -45,6 +46,12 @@ export class Stats implements ServiceMethods<Data> {
       authenticate(app),
       createAbilities,
       getStatsStructure(app),
+    );
+    app.get(
+      '/stats/conseiller/cras',
+      authenticate(app),
+      createAbilities,
+      getStatsConseiller(app),
     );
     app.get(
       '/stats/datas/structures',

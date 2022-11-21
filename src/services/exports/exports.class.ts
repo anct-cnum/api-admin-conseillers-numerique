@@ -19,7 +19,9 @@ import {
   getExportConseillersHubCsv,
   getExportStatistiquesCsv,
   getExportTerritoiresCsv,
+  getExportListeStructuresCsv,
 } from './controllers';
+import getExportConseillersCsv from './controllers/getExportConseillersCsv';
 
 interface Data {}
 
@@ -94,6 +96,18 @@ export class Exports implements ServiceMethods<Data> {
       authenticate(app),
       createAbilities,
       getExportTerritoiresCsv(app),
+    );
+    app.get(
+      '/exports/conseillers-csv',
+      authenticate(app),
+      createAbilities,
+      getExportConseillersCsv(app),
+    );
+    app.get(
+      '/exports/liste-structures-csv',
+      authenticate(app),
+      createAbilities,
+      getExportListeStructuresCsv(app),
     );
   }
 

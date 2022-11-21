@@ -50,4 +50,27 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
-export { getCoselecPositif, getLastCoselec, getCoselec };
+const deleteUser = async (app, service, req, action, email) => {
+  await app
+    .service(service.users)
+    .Model.accessibleBy(req.ability, action.delete)
+    .deleteOne({ name: email.toLowerCase() });
+};
+
+const envoiEmailInvit = (app, req, mailer, emails, user) => {
+  const mailerInstance = mailer(app);
+  const message = emails(
+    app,
+    mailerInstance,
+    req,
+  ).getEmailMessageByTemplateName('invitationActiveCompte');
+  return message.send(user).catch((errSmtp: Error) => errSmtp);
+};
+
+export {
+  getCoselecPositif,
+  getLastCoselec,
+  getCoselec,
+  deleteUser,
+  envoiEmailInvit,
+};
