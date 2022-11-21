@@ -1,34 +1,38 @@
 import { Application } from '@feathersjs/express';
-import { IUser } from '../../ts/interfaces/db.interfaces';
 import service from '../../helpers/services';
+import { IUser } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { action } from '../../helpers/accessControl/accessList';
 
 export default function (app: Application, mailer, req: IRequest) {
-  const templateName = 'confirmeNouveauEmail';
+  const templateName = 'invitationActiveCompte';
   const { utils } = mailer;
 
   const render = async (user: IUser) => {
     return mailer.render(__dirname, templateName, {
       user,
-      link: utils.getDashboardUrl(`/confirmation-email/${user.token}`),
+      link: utils.getDashboardUrl(`/invitation/${user.token}`),
     });
   };
 
   return {
     templateName,
     render,
-    send: async (user): Promise<void | Error> => {
-      const onSuccess = () => {
-        return app
+    send: async (user) => {
+      const onSuccess = async () => {
+        await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
             { _id: user._id },
             {
+              $set: {
+                mailSentDate: new Date(),
+                resend: !!user.mailSentDate,
+              },
               $unset: {
-                mailConfirmError: '',
-                mailConfirmErrorDetail: '',
+                mailError: '',
+                mailErrorDetail: '',
               },
             },
           );
@@ -40,17 +44,18 @@ export default function (app: Application, mailer, req: IRequest) {
           .updateOne(
             { _id: user._id },
             {
-              mailConfirmError: 'smtpError',
-              mailConfirmErrorDetail: err.message,
+              mailError: 'smtpError',
+              mailErrorDetail: err.message,
             },
           );
-        utils.initSentry();
         throw err;
       };
+
       return mailer
         .createMailer()
-        .sendEmail(user.nouveauEmail, {
-          subject: 'Confirmez votre nouvelle adresse mail',
+        .sendEmail(user.name, {
+          subject:
+            'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique France Services',
           body: await render(user),
         })
         .then(onSuccess)
