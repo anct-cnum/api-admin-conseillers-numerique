@@ -10,7 +10,11 @@ import {
   formatType,
 } from '../structures.repository';
 import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
-import { getNombreCrasByArrayConseillerId } from '../../cras/cras.repository';
+import {
+  checkAccessRequestCras,
+  getNombreAccompagnementsByArrayConseillerId,
+  getNombreCrasByArrayConseillerId,
+} from '../../cras/cras.repository';
 import checkAccessReadRequestUsers from '../../users/users.repository';
 
 const getDetailStructureById =
@@ -71,15 +75,23 @@ const getDetailStructureById =
       const checkAccessMiseEnRelation =
         await checkAccessReadRequestMisesEnRelation(app, req);
       const checkAccessUsers = await checkAccessReadRequestUsers(app, req);
+      const checkAccessCras = await checkAccessRequestCras(app, req);
+
       const craCount = await getNombreCrasByArrayConseillerId(
         app,
         req,
       )(structure[0].conseillers.map((conseiller) => conseiller._id));
+      const accompagnementsCount =
+        await getNombreAccompagnementsByArrayConseillerId(
+          app,
+          checkAccessCras,
+        )(structure[0].conseillers.map((conseiller) => conseiller._id));
 
       const stats = await app.service(service.misesEnRelation).Model.aggregate([
         {
           $match: {
             'structure.$id': new ObjectId(idStructure),
+            statut: { $in: ['finalisee', 'recrutee'] },
             $and: [checkAccessMiseEnRelation],
           },
         },
@@ -96,7 +108,8 @@ const getDetailStructureById =
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
       structure[0].stats = stats;
-      structure[0].craCount = craCount;
+      structure[0].craCount = craCount === 0 ? undefined : craCount;
+      structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);

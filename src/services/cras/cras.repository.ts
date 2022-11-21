@@ -38,6 +38,30 @@ const getNombreCras =
         'conseiller.$id': conseillerId,
       });
 
+const getNombreAccompagnementsByArrayConseillerId =
+  (app: Application, checkAccess) => async (conseillersIds: ObjectId[]) =>
+    app.service(service.cras).Model.aggregate([
+      {
+        $match: {
+          'conseiller.$id': { $in: conseillersIds },
+          $and: [checkAccess],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          individuel: { $sum: '$cra.accompagnement.individuel' },
+          atelier: { $sum: '$cra.accompagnement.atelier' },
+          redirection: { $sum: '$cra.accompagnement.redirection' },
+        },
+      },
+      {
+        $project: {
+          total: { $add: ['$individuel', '$atelier', '$redirection'] },
+        },
+      },
+    ]);
+
 const getNombreCrasByArrayConseillerId =
   (app: Application, req: IRequest) => async (conseillersIds: ObjectId[]) =>
     app
@@ -102,4 +126,5 @@ export {
   getCodesPostauxStatistiquesCrasStructure,
   getNombreCras,
   getNombreCrasByArrayConseillerId,
+  getNombreAccompagnementsByArrayConseillerId,
 };
