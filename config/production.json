@@ -24,7 +24,6 @@
     "from": "SMTP_FROM",
     "replyTo": "SMTP_REPLYTO"
   },
-
 	"mongodb": "MONGODB_ADDON_URI",
   "sentry": {
     "enabled": "SENTRY_ENABLED",
