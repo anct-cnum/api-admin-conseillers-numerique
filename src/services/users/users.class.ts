@@ -5,9 +5,12 @@ import getAccessibleData from './controllers/getAccessibleData';
 import getAccessibleDataAggregate from './controllers/getAccessibleDataAggregate';
 import updateAccessibleData from './controllers/updateAccessibleData';
 import createAbilities from '../../middleware/createAbilities';
-import updateEmailAccount from './controllers/updateEmailAccount';
+import postInvitation from './controllers/postInvitationPrefet';
+import postInvitationAdmin from './controllers/postInvitationAdmin';
+import postInvitationStructure from './controllers/postInvitationStructure';
+import postInvitationHub from './controllers/postInvitationHub';
 import verifyToken from './controllers/verifyToken';
-import confirmationEmail from './controllers/confirmationEmail';
+import getUsersByStructure from './controllers/getUsersByStructure';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -30,15 +33,37 @@ export default class Users extends Service {
       createAbilities,
       updateAccessibleData(app),
     );
-    app.patch(
-      '/users/sendEmailUpdate/:id',
+    app.post(
+      '/inviteAccountPrefet',
       authenticate('jwt'),
       createAbilities,
-      updateEmailAccount(app),
+      postInvitation(app),
     );
-    app.patch('/confirmation-email/:token', confirmationEmail(app));
+    app.post(
+      '/inviteAccountAdmin',
+      authenticate('jwt'),
+      createAbilities,
+      postInvitationAdmin(app),
+    );
+    app.post(
+      '/inviteStructure',
+      authenticate('jwt'),
+      createAbilities,
+      postInvitationStructure(app),
+    );
     app.get('/users/verifyToken/:token', verifyToken(app));
-
+    app.get(
+      '/users/listByIdStructure/:id',
+      authenticate('jwt'),
+      createAbilities,
+      getUsersByStructure(app),
+    );
+    app.post(
+      '/inviteAccountHub',
+      authenticate('jwt'),
+      createAbilities,
+      postInvitationHub(app),
+    );
     // Sentry test
     app.get('/debug-sentry', function mainHandler() {
       throw new Error('My first Sentry error!');

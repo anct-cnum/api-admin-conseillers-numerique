@@ -47,7 +47,13 @@ export default function (app: Application): Model<any> {
 
       passwordCreated: { type: Boolean },
     },
-    { strict: false },
+    {
+      strict: false,
+      versionKey: false,
+      timestamps: {
+        createdAt: 'createdAt',
+      },
+    },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

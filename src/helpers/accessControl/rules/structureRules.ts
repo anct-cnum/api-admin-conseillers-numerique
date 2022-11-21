@@ -21,6 +21,15 @@ export default async function structureRules(user: IUser, can): Promise<any> {
   can([action.read, action.update], ressource.conseillers, {
     structureId: user?.entity.oid,
   });
+
+  can(
+    [action.read, action.create, action.update, action.delete],
+    ressource.users,
+    {
+      'entity.$id': user?.entity.oid,
+    },
+  );
+
   can([action.read], ressource.cras, {
     'conseiller.$id': {
       $in: conseillersIds,

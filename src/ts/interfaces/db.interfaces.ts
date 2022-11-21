@@ -174,11 +174,9 @@ export interface IConseillers {
   historique: object[];
 
   cv: {
-    structure: {
-      file: string;
-      extension: string;
-      date: Date;
-    };
+    file: string;
+    extension: string;
+    date: Date;
   };
 
   telephonePro: number;

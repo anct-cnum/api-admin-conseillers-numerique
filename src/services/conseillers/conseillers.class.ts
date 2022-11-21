@@ -3,6 +3,7 @@ import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
 import getConseillersStatutRecrute from './controllers/getConseillersRecruter';
 import getCandidatById from './controllers/getCandidatById';
+import getCandidatCV from './controllers/getCandidatCV';
 import getConseillerById from './controllers/getConseillerById';
 import createAbilities from '../../middleware/createAbilities';
 
@@ -26,6 +27,12 @@ export default class Conseillers extends Service {
       authenticate('jwt'),
       createAbilities,
       getConseillerById(app),
+    );
+    app.get(
+      '/candidat/:id/cv',
+      authenticate('jwt'),
+      createAbilities,
+      getCandidatCV(app),
     );
   }
 }
