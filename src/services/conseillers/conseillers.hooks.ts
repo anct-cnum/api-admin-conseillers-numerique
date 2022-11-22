@@ -1,8 +1,11 @@
+import * as feathersAuthentication from '@feathersjs/authentication';
+
+const { authenticate } = feathersAuthentication.hooks;
 const search = require('feathers-mongodb-fuzzy-search');
 
-module.exports = {
+export default {
   before: {
-    all: [],
+    all: [authenticate('jwt')],
     find: [search()],
     get: [],
     create: [],

@@ -7,7 +7,7 @@ import { IUser } from '../ts/interfaces/db.interfaces';
 const authenticate =
   (app: Application) =>
   async (req: IRequest, res: Response, next: NextFunction) => {
-    const accessToken = req.headers.authorization.split(' ')[1];
+    const accessToken = req.headers?.authorization?.split(' ')[1];
     if (!accessToken) res.status(401).json('Accès refusé');
     try {
       jwt.verify(
@@ -20,7 +20,8 @@ const authenticate =
       );
       next();
     } catch (error) {
-      res.status(401).json('Accès refusé');
+      res.statusMessage = 'Accès refusé';
+      res.status(403).end();
     }
   };
 

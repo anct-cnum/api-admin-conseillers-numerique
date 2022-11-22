@@ -3,6 +3,7 @@ import { ServiceAddons } from '@feathersjs/feathers';
 import createModel from '../../models/structures.model';
 import { Application } from '../../declarations';
 import Structures from './structures.class';
+import hooks from './structures.hooks';
 
 // Add this service to the service type index
 declare module '../../declarations' {
@@ -18,4 +19,8 @@ export default function (app: Application): void {
   };
   // Initialize our service with any options it requires
   app.use('structures', new Structures(options, app));
+
+  // Get our initialized service so that we can register hooks
+  const service = app.service('structures');
+  service.hooks(hooks);
 }

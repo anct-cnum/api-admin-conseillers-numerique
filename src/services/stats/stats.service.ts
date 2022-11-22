@@ -2,11 +2,12 @@
 import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { Stats } from './stats.class';
+import hooks from './stats.hooks';
 
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    Stats: Stats & ServiceAddons<any>;
+    stats: Stats & ServiceAddons<any>;
   }
 }
 
@@ -17,4 +18,9 @@ export default function (app: Application): void {
 
   // Initialize our service with any options it requires
   app.use('stats', new Stats(app, options));
+
+  // Get our initialized service so that we can register hooks
+  const service = app.service('stats');
+
+  service.hooks(hooks);
 }

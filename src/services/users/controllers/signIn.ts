@@ -54,8 +54,8 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                   roles: { $in: allowedRoles },
                 },
                 {
-                  sub: keycloakUser.sub,
                   $set: {
+                    sub: keycloakUser.sub,
                     token: null,
                     tokenCreatedAt: null,
                     passwordCreated: true,
