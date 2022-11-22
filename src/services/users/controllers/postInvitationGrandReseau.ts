@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { validationEmail } from '../../../schemas/users.schemas';
+import { createUserGrandReseau } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
@@ -11,25 +11,26 @@ import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 
-const postInvitationAdmin =
+const postInvitationGrandReseau =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { email } = req.body;
+    const { email, reseau } = req.body;
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
         res.status(403).json({
-          message: `Accès refusé, vous n'êtes pas autorisé à inviter un admin`,
+          message: `Accès refusé, vous n'êtes pas autorisé à inviter un grand réseau`,
         });
         return;
       }
-      const errorJoi = await validationEmail.validate(email);
+      const errorJoi = await createUserGrandReseau.validate(req.body);
       if (errorJoi?.error) {
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
       const user: IUser = await app.service(service.users).create({
         name: email.toLowerCase(),
-        roles: ['admin'],
+        reseau,
+        roles: ['grandReseau'],
         password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),
@@ -51,9 +52,11 @@ const postInvitationAdmin =
         });
         return;
       }
-      res
-        .status(200)
-        .json({ message: `L'admin ${email} a bien été invité`, account: user });
+      res.status(200).json({
+        message:
+          'Invitation envoyée, le nouvel administrateur à été ajouté, un mail de création de compte lui à été envoyé',
+        account: user,
+      });
       return;
     } catch (error) {
       if (error?.code === 409) {
@@ -66,4 +69,4 @@ const postInvitationAdmin =
     }
   };
 
-export default postInvitationAdmin;
+export default postInvitationGrandReseau;

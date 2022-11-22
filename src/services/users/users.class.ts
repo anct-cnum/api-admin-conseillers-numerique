@@ -1,16 +1,19 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
 import { authenticate } from '@feathersjs/express';
 import { Application } from '../../declarations';
-import getAccessibleData from './controllers/getAccessibleData';
-import getAccessibleDataAggregate from './controllers/getAccessibleDataAggregate';
-import updateAccessibleData from './controllers/updateAccessibleData';
 import createAbilities from '../../middleware/createAbilities';
-import postInvitation from './controllers/postInvitationPrefet';
-import postInvitationAdmin from './controllers/postInvitationAdmin';
-import postInvitationStructure from './controllers/postInvitationStructure';
-import postInvitationHub from './controllers/postInvitationHub';
-import verifyToken from './controllers/verifyToken';
-import getUsersByStructure from './controllers/getUsersByStructure';
+import {
+  getAccessibleData,
+  getAccessibleDataAggregate,
+  getUsers,
+  postInvitationAdmin,
+  postInvitationGrandReseau,
+  postInvitationHub,
+  postInvitationPrefet,
+  postInvitationStructure,
+  updateAccessibleData,
+  verifyToken,
+} from './controllers';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -37,7 +40,7 @@ export default class Users extends Service {
       '/inviteAccountPrefet',
       authenticate('jwt'),
       createAbilities,
-      postInvitation(app),
+      postInvitationPrefet(app),
     );
     app.post(
       '/inviteAccountAdmin',
@@ -52,17 +55,18 @@ export default class Users extends Service {
       postInvitationStructure(app),
     );
     app.get('/users/verifyToken/:token', verifyToken(app));
-    app.get(
-      '/users/listByIdStructure/:id',
-      authenticate('jwt'),
-      createAbilities,
-      getUsersByStructure(app),
-    );
+    app.get('/users', authenticate('jwt'), createAbilities, getUsers(app));
     app.post(
       '/inviteAccountHub',
       authenticate('jwt'),
       createAbilities,
       postInvitationHub(app),
+    );
+    app.post(
+      '/inviteAccountGrandReseau',
+      authenticate('jwt'),
+      createAbilities,
+      postInvitationGrandReseau(app),
     );
     // Sentry test
     app.get('/debug-sentry', function mainHandler() {

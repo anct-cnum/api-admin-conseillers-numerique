@@ -5,7 +5,7 @@ import { IRequest } from '../../ts/interfaces/global.interfaces';
 
 const checkAccessReadRequestUsers = async (app: Application, req: IRequest) =>
   app
-    .service(service.structures)
+    .service(service.users)
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 

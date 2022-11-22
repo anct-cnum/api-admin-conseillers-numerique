@@ -15,7 +15,6 @@ import {
   getNombreAccompagnementsByArrayConseillerId,
   getNombreCrasByArrayConseillerId,
 } from '../../cras/cras.repository';
-import checkAccessReadRequestUsers from '../../users/users.repository';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -74,7 +73,6 @@ const getDetailStructureById =
       ]);
       const checkAccessMiseEnRelation =
         await checkAccessReadRequestMisesEnRelation(app, req);
-      const checkAccessUsers = await checkAccessReadRequestUsers(app, req);
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByArrayConseillerId(
@@ -102,12 +100,14 @@ const getDetailStructureById =
         {
           $match: {
             'entity.$id': new ObjectId(idStructure),
-            $and: [checkAccessUsers],
           },
         },
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
-      structure[0].stats = stats;
+      structure[0].posteValider =
+        stats.find((stat) => stat._id === 'recrutee')?.count || undefined;
+      structure[0].posteRecruter =
+        stats.find((stat) => stat._id === 'finalisee')?.count || undefined;
       structure[0].craCount = craCount === 0 ? undefined : craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);

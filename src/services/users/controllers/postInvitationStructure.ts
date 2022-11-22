@@ -56,9 +56,10 @@ const postInvitationStructure =
         });
         return;
       }
-      res
-        .status(200)
-        .json(`${email} a bien été invité à votre compte structure`);
+      res.status(200).json({
+        message: `${email} a bien été invité à votre compte structure`,
+        account: user,
+      });
       return;
     } catch (error) {
       if (error?.code === 409) {
