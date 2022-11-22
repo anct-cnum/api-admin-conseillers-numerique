@@ -54,9 +54,7 @@ const postInvitationHub =
         });
         return;
       }
-      res
-        .status(200)
-        .json({ message: `Hub : ${email} a bien été invité`, account: user });
+      res.status(200).json(`Hub : ${email} a bien été invité`);
       return;
     } catch (error) {
       if (error?.code === 409) {

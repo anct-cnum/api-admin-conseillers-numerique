@@ -51,9 +51,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      res
-        .status(200)
-        .json({ message: `L'admin ${email} a bien été invité`, account: user });
+      res.status(200).json(`L'admin ${email} a bien été invité`);
       return;
     } catch (error) {
       if (error?.code === 409) {

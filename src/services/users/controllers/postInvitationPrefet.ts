@@ -54,10 +54,7 @@ const postInvitationPrefet =
         });
         return;
       }
-      res.status(200).json({
-        message: `Le préfet ${body.email} a bien été invité`,
-        account: user,
-      });
+      res.status(200).json(`Le préfet ${body.email} a bien été invité`);
     } catch (error) {
       if (error?.code === 409) {
         res.status(409).json({
