@@ -19,6 +19,10 @@ export default function (app: Application): Model<any> {
 
       password: { type: String },
 
+      refreshToken: { type: String },
+
+      sub: { type: String },
+
       roles: [String],
 
       entity: { type: DBRef },
@@ -44,6 +48,8 @@ export default function (app: Application): Model<any> {
       mailSentDate: { type: Date },
 
       tokenCreatedAt: { type: Date },
+
+      lastLogin: { type: Date },
 
       passwordCreated: { type: Boolean },
     },

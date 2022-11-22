@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import { authenticate } from '@feathersjs/express';
+import authenticate from '../../middleware/authenticate';
 import { Application } from '../../declarations';
 import { getStructures, updateStructure } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
@@ -15,49 +15,49 @@ export default class Structures extends Service {
     super(options);
     app.get(
       '/structures',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getStructures(app, options),
     );
     app.get(
       '/structure/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getStructureById(app),
     );
     app.patch(
       '/structure/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       updateStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       verifySiretStructure(app),
     );
     app.patch(
       '/structure/siret/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       updateSiretStructure(app),
     );
     app.patch(
       '/structure/email/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       updateEmailStructure(app),
     );
     app.get(
       '/structures/:id/misesEnRelation',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getStructuresMisesEnRelations(app),
     );
     app.get(
       '/structures/:id/misesEnRelation/stats',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getStructuresMisesEnRelationsStats(app),
     );

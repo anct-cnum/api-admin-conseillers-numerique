@@ -3,11 +3,12 @@ import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import Cras from './cras.class';
 import createModel from '../../models/cras.model';
+import hooks from './cras.hooks';
 
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    Cras: Cras & ServiceAddons<any>;
+    cras: Cras & ServiceAddons<any>;
   }
 }
 
@@ -19,4 +20,9 @@ export default function (app: Application): void {
 
   // Initialize our service with any options it requires
   app.use('cras', new Cras(options, app));
+
+  // Get our initialized service so that we can register hooks
+  const service = app.service('cras');
+
+  service.hooks(hooks);
 }
