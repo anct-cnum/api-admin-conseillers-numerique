@@ -78,12 +78,12 @@ const getDetailStructureById =
       const craCount = await getNombreCrasByArrayConseillerId(
         app,
         req,
-      )(structure[0].conseillers.map((conseiller) => conseiller._id));
+      )(structure[0].conseillers?.map((conseiller) => conseiller._id));
       const accompagnementsCount =
         await getNombreAccompagnementsByArrayConseillerId(
           app,
           checkAccessCras,
-        )(structure[0].conseillers.map((conseiller) => conseiller._id));
+        )(structure[0].conseillers?.map((conseiller) => conseiller._id));
 
       const stats = await app.service(service.misesEnRelation).Model.aggregate([
         {

@@ -57,7 +57,8 @@ const postInvitationStructure =
         return;
       }
       res.status(200).json({
-        message: `${email} a bien été invité à votre compte structure`,
+        message:
+          'Invitation envoyée, le nouvel administrateur à été ajouté, un mail de création de compte lui à été envoyé',
         account: user,
       });
       return;
