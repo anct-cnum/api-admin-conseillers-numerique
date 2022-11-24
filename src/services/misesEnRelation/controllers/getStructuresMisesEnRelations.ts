@@ -15,7 +15,7 @@ const getStructuresMisesEnRelations =
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: structureId });
+        .findOne({ _id: new ObjectId(structureId) });
       if (structure === null) {
         res.status(404).json(
           new NotFound('Structure not found', {

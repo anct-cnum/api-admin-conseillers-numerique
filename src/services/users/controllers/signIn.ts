@@ -43,7 +43,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           userInDB = await app
             .service('users')
             .Model.findOne({ sub: keycloakUser.sub })
-            .select({ _id: 0, password: 0, refreshToken: 0 });
+            .select({ password: 0, refreshToken: 0 });
 
           // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
           if (!userInDB) {
@@ -85,7 +85,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               { refreshToken, lastLogin: Date.now() },
               { new: true },
             )
-            .select({ _id: 0, password: 0, refreshToken: 0 });
+            .select({ password: 0, refreshToken: 0 });
 
           // envoi du refresh token dans un cookie
           res.cookie(

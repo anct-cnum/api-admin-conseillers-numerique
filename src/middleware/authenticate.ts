@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { DBRef } from 'mongodb';
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction } from 'express';
 import { IRequest } from '../ts/interfaces/global.interfaces';
@@ -15,7 +16,12 @@ const authenticate =
         app.get('inclusion_connect').access_token_secret,
         (err, userDecoded: IUser) => {
           if (err) res.status(403).json('Jeton invalide');
-          req.user = userDecoded;
+          const connect = app.get('mongodb');
+          const database = connect.substr(connect.lastIndexOf('/') + 1);
+          req.user = {
+            ...userDecoded,
+            entity: new DBRef('users', userDecoded.entity.$id, database),
+          };
         },
       );
       next();

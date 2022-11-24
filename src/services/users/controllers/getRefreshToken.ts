@@ -13,7 +13,7 @@ const getRefreshToken =
       user = await app
         .service('users')
         .Model.findOne({ refreshToken })
-        .select({ _id: 0, password: 0, refreshToken: 0 });
+        .select({ password: 0, refreshToken: 0 });
     } catch (error) {
       return res.status(409);
     }
