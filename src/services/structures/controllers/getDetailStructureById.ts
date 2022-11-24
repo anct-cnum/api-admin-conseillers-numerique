@@ -105,21 +105,24 @@ const getDetailStructureById =
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
       structure[0].posteValider =
-        stats.find((stat) => stat._id === 'recrutee')?.count || undefined;
+        stats.find((stat) => stat._id === 'recrutee')?.count || 0;
       structure[0].posteRecruter =
-        stats.find((stat) => stat._id === 'finalisee')?.count || undefined;
-      structure[0].craCount = craCount === 0 ? undefined : craCount;
+        stats.find((stat) => stat._id === 'finalisee')?.count || 0;
+      structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
 
-      res.status(200).json(structure[0]);
+      if (structure.length === 0) {
+        return res.status(404).json({ message: 'Structure non trouvé' });
+      }
+
+      return res.status(200).json(structure[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
