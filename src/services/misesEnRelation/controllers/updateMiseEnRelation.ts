@@ -18,7 +18,7 @@ const updateMiseEnRelation =
           {
             $set: { ...update },
           },
-          { returnOriginal: false },
+          { new: true },
         );
       res.status(200).json(miseEnRelation);
     } catch (error) {
