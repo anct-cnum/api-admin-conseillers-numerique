@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { DBRef } from 'mongodb';
+import { DBRef, ObjectId } from 'mongodb';
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction } from 'express';
 import { IRequest } from '../ts/interfaces/global.interfaces';
@@ -20,7 +20,11 @@ const authenticate =
           const database = connect.substr(connect.lastIndexOf('/') + 1);
           req.user = {
             ...userDecoded,
-            entity: new DBRef('users', userDecoded.entity.$id, database),
+            entity: new DBRef(
+              'users',
+              new ObjectId(userDecoded.entity.$id),
+              database,
+            ),
           };
         },
       );
