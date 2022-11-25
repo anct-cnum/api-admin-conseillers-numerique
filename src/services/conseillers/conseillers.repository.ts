@@ -14,9 +14,7 @@ const checkAccessReadRequestConseillers = async (
     .getQuery();
 
 const filterNomConseiller = (nom: string) => {
-  return nom
-    ? { 'conseillerObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
-    : {};
+  return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
 };
 
 const filterNomStructure = (nom: string) => {
@@ -25,15 +23,14 @@ const filterNomStructure = (nom: string) => {
     : {};
 };
 
-const filterRegion = (region: string) =>
-  region ? { 'conseillerObj.codeRegion': region } : {};
+const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
 
 const filterIsCoordinateur = (coordinateur: string) => {
   if (coordinateur === 'true') {
-    return { 'conseillerObj.estCoordinateur': { $eq: true } };
+    return { estCoordinateur: { $eq: true } };
   }
   if (coordinateur === 'false') {
-    return { 'conseillerObj.estCoordinateur': { $exists: false } };
+    return { estCoordinateur: { $exists: false } };
   }
 
   return {};
