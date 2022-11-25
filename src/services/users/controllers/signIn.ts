@@ -47,10 +47,10 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
 
           // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
           if (!userInDB) {
-            if (req.query.verifyToken) {
+            if (req.query.verificationToken) {
               userInDB = await app.service('users').Model.findOneAndUpdate(
                 {
-                  token: req.query.verifyToken,
+                  token: req.query.verificationToken,
                   roles: { $in: allowedRoles },
                 },
                 {
