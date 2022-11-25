@@ -61,7 +61,11 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             );
             if (!userInDB) {
               userInDB = await app.service('users').Model.findOneAndUpdate(
-                { name: keycloakUser.email, sub: { $exists: false } },
+                {
+                  name: keycloakUser.email,
+                  sub: { $exists: false },
+                  token: { $ne: null },
+                },
                 {
                   sub: keycloakUser.sub,
                   token: null,
@@ -86,7 +90,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           const user = await app
             .service('users')
             .Model.findOneAndUpdate(
-              { name: userInDB?.name },
+              { name: userInDB.name },
               { refreshToken, lastLogin: Date.now() },
               { new: true },
             )
