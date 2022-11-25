@@ -47,18 +47,20 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
 
           // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
           if (!userInDB) {
-            userInDB = await app.service('users').Model.findOneAndUpdate(
-              {
-                token: req.query.verifyToken || '',
-                roles: { $in: allowedRoles },
-              },
-              {
-                sub: keycloakUser.sub,
-                token: null,
-                tokenCreatedAt: null,
-                passwordCreated: true,
-              },
-            );
+            if (req.query.verifyToken) {
+              userInDB = await app.service('users').Model.findOneAndUpdate(
+                {
+                  token: req.query.verifyToken,
+                  roles: { $in: allowedRoles },
+                },
+                {
+                  sub: keycloakUser.sub,
+                  token: null,
+                  tokenCreatedAt: null,
+                  passwordCreated: true,
+                },
+              );
+            }
             if (!userInDB) {
               userInDB = await app.service('users').Model.findOneAndUpdate(
                 {
