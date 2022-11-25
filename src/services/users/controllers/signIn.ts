@@ -47,30 +47,35 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
 
           // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
           if (!userInDB) {
-            try {
+            userInDB = await app.service('users').Model.findOneAndUpdate(
+              {
+                token: req.query.verifyToken || '',
+                roles: { $in: allowedRoles },
+              },
+              {
+                sub: keycloakUser.sub,
+                token: null,
+                tokenCreatedAt: null,
+                passwordCreated: true,
+              },
+            );
+            if (!userInDB) {
               userInDB = await app.service('users').Model.findOneAndUpdate(
+                { name: keycloakUser.email, sub: { $exists: false } },
                 {
-                  token: req.query.verificationToken,
-                  roles: { $in: allowedRoles },
-                },
-                {
-                  $set: {
-                    sub: keycloakUser.sub,
-                    token: null,
-                    tokenCreatedAt: null,
-                    passwordCreated: true,
-                  },
+                  sub: keycloakUser.sub,
+                  token: null,
+                  tokenCreatedAt: null,
+                  passwordCreated: true,
                 },
               );
-              if (!userInDB) {
-                return res.status(403).json('Connexion refusée');
-              }
-            } catch (error) {
-              return res.status(500).json(error.message);
             }
           }
         } catch (error) {
-          return res.status(500).json(error.message);
+          return res.status(500).json(error);
+        }
+        if (!userInDB) {
+          return res.status(401).json('Connexion refusée');
         }
         try {
           // création de l'access token et du refresh token
@@ -81,7 +86,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           const user = await app
             .service('users')
             .Model.findOneAndUpdate(
-              { name: userInDB.name },
+              { name: userInDB?.name },
               { refreshToken, lastLogin: Date.now() },
               { new: true },
             )
