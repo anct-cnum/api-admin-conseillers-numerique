@@ -9,7 +9,8 @@ import {
   filterNomConseiller,
   filterRegion,
   filterNomStructure,
-  filterIsRupture,
+  filterIsRuptureConseiller,
+  filterIsRuptureMisesEnRelation,
   checkAccessReadRequestConseillers,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
@@ -24,6 +25,7 @@ const getConseillersRecruter =
     isCoordinateur: string,
     searchByConseiller: string,
     region: string,
+    rupture: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
@@ -31,8 +33,7 @@ const getConseillersRecruter =
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
-          datePrisePoste: { $gt: dateDebut, $lt: dateFin },
-          statut: { $in: ['RECRUTE', 'RUPTURE'] },
+          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           $and: [checkAccess],
         },
       },
@@ -56,10 +57,12 @@ const getMisesEnRelationRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRupture(rupture),
+          ...filterIsRuptureMisesEnRelation(
+            rupture,
+            conseillerIds,
+            structureIds,
+          ),
           ...filterNomStructure(searchByStructure),
-          'conseiller.$id': { $in: conseillerIds },
-          'structure.$id': { $in: structureIds },
           $and: [checkAccess],
         },
       },
@@ -134,6 +137,7 @@ const getExportConseillersCsv =
         coordinateur as string,
         searchByConseiller as string,
         region as string,
+        rupture as string,
       );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
@@ -148,7 +152,10 @@ const getExportConseillersCsv =
       misesEnRelation = await Promise.all(
         misesEnRelation.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.craCount = await getNombreCras(app, req)(item.conseillerObj._id);
+          item.craCount = await getNombreCras(
+            app,
+            req,
+          )(item.conseillerObj?._id);
 
           return item;
         }),

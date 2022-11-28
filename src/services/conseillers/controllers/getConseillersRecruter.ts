@@ -7,7 +7,8 @@ import { validConseillers } from '../../../schemas/conseillers.schemas';
 import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
-  filterIsRupture,
+  filterIsRuptureMisesEnRelation,
+  filterIsRuptureConseiller,
   filterNomConseiller,
   filterNomStructure,
   filterRegion,
@@ -26,10 +27,12 @@ const getTotalConseillersRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRupture(rupture),
+          ...filterIsRuptureMisesEnRelation(
+            rupture,
+            conseillerIds,
+            structureIds,
+          ),
           ...filterNomStructure(searchByStructure),
-          'conseiller.$id': { $in: conseillerIds },
-          'structure.$id': { $in: structureIds },
           $and: [checkAccess],
         },
       },
@@ -45,6 +48,7 @@ const getConseillersRecruter =
     isCoordinateur: string,
     searchByConseiller: string,
     region: string,
+    rupture: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
@@ -52,8 +56,7 @@ const getConseillersRecruter =
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
-          datePrisePoste: { $gt: dateDebut, $lt: dateFin },
-          statut: { $in: ['RECRUTE', 'RUPTURE'] },
+          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           $and: [checkAccess],
         },
       },
@@ -79,10 +82,12 @@ const getMisesEnRelationRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRupture(rupture),
+          ...filterIsRuptureMisesEnRelation(
+            rupture,
+            conseillerIds,
+            structureIds,
+          ),
           ...filterNomStructure(searchByStructure),
-          'conseiller.$id': { $in: conseillerIds },
-          'structure.$id': { $in: structureIds },
           $and: [checkAccess],
         },
       },
@@ -163,6 +168,7 @@ const getConseillersStatutRecrute =
         coordinateur as string,
         searchByConseiller as string,
         region as string,
+        rupture as string,
       );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
@@ -186,13 +192,13 @@ const getConseillersStatutRecrute =
           } else {
             item.rupture = 'En activité';
           }
-          item.idPG = item.conseillerObj.idPG;
-          item._id = item.conseillerObj._id;
-          item.nom = item.conseillerObj.nom;
-          item.prenom = item.conseillerObj.prenom;
-          item.address = item.conseillerObj.emailCN.address;
-          item.estCoordinateur = item.conseillerObj.estCoordinateur;
-          item.nomStructure = item.structureObj.nom;
+          item.idPG = item.conseillerObj?.idPG;
+          item._id = item.conseillerObj?._id;
+          item.nom = item.conseillerObj?.nom;
+          item.prenom = item.conseillerObj?.prenom;
+          item.address = item.conseillerObj?.emailCN?.address;
+          item.estCoordinateur = item.conseillerObj?.estCoordinateur;
+          item.nomStructure = item.structureObj?.nom;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;

@@ -22,37 +22,48 @@ const getConseillerById =
           },
           {
             $lookup: {
-              localField: 'structureId',
-              from: 'structures',
-              foreignField: '_id',
-              as: 'structure',
-            },
-          },
-          { $unwind: '$structure' },
-          {
-            $lookup: {
               from: 'misesEnRelation',
-              let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
-              as: 'miseEnRelation',
+              let: {
+                idConseiller: '$_id',
+                statutMisesEnrelation: [
+                  'nouvelle_rupture',
+                  'finalisee',
+                  'finalisee_rupture',
+                ],
+              },
+              as: 'misesEnRelation',
               pipeline: [
                 {
                   $match: {
                     $and: [
                       {
                         $expr: {
-                          $eq: ['$$idConseiller', '$conseillerObj.idPG'],
+                          $eq: ['$$idConseiller', '$conseillerObj._id'],
                         },
                       },
                       {
-                        $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] },
+                        $expr: {
+                          $or: [
+                            { $eq: ['finalisee', '$statut'] },
+                            { $eq: ['nouvelle_rupture', '$statut'] },
+                            { $eq: ['finalisee_rupture', '$statut'] },
+                          ],
+                        },
                       },
                     ],
+                  },
+                },
+                {
+                  $project: {
+                    statut: 1,
+                    dateRecrutement: 1,
+                    dateRupture: 1,
+                    motifRupture: 1,
                   },
                 },
               ],
             },
           },
-          { $unwind: '$miseEnRelation' },
           {
             $lookup: {
               from: 'permanences',
@@ -87,19 +98,17 @@ const getConseillerById =
               dateDisponibilite: 1,
               datePrisePoste: 1,
               userCreated: 1,
+              statut: 1,
               sexe: 1,
               structureId: 1,
               certifie: 1,
               groupeCRA: 1,
               'emailCN.address': 1,
-              'miseEnRelation.dateRecrutement': 1,
-              'miseEnRelation.dateRupture': 1,
-              'miseEnRelation.motifRupture': 1,
-              'miseEnRelation.statut': 1,
               pix: 1,
               distanceMax: 1,
               estCoordinateur: 1,
               emailPro: 1,
+              misesEnRelation: '$misesEnRelation',
               permanences: '$permanences',
             },
           },
