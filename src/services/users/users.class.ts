@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import { authenticate } from '@feathersjs/express';
+import authenticate from '../../middleware/authenticate';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
@@ -13,58 +13,63 @@ import {
   postInvitationStructure,
   updateAccessibleData,
   verifyToken,
+  signIn,
+  signOut,
+  getRefreshToken,
 } from './controllers';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
     super(options);
-    app.get(
-      '/custom-route-get',
-      authenticate('jwt'),
-      createAbilities,
-      getAccessibleData(app),
-    );
+    app.get('/login', signIn(app));
+
+    app.post('/logout', signOut(app));
+
+    app.post('/refresh-token', getRefreshToken(app));
+
+    app.get('/custom-route-get', authenticate(app), getAccessibleData(app));
+
     app.get(
       '/custom-route-get-aggregate',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getAccessibleDataAggregate(app),
     );
     app.patch(
       '/custom-route-update/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       updateAccessibleData(app),
     );
     app.post(
       '/inviteAccountPrefet',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       postInvitationPrefet(app),
     );
     app.post(
       '/inviteAccountAdmin',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       postInvitationAdmin(app),
     );
     app.post(
       '/inviteStructure',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       postInvitationStructure(app),
     );
     app.get('/users/verifyToken/:token', verifyToken(app));
-    app.get('/users', authenticate('jwt'), createAbilities, getUsers(app));
+    app.get('/users', authenticate(app), createAbilities, getUsers(app));
     app.post(
       '/inviteAccountHub',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       postInvitationHub(app),
     );
     app.post(
       '/inviteAccountGrandReseau',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       postInvitationGrandReseau(app),
     );
