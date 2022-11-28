@@ -31,7 +31,7 @@ export default class Structures extends Service {
     );
     app.get(
       '/structure/details/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getDetailStructureById(app),
     );

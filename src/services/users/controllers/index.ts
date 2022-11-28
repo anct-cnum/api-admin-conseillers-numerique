@@ -8,7 +8,9 @@ import getUsers from './getUsers';
 import postInvitationHub from './postInvitationHub';
 import postInvitationGrandReseau from './postInvitationGrandReseau';
 import postInvitationPrefet from './postInvitationPrefet';
-
+import signIn from './signIn';
+import signOut from './signOut';
+import getRefreshToken from './getRefreshToken';
 // eslint-disable-next-line import/prefer-default-export
 export {
   getAccessibleData,
@@ -21,4 +23,7 @@ export {
   postInvitationHub,
   postInvitationGrandReseau,
   postInvitationPrefet,
+  signIn,
+  signOut,
+  getRefreshToken,
 };
