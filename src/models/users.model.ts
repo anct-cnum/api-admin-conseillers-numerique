@@ -21,7 +21,7 @@ export default function (app: Application): Model<any> {
 
       refreshToken: { type: String },
 
-      sub: { type: String },
+      sub: { type: String, unique: true },
 
       roles: [String],
 
