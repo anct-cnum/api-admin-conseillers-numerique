@@ -39,15 +39,11 @@ const getDetailStructureById =
             pipeline: [
               {
                 $match: {
-                  $and: [
-                    { $expr: { $eq: ['$$idStructure', '$structureId'] } },
-                    { $expr: { $eq: ['$statut', 'RECRUTE'] } },
-                  ],
+                  $expr: { $eq: ['$$idStructure', '$structureId'] },
                 },
               },
               {
                 $project: {
-                  _id: 1,
                   nom: 1,
                   prenom: 1,
                   idPG: 1,
@@ -116,7 +112,7 @@ const getDetailStructureById =
       structure[0].users = users;
 
       if (structure.length === 0) {
-        return res.status(404).json({ message: 'Structure non trouvé' });
+        return res.status(404).json({ message: 'Structure non trouvée' });
       }
 
       return res.status(200).json(structure[0]);

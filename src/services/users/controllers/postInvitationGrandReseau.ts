@@ -54,7 +54,7 @@ const postInvitationGrandReseau =
       }
       res.status(200).json({
         message:
-          'Invitation envoyée, le nouvel administrateur à été ajouté, un mail de création de compte lui à été envoyé',
+          'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui à été envoyé',
         account: user,
       });
       return;

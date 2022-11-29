@@ -39,7 +39,6 @@ const getConseillersRecruter =
       },
       {
         $project: {
-          _id: 1,
           structureId: 1,
         },
       },
@@ -145,8 +144,8 @@ const getExportConseillersCsv =
       )(
         rupture as string,
         searchByStructure as string,
-        conseillers.map((conseiller) => conseiller?.structureId),
-        conseillers.map((conseiller) => conseiller?._id),
+        conseillers.map((conseiller) => conseiller.structureId),
+        conseillers.map((conseiller) => conseiller._id),
         sortColonne,
       );
       misesEnRelation = await Promise.all(
