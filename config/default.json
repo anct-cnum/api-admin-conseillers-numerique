@@ -44,8 +44,8 @@
   },
   "inclusion_connect": {
     "keycloak_issuer": "https://userinfo/",
-    "access_token_secret": "JQS9+BQKGT+RiErsm+mMBk9KxpgrrxCidW1b2aZ1epJeLeCazkInFyW9L7gf5ZCiDiHLac+ukVX7wfobgg8uwCILkeLHXUPUUytIxDtGdlCV1AkS8lx9p02reGm2Cx68VzzYYwT8Rr84KXhUnJIMQRPCpPltcL12uuzNZWdIrJkFjDRqrh+4LPpSwGMeB6eO1rCcnZzfo3gadaKZK4SJAxMSAu/1lArloRMcocD/0a0IoNAx8F7TYk45aEDaoXn9Fae701/TcHmrUifpIOTV/amdE+sd957dO9enXRNIJt/HjDVym9TWHpZPvcCxzynBGjop0h8BtsxhZs8DBa+eGw==",
-    "refresh_token_secret": "4L6dDtbUyA7llQwV2k0YmVn1iyNZbWh5cVkporpB1d7WK0bj+2WtYj+xAvvi2nft+OIAisqHqQYN7kLHqrbNTFGKZfByXjC/FSXL/hxVTv0kBPIAMYp2wk4pi49dEjwEOqcvYk0hinppgjyvwaXC0ZySTyucJYfqPJc0bH1Su3X0qKtcRjMkdbf+GbWpUIPQwcKDjvTjZoVLOGnW4iP3jLiqCuRrTVjpu3JiT4n9uLFZ5+lhcplcWLYclQpWcqctbAdJH3iIm9UD+FAnppaJMko6pCLqCvXZBBmb7P2lgI0KpoAXLAQ5gB0tuepEF2VnJT/JGOUHfnMaLIVWYhRcCQ==",
+    "access_token_secret": "xxxxxxxxxx",
+    "refresh_token_secret": "yyyyyyyyyy",
     "refresh_token_key": "refreshToken",
     "access_token_duration": "30s",
     "refresh_token_duration": "120s"
