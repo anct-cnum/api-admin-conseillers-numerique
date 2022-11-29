@@ -63,7 +63,12 @@ const filterIsRuptureMisesEnRelation = (
     default:
       return {
         $or: [
-          { statut: { $eq: 'finalisee_rupture' } },
+          {
+            $and: [
+              { statut: { $eq: 'finalisee_rupture' } },
+              { 'conseiller.$id': { $in: conseillerIds } },
+            ],
+          },
           {
             $and: [
               { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },

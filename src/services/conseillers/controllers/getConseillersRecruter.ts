@@ -53,10 +53,10 @@ const getConseillersRecruter =
     app.service(service.conseillers).Model.aggregate([
       {
         $match: {
+          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           $and: [checkAccess],
         },
       },
