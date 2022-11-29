@@ -155,14 +155,18 @@ const getConseillersStatutRecrute =
           item._id = item.conseillerObj._id;
           item.nom = item.conseillerObj.nom;
           item.prenom = item.conseillerObj.prenom;
-          item.address = item.conseillerObj.emailCN.address;
+          item.address = item.conseillerObj?.emailCN?.address;
           item.estCoordinateur = item.conseillerObj.estCoordinateur;
           item.nomStructure = item.structureObj.nom;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
         }),
-      );
+      ).catch(error => {
+        res.status(500).json(error.message);
+        throw error;
+
+      });
       if (conseillers.length > 0) {
         const totalConseillers = await getTotalConseillersRecruter(
           app,
