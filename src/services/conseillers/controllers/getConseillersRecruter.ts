@@ -162,10 +162,9 @@ const getConseillersStatutRecrute =
 
           return item;
         }),
-      ).catch(error => {
+      ).catch((error) => {
         res.status(500).json(error.message);
         throw error;
-
       });
       if (conseillers.length > 0) {
         const totalConseillers = await getTotalConseillersRecruter(
