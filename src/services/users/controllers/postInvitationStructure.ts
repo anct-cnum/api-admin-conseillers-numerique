@@ -56,9 +56,11 @@ const postInvitationStructure =
         });
         return;
       }
-      res
-        .status(200)
-        .json(`${email} a bien été invité à votre compte structure`);
+      res.status(200).json({
+        message:
+          'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui à été envoyé',
+        account: user,
+      });
       return;
     } catch (error) {
       if (error?.code === 409) {

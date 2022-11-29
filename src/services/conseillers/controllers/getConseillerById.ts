@@ -22,70 +22,106 @@ const getConseillerById =
           },
           {
             $lookup: {
-              localField: 'structureId',
-              from: 'structures',
-              foreignField: '_id',
-              as: 'structure',
-            },
-          },
-          { $unwind: '$structure' },
-          {
-            $lookup: {
               from: 'misesEnRelation',
-              let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
-              as: 'miseEnRelation',
+              let: {
+                idConseiller: '$_id',
+                statutMisesEnrelation: [
+                  'nouvelle_rupture',
+                  'finalisee',
+                  'finalisee_rupture',
+                ],
+              },
+              as: 'misesEnRelation',
               pipeline: [
                 {
                   $match: {
                     $and: [
                       {
                         $expr: {
-                          $eq: ['$$idConseiller', '$conseillerObj.idPG'],
+                          $eq: ['$$idConseiller', '$conseillerObj._id'],
                         },
                       },
                       {
-                        $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] },
+                        $expr: {
+                          $or: [
+                            { $eq: ['finalisee', '$statut'] },
+                            { $eq: ['nouvelle_rupture', '$statut'] },
+                            { $eq: ['finalisee_rupture', '$statut'] },
+                          ],
+                        },
                       },
                     ],
+                  },
+                },
+                {
+                  $project: {
+                    statut: 1,
+                    dateRecrutement: 1,
+                    dateRupture: 1,
+                    motifRupture: 1,
                   },
                 },
               ],
             },
           },
-          { $unwind: '$miseEnRelation' },
+          {
+            $lookup: {
+              from: 'permanences',
+              let: { idConseiller: '$_id' },
+              as: 'permanences',
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $or: [
+                        { $in: ['$$idConseiller', '$conseillers'] },
+                        { $in: ['$$idConseiller', '$lieuPrincipalPour'] },
+                        { $in: ['$$idConseiller', '$conseillersItinerants'] },
+                      ],
+                    },
+                  },
+                },
+              ],
+            },
+          },
           {
             $project: {
               idPG: 1,
               prenom: 1,
               nom: 1,
               email: 1,
+              codeCommune: 1,
+              nomCommune: 1,
               telephonePro: 1,
               dateDeNaissance: 1,
               dateFinFormation: 1,
+              dateDisponibilite: 1,
               datePrisePoste: 1,
               userCreated: 1,
+              statut: 1,
               sexe: 1,
               structureId: 1,
               certifie: 1,
               groupeCRA: 1,
               'emailCN.address': 1,
-              'miseEnRelation.dateRecrutement': 1,
+              pix: 1,
+              distanceMax: 1,
               estCoordinateur: 1,
+              emailPro: 1,
+              misesEnRelation: '$misesEnRelation',
+              permanences: '$permanences',
             },
           },
         ]);
       if (conseiller.length === 0) {
-        res.statusMessage = 'Conseiller non trouvé';
-        res.status(404).end();
-        return;
+        return res.status(404).json({ message: 'Conseiller non trouvé' });
       }
-      res.status(200).json(conseiller[0]);
+      return res.status(200).json(conseiller[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
-      res.status(500).json(error.message);
+      return res.status(500).json({ message: error.message });
     }
   };
 

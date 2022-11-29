@@ -1,5 +1,6 @@
 /* eslint-disable prefer-template */
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -14,9 +15,7 @@ const checkAccessReadRequestConseillers = async (
     .getQuery();
 
 const filterNomConseiller = (nom: string) => {
-  return nom
-    ? { 'conseillerObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
-    : {};
+  return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
 };
 
 const filterNomStructure = (nom: string) => {
@@ -25,30 +24,94 @@ const filterNomStructure = (nom: string) => {
     : {};
 };
 
-const filterRegion = (region: string) =>
-  region ? { 'conseillerObj.codeRegion': region } : {};
+const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
 
 const filterIsCoordinateur = (coordinateur: string) => {
   if (coordinateur === 'true') {
-    return { 'conseillerObj.estCoordinateur': { $eq: true } };
+    return { estCoordinateur: { $eq: true } };
   }
   if (coordinateur === 'false') {
-    return { 'conseillerObj.estCoordinateur': { $exists: false } };
+    return { estCoordinateur: { $exists: false } };
   }
 
   return {};
 };
 
-const filterIsRupture = (rupture: string) => {
-  if (rupture && rupture !== 'contrat') {
-    return { statut: { $eq: rupture } };
+const filterIsRuptureMisesEnRelation = (
+  rupture: string,
+  conseillerIds: ObjectId[],
+  structureIds: ObjectId[],
+) => {
+  switch (rupture) {
+    case 'nouvelle_rupture':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerIds },
+        'structure.$id': { $in: structureIds },
+      };
+    case 'finalisee_rupture':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerIds },
+      };
+    case 'contrat':
+      return {
+        statut: { $eq: 'finalisee' },
+        'conseiller.$id': { $in: conseillerIds },
+        'structure.$id': { $in: structureIds },
+      };
+    default:
+      return {
+        $or: [
+          {
+            $and: [
+              { statut: { $eq: 'finalisee_rupture' } },
+              { 'conseiller.$id': { $in: conseillerIds } },
+            ],
+          },
+          {
+            $and: [
+              { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
+              { 'conseiller.$id': { $in: conseillerIds } },
+              { 'structure.$id': { $in: structureIds } },
+            ],
+          },
+        ],
+      };
   }
-  if (rupture === 'contrat') {
-    return { statut: { $eq: 'finalisee' } };
+};
+
+const filterIsRuptureConseiller = (
+  rupture: string,
+  dateDebut: Date,
+  dateFin: Date,
+) => {
+  switch (rupture) {
+    case 'nouvelle_rupture':
+      return {
+        statut: { $eq: 'RECRUTE' },
+        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
+      };
+    case 'finalisee_rupture':
+      return { statut: { $eq: 'RUPTURE' } };
+    case 'contrat':
+      return {
+        statut: { $eq: 'RECRUTE' },
+        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
+      };
+    default:
+      return {
+        $or: [
+          { statut: { $eq: 'RUPTURE' } },
+          {
+            $and: [
+              { statut: { $eq: 'RECRUTE' } },
+              { datePrisePoste: { $gt: dateDebut, $lt: dateFin } },
+            ],
+          },
+        ],
+      };
   }
-  return {
-    statut: { $in: ['finalisee_rupture', 'nouvelle_rupture', 'finalisee'] },
-  };
 };
 
 export {
@@ -56,6 +119,7 @@ export {
   filterIsCoordinateur,
   filterNomConseiller,
   filterNomStructure,
-  filterIsRupture,
+  filterIsRuptureMisesEnRelation,
+  filterIsRuptureConseiller,
   filterRegion,
 };

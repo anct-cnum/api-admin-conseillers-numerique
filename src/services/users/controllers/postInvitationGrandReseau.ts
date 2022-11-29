@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { createUserPrefet } from '../../../schemas/users.schemas';
+import { createUserGrandReseau } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
@@ -11,33 +11,31 @@ import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 
-const postInvitationPrefet =
+const postInvitationGrandReseau =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { body } = req;
+    const { email, reseau } = req.body;
     try {
-      const { email, ...localite } = body;
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
         res.status(403).json({
-          message: `Accès refusé, vous n'êtes pas autorisé à inviter un préfet`,
+          message: `Accès refusé, vous n'êtes pas autorisé à inviter un grand réseau`,
         });
         return;
       }
-      const errorJoi = await createUserPrefet.validate(body);
+      const errorJoi = await createUserGrandReseau.validate(req.body);
       if (errorJoi?.error) {
-        res.status(400).json(String(errorJoi?.error));
+        res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
-
       const user: IUser = await app.service(service.users).create({
-        name: body.email.toLowerCase(),
-        roles: ['prefet'],
+        name: email.toLowerCase(),
+        reseau,
+        roles: ['grandReseau'],
         password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),
         mailSentDate: null,
         passwordCreated: false,
-        ...localite,
       });
       const errorSmtpMail = await envoiEmailInvit(
         app,
@@ -54,7 +52,12 @@ const postInvitationPrefet =
         });
         return;
       }
-      res.status(200).json(`Le préfet ${body.email} a bien été invité`);
+      res.status(200).json({
+        message:
+          'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui à été envoyé',
+        account: user,
+      });
+      return;
     } catch (error) {
       if (error?.code === 409) {
         res.status(409).json({
@@ -66,4 +69,4 @@ const postInvitationPrefet =
     }
   };
 
-export default postInvitationPrefet;
+export default postInvitationGrandReseau;

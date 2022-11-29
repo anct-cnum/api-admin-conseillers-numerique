@@ -26,4 +26,19 @@ const createUserHub = Joi.object({
   hub: Joi.string().required().error(new Error('Le nom du hub est invalide')),
 });
 
-export { createUserPrefet, validationEmail, createUserHub };
+const createUserGrandReseau = Joi.object({
+  email: Joi.string()
+    .required()
+    .email()
+    .error(new Error("Le format de l'email est invalide")),
+  reseau: Joi.string()
+    .required()
+    .error(new Error('Le nom du grand réseau est invalide')),
+});
+
+export {
+  createUserPrefet,
+  validationEmail,
+  createUserHub,
+  createUserGrandReseau,
+};

@@ -51,7 +51,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      res.status(200).json(`L'admin ${email} a bien été invité `);
+      res.status(200).json(`L'admin ${email} a bien été invité`);
       return;
     } catch (error) {
       if (error?.code === 409) {
