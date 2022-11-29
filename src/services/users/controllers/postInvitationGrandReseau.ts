@@ -13,7 +13,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const postInvitationGrandReseau =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { email, reseau } = req.body;
+    const { email, reseau, nom, prenom } = req.body;
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -30,6 +30,8 @@ const postInvitationGrandReseau =
       const user: IUser = await app.service(service.users).create({
         name: email.toLowerCase(),
         reseau,
+        nom,
+        prenom,
         roles: ['grandReseau'],
         password: uuidv4(),
         token: uuidv4(),

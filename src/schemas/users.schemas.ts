@@ -31,6 +31,8 @@ const createUserGrandReseau = Joi.object({
     .required()
     .email()
     .error(new Error("Le format de l'email est invalide")),
+  nom: Joi.string().required().error(new Error('Le nom est invalide')),
+  prenom: Joi.string().required().error(new Error('Le prénom est invalide')),
   reseau: Joi.string()
     .required()
     .error(new Error('Le nom du grand réseau est invalide')),
