@@ -20,8 +20,10 @@ const formatStatutMisesEnRelation = (statut: string) => {
       return 'Rupture en cours';
     case 'finalisee_rupture':
       return 'Sans mission';
-    default:
+    case 'finalisee':
       return 'En activité';
+    default:
+      return '';
   }
 };
 
