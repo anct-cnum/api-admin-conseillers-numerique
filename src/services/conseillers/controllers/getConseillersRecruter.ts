@@ -12,6 +12,7 @@ import {
   filterNomConseiller,
   filterNomStructure,
   filterRegion,
+  formatStatutMisesEnRelation,
 } from '../conseillers.repository';
 import { getNombreCras } from '../../cras/cras.repository';
 import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
@@ -184,13 +185,7 @@ const getConseillersStatutRecrute =
       misesEnRelation = await Promise.all(
         misesEnRelation.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          if (item.statut === 'nouvelle_rupture') {
-            item.rupture = 'Rupture en cours';
-          } else if (item.statut === 'finalisee_rupture') {
-            item.rupture = 'Sans mission';
-          } else {
-            item.rupture = 'En activité';
-          }
+          item.rupture = formatStatutMisesEnRelation(item.statut);
           item.idPG = item.conseillerObj?.idPG;
           item._id = item.conseillerObj?._id;
           item.nom = item.conseillerObj?.nom;

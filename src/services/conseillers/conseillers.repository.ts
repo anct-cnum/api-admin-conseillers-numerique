@@ -14,6 +14,17 @@ const checkAccessReadRequestConseillers = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
+const formatStatutMisesEnRelation = (statut: string) => {
+  switch (statut) {
+    case 'nouvelle_rupture':
+      return 'Rupture en cours';
+    case 'finalisee_rupture':
+      return 'Sans mission';
+    default:
+      return 'En activité';
+  }
+};
+
 const filterNomConseiller = (nom: string) => {
   return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
 };
@@ -116,6 +127,7 @@ const filterIsRuptureConseiller = (
 
 export {
   checkAccessReadRequestConseillers,
+  formatStatutMisesEnRelation,
   filterIsCoordinateur,
   filterNomConseiller,
   filterNomStructure,
