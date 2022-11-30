@@ -1,68 +1,41 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
+import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { validConseillers } from '../../../schemas/conseillers.schemas';
 import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
-  filterIsRupture,
+  filterIsRuptureMisesEnRelation,
+  filterIsRuptureConseiller,
   filterNomConseiller,
   filterNomStructure,
   filterRegion,
 } from '../conseillers.repository';
 import { getNombreCras } from '../../cras/cras.repository';
+import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
 
 const getTotalConseillersRecruter =
   (app: Application, checkAccess) =>
   async (
-    dateDebut: Date,
-    dateFin: Date,
-    isCoordinateur: string,
-    searchByConseiller: string,
-    region: string,
     rupture: string,
     searchByStructure: string,
+    structureIds: ObjectId[],
+    conseillerIds: ObjectId[],
   ) =>
-    app.service(service.conseillers).Model.aggregate([
+    app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          statut: 'RECRUTE',
-          datePrisePoste: { $gt: dateDebut, $lt: dateFin },
+          ...filterIsRuptureMisesEnRelation(
+            rupture,
+            conseillerIds,
+            structureIds,
+          ),
+          ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
-          ...filterIsCoordinateur(isCoordinateur as string),
-          ...filterNomConseiller(searchByConseiller as string),
-          ...filterRegion(region as string),
         },
       },
-      {
-        $lookup: {
-          from: 'structures',
-          let: { idStructure: '$structureId' },
-          as: 'structure',
-          pipeline: filterNomStructure(searchByStructure),
-        },
-      },
-      { $unwind: '$structure' },
-      {
-        $lookup: {
-          from: 'misesEnRelation',
-          let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
-          as: 'miseEnRelation',
-          pipeline: [
-            {
-              $match: {
-                $and: [
-                  { $expr: { $eq: ['$$idConseiller', '$conseillerObj.idPG'] } },
-                  { $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] } },
-                  filterIsRupture(rupture),
-                ],
-              },
-            },
-          ],
-        },
-      },
-      { $unwind: '$miseEnRelation' },
       { $group: { _id: null, count: { $sum: 1 } } },
       { $project: { _id: 0, count_conseillers: '$count' } },
     ]);
@@ -76,59 +49,58 @@ const getConseillersRecruter =
     searchByConseiller: string,
     region: string,
     rupture: string,
-    searchByStructure: string,
-    sortColonne: object,
-    skip: string,
-    limit: number,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
         $match: {
-          statut: 'RECRUTE',
-          datePrisePoste: { $gt: dateDebut, $lt: dateFin },
-          $and: [checkAccess],
+          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
+          $and: [checkAccess],
         },
       },
-      {
-        $lookup: {
-          from: 'structures',
-          let: { idStructure: '$structureId' },
-          as: 'structure',
-          pipeline: filterNomStructure(searchByStructure),
-        },
-      },
-      { $unwind: '$structure' },
-      {
-        $lookup: {
-          from: 'misesEnRelation',
-          let: { idConseiller: '$idPG', idStructure: '$structure.idPG' },
-          as: 'miseEnRelation',
-          pipeline: [
-            {
-              $match: {
-                $and: [
-                  { $expr: { $eq: ['$$idConseiller', '$conseillerObj.idPG'] } },
-                  { $expr: { $eq: ['$$idStructure', '$structureObj.idPG'] } },
-                  filterIsRupture(rupture),
-                ],
-              },
-            },
-          ],
-        },
-      },
-      { $unwind: '$miseEnRelation' },
       {
         $project: {
-          _id: 1,
-          idPG: 1,
-          prenom: 1,
-          nom: 1,
-          'emailCN.address': 1,
-          'miseEnRelation.statut': 1,
-          estCoordinateur: 1,
+          structureId: 1,
+        },
+      },
+    ]);
+
+const getMisesEnRelationRecruter =
+  (app: Application, checkAccess) =>
+  async (
+    rupture: string,
+    searchByStructure: string,
+    structureIds: ObjectId[],
+    conseillerIds: ObjectId[],
+    sortColonne: object,
+    skip: string,
+    limit: number,
+  ) =>
+    app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $match: {
+          ...filterIsRuptureMisesEnRelation(
+            rupture,
+            conseillerIds,
+            structureIds,
+          ),
+          ...filterNomStructure(searchByStructure),
+          $and: [checkAccess],
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          statut: 1,
+          'conseillerObj.idPG': 1,
+          'conseillerObj.prenom': 1,
+          'conseillerObj.nom': 1,
+          'structureObj.nom': 1,
+          'conseillerObj._id': 1,
+          'conseillerObj.emailCN.address': 1,
+          'conseillerObj.estCoordinateur': 1,
         },
       },
       { $sort: sortColonne },
@@ -177,45 +149,71 @@ const getConseillersStatutRecrute =
         limit: 0,
         skip: 0,
       };
-    const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
+    const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
     try {
-      let conseillers: any[];
-      const checkAccess = await checkAccessReadRequestConseillers(app, req);
-      conseillers = await getConseillersRecruter(app, checkAccess)(
+      let misesEnRelation: any[];
+      const checkAccesMisesEnRelation =
+        await checkAccessReadRequestMisesEnRelation(app, req);
+      const checkAccessConseiller = await checkAccessReadRequestConseillers(
+        app,
+        req,
+      );
+      const conseillers = await getConseillersRecruter(
+        app,
+        checkAccessConseiller,
+      )(
         dateDebut,
         dateFin,
         coordinateur as string,
         searchByConseiller as string,
         region as string,
         rupture as string,
+      );
+      misesEnRelation = await getMisesEnRelationRecruter(
+        app,
+        checkAccesMisesEnRelation,
+      )(
+        rupture as string,
         searchByStructure as string,
+        conseillers.map((conseiller) => conseiller.structureId),
+        conseillers.map((conseiller) => conseiller._id),
         sortColonne,
         skip as string,
         options.paginate.default,
       );
-      conseillers = await Promise.all(
-        conseillers.map(async (ligneStats) => {
+      misesEnRelation = await Promise.all(
+        misesEnRelation.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.rupture = item.miseEnRelation.statut === 'nouvelle_rupture';
+          if (item.statut === 'nouvelle_rupture') {
+            item.rupture = 'Rupture en cours';
+          } else if (item.statut === 'finalisee_rupture') {
+            item.rupture = 'Sans mission';
+          } else {
+            item.rupture = 'En activité';
+          }
+          item.idPG = item.conseillerObj?.idPG;
+          item._id = item.conseillerObj?._id;
+          item.nom = item.conseillerObj?.nom;
+          item.prenom = item.conseillerObj?.prenom;
+          item.address = item.conseillerObj?.emailCN?.address;
+          item.estCoordinateur = item.conseillerObj?.estCoordinateur;
+          item.nomStructure = item.structureObj?.nom;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
         }),
       );
-      if (conseillers.length > 0) {
+      if (misesEnRelation.length > 0) {
         const totalConseillers = await getTotalConseillersRecruter(
           app,
-          checkAccess,
+          checkAccesMisesEnRelation,
         )(
-          dateDebut,
-          dateFin,
-          coordinateur as string,
-          searchByConseiller as string,
-          region as string,
           rupture as string,
           searchByStructure as string,
+          conseillers.map((conseiller) => conseiller?.structureId),
+          conseillers.map((conseiller) => conseiller?._id),
         );
-        items.data = conseillers;
+        items.data = misesEnRelation;
         items.total = totalConseillers[0]?.count_conseillers;
         items.limit = options.paginate.default;
         items.skip = Number(skip);

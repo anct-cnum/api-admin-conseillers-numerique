@@ -19,23 +19,12 @@ const filterNomConseiller = (nom: string) => {
 };
 
 const filterNomStructure = (nom: string) => {
-  if (nom) {
-    return [
-      {
-        $match: {
-          nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' },
-        },
-      },
-      { $match: { $expr: { $eq: ['$$idStructure', '$_id'] } } },
-    ];
-  }
-  return [{ $match: { $expr: { $eq: ['$$idStructure', '$_id'] } } }];
+  return nom
+    ? { 'structureObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
+    : {};
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
-
-const filterStructure = (structure: string) =>
-  structure ? { structureId: new ObjectId(structure) } : {};
 
 const filterIsCoordinateur = (coordinateur: string) => {
   if (coordinateur === 'true') {
@@ -48,14 +37,81 @@ const filterIsCoordinateur = (coordinateur: string) => {
   return {};
 };
 
-const filterIsRupture = (rupture: string) => {
-  if (rupture === 'true') {
-    return { statut: { $eq: 'nouvelle_rupture' } };
+const filterIsRuptureMisesEnRelation = (
+  rupture: string,
+  conseillerIds: ObjectId[],
+  structureIds: ObjectId[],
+) => {
+  switch (rupture) {
+    case 'nouvelle_rupture':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerIds },
+        'structure.$id': { $in: structureIds },
+      };
+    case 'finalisee_rupture':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerIds },
+      };
+    case 'contrat':
+      return {
+        statut: { $eq: 'finalisee' },
+        'conseiller.$id': { $in: conseillerIds },
+        'structure.$id': { $in: structureIds },
+      };
+    default:
+      return {
+        $or: [
+          {
+            $and: [
+              { statut: { $eq: 'finalisee_rupture' } },
+              { 'conseiller.$id': { $in: conseillerIds } },
+            ],
+          },
+          {
+            $and: [
+              { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
+              { 'conseiller.$id': { $in: conseillerIds } },
+              { 'structure.$id': { $in: structureIds } },
+            ],
+          },
+        ],
+      };
   }
-  if (rupture === 'false') {
-    return { statut: { $eq: 'finalisee' } };
+};
+
+const filterIsRuptureConseiller = (
+  rupture: string,
+  dateDebut: Date,
+  dateFin: Date,
+) => {
+  switch (rupture) {
+    case 'nouvelle_rupture':
+      return {
+        statut: { $eq: 'RECRUTE' },
+        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
+      };
+    case 'finalisee_rupture':
+      return { statut: { $eq: 'RUPTURE' } };
+    case 'contrat':
+      return {
+        statut: { $eq: 'RECRUTE' },
+        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
+      };
+    default:
+      return {
+        $or: [
+          { statut: { $eq: 'RUPTURE' } },
+          {
+            $and: [
+              { statut: { $eq: 'RECRUTE' } },
+              { datePrisePoste: { $gt: dateDebut, $lt: dateFin } },
+            ],
+          },
+        ],
+      };
   }
-  return {};
 };
 
 export {
@@ -63,7 +119,7 @@ export {
   filterIsCoordinateur,
   filterNomConseiller,
   filterNomStructure,
-  filterIsRupture,
+  filterIsRuptureMisesEnRelation,
+  filterIsRuptureConseiller,
   filterRegion,
-  filterStructure,
 };

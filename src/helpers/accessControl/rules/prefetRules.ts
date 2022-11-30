@@ -1,11 +1,12 @@
+import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
-import { IUser, IStructures } from '../../../ts/interfaces/db.interfaces';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 import app from '../../../app';
 import service from '../../services';
+import { getConseillersById } from '../../commonQueriesFunctions';
 
 const getConseillersIds = async (user) => {
   try {
-    const conseillersIds = [];
     let query = {};
     if (user?.region) {
       query = {
@@ -20,29 +21,14 @@ const getConseillersIds = async (user) => {
         },
       };
     }
-    const structures: IStructures[] = await app
+    const structures: ObjectId[] = await app
       .service(service.structures)
-      .Model.find(query);
-    const promises = [];
-    structures?.forEach((structure) => {
-      // eslint-disable-next-line
-      const p = new Promise(async (resolve) => {
-        const conseillersStructure = await app
-          .service(service.conseillers)
-          .Model.find({
-            structureId: structure._id,
-          });
+      .Model.find(query)
+      .distinct('_id');
+    const conseillersIds: ObjectId[] = await getConseillersById(app)(
+      structures,
+    );
 
-        if (conseillersStructure.length > 0) {
-          conseillersStructure?.forEach((conseiller) => {
-            conseillersIds.push(conseiller._id);
-          });
-        }
-        resolve(conseillersIds);
-      });
-      promises.push(p);
-    });
-    await Promise.all(promises);
     return conseillersIds;
   } catch (error) {
     throw new Error(error);

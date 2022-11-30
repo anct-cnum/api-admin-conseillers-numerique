@@ -17,6 +17,10 @@ export interface IUser {
 
   password: string;
 
+  refreshToken: string;
+
+  sub: string;
+
   roles: string[];
 
   roleActivated: string;
@@ -45,11 +49,15 @@ export interface IUser {
 
   tokenCreatedAt?: Date;
 
+  lastLogin?: Date;
+
   passwordCreated?: boolean;
 
   timestamps?: boolean;
 
   hub?: string;
+
+  toJSON(): string | object | Buffer;
 }
 export interface IMisesEnRelation {
   conseiller: typeof DBRef;
@@ -77,6 +85,8 @@ export interface IMisesEnRelation {
   emetteurRupture: string | undefined;
 }
 export interface IConseillers {
+  _id: ObjectId;
+
   idPG: number;
 
   password: string;
@@ -172,11 +182,9 @@ export interface IConseillers {
   historique: object[];
 
   cv: {
-    structure: {
-      file: string;
-      extension: string;
-      date: Date;
-    };
+    file: string;
+    extension: string;
+    date: Date;
   };
 
   telephonePro: number;
@@ -387,6 +395,6 @@ export interface IStatsConseillersCras {
   2024: [Object];
 }
 
-export function isConseiller(item: any): item is IConseillers {
+export function isArrayConseillers(item: any): item is IConseillers[] {
   return item;
 }

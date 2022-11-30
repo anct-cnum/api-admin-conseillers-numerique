@@ -6,6 +6,7 @@ export interface IRequest extends Request {
   ability: any;
   query: any;
   user?: IUser;
+  decoded: IUser;
 }
 
 export interface Functionnality {

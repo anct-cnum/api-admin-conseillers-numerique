@@ -19,6 +19,10 @@ export default function (app: Application): Model<any> {
 
       password: { type: String },
 
+      refreshToken: { type: String },
+
+      sub: { type: String, unique: true },
+
       roles: [String],
 
       entity: { type: DBRef },
@@ -45,9 +49,17 @@ export default function (app: Application): Model<any> {
 
       tokenCreatedAt: { type: Date },
 
+      lastLogin: { type: Date },
+
       passwordCreated: { type: Boolean },
     },
-    { strict: false },
+    {
+      strict: false,
+      versionKey: false,
+      timestamps: {
+        createdAt: 'createdAt',
+      },
+    },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

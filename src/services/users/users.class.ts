@@ -1,44 +1,78 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import { authenticate } from '@feathersjs/express';
+import authenticate from '../../middleware/authenticate';
 import { Application } from '../../declarations';
-import getAccessibleData from './controllers/getAccessibleData';
-import getAccessibleDataAggregate from './controllers/getAccessibleDataAggregate';
-import updateAccessibleData from './controllers/updateAccessibleData';
 import createAbilities from '../../middleware/createAbilities';
-import updateEmailAccount from './controllers/updateEmailAccount';
-import verifyToken from './controllers/verifyToken';
-import confirmationEmail from './controllers/confirmationEmail';
+import {
+  getAccessibleData,
+  getAccessibleDataAggregate,
+  getUsers,
+  postInvitationAdmin,
+  postInvitationGrandReseau,
+  postInvitationHub,
+  postInvitationPrefet,
+  postInvitationStructure,
+  updateAccessibleData,
+  verifyToken,
+  signIn,
+  signOut,
+  getRefreshToken,
+} from './controllers';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
     super(options);
-    app.get(
-      '/custom-route-get',
-      authenticate('jwt'),
-      createAbilities,
-      getAccessibleData(app),
-    );
+    app.get('/login', signIn(app));
+
+    app.post('/logout', signOut(app));
+
+    app.post('/refresh-token', getRefreshToken(app));
+
+    app.get('/custom-route-get', authenticate(app), getAccessibleData(app));
+
     app.get(
       '/custom-route-get-aggregate',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getAccessibleDataAggregate(app),
     );
     app.patch(
       '/custom-route-update/:id',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       updateAccessibleData(app),
     );
-    app.patch(
-      '/users/sendEmailUpdate/:id',
-      authenticate('jwt'),
+    app.post(
+      '/inviteAccountPrefet',
+      authenticate(app),
       createAbilities,
-      updateEmailAccount(app),
+      postInvitationPrefet(app),
     );
-    app.patch('/confirmation-email/:token', confirmationEmail(app));
+    app.post(
+      '/inviteAccountAdmin',
+      authenticate(app),
+      createAbilities,
+      postInvitationAdmin(app),
+    );
+    app.post(
+      '/inviteStructure',
+      authenticate(app),
+      createAbilities,
+      postInvitationStructure(app),
+    );
     app.get('/users/verifyToken/:token', verifyToken(app));
-
+    app.get('/users', authenticate(app), createAbilities, getUsers(app));
+    app.post(
+      '/inviteAccountHub',
+      authenticate(app),
+      createAbilities,
+      postInvitationHub(app),
+    );
+    app.post(
+      '/inviteAccountGrandReseau',
+      authenticate(app),
+      createAbilities,
+      postInvitationGrandReseau(app),
+    );
     // Sentry test
     app.get('/debug-sentry', function mainHandler() {
       throw new Error('My first Sentry error!');

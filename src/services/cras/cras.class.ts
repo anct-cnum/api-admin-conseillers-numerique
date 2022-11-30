@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import { authenticate } from '@feathersjs/express';
+import authenticate from '../../middleware/authenticate';
 import { Application } from '../../declarations';
 
 import createAbilities from '../../middleware/createAbilities';
@@ -10,7 +10,7 @@ export default class Cras extends Service {
     super(options);
     app.get(
       '/cras/codesPostaux/structure',
-      authenticate('jwt'),
+      authenticate(app),
       createAbilities,
       getCodePostauxStructureCras(app),
     );

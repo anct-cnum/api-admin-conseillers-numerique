@@ -21,6 +21,7 @@ const getExportStatistiquesCsv =
     idType = idType === 'undefined' ? '' : idType;
     codePostal = codePostal === 'undefined' ? '' : codePostal;
     let idStructure: ObjectId;
+    let idConseiller: ObjectId;
     let conseillerIds: ObjectId[];
     let query: Object;
     let statistiques = {};
@@ -54,6 +55,22 @@ const getExportStatistiquesCsv =
           if (codePostal !== '' && codePostal !== 'null') {
             query['cra.codePostal'] = codePostal;
           }
+          statistiques = await getStatsGlobales(
+            query,
+            req.ability,
+            action.read,
+            app,
+          );
+          break;
+        case 'conseiller':
+          idConseiller = new ObjectId(String(idType));
+          query = {
+            'cra.dateAccompagnement': {
+              $gte: dateDebut,
+              $lte: dateFin,
+            },
+            'conseiller.$id': { $eq: idConseiller },
+          };
           statistiques = await getStatsGlobales(
             query,
             req.ability,
