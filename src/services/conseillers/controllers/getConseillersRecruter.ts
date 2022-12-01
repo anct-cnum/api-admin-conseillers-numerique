@@ -23,15 +23,17 @@ const getTotalConseillersRecruter =
     rupture: string,
     searchByStructure: string,
     structureIds: ObjectId[],
-    conseillerIds: ObjectId[],
+    conseillerIdsRecruter: ObjectId[],
+    conseillerIdsRupture: ObjectId[],
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
           ...filterIsRuptureMisesEnRelation(
             rupture,
-            conseillerIds,
+            conseillerIdsRecruter,
             structureIds,
+            conseillerIdsRupture,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -64,6 +66,7 @@ const getConseillersRecruter =
       {
         $project: {
           structureId: 1,
+          statut: 1,
         },
       },
     ]);
@@ -74,7 +77,8 @@ const getMisesEnRelationRecruter =
     rupture: string,
     searchByStructure: string,
     structureIds: ObjectId[],
-    conseillerIds: ObjectId[],
+    conseillerIdsRecruter: ObjectId[],
+    conseillerIdsRupture: ObjectId[],
     sortColonne: object,
     skip: string,
     limit: number,
@@ -84,8 +88,9 @@ const getMisesEnRelationRecruter =
         $match: {
           ...filterIsRuptureMisesEnRelation(
             rupture,
-            conseillerIds,
+            conseillerIdsRecruter,
             structureIds,
+            conseillerIdsRupture,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -170,6 +175,12 @@ const getConseillersStatutRecrute =
         region as string,
         rupture as string,
       );
+      const conseillerRecruter = conseillers.filter(
+        (conseiller) => conseiller.statut === 'RECRUTE',
+      );
+      const conseillerRupture = conseillers.filter(
+        (conseiller) => conseiller.statut === 'RUPTURE',
+      );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
@@ -177,7 +188,8 @@ const getConseillersStatutRecrute =
         rupture as string,
         searchByStructure as string,
         conseillers.map((conseiller) => conseiller.structureId),
-        conseillers.map((conseiller) => conseiller._id),
+        conseillerRecruter.map((conseiller) => conseiller._id),
+        conseillerRupture.map((conseiller) => conseiller._id),
         sortColonne,
         skip as string,
         options.paginate.default,
@@ -205,8 +217,9 @@ const getConseillersStatutRecrute =
         )(
           rupture as string,
           searchByStructure as string,
-          conseillers.map((conseiller) => conseiller?.structureId),
-          conseillers.map((conseiller) => conseiller?._id),
+          conseillers.map((conseiller) => conseiller.structureId),
+          conseillerRecruter.map((conseiller) => conseiller._id),
+          conseillerRupture.map((conseiller) => conseiller._id),
         );
         items.data = misesEnRelation;
         items.total = totalConseillers[0]?.count_conseillers;
