@@ -44,6 +44,9 @@ export default function (app: Application) {
   const getDashboardUrl = (pathUrl: string) =>
     `${app.get('dashboard_hostname')}${pathUrl}`;
 
+  const getEspaceCandidatUrl = (pathUrl: string) =>
+    `${app.get('espace_candidat_hostname')}${pathUrl}`;
+
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
 
   const initSentry = () => {
@@ -62,13 +65,15 @@ export default function (app: Application) {
       app.use(Sentry.Handlers.errorHandler());
     }
   };
+  const getPixContactMail = () => app.get('pix').contactMailing;
 
   const utils = {
     getPublicUrl,
     getDashboardUrl,
     initSentry,
+    getPixContactMail,
+    getEspaceCandidatUrl,
   };
-
   return {
     utils,
     render: async (rootDir, templateName, data = {}) => {

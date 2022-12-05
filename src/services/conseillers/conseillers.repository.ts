@@ -50,6 +50,11 @@ const filterIsCoordinateur = (coordinateur: string) => {
   return {};
 };
 
+const filterDepartement = (departement: string) =>
+  departement ? { codeDepartement: departement } : {};
+
+const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
+
 const filterIsRuptureMisesEnRelation = (
   rupture: string,
   conseillerIdsRecruter: ObjectId[],
@@ -137,4 +142,6 @@ export {
   filterIsRuptureMisesEnRelation,
   filterIsRuptureConseiller,
   filterRegion,
+  filterDepartement,
+  filterComs,
 };
