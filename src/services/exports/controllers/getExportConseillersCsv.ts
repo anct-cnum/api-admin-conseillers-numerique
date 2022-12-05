@@ -40,6 +40,7 @@ const getConseillersRecruter =
       {
         $project: {
           structureId: 1,
+          statut: 1,
         },
       },
     ]);
@@ -50,7 +51,8 @@ const getMisesEnRelationRecruter =
     rupture: string,
     searchByStructure: string,
     structureIds: ObjectId[],
-    conseillerIds: ObjectId[],
+    conseillerIdsRecruter: ObjectId[],
+    conseillerIdsRupture: ObjectId[],
     sortColonne: object,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -58,8 +60,9 @@ const getMisesEnRelationRecruter =
         $match: {
           ...filterIsRuptureMisesEnRelation(
             rupture,
-            conseillerIds,
+            conseillerIdsRecruter,
             structureIds,
+            conseillerIdsRupture,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -74,6 +77,7 @@ const getMisesEnRelationRecruter =
           'conseillerObj.nom': 1,
           'conseillerObj.emailCN.address': 1,
           dateRecrutement: 1,
+          statut: 1,
           'structureObj.idPG': 1,
           'structureObj._id': 1,
           'structureObj.nom': 1,
@@ -138,6 +142,12 @@ const getExportConseillersCsv =
         region as string,
         rupture as string,
       );
+      const conseillerRecruter = conseillers.filter(
+        (conseiller) => conseiller.statut === 'RECRUTE',
+      );
+      const conseillerRupture = conseillers.filter(
+        (conseiller) => conseiller.statut === 'RUPTURE',
+      );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
@@ -145,7 +155,8 @@ const getExportConseillersCsv =
         rupture as string,
         searchByStructure as string,
         conseillers.map((conseiller) => conseiller.structureId),
-        conseillers.map((conseiller) => conseiller._id),
+        conseillerRecruter.map((conseiller) => conseiller._id),
+        conseillerRupture.map((conseiller) => conseiller._id),
         sortColonne,
       );
       misesEnRelation = await Promise.all(
