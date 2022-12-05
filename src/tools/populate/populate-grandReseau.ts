@@ -24,11 +24,11 @@ execute(__filename, async ({ app, logger, exit }) => {
 
   const options = program.opts();
   const structures = await readCSV(options.csv);
-  const promises = [];
+  const promises: Promise<void>[] = [];
 
   structures.forEach(async (structure) => {
     // eslint-disable-next-line no-async-promise-executor
-    const p = new Promise(async (resolve, reject) => {
+    const p = new Promise<void>(async (resolve, reject) => {
       const match = await matchStructure(parseInt(structure.ID, 10));
 
       if (match === null) {

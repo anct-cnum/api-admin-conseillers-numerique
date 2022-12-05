@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable prettier/prettier */
 
-// Lancement de ce script : ts-node src/tools/deploy/mailsInvitations-grandReseau.ts -c <file>
+// Lancement de ce script : ts-node src/tools/deploy/mailsInvitations-grandReseau.ts
 
 import { program } from 'commander';
 import execute from '../utils';
@@ -11,7 +11,7 @@ import { IUser } from '../../ts/interfaces/db.interfaces';
 program.parse(process.argv);
 
 execute(__filename, async ({ app, emails, logger, exit }) => {
-  const promises = [];
+  const promises: Promise<void>[] = [];
 
   const messageInvitation = emails.getEmailMessageByTemplateName('invitationActiveCompte');
 
@@ -26,7 +26,7 @@ execute(__filename, async ({ app, emails, logger, exit }) => {
 
   users.forEach(async (user: IUser) => {
     // eslint-disable-next-line no-async-promise-executor
-    const p = new Promise(async (resolve) => {
+    const p = new Promise<void>(async (resolve) => {
       await messageInvitation.send(user);
       logger.info(`Invitation envoyée pour ${user.name}`);
       resolve(p);

@@ -25,11 +25,11 @@ const readCSV = async (filePath: any) => {
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
   const users = await readCSV(options.csv);
-  const promises = [];
+  const promises: Promise<void>[] = [];
 
   users.forEach(async (user) => {
     // eslint-disable-next-line no-async-promise-executor
-    const p = new Promise(async (resolve, reject) => {
+    const p = new Promise<void>(async (resolve, reject) => {
 
       if (!user.EMAIL || !user.NOM || !user.PRENOM || GrandsReseaux.some((reseau: { valeur: string; }) => reseau.valeur === user.RESEAU) === false) {
         logger.warn(`Informations manquantes ou erronées pour : ${JSON.stringify(user)}`);

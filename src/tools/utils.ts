@@ -23,7 +23,7 @@ app.configure(services);
 app.configure(channels);
 app.hooks(appHooks);
 
-let transaction = null;
+let transaction: any = null;
 
 const execute = async (name: string, job: any) => {
   if (config().sentry.enabled === 'true') {

@@ -20,6 +20,7 @@ export default function (app: Application, mailer, req: IRequest) {
     render,
     send: async (user) => {
       const onSuccess = async () => {
+        // Mode Script
         if (req === null) {
           await app.service(service.users).Model.updateOne(
             { _id: user._id },
@@ -54,6 +55,7 @@ export default function (app: Application, mailer, req: IRequest) {
         }
       };
       const onError = async (err: Error) => {
+        // Mode Script
         if (req === null) {
           await app.service(service.users).Model.updateOne(
             { _id: user._id },
