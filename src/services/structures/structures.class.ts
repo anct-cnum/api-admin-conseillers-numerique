@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import {
   getDetailStructureById,
@@ -19,55 +19,55 @@ export default class Structures extends Service {
     super(options);
     app.get(
       '/structures',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getStructures(app, options),
     );
     app.get(
       '/structure/:id',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getStructureById(app),
     );
     app.get(
       '/structure/details/:id',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getDetailStructureById(app),
     );
     app.patch(
       '/structure/:id',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       updateStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       verifySiretStructure(app),
     );
     app.patch(
       '/structure/siret/:id',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       updateSiretStructure(app),
     );
     app.patch(
       '/structure/email/:id',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       updateEmailStructure(app),
     );
     app.get(
       '/structures/:id/misesEnRelation',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getStructuresMisesEnRelations(app),
     );
     app.get(
       '/structures/:id/misesEnRelation/stats',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getStructuresMisesEnRelationsStats(app),
     );

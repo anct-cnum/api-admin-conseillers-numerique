@@ -5,7 +5,7 @@ import {
   Params,
   ServiceMethods,
 } from '@feathersjs/feathers';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
@@ -39,73 +39,73 @@ export class Exports implements ServiceMethods<Data> {
 
     app.get(
       '/exports/candidats-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportJeRecruteCsv(app),
     );
     app.get(
       '/exports/candidatsValidesStructure-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportCandidatsValideStructureCsv(app),
     );
     app.get(
       '/exports/embauches-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportEmbauchesCsv(app),
     );
     app.get(
       '/exports/candidatsByStructure-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportCandidatsByStructureCsv(app),
     );
     app.get(
       '/exports/cnfs-without-cra-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportConseillersWithoutCRACsv(app),
     );
     app.get(
       '/exports/structures-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportStructuresCsv(app),
     );
     app.get(
       '/exports/ruptures-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportRupturesCsv(app),
     );
     app.get(
       '/exports/cnfs-hub-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportConseillersHubCsv(app),
     );
     app.get(
       '/exports/statistiques-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportStatistiquesCsv(app),
     );
     app.get(
       '/exports/territoires-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportTerritoiresCsv(app),
     );
     app.get(
       '/exports/conseillers-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportConseillersCsv(app),
     );
     app.get(
       '/exports/liste-structures-csv',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getExportListeStructuresCsv(app),
     );

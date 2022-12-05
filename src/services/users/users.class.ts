@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
@@ -27,49 +27,49 @@ export default class Users extends Service {
 
     app.post('/refresh-token', getRefreshToken(app));
 
-    app.get('/custom-route-get', authenticate(app), getAccessibleData(app));
+    app.get('/custom-route-get', authenticateMode(app), getAccessibleData(app));
 
     app.get(
       '/custom-route-get-aggregate',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       getAccessibleDataAggregate(app),
     );
     app.patch(
       '/custom-route-update/:id',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       updateAccessibleData(app),
     );
     app.post(
       '/inviteAccountPrefet',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       postInvitationPrefet(app),
     );
     app.post(
       '/inviteAccountAdmin',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       postInvitationAdmin(app),
     );
     app.post(
       '/inviteStructure',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       postInvitationStructure(app),
     );
     app.get('/users/verifyToken/:token', verifyToken(app));
-    app.get('/users', authenticate(app), createAbilities, getUsers(app));
+    app.get('/users', authenticateMode(app), createAbilities, getUsers(app));
     app.post(
       '/inviteAccountHub',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       postInvitationHub(app),
     );
     app.post(
       '/inviteAccountGrandReseau',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities,
       postInvitationGrandReseau(app),
     );

@@ -5,7 +5,7 @@ import { Response, NextFunction } from 'express';
 import { IRequest } from '../ts/interfaces/global.interfaces';
 import { IUser } from '../ts/interfaces/db.interfaces';
 
-const authenticates =
+const authenticateMode =
   (app: Application) =>
   async (req: IRequest, res: Response, next: NextFunction) => {
     if (process.env.NODE_ENV === 'development') {
@@ -43,4 +43,4 @@ const authenticates =
     }
   };
 
-export default authenticates;
+export default authenticateMode;
