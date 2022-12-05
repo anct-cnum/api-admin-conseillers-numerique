@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 /* eslint-disable prettier/prettier */
 
-// Lancement de ce script : ts-node src\tools\populate\populate-grandReseau.ts -c <file>
+// Lancement de ce script : ts-node src/tools/populate/populate-grandReseau.ts -c <file>
 
 import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
+
+const  GrandsReseaux = require('../../../datas/imports/grands-reseaux.json');
 
 program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
@@ -17,7 +19,7 @@ const readCSV = async (filePath: any) => {
   return structures;
 };
 
-execute(async ({ app, logger, exit }) => {
+execute(__filename, async ({ app, logger, exit }) => {
   const matchStructure = (id: number) => app.service(service.structures).Model.findOne({ idPG: id });
 
   const options = program.opts();
@@ -31,6 +33,9 @@ execute(async ({ app, logger, exit }) => {
 
       if (match === null) {
         logger.warn(`Structure ${structure.ID} inexistante`);
+        reject();
+      } else if (GrandsReseaux.some((reseau: { valeur: string; }) => reseau.valeur === structure.RESEAU) === false) {
+        logger.warn(`Réseau incorrect pour la structure ${structure.ID}`);
         reject();
       } else {
         const s = await app.service(service.structures).Model.findOneAndUpdate(

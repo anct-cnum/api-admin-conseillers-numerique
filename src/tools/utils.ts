@@ -23,9 +23,31 @@ app.configure(services);
 app.configure(channels);
 app.hooks(appHooks);
 
-const transaction = null;
+let transaction = null;
 
-const execute = async (job: any) => {
+const execute = async (name: string, job: any) => {
+  if (config().sentry.enabled === 'true') {
+    Sentry.init({
+      dsn: config().sentry.dsn,
+      environment: config().sentry.environment,
+
+      // Set tracesSampleRate to 1.0 to capture 100%
+      // of transactions for performance monitoring.
+      // We recommend adjusting this value in production
+      tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
+    });
+    transaction = Sentry.startTransaction({
+      op: 'Lancement de script',
+      name,
+    });
+    app.use(Sentry.Handlers.errorHandler());
+    process.on('unhandledRejection', (e) => Sentry.captureException(e));
+    process.on('uncaughtException', (e) => Sentry.captureException(e));
+  } else {
+    process.on('unhandledRejection', (e) => logger.error(e));
+    process.on('uncaughtException', (e) => logger.error(e));
+  }
+
   const exit = async (error = null) => {
     if (error) {
       logger.error(error);

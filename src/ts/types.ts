@@ -8,6 +8,20 @@ type Roles =
   | 'hub_coop'
   | 'coordinateur_coop';
 
-type Reseau = 'Croix-Rouge' | 'Emmaüs Connect' | 'Groupe SOS' | 'La Poste';
+type Reseau =
+  | 'Croix-Rouge'
+  | 'Groupe SOS'
+  | 'Emmaüs Connect'
+  | 'La Poste'
+  | 'UNAF'
+  | 'La Ligue de l’enseignement'
+  | 'Familles rurales'
+  | 'FACE'
+  | 'PIMMS'
+  | 'APF Handicap'
+  | 'UNIJ'
+  | 'Conférération MJC'
+  | 'Régie de quartier'
+  | 'Chambres d’agriculture';
 
 export { Roles, Reseau };

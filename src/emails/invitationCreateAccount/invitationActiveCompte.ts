@@ -20,10 +20,8 @@ export default function (app: Application, mailer, req: IRequest) {
     render,
     send: async (user) => {
       const onSuccess = async () => {
-        await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
+        if (req === null) {
+          await app.service(service.users).Model.updateOne(
             { _id: user._id },
             {
               $set: {
@@ -36,18 +34,46 @@ export default function (app: Application, mailer, req: IRequest) {
               },
             },
           );
+        } else {
+          await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              { _id: user._id },
+              {
+                $set: {
+                  mailSentDate: new Date(),
+                  resend: !!user.mailSentDate,
+                },
+                $unset: {
+                  mailError: '',
+                  mailErrorDetail: '',
+                },
+              },
+            );
+        }
       };
       const onError = async (err: Error) => {
-        await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
+        if (req === null) {
+          await app.service(service.users).Model.updateOne(
             { _id: user._id },
             {
               mailError: 'smtpError',
               mailErrorDetail: err.message,
             },
           );
+        } else {
+          await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              { _id: user._id },
+              {
+                mailError: 'smtpError',
+                mailErrorDetail: err.message,
+              },
+            );
+        }
         throw err;
       };
 
