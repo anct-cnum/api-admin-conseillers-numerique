@@ -1,3 +1,5 @@
+const GrandsReseaux = require('../../datas/imports/grands-reseaux.json');
+
 type Roles =
   | 'admin'
   | 'anonyme'
@@ -8,20 +10,7 @@ type Roles =
   | 'hub_coop'
   | 'coordinateur_coop';
 
-type Reseau =
-  | 'Croix-Rouge'
-  | 'Groupe SOS'
-  | 'Emmaüs Connect'
-  | 'La Poste'
-  | 'UNAF'
-  | 'La Ligue de l’enseignement'
-  | 'Familles rurales'
-  | 'FACE'
-  | 'PIMMS'
-  | 'APF Handicap'
-  | 'UNIJ'
-  | 'Conférération MJC'
-  | 'Régie de quartier'
-  | 'Chambres d’agriculture';
+const mapReseau = GrandsReseaux.map((reseau: any) => reseau.valeur);
+type Reseau = typeof mapReseau[number];
 
 export { Roles, Reseau };

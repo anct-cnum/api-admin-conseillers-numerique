@@ -72,8 +72,7 @@ const execute = async (name: string, job: any) => {
     const duration = moment
       .utc(new Date().getTime() - launchTime)
       .format('HH:mm:ss.SSS');
-    // eslint-disable-next-line no-console
-    console.log(`Completed in ${duration}`);
+    logger.info(`Completed in ${duration}`);
     exit();
   } catch (e) {
     exit(e);
