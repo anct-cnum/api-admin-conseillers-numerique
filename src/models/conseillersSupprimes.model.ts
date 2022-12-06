@@ -9,7 +9,7 @@ const dbref = require('mongoose-dbref');
 const loaded = dbref.install(mongoose);
 
 export default function (app: Application): Model<any> {
-  const modelName = 'cras';
+  const modelName = 'conseillersSupprimes';
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const schema = new mongooseClient.Schema<ConseillersSupprimes>(
     {
