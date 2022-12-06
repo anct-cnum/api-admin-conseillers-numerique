@@ -1,7 +1,7 @@
 import feathers from '@feathersjs/feathers';
 import configuration from '@feathersjs/configuration';
 import express from '@feathersjs/express';
-import Sentry from '@sentry/node';
+import * as Sentry from '@sentry/node';
 import moment from 'moment';
 import logger from '../logger';
 import services from '../services';
