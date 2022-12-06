@@ -10,7 +10,7 @@ export default class MisesEnRelation extends Service {
     app.patch(
       '/misesEnRelation/:id',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       updateMiseEnRelation(app),
     );
   }

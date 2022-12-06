@@ -11,7 +11,7 @@ export default class Cras extends Service {
     app.get(
       '/cras/codesPostaux/structure',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getCodePostauxStructureCras(app),
     );
   }

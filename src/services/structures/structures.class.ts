@@ -20,55 +20,55 @@ export default class Structures extends Service {
     app.get(
       '/structures',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getStructures(app, options),
     );
     app.get(
       '/structure/:id',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getStructureById(app),
     );
     app.get(
       '/structure/details/:id',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getDetailStructureById(app),
     );
     app.patch(
       '/structure/:id',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       updateStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       verifySiretStructure(app),
     );
     app.patch(
       '/structure/siret/:id',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       updateSiretStructure(app),
     );
     app.patch(
       '/structure/email/:id',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       updateEmailStructure(app),
     );
     app.get(
       '/structures/:id/misesEnRelation',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getStructuresMisesEnRelations(app),
     );
     app.get(
       '/structures/:id/misesEnRelation/stats',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getStructuresMisesEnRelationsStats(app),
     );
   }

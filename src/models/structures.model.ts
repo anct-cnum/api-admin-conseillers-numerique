@@ -68,6 +68,8 @@ export default function (app: Application): Model<any> {
       userCreated: { type: Boolean },
 
       coselecAt: { type: Date },
+
+      reseau: { type: String },
     },
     { strict: false },
   );

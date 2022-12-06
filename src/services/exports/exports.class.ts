@@ -40,73 +40,73 @@ export class Exports implements ServiceMethods<Data> {
     app.get(
       '/exports/candidats-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportJeRecruteCsv(app),
     );
     app.get(
       '/exports/candidatsValidesStructure-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportCandidatsValideStructureCsv(app),
     );
     app.get(
       '/exports/embauches-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportEmbauchesCsv(app),
     );
     app.get(
       '/exports/candidatsByStructure-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportCandidatsByStructureCsv(app),
     );
     app.get(
       '/exports/cnfs-without-cra-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportConseillersWithoutCRACsv(app),
     );
     app.get(
       '/exports/structures-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportStructuresCsv(app),
     );
     app.get(
       '/exports/ruptures-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportRupturesCsv(app),
     );
     app.get(
       '/exports/cnfs-hub-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportConseillersHubCsv(app),
     );
     app.get(
       '/exports/statistiques-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportStatistiquesCsv(app),
     );
     app.get(
       '/exports/territoires-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportTerritoiresCsv(app),
     );
     app.get(
       '/exports/conseillers-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportConseillersCsv(app),
     );
     app.get(
       '/exports/liste-structures-csv',
       authenticate(app),
-      createAbilities,
+      createAbilities(app),
       getExportListeStructuresCsv(app),
     );
   }
