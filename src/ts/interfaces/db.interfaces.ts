@@ -376,7 +376,7 @@ export interface ICras {
 
 export interface ConseillersSupprimes {
   _id: ObjectId;
-  deleteAt: Date;
+  deletedAt: Date;
   motif: string;
   conseiller: object;
   actionUser: object;

@@ -16,7 +16,7 @@ export default function (app: Application): Model<any> {
       motif: { type: String },
       conseiller: { type: Object },
       actionUser: { type: Object },
-      deleteAt: { type: Date },
+      deletedAt: { type: Date },
     },
     { strict: false, collection: 'conseillersSupprimes' },
   );
