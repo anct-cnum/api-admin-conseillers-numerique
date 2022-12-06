@@ -31,8 +31,15 @@ execute(__filename, async ({ app, logger, exit }) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve, reject) => {
 
+      const userAlreadyPresent = await app.service(service.users).Model.countDocuments({
+        name: user.EMAIL.toLowerCase(),
+      });
+
       if (!user.EMAIL || !user.NOM || !user.PRENOM || GrandsReseaux.some((reseau: { valeur: string; }) => reseau.valeur === user.RESEAU) === false) {
         logger.warn(`Informations manquantes ou erronées pour : ${JSON.stringify(user)}`);
+        reject();
+      } else if (userAlreadyPresent > 0) {
+        logger.warn(`Email déjà présent : ${user.EMAIL.toLowerCase()}`);
         reject();
       } else {
         const userGR: IUser = await app.service(service.users).create({
