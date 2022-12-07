@@ -4,7 +4,7 @@ import creationCompteCandidat from './candidats/creationCompteCandidat';
 import invitationActiveCompte from './invitationCreateAccount/invitationActiveCompte';
 import candidatSupprimePix from './pix/candidatSupprimePix';
 
-export default function (app: Application, mailer, req: IRequest) {
+export default function (app: Application, mailer, req: IRequest = null) {
   const emails = [
     invitationActiveCompte(app, mailer, req),
     candidatSupprimePix(mailer),
