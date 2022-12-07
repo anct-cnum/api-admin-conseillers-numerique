@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import getConseillersStatutRecrute from './controllers/getConseillersRecruter';
 import getCandidatById from './controllers/getCandidatById';
@@ -15,8 +15,8 @@ export default class Conseillers extends Service {
     super(options);
     app.get(
       '/conseillers-recruter',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getConseillersStatutRecrute(app, options),
     );
     app.get(
@@ -27,8 +27,8 @@ export default class Conseillers extends Service {
     );
     app.get(
       '/candidat/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getCandidatById(app),
     );
     app.post(
@@ -45,14 +45,14 @@ export default class Conseillers extends Service {
     );
     app.get(
       '/conseiller/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getConseillerById(app),
     );
     app.get(
       '/candidat/:id/cv',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getCandidatCV(app),
     );
   }

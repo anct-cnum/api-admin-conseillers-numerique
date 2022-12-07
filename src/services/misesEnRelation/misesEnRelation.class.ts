@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import updateMiseEnRelation from './controllers/updateMiseEnRelation';
@@ -9,8 +9,8 @@ export default class MisesEnRelation extends Service {
     super(options);
     app.patch(
       '/misesEnRelation/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       updateMiseEnRelation(app),
     );
   }

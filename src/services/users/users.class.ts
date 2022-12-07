@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
@@ -27,50 +27,55 @@ export default class Users extends Service {
 
     app.post('/refresh-token', getRefreshToken(app));
 
-    app.get('/custom-route-get', authenticate(app), getAccessibleData(app));
+    app.get('/custom-route-get', authenticateMode(app), getAccessibleData(app));
 
     app.get(
       '/custom-route-get-aggregate',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getAccessibleDataAggregate(app),
     );
     app.patch(
       '/custom-route-update/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       updateAccessibleData(app),
     );
     app.post(
       '/inviteAccountPrefet',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       postInvitationPrefet(app),
     );
     app.post(
       '/inviteAccountAdmin',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       postInvitationAdmin(app),
     );
     app.post(
       '/inviteStructure',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       postInvitationStructure(app),
     );
     app.get('/users/verifyToken/:token', verifyToken(app));
-    app.get('/users', authenticate(app), createAbilities, getUsers(app));
+    app.get(
+      '/users',
+      authenticateMode(app),
+      createAbilities(app),
+      getUsers(app),
+    );
     app.post(
       '/inviteAccountHub',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       postInvitationHub(app),
     );
     app.post(
       '/inviteAccountGrandReseau',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       postInvitationGrandReseau(app),
     );
     // Sentry test
