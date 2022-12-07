@@ -9,7 +9,7 @@ import {
   Params,
   ServiceMethods,
 } from '@feathersjs/feathers';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
@@ -37,43 +37,43 @@ export class Stats implements ServiceMethods<Data> {
 
     app.get(
       '/stats/nationales/cras',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getStatsNationales(app),
     );
     app.get(
       '/stats/structure/cras',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getStatsStructure(app),
     );
     app.get(
       '/stats/conseiller/cras',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getStatsConseiller(app),
     );
     app.get(
       '/stats/datas/structures',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getDatasStructures(app, options),
     );
     app.get(
       '/stats/territoires',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getStatsTerritoires(app, options),
     );
     app.get(
       '/stats/territoire',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getStatsTerritoire(app),
     );
     app.get(
       '/stats/territoire/cra',
-      authenticate(app),
+      authenticateMode(app),
       createAbilities(app),
       getStatsTerritoireCra(app),
     );
