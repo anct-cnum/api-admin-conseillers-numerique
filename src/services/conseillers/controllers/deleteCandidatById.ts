@@ -23,7 +23,7 @@ const verificationCandidaturesRecrutee =
             .Model.accessibleBy(req.ability, action.read)
             .find({
               'conseiller.$id': profil._id,
-              statut: { $in: ['finalisee', 'recrutee'] },
+              statut: { $in: ['finalisee', 'recrutee', 'nouvelle_rupture'] },
             });
           if (misesEnRelations.length !== 0) {
             const misesEnRelationsFinalisees = await app
@@ -31,10 +31,11 @@ const verificationCandidaturesRecrutee =
               .Model.accessibleBy(req.ability, action.read)
               .findOne({
                 'conseiller.$id': profil._id,
-                statut: { $in: ['finalisee', 'recrutee'] },
+                statut: { $in: ['finalisee', 'recrutee', 'nouvelle_rupture'] },
               });
             const statut =
-              misesEnRelationsFinalisees.statut === 'finalisee'
+              misesEnRelationsFinalisees.statut === 'finalisee' ||
+              misesEnRelationsFinalisees.statut === 'nouvelle_rupture'
                 ? 'recrutée'
                 : 'validée';
             const structure = await app
@@ -51,7 +52,7 @@ const verificationCandidaturesRecrutee =
               `Le conseiller ${messageDoublon} par la structure ${structure.nom}, SIRET: ${messageSiret}`,
             );
           }
-          // Pour etre sure qu'il n'a pas d'espace COOP
+          // Vérification compte coop inexistant
           const usersCount = await app
             .service(service.users)
             .Model.accessibleBy(req.ability, action.read)
@@ -65,7 +66,7 @@ const verificationCandidaturesRecrutee =
             const messageDoublonCoop =
               idConvertString === `"${id}"` ? `` : `a un doublon qui`;
             throw new Error(
-              `Le conseiller ${messageDoublonCoop} a un compte COOP d'activer`,
+              `Le conseiller ${messageDoublonCoop} a un compte COOP d'activé`,
             );
           }
         }),
@@ -84,7 +85,15 @@ const archiverLaSuppression = (app) => async (tableauCandidat, user, motif) => {
       tableauCandidat.map(async (profil) => {
         try {
           // eslint-disable-next-line no-unused-vars
-          const { email, telephone, nom, prenom, ...conseiller } = profil;
+          const {
+            email,
+            telephone,
+            nom,
+            prenom,
+            emailPro,
+            telephonePro,
+            ...conseiller
+          } = profil;
           const objAnonyme = {
             deletedAt: new Date(),
             motif,
@@ -109,11 +118,6 @@ const suppressionTotalCandidat =
       await Promise.all(
         tableauCandidat.map(async (profil) => {
           try {
-            await pool.query(
-              `
-          DELETE FROM djapp_matching WHERE coach_id = $1`,
-              [profil.idPG],
-            );
             await pool.query(
               `
           DELETE FROM djapp_coach WHERE id = $1`,

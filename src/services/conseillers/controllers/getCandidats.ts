@@ -86,8 +86,7 @@ const getCandidats =
     });
 
     if (candidatValidation.error) {
-      res.statusMessage = candidatValidation.error.message;
-      res.status(400).end();
+      res.status(400).json({ message: candidatValidation.error.message });
       return;
     }
     const items: { total: number; data: object; limit: number; skip: number } =
