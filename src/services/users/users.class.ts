@@ -60,7 +60,11 @@ export default class Users extends Service {
       postInvitationStructure(app),
     );
     app.get('/users/verifyToken/:token', verifyToken(app));
-    app.get('/users', authenticateMode(app), createAbilities(app), getUsers(app));
+    app.get('/users',
+      authenticateMode(app),
+      createAbilities(app),
+      getUsers(app)
+    );
     app.post(
       '/inviteAccountHub',
       authenticateMode(app),
