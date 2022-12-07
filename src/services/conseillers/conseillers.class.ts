@@ -13,25 +13,25 @@ export default class Conseillers extends Service {
     app.get(
       '/conseillers-recruter',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getConseillersStatutRecrute(app, options),
     );
     app.get(
       '/candidat/:id',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getCandidatById(app),
     );
     app.get(
       '/conseiller/:id',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getConseillerById(app),
     );
     app.get(
       '/candidat/:id/cv',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getCandidatCV(app),
     );
   }

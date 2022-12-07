@@ -32,45 +32,45 @@ export default class Users extends Service {
     app.get(
       '/custom-route-get-aggregate',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getAccessibleDataAggregate(app),
     );
     app.patch(
       '/custom-route-update/:id',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       updateAccessibleData(app),
     );
     app.post(
       '/inviteAccountPrefet',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       postInvitationPrefet(app),
     );
     app.post(
       '/inviteAccountAdmin',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       postInvitationAdmin(app),
     );
     app.post(
       '/inviteStructure',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       postInvitationStructure(app),
     );
     app.get('/users/verifyToken/:token', verifyToken(app));
-    app.get('/users', authenticateMode(app), createAbilities, getUsers(app));
+    app.get('/users', authenticateMode(app), createAbilities(app), getUsers(app));
     app.post(
       '/inviteAccountHub',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       postInvitationHub(app),
     );
     app.post(
       '/inviteAccountGrandReseau',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       postInvitationGrandReseau(app),
     );
     // Sentry test

@@ -1,4 +1,5 @@
 /* eslint-disable prefer-const */
+import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
 import { action, functionnality, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
@@ -10,9 +11,8 @@ import {
 } from '../../commonQueriesFunctions';
 import { IHub } from '../../../ts/interfaces/json.interface';
 
-import app from '../../../app';
-
 const getStructureAndConseillerByDepartement = async (
+  app: Application,
   departementsHub: Array<string>,
 ) => {
   let structureAndConseillers: IStructuresConseillers[];
@@ -54,6 +54,7 @@ const getStructureAndConseillerByDepartement = async (
 };
 
 const getStructureAndConseillerByDepartementHubAntillesGuyane = async (
+  app: Application,
   departementsHub: Array<string>,
 ) => {
   try {
@@ -98,7 +99,11 @@ const getStructureAndConseillerByDepartementHubAntillesGuyane = async (
   }
 };
 
-export default async function hubRules(user: IUser, can) {
+export default async function hubRules(
+  app: Application,
+  user: IUser,
+  can: any,
+) {
   const hub: IHub = findDepartementOrRegion(user?.hub);
 
   let conseillersAndStructures: IStructuresConseillers[];
@@ -108,15 +113,18 @@ export default async function hubRules(user: IUser, can) {
   if (hub?.region_names) {
     const departementsList = findNumDepartementsByRegion(hub.region_names);
     conseillersAndStructures = await getStructureAndConseillerByDepartement(
+      app,
       departementsList,
     );
   } else if (hub.name === 'Hub Antilles-Guyane') {
     conseillersAndStructures =
       await getStructureAndConseillerByDepartementHubAntillesGuyane(
+        app,
         hub.departements,
       );
   } else {
     conseillersAndStructures = await getStructureAndConseillerByDepartement(
+      app,
       hub.departements,
     );
   }

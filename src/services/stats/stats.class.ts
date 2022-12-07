@@ -38,43 +38,43 @@ export class Stats implements ServiceMethods<Data> {
     app.get(
       '/stats/nationales/cras',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getStatsNationales(app),
     );
     app.get(
       '/stats/structure/cras',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getStatsStructure(app),
     );
     app.get(
       '/stats/conseiller/cras',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getStatsConseiller(app),
     );
     app.get(
       '/stats/datas/structures',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getDatasStructures(app, options),
     );
     app.get(
       '/stats/territoires',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getStatsTerritoires(app, options),
     );
     app.get(
       '/stats/territoire',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getStatsTerritoire(app),
     );
     app.get(
       '/stats/territoire/cra',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getStatsTerritoireCra(app),
     );
   }

@@ -301,7 +301,7 @@ export interface IStructures {
   estZRR: boolean;
   qpvStatut: string;
   qpvListe: Array<object>;
-  reseau: boolean;
+  reseau: Reseau;
 }
 
 interface IEtablissement {

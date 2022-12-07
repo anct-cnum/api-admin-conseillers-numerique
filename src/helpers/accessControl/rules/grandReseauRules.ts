@@ -1,11 +1,15 @@
+import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
-import app from '../../../app';
 import { getConseillersById } from '../../commonQueriesFunctions';
 
-export default async function grandReseauRules(user: IUser, can): Promise<any> {
+export default async function grandReseauRules(
+  app: Application,
+  user: IUser,
+  can: any,
+): Promise<any> {
   // Restreindre les permissions : les grands réseau ne peuvent voir que les informations des structures appartenant à leur organisation
   let structuresIds: ObjectId[];
   try {

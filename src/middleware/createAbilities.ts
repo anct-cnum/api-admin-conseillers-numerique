@@ -1,3 +1,4 @@
+import { Application } from '@feathersjs/express';
 import { AbilityBuilder, Ability } from '@casl/ability';
 import { Response } from 'express';
 import { IUser } from '../ts/interfaces/db.interfaces';
@@ -15,33 +16,33 @@ import {
   coordinateurRules,
 } from '../helpers/accessControl/rules';
 
-async function defineAbilitiesFor(user: IUser, role: Roles) {
+async function defineAbilitiesFor(app: Application, user: IUser, role: Roles) {
   const { can, build } = new AbilityBuilder(Ability);
 
   switch (role) {
     case 'admin':
-      adminRules(can);
+      adminRules(app, can);
       break;
     case 'anonyme':
-      anonymeRules(can);
+      anonymeRules(app, can);
       break;
     case 'structure':
-      await structureRules(user, can);
+      await structureRules(app, user, can);
       break;
     case 'prefet':
-      await prefetRules(user, can);
+      await prefetRules(app, user, can);
       break;
     case 'conseiller':
-      conseillerRules(user, can);
+      conseillerRules(app, user, can);
       break;
     case 'hub_coop':
-      await hubRules(user, can);
+      await hubRules(app, user, can);
       break;
     case 'grandReseau':
-      await grandReseauRules(user, can);
+      await grandReseauRules(app, user, can);
       break;
     case 'coordinateur_coop':
-      await coordinateurRules(user, can);
+      await coordinateurRules(app, user, can);
       break;
     default:
       break;
@@ -50,15 +51,14 @@ async function defineAbilitiesFor(user: IUser, role: Roles) {
   return build();
 }
 
-const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null);
+const ANONYMOUS_ABILITY = defineAbilitiesFor(null, null, null);
 
-export default async function createAbilities(
-  req: IRequest,
-  res: Response,
-  next,
-) {
-  req.ability = req.user?.name
-    ? await defineAbilitiesFor(req.user, req.query.role as Roles)
-    : ANONYMOUS_ABILITY;
-  next();
-}
+const createAbilities =
+  (app: Application) => async (req: IRequest, res: Response, next) => {
+    req.ability = req.user?.name
+      ? await defineAbilitiesFor(app, req.user, req.query.role as Roles)
+      : ANONYMOUS_ABILITY;
+    next();
+  };
+
+export default createAbilities;
