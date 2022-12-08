@@ -39,8 +39,25 @@ execute(__filename, async ({ app, logger, exit }) => {
         logger.warn(`Informations manquantes ou erronées pour : ${JSON.stringify(user)}`);
         reject();
       } else if (userAlreadyPresent > 0) {
-        logger.warn(`Email déjà présent : ${user.EMAIL.toLowerCase()}`);
-        reject();
+          await app.service(service.users).Model.updateOne(
+            { name: user.EMAIL.toLowerCase() },
+            {
+              reseau: user.RESEAU,
+              nom: user.NOM,
+              prenom: user.PRENOM,
+              token: uuidv4(),
+              tokenCreatedAt: new Date(),
+              mailSentDate: null,
+              migrationDashboard: true,
+              $push: {
+                roles: {
+                   $each: ['grandReseau'],
+                   $position: 0
+                }
+              }
+            });
+        logger.info(`Email déjà présent : ${user.EMAIL.toLowerCase()} - Rôle grandReseau ajouté`);
+        resolve(p);
       } else {
         const userGR: IUser = await app.service(service.users).create({
           name: user.EMAIL.toLowerCase(),
@@ -53,6 +70,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           tokenCreatedAt: new Date(),
           mailSentDate: null,
           passwordCreated: false,
+          migrationDashboard: true,
         });
         logger.info(`Utilisateur ${userGR.name} créé et associé au réseau ${userGR.reseau}`);
         resolve(p);
