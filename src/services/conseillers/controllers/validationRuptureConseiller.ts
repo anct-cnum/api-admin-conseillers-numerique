@@ -339,7 +339,10 @@ const validationRuptureConseiller =
           name: conseiller.email,
         });
       if (userCandidatAlreadyPresent !== null) {
-        conseillerRecruteReinscription(app, req)(users._id, conseiller._id);
+        await conseillerRecruteReinscription(app, req)(
+          users._id,
+          conseiller._id,
+        );
       }
       // Suppression compte Gandi
       if (login !== undefined) {
