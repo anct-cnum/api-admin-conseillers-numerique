@@ -29,7 +29,7 @@ const candidatRelanceInvitation =
         .findOne({ 'entity.$id': new ObjectId(idConseiller) });
       if (!conseillerUser) {
         res.status(404).json({
-          message: 'Le candidat ne possède pas de compte',
+          message: 'Le candidat ne possède pas de compte (doublon)',
         });
         return;
       }
