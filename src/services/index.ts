@@ -8,6 +8,8 @@ import stats from './stats/stats.service';
 import cras from './cras/cras.service';
 import statsTerritoires from './statsTerritoires/statsTerritoires.service';
 import statsConseillersCras from './statsConseillersCras/statsConseillersCras.service';
+import conseillersRuptures from './conseillersRuptures/conseillersRuptures.service';
+import permanences from './permanences/permanences.service';
 
 export default function (app: Application): void {
   app.configure(users);
@@ -19,4 +21,6 @@ export default function (app: Application): void {
   app.configure(cras);
   app.configure(statsTerritoires);
   app.configure(statsConseillersCras);
+  app.configure(conseillersRuptures);
+  app.configure(permanences);
 }

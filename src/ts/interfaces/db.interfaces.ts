@@ -338,6 +338,42 @@ interface IEntreprise {
   raison_sociale: string;
 }
 
+export interface IConseillersRuptures {
+  _id: ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
+  dateRupture: Date;
+  motifRupture: string;
+}
+
+export interface IPermanences {
+  _id: ObjectId;
+  estStructure: boolean;
+  nomEnseigne: string;
+  numeroTelephone: string;
+  email: string;
+  siteWeb: string;
+  siret: string;
+  adresse: {
+    numeroRue: string;
+    rue: string;
+    codePostal: string;
+    ville: string;
+  };
+  location: {
+    type: string;
+    coordinates: number[];
+  };
+  horaires: object[];
+  typeAcces: string[];
+  conseillers: ObjectId[];
+  lieuPrincipalPour: ObjectId[];
+  conseillersItinerants: ObjectId[];
+  structure: typeof DBRef;
+  updatedAt: Date;
+  updatedBy: Date;
+}
+
 export interface ICras {
   _id: ObjectId;
   cra: {
