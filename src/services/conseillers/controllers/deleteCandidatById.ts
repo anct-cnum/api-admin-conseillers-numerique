@@ -121,7 +121,7 @@ const suppressionTotalCandidat =
             await pool.query(
               `
           DELETE FROM djapp_matching WHERE coach_id = $1`,
-              [profil.idPG]
+              [profil.idPG],
             );
             await pool.query(
               `
