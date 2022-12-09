@@ -108,10 +108,10 @@ const getExportListeStructuresCsv =
       generateCsvListeStructures(structures, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.status(500).json(error.message);
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };

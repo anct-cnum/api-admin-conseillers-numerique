@@ -70,7 +70,7 @@ const getCandidatCV =
       };
       s3.getObject(params, function (error, data) {
         if (error) {
-          res.status(500).json('La récupération du cv a échoué.');
+          res.status(500).json({ message: 'La récupération du cv a échoué.' });
         } else {
           // Dechiffrement du CV (le buffer se trouve dans data.Body)
           const cryptoConfig = app.get('crypto');
@@ -98,10 +98,11 @@ const getCandidatCV =
       });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json('Accès refusé');
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.status(500).json(error.message);
+      res.status(500).json({ message: error.message });
+      throw new Error(error);
     }
   };
 

@@ -14,6 +14,7 @@ const getUsers = (app: Application) => async (req: IRequest, res: Response) => {
       .select({ name: 1, passwordCreated: 1 });
     res.status(200).json(user);
   } catch (error) {
+    res.status(500).json({ message: error.message });
     throw new Error(error);
   }
 };

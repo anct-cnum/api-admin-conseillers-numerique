@@ -18,8 +18,7 @@ const verifyToken =
       }
       res.send({ roles: user.roles, name: user.name });
     } catch (error) {
-      res.statusMessage = error.message;
-      res.status(500).end();
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };

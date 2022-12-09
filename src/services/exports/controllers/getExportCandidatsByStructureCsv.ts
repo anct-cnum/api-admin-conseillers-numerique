@@ -19,17 +19,15 @@ const getExportCandidatsByStructureCsv =
         })
         .collation({ locale: 'fr' })
         .sort({ 'conseillerObj.nom': 1, 'conseillerObj.prenom': 1 });
+      generateCsvCandidatByStructure(misesEnRelation, res, app);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.statusMessage = 'Accès refusé';
-        res.status(403).end();
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.statusMessage = error.message;
-      res.status(500).end();
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
-    generateCsvCandidatByStructure(misesEnRelation, res, app);
   };
 
 export default getExportCandidatsByStructureCsv;

@@ -49,4 +49,16 @@ const validExportConseillers = Joi.object({
   region: Joi.string().error(new Error('Le filtre region est invalide')),
 });
 
-export { validConseillers, validExportConseillers };
+const validCandidats = Joi.object({
+  skip: Joi.number().required().error(new Error('La pagination est invalide')),
+  searchByNomCandidat: Joi.string().error(
+    new Error('La recherche par nom est invalide'),
+  ),
+  departement: Joi.string().error(
+    new Error('Le filtre département est invalide'),
+  ),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
+  coms: Joi.string().error(new Error('Le filtre coms est invalide')),
+});
+
+export { validConseillers, validExportConseillers, validCandidats };

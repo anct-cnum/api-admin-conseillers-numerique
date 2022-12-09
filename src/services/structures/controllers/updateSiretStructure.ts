@@ -21,7 +21,7 @@ const updateSiretStructure =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
       if (!structure) {
-        res.status(404).json({ message: "La strutucture n'existe pas" });
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
       await pool.query(
