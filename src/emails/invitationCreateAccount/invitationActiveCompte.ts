@@ -1,8 +1,8 @@
 import { Application } from '@feathersjs/express';
+import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IUser } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
-import { action } from '../../helpers/accessControl/accessList';
 
 export default function (app: Application, mailer, req: IRequest) {
   const templateName = 'invitationActiveCompte';
