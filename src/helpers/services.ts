@@ -8,6 +8,7 @@ const service = {
   statsConseillersCras: 'statsConseillersCras',
   conseillersRuptures: 'conseillersRuptures',
   permanences: 'permanences',
+  conseillersSupprimes: 'conseillersSupprimes',
 };
 
 export default service;

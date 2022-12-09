@@ -10,6 +10,7 @@ import statsTerritoires from './statsTerritoires/statsTerritoires.service';
 import statsConseillersCras from './statsConseillersCras/statsConseillersCras.service';
 import conseillersRuptures from './conseillersRuptures/conseillersRuptures.service';
 import permanences from './permanences/permanences.service';
+import conseillersSupprimes from './conseillersSupprimes/conseillersSupprimes.service';
 
 export default function (app: Application): void {
   app.configure(users);
@@ -23,4 +24,5 @@ export default function (app: Application): void {
   app.configure(statsConseillersCras);
   app.configure(conseillersRuptures);
   app.configure(permanences);
+  app.configure(conseillersSupprimes);
 }

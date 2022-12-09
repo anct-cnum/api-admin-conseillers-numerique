@@ -124,7 +124,8 @@ const getConseillerById =
       if (error.name === 'ForbiddenError') {
         return res.status(403).json({ message: 'Accès refusé' });
       }
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
+      throw new Error(error);
     }
   };
 

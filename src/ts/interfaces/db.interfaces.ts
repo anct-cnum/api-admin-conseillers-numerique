@@ -410,6 +410,14 @@ export interface ICras {
   createdAt: Date;
 }
 
+export interface ConseillersSupprimes {
+  _id: ObjectId;
+  deletedAt: Date;
+  motif: string;
+  conseiller: object;
+  actionUser: object;
+}
+
 export interface IStatsTerritoires {
   date: string;
   nombreConseillersCoselec: number;

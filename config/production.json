@@ -1,6 +1,7 @@
 {
   "host": "HOST",
   "dashboard_hostname": "DASHBOARD_HOSTNAME",
+  "espace_candidat_hostname": "ESPACE_CANDIDAT_HOSTNAME",
   "port": "PORT",
   "public": "PUBLIC_HOSTNAME",
   "paginate": {
@@ -49,5 +50,10 @@
   "crypto": {
     "algorithm": "CRYPTO_ALGORITHM",
     "key": "CRYPTO_KEY"
-  }
+  },
+  "pix": {
+    "hostname": "PIX_HOSTNAME",
+    "contactMailing": "PIX_CONTACT_MAILING"
+  },
+  "sib_api_key": "SIB_API_KEY"
 }

@@ -83,6 +83,7 @@
 		"request": "^2.88.2",
 		"serve-favicon": "^2.5.0",
 		"shx": "^0.3.4",
+		"sib-api-v3-sdk": "^8.4.2",
 		"supertest": "^6.2.4",
 		"ts-migrate": "^0.1.31",
     "ts-node": "^10.9.1",

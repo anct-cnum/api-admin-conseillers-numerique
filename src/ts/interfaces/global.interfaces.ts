@@ -34,6 +34,7 @@ export interface Ressource {
   statsConseillersCras: string;
   conseillersRuptures: string;
   permanences: string;
+  conseillersSupprimes: string;
 }
 export interface IStructuresConseillers {
   _id: ObjectId;
