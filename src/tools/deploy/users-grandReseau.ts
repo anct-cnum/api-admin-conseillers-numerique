@@ -31,49 +31,50 @@ execute(__filename, async ({ app, logger, exit }) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve, reject) => {
 
-      const userAlreadyPresent = await app.service(service.users).Model.countDocuments({
-        name: user.EMAIL.toLowerCase(),
-      });
-
-      if (!user.EMAIL || !user.NOM || !user.PRENOM || GrandsReseaux.some((reseau: { valeur: string; }) => reseau.valeur === user.RESEAU) === false) {
-        logger.warn(`Informations manquantes ou erronées pour : ${JSON.stringify(user)}`);
-        reject();
-      } else if (userAlreadyPresent > 0) {
-          await app.service(service.users).Model.updateOne(
-            { name: user.EMAIL.toLowerCase() },
-            {
-              reseau: user.RESEAU,
-              nom: user.NOM,
-              prenom: user.PRENOM,
-              token: uuidv4(),
-              tokenCreatedAt: new Date(),
-              mailSentDate: null,
-              migrationDashboard: true,
-              $push: {
-                roles: {
-                   $each: ['grandReseau'],
-                   $position: 0
-                }
-              }
-            });
-        logger.info(`Email déjà présent : ${user.EMAIL.toLowerCase()} - Rôle grandReseau ajouté`);
-        resolve(p);
-      } else {
-        const userGR: IUser = await app.service(service.users).create({
+      try {
+        const userAlreadyPresent = await app.service(service.users).Model.countDocuments({
           name: user.EMAIL.toLowerCase(),
-          reseau: user.RESEAU,
-          nom: user.NOM,
-          prenom: user.PRENOM,
-          roles: ['grandReseau'],
-          password: uuidv4(),
-          token: uuidv4(),
-          tokenCreatedAt: new Date(),
-          mailSentDate: null,
-          passwordCreated: false,
-          migrationDashboard: true,
         });
-        logger.info(`Utilisateur ${userGR.name} créé et associé au réseau ${userGR.reseau}`);
-        resolve(p);
+
+        if (!user.EMAIL || !user.NOM || !user.PRENOM || GrandsReseaux.some((reseau: { valeur: string; }) => reseau.valeur === user.RESEAU) === false) {
+          logger.warn(`Informations manquantes ou erronées pour : ${JSON.stringify(user)}`);
+          reject();
+        } else if (userAlreadyPresent > 0) {
+            await app.service(service.users).Model.updateOne(
+              { name: user.EMAIL.toLowerCase() },
+              {
+                reseau: user.RESEAU,
+                nom: user.NOM,
+                prenom: user.PRENOM,
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
+                migrationDashboard: true,
+                $push: {
+                  roles: 'grandReseau'
+                }
+              });
+          logger.info(`Email déjà présent : ${user.EMAIL.toLowerCase()} - Rôle grandReseau ajouté`);
+          resolve(p);
+        } else {
+          const userGR: IUser = await app.service(service.users).create({
+            name: user.EMAIL.toLowerCase(),
+            reseau: user.RESEAU,
+            nom: user.NOM,
+            prenom: user.PRENOM,
+            roles: ['grandReseau'],
+            password: uuidv4(),
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+            passwordCreated: false,
+            migrationDashboard: true,
+          });
+          logger.info(`Utilisateur ${userGR.name} créé et associé au réseau ${userGR.reseau}`);
+          resolve(p);
+        }
+      } catch (e) {
+        logger.error(e.message);
       }
     });
     promises.push(p);

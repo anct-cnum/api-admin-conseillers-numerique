@@ -25,8 +25,8 @@ execute(__filename, async ({ app, logger, exit }) => {
     return;
   }
 
-  const allowedRoles = ['admin', 'structure', 'prefet', 'hub_coop', 'coordinateur_coop']; // pas de users grandReseau à migrer
-  // TODO WARNING ATTENTION POUR LES STRUCTURES à cause du mailSentDate à null (le CRON de l'ancien API va envoyer un mail inapproprié)
+  // pas de users existants grandReseau à migrer & 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
+  const allowedRoles = ['admin'];
 
   if (options.email) {
     const user: IUser = await app.service(service.users).Model.findOne({
@@ -76,17 +76,21 @@ execute(__filename, async ({ app, logger, exit }) => {
     users.forEach(async (user: IUser) => {
       // eslint-disable-next-line no-async-promise-executor
       const p = new Promise<void>(async (resolve) => {
-        await app.service(service.users).Model.updateOne(
-          { name: user.name },
-          {
-            token: uuidv4(),
-            tokenCreatedAt: new Date(),
-            mailSentDate: null,
-            migrationDashboard: true
-          }
-        );
-        logger.info(`Utilisateur ${user.name} invité au tableau de bord`);
-        resolve(p);
+        try {
+          await app.service(service.users).Model.updateOne(
+            { name: user.name },
+            {
+              token: uuidv4(),
+              tokenCreatedAt: new Date(),
+              mailSentDate: null,
+              migrationDashboard: true
+            }
+          );
+          logger.info(`Utilisateur ${user.name} invité au tableau de bord`);
+          resolve(p);
+        } catch (e) {
+          logger.error(e.message);
+        }
       });
       promises.push(p);
     });

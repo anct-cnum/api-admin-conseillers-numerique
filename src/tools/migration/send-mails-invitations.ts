@@ -41,9 +41,13 @@ execute(__filename, async ({ app, emails, logger, exit }) => {
   users.forEach(async (user: IUser) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve) => {
-      await messageInvitation.send(user);
-      logger.info(`Invitation envoyée pour ${user.name}`);
-      resolve(p);
+      try {
+        await messageInvitation.send(user);
+        logger.info(`Invitation envoyée pour ${user.name}`);
+        resolve(p);
+      } catch (e) {
+        logger.error(e.message);
+      }
     });
     promises.push(p);
   });
