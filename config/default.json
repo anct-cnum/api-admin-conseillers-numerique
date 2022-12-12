@@ -66,5 +66,19 @@
     "hostname": "PIX_HOSTNAME",
     "contactMailing": "PIX_CONTACT_MAILING"
   },
+  "mattermost": {
+    "endPoint": "MATTERMOST_ENDPOINT",
+    "login": "MATTERMOST_LOGIN",
+    "password": "MATTERMOST_PASSWORD",
+    "teamId": "MATTERMOST_TEAMID",
+    "themeChannelId": "MATTERMOST_THEME_CHANNEL_ID",
+    "resourcesChannelId": "MATTERMOST_RESOURCES_CHANNEL_ID",
+    "hubTeamId": "MATTERMOST_HUB_TEAM_ID"
+  },
+  "gandi": {
+    "token": "GANDI_TOKEN",
+    "endPoint": "GANDI_ENDPOINT",
+    "domain": "GANDI_DOMAIN"
+  },
   "sib_api_key": "SIB_API_KEY"
 }
