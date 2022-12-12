@@ -25,6 +25,7 @@ const getTotalConseillersRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    pieceManquante: boolean,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -34,6 +35,7 @@ const getTotalConseillersRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            pieceManquante,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -79,6 +81,7 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    pieceManquante: boolean,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -91,6 +94,7 @@ const getMisesEnRelationRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            pieceManquante,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -100,6 +104,7 @@ const getMisesEnRelationRecruter =
         $project: {
           _id: 0,
           statut: 1,
+          dossierIncompletRupture: 1,
           'conseillerObj.idPG': 1,
           'conseillerObj.prenom': 1,
           'conseillerObj.nom': 1,
@@ -127,6 +132,7 @@ const getConseillersStatutRecrute =
       searchByConseiller,
       searchByStructure,
       region,
+      pieceManquante,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -141,6 +147,7 @@ const getConseillersStatutRecrute =
       searchByConseiller,
       searchByStructure,
       region,
+      pieceManquante,
     });
 
     if (emailValidation.error) {
@@ -190,6 +197,7 @@ const getConseillersStatutRecrute =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        pieceManquante as boolean,
         sortColonne,
         skip as string,
         options.paginate.default,
@@ -197,7 +205,10 @@ const getConseillersStatutRecrute =
       misesEnRelation = await Promise.all(
         misesEnRelation.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.rupture = formatStatutMisesEnRelation(item.statut);
+          item.rupture = formatStatutMisesEnRelation(
+            item.statut,
+            item?.dossierIncompletRupture,
+          );
           item.idPG = item.conseillerObj?.idPG;
           item._id = item.conseillerObj?._id;
           item.nom = item.conseillerObj?.nom;
@@ -220,6 +231,7 @@ const getConseillersStatutRecrute =
           conseillers.map((conseiller) => conseiller.structureId),
           conseillerRecruter.map((conseiller) => conseiller._id),
           conseillerRupture.map((conseiller) => conseiller._id),
+          pieceManquante as boolean,
         );
         items.data = misesEnRelation;
         items.total = totalConseillers[0]?.count_conseillers;

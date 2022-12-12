@@ -24,7 +24,7 @@ export default class Conseillers extends Service {
     app.get(
       '/candidats',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getCandidats(app, options),
     );
     app.get(
@@ -36,13 +36,13 @@ export default class Conseillers extends Service {
     app.post(
       '/candidat/relance-invitation/:id',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       candidatRelanceInvitation(app),
     );
     app.delete(
       '/candidat/:id',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       deleteCandidatById(app),
     );
     app.get(

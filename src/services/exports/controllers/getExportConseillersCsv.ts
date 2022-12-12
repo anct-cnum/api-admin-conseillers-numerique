@@ -53,6 +53,7 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    pieceManquante: boolean,
     sortColonne: object,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -63,6 +64,7 @@ const getMisesEnRelationRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            pieceManquante,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -78,6 +80,7 @@ const getMisesEnRelationRecruter =
           'conseillerObj.emailCN.address': 1,
           dateRecrutement: 1,
           statut: 1,
+          dossierIncompletRupture: 1,
           'structureObj.idPG': 1,
           'structureObj._id': 1,
           'structureObj.nom': 1,
@@ -102,6 +105,7 @@ const getExportConseillersCsv =
       searchByConseiller,
       searchByStructure,
       region,
+      pieceManquante,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -115,6 +119,7 @@ const getExportConseillersCsv =
       searchByConseiller,
       searchByStructure,
       region,
+      pieceManquante,
     });
 
     if (emailValidation.error) {
@@ -157,6 +162,7 @@ const getExportConseillersCsv =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        pieceManquante as boolean,
         sortColonne,
       );
       misesEnRelation = await Promise.all(

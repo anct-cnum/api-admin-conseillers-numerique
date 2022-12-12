@@ -59,6 +59,7 @@ const getConseillerById =
                     dateRecrutement: 1,
                     dateRupture: 1,
                     motifRupture: 1,
+                    dossierIncompletRupture: 1,
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
                   },

@@ -92,28 +92,18 @@ export default function (app: Application): Model<any> {
       },
 
       mattermost: {
-        structure: {
-          error: { type: Boolean },
-          login: {
-            type: String,
-          },
-          id: { type: String },
-          errorResetPassword: { type: Boolean },
-          errorPatchLogin: { type: Boolean },
+        error: { type: Boolean },
+        login: {
+          type: String,
         },
+        id: { type: String },
+        errorResetPassword: { type: Boolean },
+        errorPatchLogin: { type: Boolean },
       },
-
       emailCN: {
-        structure: {
-          address: {
-            type: String,
-          },
-          deleteMailboxCNError: {
-            type: Boolean,
-          },
-        },
+        address: String,
+        deleteMailboxCNError: String,
       },
-
       emailCNError: { type: Boolean },
 
       resetPasswordCNError: { type: Boolean },

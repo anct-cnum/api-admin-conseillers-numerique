@@ -597,7 +597,10 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               'compte COOP non créé',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
-            formatStatutMisesEnRelation(miseEnRelation.statut),
+            formatStatutMisesEnRelation(
+              miseEnRelation.statut,
+              miseEnRelation?.dossierIncompletRupture,
+            ),
             formatDate(miseEnRelation?.dateRecrutement),
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),

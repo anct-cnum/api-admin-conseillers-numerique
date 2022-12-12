@@ -338,14 +338,6 @@ interface IEntreprise {
   raison_sociale: string;
 }
 
-export interface IConseillersRuptures {
-  _id: ObjectId;
-  conseillerId: ObjectId;
-  structureId: ObjectId;
-  dateRupture: Date;
-  motifRupture: string;
-}
-
 export interface IPermanences {
   _id: ObjectId;
   estStructure: boolean;
@@ -416,6 +408,14 @@ export interface ConseillersSupprimes {
   motif: string;
   conseiller: object;
   actionUser: object;
+}
+
+export interface ConseillersRuptures {
+  _id: ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
+  dateRupture: Date;
+  motifRupture: string;
 }
 
 export interface IStatsTerritoires {

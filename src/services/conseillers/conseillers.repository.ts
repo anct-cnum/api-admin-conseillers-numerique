@@ -14,10 +14,13 @@ const checkAccessReadRequestConseillers = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const formatStatutMisesEnRelation = (statut: string) => {
+const formatStatutMisesEnRelation = (
+  statut: string,
+  dossierIncompletRupture: boolean,
+) => {
   switch (statut) {
     case 'nouvelle_rupture':
-      return 'Rupture en cours';
+      return dossierIncompletRupture ? 'Pièces manquantes' : 'Rupture en cours';
     case 'finalisee_rupture':
       return 'Sans mission';
     case 'finalisee':
@@ -55,11 +58,17 @@ const filterDepartement = (departement: string) =>
 
 const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
 
+const filtrePieceManquante = (pieceManquante: boolean) =>
+  pieceManquante
+    ? { dossierIncompletRupture: true }
+    : { dossierIncompletRupture: { $exists: false } };
+
 const filterIsRuptureMisesEnRelation = (
   rupture: string,
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
   conseillerIdsRupture: ObjectId[],
+  pieceManquante: boolean,
 ) => {
   switch (rupture) {
     case 'nouvelle_rupture':
@@ -67,6 +76,7 @@ const filterIsRuptureMisesEnRelation = (
         statut: { $eq: rupture },
         'conseiller.$id': { $in: conseillerIdsRecruter },
         'structure.$id': { $in: structureIds },
+        ...filtrePieceManquante(pieceManquante),
       };
     case 'finalisee_rupture':
       return {

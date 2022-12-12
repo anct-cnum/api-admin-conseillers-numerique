@@ -164,21 +164,22 @@ const updateConseillerRupture =
   async (
     conseiller: IConseillers,
     miseEnRelation: IMisesEnRelation,
-    dateFinDeContrat: Date,
+    dateFinDeContrat: string,
   ) => {
     try {
       const objAnonyme = {
         conseillerId: conseiller._id,
         structureId: conseiller.structureId,
-        dateRupture: miseEnRelation.dateRupture,
+        dateRupture: new Date(dateFinDeContrat),
         motifRupture: miseEnRelation.motifRupture,
       };
+
       await app.service(service.conseillersRuptures).create(objAnonyme);
 
       const conseillerUpdate = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           { _id: conseiller._id },
           {
             $set: {
@@ -188,7 +189,7 @@ const updateConseillerRupture =
             $push: {
               ruptures: {
                 structureId: conseiller.structureId,
-                dateRupture: miseEnRelation.dateRupture,
+                dateRupture: new Date(dateFinDeContrat),
                 motifRupture: miseEnRelation.motifRupture,
               },
             },
@@ -202,7 +203,6 @@ const updateConseillerRupture =
               mattermost: '',
               resetPasswordCNError: '',
               codeRegionStructure: '',
-              dossierIncompletRupture: '',
             },
           },
           { returnOriginal: false },
@@ -261,8 +261,11 @@ const updateConseillerRupture =
           {
             $set: {
               statut: 'finalisee_rupture',
-              dateRupture: dateFinDeContrat,
+              dateRupture: new Date(dateFinDeContrat),
               conseillerObj: conseillerUpdate,
+            },
+            $unset: {
+              dossierIncompletRupture: '',
             },
           },
         );
@@ -383,7 +386,7 @@ const validationRuptureConseiller =
           .json({ message: errorSmtpMailRuptureStructure.message });
         return;
       }
-      res.send({ deleteSuccess: true });
+      res.send({ rupture: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

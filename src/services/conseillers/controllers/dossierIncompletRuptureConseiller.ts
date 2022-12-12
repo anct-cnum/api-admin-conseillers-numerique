@@ -8,15 +8,20 @@ import { action } from '../../../helpers/accessControl/accessList';
 const dossierIncompletRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
+    const { dateFinDeContrat } = req.body;
     try {
       await app
-        .service(service.conseillers)
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
-          { _id: new ObjectId(idConseiller) },
+          {
+            'conseiller.$id': new ObjectId(idConseiller),
+            statut: 'nouvelle_rupture',
+          },
           {
             $set: {
               dossierIncompletRupture: true,
+              dateRupture: new Date(dateFinDeContrat),
             },
           },
         );
