@@ -17,6 +17,30 @@
             <mj-text align="left">
               Veuillez trouver ci-joint la liste des conseillers numérique en rupture de contrat de travail.
             </mj-text>
+            <mj-table>
+              <tr style="border-bottom:1px solid;text-align:left;padding:15px 0;">
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th style="padding: 0 0 0 15px;">Adresse mail</th>
+              </tr>
+              <tr>
+                <td style="padding: 0 15px 0 0;">
+                  <mj-text>
+                    <%= conseiller.nom %>
+                  </mj-text>
+                </td>
+                <td style="padding: 0 15px;">
+                  <mj-text>
+                    <%= conseiller.prenom %>
+                  </mj-text>
+                </td>
+                <td style="padding: 0 0 0 15px;">
+                  <mj-text>
+                    <%= conseiller.email %>
+                  </mj-text>
+                </td>
+              </tr>
+            </mj-table>
             <mj-text align="left">
               Merci de bien vouloir supprimer leur accès Pix orga.
             </mj-text>
