@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable prettier/prettier */
 
-// Lancement de ce script : ts-node src/tools/migration/send-mails-invitations.ts
+// Lancement de ce script : ts-node src/tools/migration/send-mails-invitations.ts <option>
 
 import { program } from 'commander';
 import execute from '../utils';
@@ -19,6 +19,14 @@ execute(__filename, async ({ app, emails, logger, exit }) => {
     logger.error(`paramètre rôle manquant`);
     return;
   }
+
+    // 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
+    const allowedRoles = ['admin', 'grandReseau'];
+
+    if (allowedRoles.includes(options.role) === false) {
+      logger.warn(`Rôle ${options.role} non autorisé`);
+      return;
+    }
 
   const messageInvitation = emails.getEmailMessageByTemplateName('invitationActiveCompte');
 

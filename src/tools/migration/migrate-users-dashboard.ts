@@ -65,7 +65,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
     const users: IUser[] = await app.service(service.users).Model.find({
       roles: { $in: [options.role] },
-      migrationDashboard: { $ne: true } // utile notamment avec le multi rôle
+      migrationDashboard: { $ne: true } // Nécessaire pour n'inviter que les users autorisés & migrés & pas déjà invités (multi-rôles)
     }).limit(limit);
 
     if (users.length === 0) {
