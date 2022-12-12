@@ -86,7 +86,7 @@
 		"sib-api-v3-sdk": "^8.4.2",
 		"supertest": "^6.2.4",
 		"ts-migrate": "^0.1.31",
-    "ts-node": "^10.9.1",
+		"ts-node": "^10.9.1",
 		"uuid": "^8.3.2",
 		"winston": "^3.8.1"
 	},

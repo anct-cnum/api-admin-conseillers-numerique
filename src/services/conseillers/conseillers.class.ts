@@ -22,7 +22,7 @@ export default class Conseillers extends Service {
     app.get(
       '/candidats',
       authenticateMode(app),
-      createAbilities,
+      createAbilities(app),
       getCandidats(app, options),
     );
     app.get(
