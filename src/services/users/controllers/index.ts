@@ -11,6 +11,7 @@ import postInvitationPrefet from './postInvitationPrefet';
 import signIn from './signIn';
 import signOut from './signOut';
 import getRefreshToken from './getRefreshToken';
+import deleteAccountAdmin from './deleteAccountAdmin';
 // eslint-disable-next-line import/prefer-default-export
 export {
   getAccessibleData,
@@ -26,4 +27,5 @@ export {
   signIn,
   signOut,
   getRefreshToken,
+  deleteAccountAdmin,
 };
