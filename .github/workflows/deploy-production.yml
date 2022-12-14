@@ -1,12 +1,12 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Déploiement en recette
+name: Déploiement en production
 
 on:
   workflow_dispatch:
   push:
-    branches: [ recette ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
 
     - uses: 47ng/actions-clever-cloud@v1.2.0
       with:
-        appID: ${{ secrets.CLEVER_APP_ADMIN_API_RECETTE_ID }}
+        appID: ${{ secrets.CLEVER_APP_ADMIN_API_PRODUCTION_ID }}
         timeout: 300 #5 minutes before move on (in case of never exit even though a deployment is successful)
       env:
         CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -38,6 +38,6 @@ jobs:
         SENTRY_PROJECT: ${{ secrets.SENTRY_API_PILOTAGE_PROJECT }}
         SENTRY_URL: ${{ secrets.SENTRY_BETA_URL }}
       with:
-        environment: recette
+        environment: production
         ignore_missing: true
         ignore_empty: true
