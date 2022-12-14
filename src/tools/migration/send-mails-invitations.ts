@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable prettier/prettier */
 
 // Lancement de ce script : ts-node src/tools/migration/send-mails-invitations.ts <option>
 
@@ -20,29 +19,30 @@ execute(__filename, async ({ app, emails, logger, exit }) => {
     return;
   }
 
-    // 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
-    const allowedRoles = ['admin', 'grandReseau'];
+  // 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
+  const allowedRoles = ['admin', 'grandReseau'];
 
-    if (allowedRoles.includes(options.role) === false) {
-      logger.warn(`Rôle ${options.role} non autorisé`);
-      return;
-    }
+  if (allowedRoles.includes(options.role) === false) {
+    logger.warn(`Rôle ${options.role} non autorisé`);
+    return;
+  }
 
-  const messageInvitation = emails.getEmailMessageByTemplateName('invitationActiveCompte');
+  const messageInvitation = emails.getEmailMessageByTemplateName(
+    'invitationActiveCompte',
+  );
 
   const users: IUser[] = await app
-  .service(service.users)
-  .Model
-  .find({
-    roles: {$in: [options.role] },
-    mailSentDate: null,
-    migrationDashboard: true, // Nécessaire pour inviter que les users autorisés & migrés
-    token: { $ne: null }
-  })
-  .select({ name: 1, token: 1 });
+    .service(service.users)
+    .Model.find({
+      roles: { $in: [options.role] },
+      mailSentDate: null,
+      migrationDashboard: true, // Nécessaire pour inviter que les users autorisés & migrés
+      token: { $ne: null },
+    })
+    .select({ name: 1, token: 1 });
 
   if (users.length === 0) {
-    logger.info(`Aucun compte user restant à inviter pour ce rôle`)
+    logger.info(`Aucun compte user restant à inviter pour ce rôle`);
     return;
   }
 
@@ -54,7 +54,7 @@ execute(__filename, async ({ app, emails, logger, exit }) => {
         logger.info(`Invitation envoyée pour ${user.name}`);
         resolve(p);
       } catch (e) {
-        logger.error(e.message);
+        logger.error(e);
       }
     });
     promises.push(p);
