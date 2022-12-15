@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable prettier/prettier */
 
 // Lancement de ce script : ts-node src/tools/populate/populate-grandReseau.ts -c <file>
 
@@ -8,7 +7,7 @@ import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
 
-const  GrandsReseaux = require('../../../datas/imports/grands-reseaux.json');
+const GrandsReseaux = require('../../../datas/imports/grands-reseaux.json');
 
 program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
@@ -20,11 +19,22 @@ const readCSV = async (filePath: any) => {
 };
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const matchStructure = (id: number) => app.service(service.structures).Model.findOne({ idPG: id });
+  const matchStructure = (id: number) =>
+    app.service(service.structures).Model.findOne({ idPG: id });
 
   const options = program.opts();
   const structures = await readCSV(options.csv);
   const promises: Promise<void>[] = [];
+
+  // Nettoyage des flags réseau pour remise à plat
+  await app.service(service.structures).Model.updateMany(
+    {
+      reseau: { $exist: true },
+    },
+    {
+      $unset: { reseau: '' },
+    },
+  );
 
   structures.forEach(async (structure) => {
     // eslint-disable-next-line no-async-promise-executor
@@ -34,15 +44,21 @@ execute(__filename, async ({ app, logger, exit }) => {
       if (match === null) {
         logger.warn(`Structure ${structure.ID} inexistante`);
         reject();
-      } else if (GrandsReseaux.some((reseau: { valeur: string; }) => reseau.valeur === structure.RESEAU) === false) {
+      } else if (
+        GrandsReseaux.some(
+          (reseau: { valeur: string }) => reseau.valeur === structure.RESEAU,
+        ) === false
+      ) {
         logger.warn(`Réseau incorrect pour la structure ${structure.ID}`);
         reject();
       } else {
-        const s = await app.service(service.structures).Model.findOneAndUpdate(
-          { _id: match._id },
-          { $set: { reseau: structure.RESEAU } },
-          { returnOriginal: false },
-        );
+        const s = await app
+          .service(service.structures)
+          .Model.findOneAndUpdate(
+            { _id: match._id },
+            { $set: { reseau: structure.RESEAU } },
+            { returnOriginal: false },
+          );
         logger.info(`Structure ${s.nom} associé au réseau ${s.reseau}`);
         resolve(p);
       }
