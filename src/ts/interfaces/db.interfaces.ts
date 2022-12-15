@@ -301,7 +301,7 @@ export interface IStructures {
   estZRR: boolean;
   qpvStatut: string;
   qpvListe: Array<object>;
-  reseau: boolean;
+  reseau: Reseau;
 }
 
 interface IEtablissement {
@@ -372,6 +372,14 @@ export interface ICras {
   };
   conseiller: typeof DBRef;
   createdAt: Date;
+}
+
+export interface ConseillersSupprimes {
+  _id: ObjectId;
+  deletedAt: Date;
+  motif: string;
+  conseiller: object;
+  actionUser: object;
 }
 
 export interface IStatsTerritoires {

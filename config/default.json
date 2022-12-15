@@ -1,6 +1,7 @@
 {
   "host": "localhost",
   "dashboard_hostname": "http://localhost:3000",
+  "espace_candidat_hostname": "ESPACE_CANDIDAT_HOSTNAME",
   "port": 8080,
   "public": "https://www.conseiller-numerique.gouv.fr",
   "paginate": {
@@ -47,8 +48,8 @@
     "access_token_secret": "xxxxxxxxxx",
     "refresh_token_secret": "yyyyyyyyyy",
     "refresh_token_key": "refreshToken",
-    "access_token_duration": "30s",
-    "refresh_token_duration": "120s"
+    "access_token_duration": "1d",
+    "refresh_token_duration": "1d"
   },
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {
@@ -60,5 +61,10 @@
   "crypto": {
     "algorithm": "CRYPTO_ALGORITHM",
     "key": "CRYPTO_KEY"
-  }
+  },
+  "pix": {
+    "hostname": "PIX_HOSTNAME",
+    "contactMailing": "PIX_CONTACT_MAILING"
+  },
+  "sib_api_key": "SIB_API_KEY"
 }

@@ -14,6 +14,19 @@ const checkAccessReadRequestConseillers = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
+const formatStatutMisesEnRelation = (statut: string) => {
+  switch (statut) {
+    case 'nouvelle_rupture':
+      return 'Rupture en cours';
+    case 'finalisee_rupture':
+      return 'Sans mission';
+    case 'finalisee':
+      return 'En activité';
+    default:
+      return '';
+  }
+};
+
 const filterNomConseiller = (nom: string) => {
   return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
 };
@@ -37,27 +50,33 @@ const filterIsCoordinateur = (coordinateur: string) => {
   return {};
 };
 
+const filterDepartement = (departement: string) =>
+  departement ? { codeDepartement: departement } : {};
+
+const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
+
 const filterIsRuptureMisesEnRelation = (
   rupture: string,
-  conseillerIds: ObjectId[],
+  conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
+  conseillerIdsRupture: ObjectId[],
 ) => {
   switch (rupture) {
     case 'nouvelle_rupture':
       return {
         statut: { $eq: rupture },
-        'conseiller.$id': { $in: conseillerIds },
+        'conseiller.$id': { $in: conseillerIdsRecruter },
         'structure.$id': { $in: structureIds },
       };
     case 'finalisee_rupture':
       return {
         statut: { $eq: rupture },
-        'conseiller.$id': { $in: conseillerIds },
+        'conseiller.$id': { $in: conseillerIdsRupture },
       };
     case 'contrat':
       return {
         statut: { $eq: 'finalisee' },
-        'conseiller.$id': { $in: conseillerIds },
+        'conseiller.$id': { $in: conseillerIdsRecruter },
         'structure.$id': { $in: structureIds },
       };
     default:
@@ -66,13 +85,13 @@ const filterIsRuptureMisesEnRelation = (
           {
             $and: [
               { statut: { $eq: 'finalisee_rupture' } },
-              { 'conseiller.$id': { $in: conseillerIds } },
+              { 'conseiller.$id': { $in: conseillerIdsRupture } },
             ],
           },
           {
             $and: [
               { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
-              { 'conseiller.$id': { $in: conseillerIds } },
+              { 'conseiller.$id': { $in: conseillerIdsRecruter } },
               { 'structure.$id': { $in: structureIds } },
             ],
           },
@@ -116,10 +135,13 @@ const filterIsRuptureConseiller = (
 
 export {
   checkAccessReadRequestConseillers,
+  formatStatutMisesEnRelation,
   filterIsCoordinateur,
   filterNomConseiller,
   filterNomStructure,
   filterIsRuptureMisesEnRelation,
   filterIsRuptureConseiller,
   filterRegion,
+  filterDepartement,
+  filterComs,
 };

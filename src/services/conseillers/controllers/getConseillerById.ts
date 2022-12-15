@@ -59,6 +59,8 @@ const getConseillerById =
                     dateRecrutement: 1,
                     dateRupture: 1,
                     motifRupture: 1,
+                    'structureObj.idPG': 1,
+                    'structureObj.nom': 1,
                   },
                 },
               ],
@@ -121,7 +123,8 @@ const getConseillerById =
       if (error.name === 'ForbiddenError') {
         return res.status(403).json({ message: 'Accès refusé' });
       }
-      return res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
+      throw new Error(error);
     }
   };
 

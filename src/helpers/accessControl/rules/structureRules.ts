@@ -1,9 +1,13 @@
+import { Application } from '@feathersjs/express';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import app from '../../../app';
 import { getConseillersById } from '../../commonQueriesFunctions';
 
-export default async function structureRules(user: IUser, can): Promise<any> {
+export default async function structureRules(
+  app: Application,
+  user: IUser,
+  can: any,
+): Promise<any> {
   const conseillersIds = await getConseillersById(app)(user?.entity.oid);
 
   // Restreindre les permissions : les structures ne peuvent voir que les informations les concernant

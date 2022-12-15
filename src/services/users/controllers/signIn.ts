@@ -107,6 +107,13 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             },
           );
 
+          // A SUPPRIMER LORS DU DEPLOIEMENT DU PARCOURS SA
+          user.roles =
+            user.roles.includes('grandReseau') &&
+            user.roles.includes('structure')
+              ? user.roles.filter((role: string) => role !== 'structure')
+              : user.roles;
+
           // envoi de l'access token
           return res.status(200).json({ user, accessToken });
         } catch (error) {

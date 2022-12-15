@@ -14,6 +14,7 @@ import {
   formatAdresseStructure,
   formatQpv,
 } from '../structures/structures.repository';
+import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -573,6 +574,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Email Professionnelle',
       'Téléphone professionnel',
       'Email personnelle',
+      'Statut',
       'Date de recrutement',
       "Date d'entrée en formation",
       'Date de sortie de formation',
@@ -595,6 +597,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               'compte COOP non créé',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
+            formatStatutMisesEnRelation(miseEnRelation.statut),
             formatDate(miseEnRelation?.dateRecrutement),
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),

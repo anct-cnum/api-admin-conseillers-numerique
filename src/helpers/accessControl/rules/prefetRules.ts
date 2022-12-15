@@ -1,11 +1,11 @@
+import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import app from '../../../app';
 import service from '../../services';
 import { getConseillersById } from '../../commonQueriesFunctions';
 
-const getConseillersIds = async (user) => {
+const getConseillersIds = async (app: Application, user: IUser) => {
   try {
     let query = {};
     if (user?.region) {
@@ -35,8 +35,12 @@ const getConseillersIds = async (user) => {
   }
 };
 
-export default async function prefetRules(user: IUser, can): Promise<any> {
-  const conseillersIds = await getConseillersIds(user);
+export default async function prefetRules(
+  app: Application,
+  user: IUser,
+  can: any,
+): Promise<any> {
+  const conseillersIds = await getConseillersIds(app, user);
   // Restreindre les permissions : les prefets ne peuvent voir que les structures de leur departement ou région
   can([action.read], ressource.structures, {
     codeDepartement: String(user?.departement),

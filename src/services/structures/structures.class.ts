@@ -1,5 +1,5 @@
 import { Service, MongooseServiceOptions } from 'feathers-mongoose';
-import authenticate from '../../middleware/authenticate';
+import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import {
   getDetailStructureById,
@@ -19,56 +19,56 @@ export default class Structures extends Service {
     super(options);
     app.get(
       '/structures',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getStructures(app, options),
     );
     app.get(
       '/structure/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getStructureById(app),
     );
     app.get(
       '/structure/details/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getDetailStructureById(app),
     );
     app.patch(
       '/structure/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       updateStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       verifySiretStructure(app),
     );
     app.patch(
       '/structure/siret/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       updateSiretStructure(app),
     );
     app.patch(
       '/structure/email/:id',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       updateEmailStructure(app),
     );
     app.get(
       '/structures/:id/misesEnRelation',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getStructuresMisesEnRelations(app),
     );
     app.get(
       '/structures/:id/misesEnRelation/stats',
-      authenticate(app),
-      createAbilities,
+      authenticateMode(app),
+      createAbilities(app),
       getStructuresMisesEnRelationsStats(app),
     );
   }

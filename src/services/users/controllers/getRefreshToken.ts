@@ -26,7 +26,8 @@ const getRefreshToken =
         user,
       );
     } catch (error) {
-      return res.status(500).json(error.message);
+      res.status(500).json({ message: error.message });
+      throw new Error(error);
     }
     return true;
   };

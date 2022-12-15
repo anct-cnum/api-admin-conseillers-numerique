@@ -1,3 +1,5 @@
+const GrandsReseaux = require('../../datas/imports/grands-reseaux.json');
+
 type Roles =
   | 'admin'
   | 'anonyme'
@@ -8,6 +10,7 @@ type Roles =
   | 'hub_coop'
   | 'coordinateur_coop';
 
-type Reseau = 'Croix-Rouge' | 'Emmaüs Connect' | 'Groupe SOS' | 'La Poste';
+const mapReseau = GrandsReseaux.map((reseau: any) => reseau.valeur);
+type Reseau = typeof mapReseau[number];
 
 export { Roles, Reseau };

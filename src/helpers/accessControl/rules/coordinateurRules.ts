@@ -1,13 +1,14 @@
+import { Application } from '@feathersjs/express';
 import { action, ressource } from '../accessList';
 import {
   IUser,
   IConseillers,
   isArrayConseillers,
 } from '../../../ts/interfaces/db.interfaces';
-import app from '../../../app';
 import service from '../../services';
 
 const getConseillers = async (
+  app: Application,
   userId: string,
 ): Promise<IConseillers[] | Error> => {
   let conseiller: IConseillers;
@@ -53,11 +54,13 @@ const getConseillers = async (
 };
 
 export default async function coordinateurRules(
+  app: Application,
   user: IUser,
-  can,
+  can: any,
 ): Promise<any> {
   // Restreindre les permissions : les coordinateurs ne peuvent voir que les informations correspondant à leur profil conseiller
   const conseillers: IConseillers[] | Error = await getConseillers(
+    app,
     user.entity.oid,
   );
   if (isArrayConseillers(conseillers)) {
