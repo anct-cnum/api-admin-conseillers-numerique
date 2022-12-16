@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { DBRef, ObjectId } from 'mongodb';
 import { Application, authenticate } from '@feathersjs/express';
 import { Response, NextFunction } from 'express';
+import { ConnectContactLens } from 'aws-sdk';
 import { IRequest } from '../ts/interfaces/global.interfaces';
 import { IUser } from '../ts/interfaces/db.interfaces';
 
@@ -25,14 +26,18 @@ const authenticateMode =
             if (err) res.status(403).json('Jeton invalide');
             const connect = app.get('mongodb');
             const database = connect.substr(connect.lastIndexOf('/') + 1);
-            req.user = {
-              ...userDecoded,
-              entity: new DBRef(
-                'users',
-                new ObjectId(userDecoded.entity.$id),
-                database,
-              ),
-            };
+            if (userDecoded.entity) {
+              req.user = {
+                ...userDecoded,
+                entity: new DBRef(
+                  'users',
+                  new ObjectId(userDecoded.entity.$id),
+                  database,
+                ),
+              };
+            } else {
+              req.user = userDecoded;
+            }
           },
         );
       } catch (error) {
