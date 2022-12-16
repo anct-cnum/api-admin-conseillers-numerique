@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { DBRef, ObjectId } from 'mongodb';
 import { Application, authenticate } from '@feathersjs/express';
 import { Response, NextFunction } from 'express';
-import { ConnectContactLens } from 'aws-sdk';
 import { IRequest } from '../ts/interfaces/global.interfaces';
 import { IUser } from '../ts/interfaces/db.interfaces';
 
