@@ -58,8 +58,8 @@ const filterDepartement = (departement: string) =>
 
 const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
 
-const filtrePieceManquante = (pieceManquante: boolean) =>
-  pieceManquante
+const filtrePiecesManquantes = (piecesManquantes: boolean) =>
+  piecesManquantes
     ? { dossierIncompletRupture: true }
     : { dossierIncompletRupture: { $exists: false } };
 
@@ -68,7 +68,7 @@ const filterIsRuptureMisesEnRelation = (
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
   conseillerIdsRupture: ObjectId[],
-  pieceManquante: boolean,
+  piecesManquantes: boolean,
 ) => {
   switch (rupture) {
     case 'nouvelle_rupture':
@@ -76,7 +76,7 @@ const filterIsRuptureMisesEnRelation = (
         statut: { $eq: rupture },
         'conseiller.$id': { $in: conseillerIdsRecruter },
         'structure.$id': { $in: structureIds },
-        ...filtrePieceManquante(pieceManquante),
+        ...filtrePiecesManquantes(piecesManquantes),
       };
     case 'finalisee_rupture':
       return {

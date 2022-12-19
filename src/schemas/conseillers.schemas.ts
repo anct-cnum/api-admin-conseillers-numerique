@@ -23,7 +23,7 @@ const validConseillers = Joi.object({
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
   region: Joi.string().error(new Error('Le filtre region est invalide')),
-  pieceManquante: Joi.string().error(
+  piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
   ),
 });
@@ -50,7 +50,7 @@ const validExportConseillers = Joi.object({
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
   region: Joi.string().error(new Error('Le filtre region est invalide')),
-  pieceManquante: Joi.string().error(
+  piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
   ),
 });

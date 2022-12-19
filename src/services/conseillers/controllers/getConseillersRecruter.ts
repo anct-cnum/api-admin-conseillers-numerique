@@ -25,7 +25,7 @@ const getTotalConseillersRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
-    pieceManquante: boolean,
+    piecesManquantes: boolean,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -35,7 +35,7 @@ const getTotalConseillersRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
-            pieceManquante,
+            piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -81,7 +81,7 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
-    pieceManquante: boolean,
+    piecesManquantes: boolean,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -94,7 +94,7 @@ const getMisesEnRelationRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
-            pieceManquante,
+            piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
           $and: [checkAccess],
@@ -132,7 +132,7 @@ const getConseillersStatutRecrute =
       searchByConseiller,
       searchByStructure,
       region,
-      pieceManquante,
+      piecesManquantes,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -147,7 +147,7 @@ const getConseillersStatutRecrute =
       searchByConseiller,
       searchByStructure,
       region,
-      pieceManquante,
+      piecesManquantes,
     });
 
     if (emailValidation.error) {
@@ -197,7 +197,7 @@ const getConseillersStatutRecrute =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
-        pieceManquante as boolean,
+        piecesManquantes as boolean,
         sortColonne,
         skip as string,
         options.paginate.default,
@@ -231,7 +231,7 @@ const getConseillersStatutRecrute =
           conseillers.map((conseiller) => conseiller.structureId),
           conseillerRecruter.map((conseiller) => conseiller._id),
           conseillerRupture.map((conseiller) => conseiller._id),
-          pieceManquante as boolean,
+          piecesManquantes as boolean,
         );
         items.data = misesEnRelation;
         items.total = totalConseillers[0]?.count_conseillers;
