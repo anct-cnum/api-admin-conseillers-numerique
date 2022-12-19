@@ -26,7 +26,8 @@
 	"scripts": {
 		"test": "npm run jest",
 		"lint": "tsc --project tsconfig.json --noEmit && eslint src/. --ignore-path .gitignore",
-		"dev": "NODE_ENV=development nodemon src/index.ts",
+    "dev:ic": "nodemon src/index.ts",
+    "dev:local": "NODE_ENV=development nodemon src/index.ts",
 		"start": "npm run build && npm run copy-files && node dist/",
 		"jest": "jest --forceExit",
 		"copy-files": "copyfiles -u 1 src/**/*.mjml.ejs dist/",

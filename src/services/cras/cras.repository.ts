@@ -104,26 +104,27 @@ const getConseillersIdsByTerritoire = async (type, idType, app) => {
   return conseillersIds;
 };
 
-const getCodesPostauxStatistiquesCrasStructure = async (
-  conseillersId,
-  ability,
-  read,
-  app,
-) =>
-  app
-    .service(service.cras)
-    .Model.accessibleBy(ability, read)
-    .distinct('cra.codePostal', {
-      'conseiller.$id': {
-        $in: conseillersId,
+const getCodesPostauxStatistiquesCras =
+  (app, checkAccess) => async (conseillersId) =>
+    app.service(service.cras).Model.aggregate([
+      {
+        $match: {
+          'conseiller.$id': { $in: conseillersId },
+          $and: [checkAccess],
+        },
       },
-    });
+      {
+        $group: {
+          _id: { ville: '$cra.nomCommune', codePostal: '$cra.codePostal' },
+        },
+      },
+    ]);
 
 export {
   checkAccessRequestCras,
   getConseillersIdsByStructure,
   getConseillersIdsByTerritoire,
-  getCodesPostauxStatistiquesCrasStructure,
+  getCodesPostauxStatistiquesCras,
   getNombreCras,
   getNombreCrasByArrayConseillerId,
   getNombreAccompagnementsByArrayConseillerId,
