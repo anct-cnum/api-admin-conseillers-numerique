@@ -32,7 +32,9 @@ export interface Ressource {
   statsTerritoires: string;
   cras: string;
   statsConseillersCras: string;
+  permanences: string;
   conseillersSupprimes: string;
+  conseillersRuptures: string;
 }
 export interface IStructuresConseillers {
   _id: ObjectId;

@@ -66,12 +66,14 @@ export default function (app: Application) {
     }
   };
   const getPixContactMail = () => app.get('pix').contactMailing;
+  const getPixSupportMail = () => app.get('pix').supportMailing;
 
   const utils = {
     getPublicUrl,
     getDashboardUrl,
     initSentry,
     getPixContactMail,
+    getPixSupportMail,
     getEspaceCandidatUrl,
   };
   return {

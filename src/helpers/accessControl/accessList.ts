@@ -22,7 +22,9 @@ const ressource: Ressource = {
   statsTerritoires: 'statsTerritoires',
   cras: 'cras',
   statsConseillersCras: 'statsConseillersCras',
+  permanences: 'permanences',
   conseillersSupprimes: 'conseillersSupprimes',
+  conseillersRuptures: 'conseillersRuptures',
 };
 
 const functionnality: Functionnality = {

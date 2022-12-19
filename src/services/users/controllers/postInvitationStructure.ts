@@ -49,7 +49,7 @@ const postInvitationStructure =
         user,
       );
       if (errorSmtpMail instanceof Error) {
-        await deleteUser(app, service, req, action, email);
+        await deleteUser(app, req, email);
         res.status(503).json({
           message:
             "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",

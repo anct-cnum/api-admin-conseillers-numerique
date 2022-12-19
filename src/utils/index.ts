@@ -1,4 +1,7 @@
 /* eslint-disable no-bitwise */
+import { action } from '../helpers/accessControl/accessList';
+import service from '../helpers/services';
+
 /**
  * On cherche le bon coselec avec avis POSITIF :
  * 1/ Ce n'est pas forcément le dernier de toute la liste. Car parfois structure repassée
@@ -50,7 +53,7 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
-const deleteUser = async (app, service, req, action, email) => {
+const deleteUser = async (app, req, email) => {
   await app
     .service(service.users)
     .Model.accessibleBy(req.ability, action.delete)
