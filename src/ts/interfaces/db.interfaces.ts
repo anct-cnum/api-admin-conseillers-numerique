@@ -60,6 +60,8 @@ export interface IUser {
   toJSON(): string | object | Buffer;
 }
 export interface IMisesEnRelation {
+  _id: ObjectId;
+
   conseiller: typeof DBRef;
 
   structure: typeof DBRef;
@@ -83,6 +85,10 @@ export interface IMisesEnRelation {
   motifRupture: string | undefined;
 
   emetteurRupture: string | undefined;
+
+  resendMailCnfsRupture: boolean | undefined;
+
+  dossierIncompletRupture: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;

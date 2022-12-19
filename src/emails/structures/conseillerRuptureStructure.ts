@@ -1,22 +1,23 @@
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import { IMisesEnRelation } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { action } from '../../helpers/accessControl/accessList';
+import {
+  IMisesEnRelation,
+  IStructures,
+} from '../../ts/interfaces/db.interfaces';
 
 export default function (app: Application, mailer, req: IRequest) {
   const templateName = 'conseillerRuptureStructure';
 
-  const render = async (miseEnRelation: IMisesEnRelation) => {
-    return mailer.render(__dirname, templateName, {
-      miseEnRelation,
-    });
+  const render = async () => {
+    return mailer.render(__dirname, templateName);
   };
 
   return {
     templateName,
     render,
-    send: async (miseEnRelation) => {
+    send: async (miseEnRelation: IMisesEnRelation, structure: IStructures) => {
       const onSuccess = async () => {
         await app
           .service(service.misesEnRelation)
@@ -53,9 +54,9 @@ export default function (app: Application, mailer, req: IRequest) {
 
       return mailer
         .createMailer()
-        .sendEmail(miseEnRelation.structureObj.contact.email, {
+        .sendEmail(structure.contact.email, {
           subject: 'Demande de rupture de contrat avec votre CnFS',
-          body: await render(miseEnRelation),
+          body: await render(),
         })
         .then(onSuccess)
         .catch(onError);

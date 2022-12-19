@@ -64,16 +64,13 @@
   },
   "pix": {
     "hostname": "PIX_HOSTNAME",
-    "contactMailing": "PIX_CONTACT_MAILING"
+    "contactMailing": "PIX_CONTACT_MAILING",
+    "supportMailing": "PIX_SUPPORT_MAILING"
   },
   "mattermost": {
     "endPoint": "MATTERMOST_ENDPOINT",
     "login": "MATTERMOST_LOGIN",
-    "password": "MATTERMOST_PASSWORD",
-    "teamId": "MATTERMOST_TEAMID",
-    "themeChannelId": "MATTERMOST_THEME_CHANNEL_ID",
-    "resourcesChannelId": "MATTERMOST_RESOURCES_CHANNEL_ID",
-    "hubTeamId": "MATTERMOST_HUB_TEAM_ID"
+    "password": "MATTERMOST_PASSWORD"
   },
   "gandi": {
     "token": "GANDI_TOKEN",

@@ -26,6 +26,7 @@ export default function (mailer) {
         .sendEmail(utils.getPixContactMail(), {
           subject: 'Conseiller en rupture de contrat',
           body: await render(conseiller),
+          carbonCopy: utils.getPixSupportMail(),
         })
         .then(onSuccess)
         .catch(onError);

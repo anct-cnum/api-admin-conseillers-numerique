@@ -1,19 +1,22 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import axios from 'axios';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   IConseillers,
   IMisesEnRelation,
+  IStructures,
   IUser,
 } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import emails from '../../../emails/emails';
 import mailer from '../../../mailer';
+import deleteMailbox from '../../../utils/gandi';
+import deleteAccount from '../../../utils/mattermost';
 
 const { Pool } = require('pg');
+const { v4: uuidv4 } = require('uuid');
 
 const updateConseillersPG = (pool) => async (email, disponible) => {
   try {
@@ -25,102 +28,6 @@ const updateConseillersPG = (pool) => async (email, disponible) => {
       [email, disponible],
     );
   } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const loginAPI = async ({ mattermost }) => {
-  const resultLogin = await axios({
-    method: 'post',
-    url: `${mattermost.endPoint}/api/v4/users/login`,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: { login_id: mattermost.login, password: mattermost.password },
-  });
-
-  return resultLogin.request.res.headers.token;
-};
-
-const deleteAccount = (app, req) => async (conseiller) => {
-  const mattermost = app.get('mattermost');
-  try {
-    const token = await loginAPI({ mattermost });
-
-    // Query parameter permanent pour la suppression définitive (il faut que le paramètre ServiceSettings.EnableAPIUserDeletion soit configuré à true)
-    await axios({
-      method: 'delete',
-      url: `${mattermost.endPoint}/api/v4/users/${conseiller.mattermost?.id}?permanent=true`,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    await app
-      .service(service.conseillers)
-      .Model.accessibleBy(req.ability, action.update)
-      .updateOne(
-        { _id: conseiller._id },
-        {
-          $set: { 'mattermost.errorDeleteAccount': false },
-        },
-      );
-  } catch (error) {
-    await app
-      .service(service.conseillers)
-      .Model.accessibleBy(req.ability, action.update)
-      .updateOne(
-        { _id: conseiller._id },
-        {
-          $set: { 'mattermost.errorDeleteAccount': true },
-        },
-      );
-    throw new Error(error);
-  }
-};
-
-const deleteMailbox = (app, req) => async (conseillerId, login) => {
-  const gandi = app.get('gandi');
-  try {
-    // Récuperation de l'id mailbox associé au login pour 'delete'
-    const mailbox = await axios({
-      method: 'get',
-      url: `${gandi.endPoint}/mailboxes/${gandi.domain}?login=${login}`,
-      headers: {
-        Authorization: `Apikey ${gandi.token}`,
-      },
-    });
-
-    // Si trouvé : suppression de la boite mail
-    if (mailbox?.data.length === 1) {
-      await axios({
-        method: 'delete',
-        url: `${gandi.endPoint}/mailboxes/${gandi.domain}/${mailbox.data[0].id}`,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Apikey ${gandi.token}`,
-        },
-      });
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          { _id: conseillerId },
-          {
-            $set: { 'emailCN.deleteMailboxCNError': false },
-          },
-        );
-    }
-  } catch (error) {
-    await app
-      .service(service.conseillers)
-      .Model.accessibleBy(req.ability, action.update)
-      .updateOne(
-        { _id: conseillerId },
-        {
-          $set: { 'emailCN.deleteMailboxCNError': true },
-        },
-      );
     throw new Error(error);
   }
 };
@@ -203,6 +110,8 @@ const updateConseillerRupture =
               mattermost: '',
               resetPasswordCNError: '',
               codeRegionStructure: '',
+              codeDepartementStructure: '',
+              hasPermanence: '',
             },
           },
           { returnOriginal: false },
@@ -244,6 +153,7 @@ const updateConseillerRupture =
           {
             $pull: {
               conseillers: conseiller._id,
+              lieuPrincipalPour: conseiller._id,
               conseillersItinerants: conseiller._id,
             },
           },
@@ -288,6 +198,14 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "Le conseiller n'existe pas" });
         return;
       }
+      const structure: IStructures = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ structureId: conseiller.structureId });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
       const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -324,7 +242,7 @@ const validationRuptureConseiller =
       );
       if (!canCreate) {
         res.status(403).json({
-          message: `Accès refusé, vous n'êtes pas autorisé à validé la rupture d'un conseiller`,
+          message: `Accès refusé, vous n'êtes pas autorisé à valider la rupture d'un conseiller`,
         });
         return;
       }
@@ -355,6 +273,40 @@ const validationRuptureConseiller =
       if (conseiller.mattermost?.id !== undefined) {
         await deleteAccount(app, req)(conseiller);
       }
+      const userToUpdate = {
+        name: conseiller.email,
+        roles: ['candidat'],
+        token: uuidv4(),
+        tokenCreatedAt: new Date(),
+        mailSentDate: null, // pour le mécanisme de relance d'invitation candidat
+        passwordCreated: false,
+      };
+      if (users !== null && userCandidatAlreadyPresent === null) {
+        // Maj name si le compte coop a été activé
+        if (conseiller.email !== users.name) {
+          await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              { _id: users._id },
+              {
+                $set: { ...userToUpdate },
+              },
+            );
+        } else {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          const { name: _, ...userWithoutName } = userToUpdate; // nécessaire pour ne pas avoir d'erreur de duplicate key
+          await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              { _id: users._id },
+              {
+                $set: { ...userWithoutName },
+              },
+            );
+        }
+      }
       const mailerInstance = mailer(app);
       const messageRupturePix = emails(
         app,
@@ -376,7 +328,7 @@ const validationRuptureConseiller =
         req,
       ).getEmailMessageByTemplateName('conseillerRuptureStructure');
       const errorSmtpMailRuptureStructure = await messageRuptureStructure
-        .send(miseEnRelation)
+        .send(miseEnRelation, structure)
         .catch((errSmtp: Error) => {
           return errSmtp;
         });
