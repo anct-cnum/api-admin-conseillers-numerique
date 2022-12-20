@@ -18,7 +18,7 @@ import {
   conseillerRuptureStructure,
 } from '../../../emails';
 
-// const { Pool } = require('pg');
+const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 
 const updateConseillersPG = (pool) => async (email, disponible) => {
@@ -198,7 +198,7 @@ const validationRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     const { dateFinDeContrat } = req.body;
-    // const pool = new Pool();
+    const pool = new Pool();
     try {
       const conseiller: IConseillers = await app
         .service(service.conseillers)
@@ -245,7 +245,7 @@ const validationRuptureConseiller =
         0,
         conseiller.emailCN?.address?.lastIndexOf('@'),
       );
-      // await updateConseillersPG(pool)(conseiller.email, true);
+      await updateConseillersPG(pool)(conseiller.email, true);
       const canCreate = req.ability.can(
         action.create,
         ressource.conseillersRuptures,
@@ -277,14 +277,14 @@ const validationRuptureConseiller =
         );
         conseillerUpdated.userCreated = false;
       }
-      // // Suppression compte Gandi
-      // if (login !== undefined) {
-      //   await deleteMailbox(app, req)(conseiller._id, login);
-      // }
-      // // Suppression compte Mattermost
-      // if (conseiller.mattermost?.id !== undefined) {
-      //   await deleteAccount(app, req)(conseiller);
-      // }
+      // Suppression compte Gandi
+      if (login !== undefined) {
+        await deleteMailbox(app, req)(conseiller._id, login);
+      }
+      // Suppression compte Mattermost
+      if (conseiller.mattermost?.id !== undefined) {
+        await deleteAccount(app, req)(conseiller);
+      }
       const userToUpdate = {
         name: conseiller.email,
         roles: ['candidat'],
