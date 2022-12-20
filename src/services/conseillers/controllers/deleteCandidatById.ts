@@ -5,8 +5,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
-import emails from '../../../emails/emails';
 import mailer from '../../../mailer';
+import { candidatSupprimePix } from '../../../emails';
 
 const { Pool } = require('pg');
 const aws = require('aws-sdk');
@@ -235,11 +235,7 @@ const deleteCandidatById =
       }
       if (motif !== 'doublon') {
         const mailerInstance = mailer(app);
-        const message = emails(
-          app,
-          mailerInstance,
-          req,
-        ).getEmailMessageByTemplateName('candidatSupprimePix');
+        const message = candidatSupprimePix(mailerInstance);
         const errorSmtpMail = await message
           .send({ nom, prenom, email })
           .catch((errSmtp: Error) => {

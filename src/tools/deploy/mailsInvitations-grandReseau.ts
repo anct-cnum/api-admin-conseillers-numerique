@@ -7,14 +7,14 @@ import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { IUser } from '../../ts/interfaces/db.interfaces';
+import { invitationActiveCompte } from '../../emails';
 
 program.parse(process.argv);
 
-execute(__filename, async ({ app, emails, logger, exit }) => {
+execute(__filename, async ({ app, mailer, logger, exit }) => {
   const promises: Promise<void>[] = [];
 
-  const messageInvitation = emails.getEmailMessageByTemplateName('invitationActiveCompte');
-
+  const messageInvitation = invitationActiveCompte(app, mailer);
   const users: IUser[] = await app
   .service(service.users)
   .Model

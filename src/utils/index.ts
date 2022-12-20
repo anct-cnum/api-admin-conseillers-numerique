@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import { invitationActiveCompte } from '../emails';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 
@@ -60,13 +61,9 @@ const deleteUser = async (app, req, email) => {
     .deleteOne({ name: email.toLowerCase() });
 };
 
-const envoiEmailInvit = (app, req, mailer, emails, user) => {
+const envoiEmailInvit = (app, req, mailer, user) => {
   const mailerInstance = mailer(app);
-  const message = emails(
-    app,
-    mailerInstance,
-    req,
-  ).getEmailMessageByTemplateName('invitationActiveCompte');
+  const message = invitationActiveCompte(app, mailerInstance, req);
   return message.send(user).catch((errSmtp: Error) => errSmtp);
 };
 

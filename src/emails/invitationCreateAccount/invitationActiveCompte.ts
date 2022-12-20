@@ -4,7 +4,7 @@ import service from '../../helpers/services';
 import { IUser } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 
-export default function (app: Application, mailer, req: IRequest) {
+export default function (app: Application, mailer, req: IRequest = null) {
   const templateName = 'invitationActiveCompte';
   const { utils } = mailer;
 

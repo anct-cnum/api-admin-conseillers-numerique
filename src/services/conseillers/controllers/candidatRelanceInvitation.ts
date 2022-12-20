@@ -6,7 +6,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import mailer from '../../../mailer';
-import emails from '../../../emails/emails';
+import { creationCompteCandidat } from '../../../emails';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -48,11 +48,7 @@ const candidatRelanceInvitation =
           { returnOriginal: false },
         );
       const mailerInstance = mailer(app);
-      const message = emails(
-        app,
-        mailerInstance,
-        req,
-      ).getEmailMessageByTemplateName('creationCompteCandidat');
+      const message = creationCompteCandidat(app, mailerInstance, req);
       const errorSmtpMail = await message
         .send(users)
         .catch((errSmtp: Error) => {

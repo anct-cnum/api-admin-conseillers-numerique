@@ -9,7 +9,6 @@ import appHooks from '../app.hooks';
 import channels from '../channels';
 import authentication from '../authentication';
 import mongoose from '../mongoose';
-import createEmails from '../emails/emails';
 import createMailer from '../mailer';
 
 const config = configuration();
@@ -61,10 +60,9 @@ const execute = async (name: string, job: any) => {
     }, 1000);
   };
 
-  const mailerInstance = createMailer(app);
-  const emails = createEmails(app, mailerInstance);
+  const mailer = createMailer(app);
 
-  const jobComponents = { feathers: f, logger, exit, emails, app, Sentry };
+  const jobComponents = { feathers: f, logger, exit, mailer, app, Sentry };
 
   try {
     const launchTime = new Date().getTime();

@@ -5,7 +5,6 @@ import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserPrefet } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
-import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
@@ -39,13 +38,7 @@ const postInvitationPrefet =
         passwordCreated: false,
         ...localite,
       });
-      const errorSmtpMail = await envoiEmailInvit(
-        app,
-        req,
-        mailer,
-        emails,
-        user,
-      );
+      const errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
       if (errorSmtpMail instanceof Error) {
         await deleteUser(app, req, email);
         res.status(503).json({

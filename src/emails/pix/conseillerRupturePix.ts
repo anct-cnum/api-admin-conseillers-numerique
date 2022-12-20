@@ -23,11 +23,15 @@ export default function (mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(utils.getPixContactMail(), {
-          subject: 'Conseiller en rupture de contrat',
-          body: await render(conseiller),
-          carbonCopy: utils.getPixSupportMail(),
-        })
+        .sendEmail(
+          utils.getPixContactMail(),
+          {
+            subject: 'Conseiller en rupture de contrat',
+            body: await render(conseiller),
+          },
+          {},
+          utils.getPixSupportMail(),
+        )
         .then(onSuccess)
         .catch(onError);
     },

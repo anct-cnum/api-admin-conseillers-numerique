@@ -10,12 +10,15 @@ import {
 } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
-import emails from '../../../emails/emails';
 import mailer from '../../../mailer';
 import deleteMailbox from '../../../utils/gandi';
 import deleteAccount from '../../../utils/mattermost';
+import {
+  conseillerRupturePix,
+  conseillerRuptureStructure,
+} from '../../../emails';
 
-const { Pool } = require('pg');
+// const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 
 const updateConseillersPG = (pool) => async (email, disponible) => {
@@ -71,19 +74,19 @@ const updateConseillerRupture =
   async (
     conseiller: IConseillers,
     miseEnRelation: IMisesEnRelation,
-    dateFinDeContrat: string,
+    dateFinDeContrat: Date,
   ) => {
     try {
       const objAnonyme = {
         conseillerId: conseiller._id,
         structureId: conseiller.structureId,
-        dateRupture: new Date(dateFinDeContrat),
+        dateRupture: dateFinDeContrat,
         motifRupture: miseEnRelation.motifRupture,
       };
 
       await app.service(service.conseillersRuptures).create(objAnonyme);
 
-      const conseillerUpdate = await app
+      const conseillerUpdated = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
@@ -96,7 +99,7 @@ const updateConseillerRupture =
             $push: {
               ruptures: {
                 structureId: conseiller.structureId,
-                dateRupture: new Date(dateFinDeContrat),
+                dateRupture: dateFinDeContrat,
                 motifRupture: miseEnRelation.motifRupture,
               },
             },
@@ -148,6 +151,11 @@ const updateConseillerRupture =
                   $elemMatch: { $eq: conseiller._id },
                 },
               },
+              {
+                lieuPrincipalPour: {
+                  $elemMatch: { $eq: conseiller._id },
+                },
+              },
             ],
           },
           {
@@ -159,10 +167,10 @@ const updateConseillerRupture =
           },
         );
 
-      await app
+      const miseEnRelationUpdated: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             'conseiller.$id': conseiller._id,
             'structure.$id': conseiller.structureId,
@@ -172,13 +180,15 @@ const updateConseillerRupture =
             $set: {
               statut: 'finalisee_rupture',
               dateRupture: new Date(dateFinDeContrat),
-              conseillerObj: conseillerUpdate,
+              conseillerObj: conseillerUpdated,
             },
             $unset: {
               dossierIncompletRupture: '',
             },
           },
+          { returnOriginal: false },
         );
+      return { miseEnRelationUpdated, conseillerUpdated };
     } catch (error) {
       throw new Error(error);
     }
@@ -188,7 +198,7 @@ const validationRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     const { dateFinDeContrat } = req.body;
-    const pool = new Pool();
+    // const pool = new Pool();
     try {
       const conseiller: IConseillers = await app
         .service(service.conseillers)
@@ -201,7 +211,7 @@ const validationRuptureConseiller =
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ structureId: conseiller.structureId });
+        .findOne({ _id: conseiller.structureId });
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
@@ -211,12 +221,12 @@ const validationRuptureConseiller =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           'conseiller.$id': conseiller._id,
-          'structure.$id': conseiller.structureId,
+          'structure.$id': structure._id,
           statut: { $in: ['finalisee', 'nouvelle_rupture'] },
         });
       if (!miseEnRelation) {
         res.status(404).json({
-          message: `Aucune mise en relation finalisée entre la structure id ${conseiller.structureId} et le conseiller id ${conseiller._id}`,
+          message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
         });
         return;
       }
@@ -235,7 +245,7 @@ const validationRuptureConseiller =
         0,
         conseiller.emailCN?.address?.lastIndexOf('@'),
       );
-      await updateConseillersPG(pool)(conseiller.email, true);
+      // await updateConseillersPG(pool)(conseiller.email, true);
       const canCreate = req.ability.can(
         action.create,
         ressource.conseillersRuptures,
@@ -246,11 +256,12 @@ const validationRuptureConseiller =
         });
         return;
       }
-      await updateConseillerRupture(app, req)(
-        conseiller,
-        miseEnRelation,
-        dateFinDeContrat,
-      );
+      const { miseEnRelationUpdated, conseillerUpdated } =
+        await updateConseillerRupture(app, req)(
+          conseiller,
+          miseEnRelation,
+          dateFinDeContrat,
+        );
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
         .service(service.users)
@@ -264,15 +275,16 @@ const validationRuptureConseiller =
           users._id,
           conseiller._id,
         );
+        conseillerUpdated.userCreated = false;
       }
-      // Suppression compte Gandi
-      if (login !== undefined) {
-        await deleteMailbox(app, req)(conseiller._id, login);
-      }
-      // Suppression compte Mattermost
-      if (conseiller.mattermost?.id !== undefined) {
-        await deleteAccount(app, req)(conseiller);
-      }
+      // // Suppression compte Gandi
+      // if (login !== undefined) {
+      //   await deleteMailbox(app, req)(conseiller._id, login);
+      // }
+      // // Suppression compte Mattermost
+      // if (conseiller.mattermost?.id !== undefined) {
+      //   await deleteAccount(app, req)(conseiller);
+      // }
       const userToUpdate = {
         name: conseiller.email,
         roles: ['candidat'],
@@ -308,11 +320,7 @@ const validationRuptureConseiller =
         }
       }
       const mailerInstance = mailer(app);
-      const messageRupturePix = emails(
-        app,
-        mailerInstance,
-        req,
-      ).getEmailMessageByTemplateName('conseillerRupturePix');
+      const messageRupturePix = conseillerRupturePix(mailerInstance);
       const errorSmtpMailRupturePix = await messageRupturePix
         .send(conseiller)
         .catch((errSmtp: Error) => {
@@ -322,11 +330,11 @@ const validationRuptureConseiller =
         res.status(503).json({ message: errorSmtpMailRupturePix.message });
         return;
       }
-      const messageRuptureStructure = emails(
+      const messageRuptureStructure = conseillerRuptureStructure(
         app,
         mailerInstance,
         req,
-      ).getEmailMessageByTemplateName('conseillerRuptureStructure');
+      );
       const errorSmtpMailRuptureStructure = await messageRuptureStructure
         .send(miseEnRelation, structure)
         .catch((errSmtp: Error) => {
@@ -338,7 +346,7 @@ const validationRuptureConseiller =
           .json({ message: errorSmtpMailRuptureStructure.message });
         return;
       }
-      res.send({ rupture: true });
+      res.send({ miseEnRelationUpdated, conseillerUpdated });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
