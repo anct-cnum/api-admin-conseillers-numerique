@@ -8,11 +8,13 @@ import service from '../../helpers/services';
 import { IUser } from '../../ts/interfaces/db.interfaces';
 
 program.option('-r, --role <role>', 'Role');
+program.option('-l, --limit <limit>', 'Limite');
 program.parse(process.argv);
 
 execute(__filename, async ({ app, emails, logger, exit }) => {
   const promises: Promise<void>[] = [];
   const options = program.opts();
+  const limit = options.limit ? parseInt(options.limit, 10) : 1;
 
   if (!options.role) {
     logger.error(`paramètre rôle manquant`);
@@ -39,7 +41,8 @@ execute(__filename, async ({ app, emails, logger, exit }) => {
       migrationDashboard: true, // Nécessaire pour inviter que les users autorisés & migrés
       token: { $ne: null },
     })
-    .select({ name: 1, token: 1 });
+    .select({ name: 1, token: 1 })
+    .limit(limit);
 
   if (users.length === 0) {
     logger.info(`Aucun compte user restant à inviter pour ce rôle`);
