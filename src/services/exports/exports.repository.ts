@@ -373,7 +373,7 @@ const generateCsvSatistiques = async (
         statistiques.nbAccompagnementPerso +
         statistiques.nbDemandePonctuel -
         statistiques.nbParticipantsRecurrents
-      }\nAccompagnements total enregistrés (dont récurrent);${
+      }\nAccompagnements totaux enregistrés (dont récurrent);${
         statistiques.nbTotalParticipant +
         statistiques.nbAccompagnementPerso +
         statistiques.nbDemandePonctuel

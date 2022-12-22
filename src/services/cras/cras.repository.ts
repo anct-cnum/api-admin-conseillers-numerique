@@ -11,7 +11,10 @@ const checkAccessRequestCras = async (app: Application, req: IRequest) =>
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const getConseillersIdsByStructure = async (idStructure, app) => {
+const getConseillersIdsByStructure = async (
+  idStructure: ObjectId,
+  app: Application,
+) => {
   const miseEnRelations = await app.service(service.misesEnRelation).Model.find(
     {
       'structure.$id': idStructure,
@@ -105,7 +108,7 @@ const getConseillersIdsByTerritoire = async (type, idType, app) => {
 };
 
 const getCodesPostauxStatistiquesCras =
-  (app, checkAccess) => async (conseillersId) =>
+  (app, checkAccess) => async (conseillersId: ObjectId[]) =>
     app.service(service.cras).Model.aggregate([
       {
         $match: {
@@ -120,6 +123,30 @@ const getCodesPostauxStatistiquesCras =
       },
     ]);
 
+const createArrayForFiltreCodePostaux = (
+  listCodePostaux: Array<{ _id: { ville: string; codePostal: string } }>,
+) => {
+  const listeDefinitive: Array<{ id: string; codePostal: string[] }> = [];
+  listCodePostaux.forEach((paire) => {
+    if (
+      listeDefinitive.findIndex((item) => item.id === paire._id.codePostal) > -1
+    ) {
+      listeDefinitive
+        .find((item) => item.id === paire._id.codePostal)
+        .codePostal.push(`${paire._id.codePostal} - ${paire._id.ville}`);
+    } else {
+      listeDefinitive.push({
+        id: paire._id.codePostal,
+        codePostal: [`${paire._id.codePostal} - ${paire._id.ville}`],
+      });
+    }
+  });
+
+  listeDefinitive.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+
+  return listeDefinitive;
+};
+
 export {
   checkAccessRequestCras,
   getConseillersIdsByStructure,
@@ -128,4 +155,5 @@ export {
   getNombreCras,
   getNombreCrasByArrayConseillerId,
   getNombreAccompagnementsByArrayConseillerId,
+  createArrayForFiltreCodePostaux,
 };

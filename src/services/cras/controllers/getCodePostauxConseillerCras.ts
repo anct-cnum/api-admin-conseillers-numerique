@@ -6,12 +6,13 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   getCodesPostauxStatistiquesCras,
   checkAccessRequestCras,
+  createArrayForFiltreCodePostaux,
 } from '../cras.repository';
 
 const getCodePostauxConseillerCras =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idConseiller = new ObjectId(String(req.query.id));
+      const idConseiller = new ObjectId(req.query.id);
 
       const checkAccess = checkAccessRequestCras(app, req);
       const listCodePostaux = await getCodesPostauxStatistiquesCras(
@@ -19,25 +20,7 @@ const getCodePostauxConseillerCras =
         checkAccess,
       )([idConseiller]);
 
-      const listeDefinitive = [];
-      listCodePostaux.forEach((paire) => {
-        if (
-          listeDefinitive.findIndex(
-            (item) => item.id === paire._id.codePostal,
-          ) > -1
-        ) {
-          listeDefinitive
-            .find((item) => item.id === paire._id.codePostal)
-            .codePostal.push(`${paire._id.codePostal} - ${paire._id.ville}`);
-        } else {
-          listeDefinitive.push({
-            id: paire._id.codePostal,
-            codePostal: [`${paire._id.codePostal} - ${paire._id.ville}`],
-          });
-        }
-      });
-
-      listeDefinitive.sort((a, b) => a.id - b.id);
+      const listeDefinitive = createArrayForFiltreCodePostaux(listCodePostaux);
 
       res.status(200).json(listeDefinitive);
     } catch (error) {
