@@ -5,18 +5,16 @@ import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { action } from '../../helpers/accessControl/accessList';
 
 export default function (app: Application, mailer, req: IRequest) {
-  const templateName = 'creationCompteCandidat';
   const { utils } = mailer;
 
   const render = async (user: IUser) => {
-    return mailer.render(__dirname, templateName, {
+    return mailer.render(__dirname, {
       user,
       link: utils.getEspaceCandidatUrl(`/inscription/${user.token}`),
     });
   };
 
   return {
-    templateName,
     render,
     send: async (user) => {
       const onSuccess = async () => {

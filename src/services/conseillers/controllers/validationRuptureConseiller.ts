@@ -179,8 +179,7 @@ const updateConseillerRupture =
               statut: 'finalisee_rupture',
               dateRupture: new Date(dateFinDeContrat),
               conseillerObj: conseillerUpdated,
-              validationRupture: new Date(),
-              auteurRupture: req.user?.name,
+              validateurRupture: { email: req.user?.name, date: new Date() },
             },
             $unset: {
               dossierIncompletRupture: '',

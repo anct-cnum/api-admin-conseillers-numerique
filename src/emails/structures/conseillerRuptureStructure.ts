@@ -8,14 +8,11 @@ import {
 } from '../../ts/interfaces/db.interfaces';
 
 export default function (app: Application, mailer, req: IRequest) {
-  const templateName = 'conseillerRuptureStructure';
-
   const render = async () => {
-    return mailer.render(__dirname, templateName);
+    return mailer.render(__dirname);
   };
 
   return {
-    templateName,
     render,
     send: async (miseEnRelation: IMisesEnRelation, structure: IStructures) => {
       const onSuccess = async () => {

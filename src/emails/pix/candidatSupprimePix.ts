@@ -1,15 +1,13 @@
 import logger from '../../logger';
 
 export default function (mailer) {
-  const templateName = 'candidatSupprimePix';
   const { utils } = mailer;
 
   const render = async (candidat) => {
-    return mailer.render(__dirname, templateName, { candidat });
+    return mailer.render(__dirname, { candidat });
   };
 
   return {
-    templateName,
     render,
     send: async (candidat) => {
       const onSuccess = async () => {

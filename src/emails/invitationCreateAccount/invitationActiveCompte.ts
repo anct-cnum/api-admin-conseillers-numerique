@@ -5,18 +5,16 @@ import { IUser } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 
 export default function (app: Application, mailer, req: IRequest = null) {
-  const templateName = 'invitationActiveCompte';
   const { utils } = mailer;
 
   const render = async (user: IUser) => {
-    return mailer.render(__dirname, templateName, {
+    return mailer.render(__dirname, {
       user,
       link: utils.getDashboardUrl(`/invitation/${user.token}`),
     });
   };
 
   return {
-    templateName,
     render,
     send: async (user) => {
       const onSuccess = async () => {
