@@ -125,8 +125,6 @@ const updateConseillerRupture =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            estCoordinateur: true,
-            statut: 'RECRUTE',
             'listeSubordonnes.type': 'conseillers',
             'listeSubordonnes.liste': {
               $elemMatch: { $eq: conseiller._id },
@@ -174,13 +172,15 @@ const updateConseillerRupture =
           {
             'conseiller.$id': conseiller._id,
             'structure.$id': conseiller.structureId,
-            statut: { $in: ['finalisee', 'nouvelle_rupture'] },
+            statut: { $eq: 'nouvelle_rupture' },
           },
           {
             $set: {
               statut: 'finalisee_rupture',
               dateRupture: new Date(dateFinDeContrat),
               conseillerObj: conseillerUpdated,
+              validationRupture: new Date(),
+              auteurRupture: req.user?.name,
             },
             $unset: {
               dossierIncompletRupture: '',
@@ -222,7 +222,7 @@ const validationRuptureConseiller =
         .findOne({
           'conseiller.$id': conseiller._id,
           'structure.$id': structure._id,
-          statut: { $in: ['finalisee', 'nouvelle_rupture'] },
+          statut: { $eq: 'nouvelle_rupture' },
         });
       if (!miseEnRelation) {
         res.status(404).json({
@@ -230,14 +230,14 @@ const validationRuptureConseiller =
         });
         return;
       }
-      const users: IUser = await app
+      const userCoop: IUser = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           roles: { $in: ['conseiller'] },
           'entity.$id': conseiller._id,
         });
-      if (!users) {
+      if (!userCoop) {
         res.status(404).json({ message: "L'utilisateur n'existe pas" });
         return;
       }
@@ -272,7 +272,7 @@ const validationRuptureConseiller =
         });
       if (userCandidatAlreadyPresent !== null) {
         await conseillerRecruteReinscription(app, req)(
-          users._id,
+          userCoop._id,
           conseiller._id,
         );
         conseillerUpdated.userCreated = false;
@@ -293,14 +293,14 @@ const validationRuptureConseiller =
         mailSentDate: null, // pour le mécanisme de relance d'invitation candidat
         passwordCreated: false,
       };
-      if (users !== null && userCandidatAlreadyPresent === null) {
+      if (userCoop !== null && userCandidatAlreadyPresent === null) {
         // Maj name si le compte coop a été activé
-        if (conseiller.email !== users.name) {
+        if (conseiller.email !== userCoop.name) {
           await app
             .service(service.users)
             .Model.accessibleBy(req.ability, action.update)
             .updateOne(
-              { _id: users._id },
+              { _id: userCoop._id },
               {
                 $set: { ...userToUpdate },
               },
@@ -312,7 +312,7 @@ const validationRuptureConseiller =
             .service(service.users)
             .Model.accessibleBy(req.ability, action.update)
             .updateOne(
-              { _id: users._id },
+              { _id: userCoop._id },
               {
                 $set: { ...userWithoutName },
               },
