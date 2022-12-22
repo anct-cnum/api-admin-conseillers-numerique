@@ -1,4 +1,4 @@
 import getCodePostauxStructureCras from './getCodePostauxStructureCras';
+import getCodePostauxConseillerCras from './getCodePostauxConseillerCras';
 
-// eslint-disable-next-line import/prefer-default-export
-export { getCodePostauxStructureCras };
+export { getCodePostauxStructureCras, getCodePostauxConseillerCras };
