@@ -105,8 +105,6 @@ const updateConseillerRupture =
             },
             $unset: {
               estRecrute: '',
-              datePrisePoste: '',
-              dateFinFormation: '',
               structureId: '',
               emailCNError: '',
               emailCN: '',

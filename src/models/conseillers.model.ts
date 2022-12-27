@@ -41,7 +41,7 @@ export default function (app: Application): Model<any> {
       codePostal: { type: String },
 
       location: {
-        structure: { type: String },
+        type: { type: String },
         coordinates: { type: String },
       },
 
@@ -67,14 +67,12 @@ export default function (app: Application): Model<any> {
       userCreated: { type: Boolean },
 
       pix: {
-        structure: {
-          partage: { type: Boolean },
-          datePartage: { type: Date },
-          palier: { type: Number },
-          competence1: { type: Boolean },
-          competence2: { type: Boolean },
-          competence3: { type: Boolean },
-        },
+        partage: { type: Boolean },
+        datePartage: { type: Date },
+        palier: { type: Number },
+        competence1: { type: Boolean },
+        competence2: { type: Boolean },
+        competence3: { type: Boolean },
       },
 
       sondageToken: { type: String },
@@ -87,7 +85,7 @@ export default function (app: Application): Model<any> {
       structureId: { type: 'ObjectId' },
 
       codeCom: {
-        type: Date,
+        type: String,
         required: false,
       },
 

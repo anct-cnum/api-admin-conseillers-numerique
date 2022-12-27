@@ -128,7 +128,7 @@ export interface IConseillers {
   codePostal: string;
 
   location: {
-    structure: string;
+    type: string;
     coordinates: string;
   };
 
@@ -154,7 +154,7 @@ export interface IConseillers {
 
   structureId?: Types.ObjectId;
 
-  codeCom: Date;
+  codeCom: string;
 
   mattermost: {
     error: boolean;
