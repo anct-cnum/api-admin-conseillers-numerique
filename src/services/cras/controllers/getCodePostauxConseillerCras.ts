@@ -4,26 +4,21 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
 import {
-  getConseillersIdsByStructure,
   getCodesPostauxStatistiquesCras,
   checkAccessRequestCras,
   createArrayForFiltreCodePostaux,
 } from '../cras.repository';
 
-const getCodePostauxStructureCras =
+const getCodePostauxConseillerCras =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idStructure = new ObjectId(req.query.id);
+      const idConseiller = new ObjectId(req.query.id);
 
-      const conseillersIds = await getConseillersIdsByStructure(
-        idStructure,
-        app,
-      );
       const checkAccess = checkAccessRequestCras(app, req);
       const listCodePostaux = await getCodesPostauxStatistiquesCras(
         app,
         checkAccess,
-      )(conseillersIds);
+      )([idConseiller]);
 
       const listeDefinitive = createArrayForFiltreCodePostaux(listCodePostaux);
 
@@ -38,4 +33,4 @@ const getCodePostauxStructureCras =
     }
   };
 
-export default getCodePostauxStructureCras;
+export default getCodePostauxConseillerCras;

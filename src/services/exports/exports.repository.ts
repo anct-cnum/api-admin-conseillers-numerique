@@ -373,7 +373,7 @@ const generateCsvSatistiques = async (
         statistiques.nbAccompagnementPerso +
         statistiques.nbDemandePonctuel -
         statistiques.nbParticipantsRecurrents
-      }\nAccompagnements total enregistrés (dont récurrent);${
+      }\nAccompagnements totaux enregistrés (dont récurrent);${
         statistiques.nbTotalParticipant +
         statistiques.nbAccompagnementPerso +
         statistiques.nbDemandePonctuel
@@ -409,7 +409,7 @@ const generateCsvSatistiques = async (
       '',
     ];
     const statsLieux = [
-      `\nLieux des accompagnements (en %)'`,
+      `\nCanaux d'accompagnements (en %)'`,
       ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
         (statLieux, index) =>
           `\n${statLieux};${statistiques.statsLieux[index].valeur}`,

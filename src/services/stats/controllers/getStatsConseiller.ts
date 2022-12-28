@@ -22,6 +22,13 @@ const getStatsConseiller =
         'conseiller.$id': { $eq: idConseiller },
       };
 
+      if (req.query?.codePostal !== '' && req.query?.codePostal !== 'null') {
+        query['cra.codePostal'] = req.query?.codePostal;
+      }
+      if (req.query?.ville !== '' && req.query?.ville !== 'null') {
+        query['cra.nomCommune'] = req.query?.ville;
+      }
+
       const donneesStats = await getStatsGlobales(
         query,
         req.ability,
