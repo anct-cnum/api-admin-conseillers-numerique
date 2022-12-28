@@ -123,6 +123,7 @@ const updateConseillerRupture =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
+            estCoordinateur: true,
             'listeSubordonnes.type': 'conseillers',
             'listeSubordonnes.liste': {
               $elemMatch: { $eq: conseiller._id },
@@ -185,6 +186,54 @@ const updateConseillerRupture =
           },
           { returnOriginal: false },
         );
+      // Mise à jour des autres mises en relation en candidature nouvelle
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'conseiller.$id': conseiller._id,
+            statut: 'finalisee_non_disponible',
+          },
+          {
+            $set: {
+              statut: 'nouvelle',
+              conseillerObj: conseillerUpdated,
+            },
+          },
+        );
+
+      // Modification des doublons potentiels
+      await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            _id: { $ne: conseiller._id },
+            email: conseiller.email,
+          },
+          {
+            $set: {
+              disponible: true,
+            },
+          },
+        );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'conseiller.$id': { $ne: conseiller._id },
+            statut: 'finalisee_non_disponible',
+            'conseillerObj.email': conseiller.email,
+          },
+          {
+            $set: {
+              statut: 'nouvelle',
+              'conseillerObj.disponible': true,
+            },
+          },
+        );
       return { miseEnRelationUpdated, conseillerUpdated };
     } catch (error) {
       throw new Error(error);
@@ -227,6 +276,19 @@ const validationRuptureConseiller =
         });
         return;
       }
+      if (!miseEnRelation.motifRupture) {
+        res.status(409).json({
+          message: 'Aucun motif de rupture renseigné',
+        });
+        return;
+      }
+      if (new Date(dateFinDeContrat) > new Date()) {
+        res.status(409).json({
+          message:
+            'La date de fin de contrat doit être antérieure à la date du jour',
+        });
+        return;
+      }
       const userCoop: IUser = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
@@ -242,7 +304,6 @@ const validationRuptureConseiller =
         0,
         conseiller.emailCN?.address?.lastIndexOf('@'),
       );
-      await updateConseillersPG(pool)(conseiller.email, true);
       const canCreate = req.ability.can(
         action.create,
         ressource.conseillersRuptures,
@@ -253,6 +314,7 @@ const validationRuptureConseiller =
         });
         return;
       }
+      await updateConseillersPG(pool)(conseiller.email, true);
       const { miseEnRelationUpdated, conseillerUpdated } =
         await updateConseillerRupture(app, req)(
           conseiller,

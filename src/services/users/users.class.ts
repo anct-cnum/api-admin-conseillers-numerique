@@ -16,7 +16,7 @@ import {
   signIn,
   signOut,
   getRefreshToken,
-  deleteAccountAdmin,
+  deleteAccountGrandReseau,
 } from './controllers';
 
 export default class Users extends Service {
@@ -68,10 +68,10 @@ export default class Users extends Service {
       getUsers(app),
     );
     app.delete(
-      '/user/:id',
+      '/user/grandReseau/:id',
       authenticateMode(app),
       createAbilities(app),
-      deleteAccountAdmin(app),
+      deleteAccountGrandReseau(app),
     );
     app.post(
       '/inviteAccountHub',
