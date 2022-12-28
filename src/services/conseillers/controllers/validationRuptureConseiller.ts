@@ -246,6 +246,13 @@ const validationRuptureConseiller =
     const { dateFinDeContrat } = req.body;
     const pool = new Pool();
     try {
+      if (new Date(dateFinDeContrat) > new Date()) {
+        res.status(409).json({
+          message:
+            'La date de fin de contrat doit être antérieure à la date du jour',
+        });
+        return;
+      }
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -279,13 +286,6 @@ const validationRuptureConseiller =
       if (!miseEnRelation.motifRupture) {
         res.status(409).json({
           message: 'Aucun motif de rupture renseigné',
-        });
-        return;
-      }
-      if (new Date(dateFinDeContrat) > new Date()) {
-        res.status(409).json({
-          message:
-            'La date de fin de contrat doit être antérieure à la date du jour',
         });
         return;
       }
