@@ -9,7 +9,10 @@ const deleteAccountGrandReseau =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idUser = req.params.id;
     try {
-      if (req.user?.roles.length > 1) {
+      if (
+        req.user?.roles.length > 1 &&
+        req.user?.roles.includes('grandReseau')
+      ) {
         await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
