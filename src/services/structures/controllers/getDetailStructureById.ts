@@ -9,12 +9,12 @@ import {
   formatQpv,
   formatType,
 } from '../structures.repository';
-import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
 import {
   checkAccessRequestCras,
   getNombreAccompagnementsByArrayConseillerId,
   getNombreCrasByArrayConseillerId,
 } from '../../cras/cras.repository';
+import { getCoselec } from '../../../utils';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -57,18 +57,18 @@ const getDetailStructureById =
             idPG: 1,
             nom: 1,
             qpvStatut: 1,
+            statut: 1,
             insee: 1,
             type: 1,
             siret: 1,
             codePostal: 1,
             createdAt: 1,
+            coselec: 1,
             contact: 1,
             conseillers: '$conseillers',
           },
         },
       ]);
-      const checkAccessMiseEnRelation =
-        await checkAccessReadRequestMisesEnRelation(app, req);
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByArrayConseillerId(
@@ -81,17 +81,6 @@ const getDetailStructureById =
           checkAccessCras,
         )(structure[0].conseillers?.map((conseiller) => conseiller._id));
 
-      const stats = await app.service(service.misesEnRelation).Model.aggregate([
-        {
-          $match: {
-            'structure.$id': new ObjectId(idStructure),
-            statut: { $in: ['finalisee', 'recrutee'] },
-            $and: [checkAccessMiseEnRelation],
-          },
-        },
-        { $group: { _id: '$statut', count: { $sum: 1 } } },
-        { $sort: { _id: 1 } },
-      ]);
       const users = await app.service(service.users).Model.aggregate([
         {
           $match: {
@@ -100,10 +89,8 @@ const getDetailStructureById =
         },
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
-      structure[0].posteValider =
-        stats.find((stat) => stat._id === 'recrutee')?.count || 0;
-      structure[0].posteRecruter =
-        stats.find((stat) => stat._id === 'finalisee')?.count || 0;
+      const coselec = getCoselec(structure[0]);
+      structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);

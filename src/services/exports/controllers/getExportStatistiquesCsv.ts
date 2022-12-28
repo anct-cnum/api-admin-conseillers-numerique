@@ -12,7 +12,7 @@ import {
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let { idType, codePostal } = req.query;
+    let { idType, codePostal, ville } = req.query;
     const { type } = req.query;
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -20,6 +20,7 @@ const getExportStatistiquesCsv =
     dateFin.setUTCHours(23, 59, 59, 59);
     idType = idType === 'undefined' ? '' : idType;
     codePostal = codePostal === 'undefined' ? '' : codePostal;
+    ville = ville === 'undefined' ? '' : ville;
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
     let conseillerIds: ObjectId[];
@@ -55,6 +56,9 @@ const getExportStatistiquesCsv =
           if (codePostal !== '' && codePostal !== 'null') {
             query['cra.codePostal'] = codePostal;
           }
+          if (ville !== '' && ville !== 'null') {
+            query['cra.nomCommune'] = ville;
+          }
           statistiques = await getStatsGlobales(
             query,
             req.ability,
@@ -71,6 +75,12 @@ const getExportStatistiquesCsv =
             },
             'conseiller.$id': { $eq: idConseiller },
           };
+          if (codePostal !== '' && codePostal !== 'null') {
+            query['cra.codePostal'] = codePostal;
+          }
+          if (ville !== '' && ville !== 'null') {
+            query['cra.nomCommune'] = ville;
+          }
           statistiques = await getStatsGlobales(
             query,
             req.ability,

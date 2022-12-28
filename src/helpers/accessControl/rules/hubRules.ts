@@ -136,7 +136,11 @@ export default async function hubRules(
   structuresIds = conseillersAndStructures.map((structure) => structure._id);
 
   can(action.read, functionnality.exportHub);
-  can([action.read], ressource.statsTerritoires);
+  can([action.read], ressource.statsTerritoires, {
+    conseillerIds: {
+      $in: conseillersIds,
+    },
+  });
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });

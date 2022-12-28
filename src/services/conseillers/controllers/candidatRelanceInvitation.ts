@@ -35,7 +35,7 @@ const candidatRelanceInvitation =
       }
       if (conseillerUser.passwordCreated === true) {
         res.status(409).json({
-          message: `Le compte de ${conseiller.prenom} ${conseiller.nom} est déjà activé`,
+          message: `Le compte de ${conseiller.nom} ${conseiller.prenom} est déjà activé`,
         });
         return;
       }
@@ -64,7 +64,7 @@ const candidatRelanceInvitation =
         res
           .status(200)
           .json(
-            `Le candidat ${users.name} a bien reçu un nouveau mail d'activation`,
+            `L'email d'invitation à l'espace candidat a bien été envoyé à ${conseillerUser.nom} ${conseillerUser.prenom}`,
           );
       }
     } catch (error) {

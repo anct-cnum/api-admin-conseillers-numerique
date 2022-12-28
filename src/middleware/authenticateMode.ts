@@ -25,14 +25,18 @@ const authenticateMode =
             if (err) res.status(403).json('Jeton invalide');
             const connect = app.get('mongodb');
             const database = connect.substr(connect.lastIndexOf('/') + 1);
-            req.user = {
-              ...userDecoded,
-              entity: new DBRef(
-                'users',
-                new ObjectId(userDecoded.entity.$id),
-                database,
-              ),
-            };
+            if (userDecoded.entity) {
+              req.user = {
+                ...userDecoded,
+                entity: new DBRef(
+                  'users',
+                  new ObjectId(userDecoded.entity.$id),
+                  database,
+                ),
+              };
+            } else {
+              req.user = userDecoded;
+            }
           },
         );
       } catch (error) {
