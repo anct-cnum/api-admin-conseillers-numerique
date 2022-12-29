@@ -6,6 +6,8 @@ import getCandidatById from './controllers/getCandidatById';
 import getCandidatCV from './controllers/getCandidatCV';
 import getConseillerById from './controllers/getConseillerById';
 import createAbilities from '../../middleware/createAbilities';
+import validationRuptureConseiller from './controllers/validationRuptureConseiller';
+import dossierIncompletRuptureConseiller from './controllers/dossierIncompletRuptureConseiller';
 import getCandidats from './controllers/getCandidats';
 import deleteCandidatById from './controllers/deleteCandidatById';
 import candidatRelanceInvitation from './controllers/candidatRelanceInvitation';
@@ -48,6 +50,18 @@ export default class Conseillers extends Service {
       authenticateMode(app),
       createAbilities(app),
       getConseillerById(app),
+    );
+    app.patch(
+      '/conseiller/rupture/validation/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      validationRuptureConseiller(app),
+    );
+    app.patch(
+      '/conseiller/rupture/incomplet/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      dossierIncompletRuptureConseiller(app),
     );
     app.get(
       '/candidat/:id/cv',

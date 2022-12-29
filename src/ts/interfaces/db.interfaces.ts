@@ -60,6 +60,8 @@ export interface IUser {
   toJSON(): string | object | Buffer;
 }
 export interface IMisesEnRelation {
+  _id: ObjectId;
+
   conseiller: typeof DBRef;
 
   structure: typeof DBRef;
@@ -83,6 +85,10 @@ export interface IMisesEnRelation {
   motifRupture: string | undefined;
 
   emetteurRupture: string | undefined;
+
+  resendMailCnfsRupture: boolean | undefined;
+
+  dossierIncompletRupture: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -122,7 +128,7 @@ export interface IConseillers {
   codePostal: string;
 
   location: {
-    structure: string;
+    type: string;
     coordinates: string;
   };
 
@@ -148,7 +154,7 @@ export interface IConseillers {
 
   structureId?: Types.ObjectId;
 
-  codeCom: Date;
+  codeCom: string;
 
   mattermost: {
     error: boolean;
@@ -338,6 +344,34 @@ interface IEntreprise {
   raison_sociale: string;
 }
 
+export interface IPermanences {
+  _id: ObjectId;
+  estStructure: boolean;
+  nomEnseigne: string;
+  numeroTelephone: string;
+  email: string;
+  siteWeb: string;
+  siret: string;
+  adresse: {
+    numeroRue: string;
+    rue: string;
+    codePostal: string;
+    ville: string;
+  };
+  location: {
+    type: string;
+    coordinates: number[];
+  };
+  horaires: object[];
+  typeAcces: string[];
+  conseillers: ObjectId[];
+  lieuPrincipalPour: ObjectId[];
+  conseillersItinerants: ObjectId[];
+  structure: typeof DBRef;
+  updatedAt: Date;
+  updatedBy: Date;
+}
+
 export interface ICras {
   _id: ObjectId;
   cra: {
@@ -380,6 +414,14 @@ export interface ConseillersSupprimes {
   motif: string;
   conseiller: object;
   actionUser: object;
+}
+
+export interface ConseillersRuptures {
+  _id: ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
+  dateRupture: Date;
+  motifRupture: string;
 }
 
 export interface IStatsTerritoires {

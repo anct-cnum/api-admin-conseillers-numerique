@@ -5,7 +5,6 @@ import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
-import emails from '../../../emails/emails';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
@@ -41,15 +40,9 @@ const postInvitationStructure =
         mailSentDate: null,
         resend: false,
       });
-      const errorSmtpMail = await envoiEmailInvit(
-        app,
-        req,
-        mailer,
-        emails,
-        user,
-      );
+      const errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
       if (errorSmtpMail instanceof Error) {
-        await deleteUser(app, service, req, action, email);
+        await deleteUser(app, req, email);
         res.status(503).json({
           message:
             "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
