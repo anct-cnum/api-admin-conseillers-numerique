@@ -2,9 +2,10 @@ import logger from '../../logger';
 
 export default function (mailer) {
   const { utils } = mailer;
+  const templateName = 'conseillerRupturePix';
 
   const render = async (conseiller) => {
-    return mailer.render(__dirname, { conseiller });
+    return mailer.render(__dirname, templateName, { conseiller });
   };
 
   return {
