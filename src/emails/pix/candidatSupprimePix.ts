@@ -2,9 +2,10 @@ import logger from '../../logger';
 
 export default function (mailer) {
   const { utils } = mailer;
+  const templateName = 'candidatSupprimePix';
 
   const render = async (candidat) => {
-    return mailer.render(__dirname, { candidat });
+    return mailer.render(__dirname, templateName, { candidat });
   };
 
   return {

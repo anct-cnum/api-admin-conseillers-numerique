@@ -6,9 +6,10 @@ import { action } from '../../helpers/accessControl/accessList';
 
 export default function (app: Application, mailer, req: IRequest) {
   const { utils } = mailer;
+  const templateName = 'creationCompteCandidat';
 
   const render = async (user: IUser) => {
-    return mailer.render(__dirname, {
+    return mailer.render(__dirname, templateName, {
       user,
       link: utils.getEspaceCandidatUrl(`/inscription/${user.token}`),
     });
