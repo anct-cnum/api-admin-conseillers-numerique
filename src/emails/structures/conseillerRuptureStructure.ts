@@ -1,49 +1,49 @@
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import { IUser } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { action } from '../../helpers/accessControl/accessList';
+import {
+  IMisesEnRelation,
+  IStructures,
+} from '../../ts/interfaces/db.interfaces';
 
 export default function (app: Application, mailer, req: IRequest) {
-  const { utils } = mailer;
-
-  const render = async (user: IUser) => {
-    return mailer.render(__dirname, {
-      user,
-      link: utils.getEspaceCandidatUrl(`/inscription/${user.token}`),
-    });
+  const render = async () => {
+    return mailer.render(__dirname);
   };
 
   return {
     render,
-    send: async (user) => {
+    send: async (miseEnRelation: IMisesEnRelation, structure: IStructures) => {
       const onSuccess = async () => {
         await app
-          .service(service.users)
+          .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
-            { _id: user._id },
+            { _id: miseEnRelation._id },
             {
               $set: {
-                mailSentDate: new Date(),
-                resend: !!user.mailSentDate,
+                mailCnfsRuptureSentDate: new Date(),
+                resendMailCnfsRupture: !!miseEnRelation.resendMailCnfsRupture,
               },
               $unset: {
-                mailError: '',
-                mailErrorDetail: '',
+                mailErrorCnfsRupture: '',
+                mailErrorDetailCnfsRupture: '',
               },
             },
           );
       };
       const onError = async (err: Error) => {
         await app
-          .service(service.users)
+          .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
-            { _id: user._id },
+            { _id: miseEnRelation._id },
             {
-              mailError: 'smtpError',
-              mailErrorDetail: err.message,
+              $set: {
+                mailErrorCnfsRupture: 'smtpError',
+                mailErrorDetailCnfsRupture: err.message,
+              },
             },
           );
         throw err;
@@ -51,10 +51,9 @@ export default function (app: Application, mailer, req: IRequest) {
 
       return mailer
         .createMailer()
-        .sendEmail(user.name, {
-          subject:
-            'Activer votre espace candidat Conseillers numériques France Services',
-          body: await render(user),
+        .sendEmail(structure.contact.email, {
+          subject: 'Demande de rupture de contrat avec votre CnFS',
+          body: await render(),
         })
         .then(onSuccess)
         .catch(onError);

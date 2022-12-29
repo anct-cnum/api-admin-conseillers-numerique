@@ -6,7 +6,9 @@ const service = {
   cras: 'cras',
   statsTerritoires: 'statsTerritoires',
   statsConseillersCras: 'statsConseillersCras',
+  permanences: 'permanences',
   conseillersSupprimes: 'conseillersSupprimes',
+  conseillersRuptures: 'conseillersRuptures',
 };
 
 export default service;
