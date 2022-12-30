@@ -108,6 +108,8 @@ const updateConseillerRupture =
               structureId: '',
               emailCNError: '',
               emailCN: '',
+              emailPro: '',
+              telephonePro: '',
               mattermost: '',
               resetPasswordCNError: '',
               codeRegionStructure: '',
