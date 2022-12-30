@@ -110,6 +110,7 @@ const updateConseillerRupture =
               emailCN: '',
               emailPro: '',
               telephonePro: '',
+              supHierarchique: '',
               mattermost: '',
               resetPasswordCNError: '',
               codeRegionStructure: '',
