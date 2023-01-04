@@ -110,8 +110,12 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           // A SUPPRIMER LORS DU DEPLOIEMENT DU PARCOURS SA
           user.roles =
             user.roles.includes('grandReseau') &&
-            user.roles.includes('structure')
-              ? user.roles.filter((role: string) => role !== 'structure')
+            user.roles.includes('structure') &&
+            user.roles.includes('structure_coop')
+              ? user.roles.filter(
+                  (role: string) =>
+                    role !== 'structure' && role !== 'structure_coop',
+                )
               : user.roles;
 
           // envoi de l'access token
