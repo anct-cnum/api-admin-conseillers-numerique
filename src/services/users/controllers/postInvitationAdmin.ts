@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { validationEmail } from '../../../schemas/users.schemas';
+import { createUserAdmin } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { deleteUser, envoiEmailInvit } from '../../../utils/index';
@@ -12,7 +12,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { email } = req.body;
+    const { email, nom, prenom } = req.body;
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -21,7 +21,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      const errorJoi = await validationEmail.validate(email);
+      const errorJoi = await createUserAdmin.validate(req.body);
       if (errorJoi?.error) {
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
@@ -29,6 +29,8 @@ const postInvitationAdmin =
       const user: IUser = await app.service(service.users).create({
         name: email.toLowerCase(),
         roles: ['admin'],
+        nom,
+        prenom,
         password: uuidv4(),
         token: uuidv4(),
         tokenCreatedAt: new Date(),

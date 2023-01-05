@@ -249,6 +249,12 @@ const validationRuptureConseiller =
     const { dateFinDeContrat } = req.body;
     const pool = new Pool();
     try {
+      if (!dateFinDeContrat) {
+        res.status(409).json({
+          message: 'Aucune date de fin de contrat renseignée',
+        });
+        return;
+      }
       if (new Date(dateFinDeContrat) > new Date()) {
         res.status(409).json({
           message:
