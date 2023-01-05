@@ -9,6 +9,19 @@ const dossierIncompletRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     const { dateFinDeContrat } = req.body;
+    if (!dateFinDeContrat) {
+      res.status(409).json({
+        message: 'Aucune date de fin de contrat renseignée',
+      });
+      return;
+    }
+    if (new Date(dateFinDeContrat) > new Date()) {
+      res.status(409).json({
+        message:
+          'La date de fin de contrat doit être antérieure à la date du jour',
+      });
+      return;
+    }
     try {
       await app
         .service(service.misesEnRelation)
