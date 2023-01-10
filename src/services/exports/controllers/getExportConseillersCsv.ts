@@ -15,7 +15,7 @@ import {
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
-import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
+import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
 const getConseillersRecruter =
   (app: Application, checkAccess) =>

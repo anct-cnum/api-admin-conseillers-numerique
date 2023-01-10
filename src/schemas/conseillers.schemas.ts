@@ -67,4 +67,22 @@ const validCandidats = Joi.object({
   coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 
-export { validConseillers, validExportConseillers, validCandidats };
+const validCandidatsStructure = Joi.object({
+  skip: Joi.number().required().error(new Error('La pagination est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  search: Joi.string().error(
+    new Error('La recherche par conseiller est invalide'),
+  ),
+  pix: Joi.string().error(new Error('Le filtre pix est invalide')),
+  cv: Joi.string().error(new Error('Le filtre cv est invalide')),
+  diplome: Joi.string().error(new Error('Le filtre diplome est invalide')),
+});
+
+export {
+  validConseillers,
+  validExportConseillers,
+  validCandidats,
+  validCandidatsStructure,
+};

@@ -250,13 +250,13 @@ const validationRuptureConseiller =
     const pool = new Pool();
     try {
       if (!dateFinDeContrat) {
-        res.status(409).json({
+        res.status(400).json({
           message: 'Aucune date de fin de contrat renseignée',
         });
         return;
       }
       if (new Date(dateFinDeContrat) > new Date()) {
-        res.status(409).json({
+        res.status(400).json({
           message:
             'La date de fin de contrat doit être antérieure à la date du jour',
         });

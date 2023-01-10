@@ -11,6 +11,7 @@ import dossierIncompletRuptureConseiller from './controllers/dossierIncompletRup
 import getCandidats from './controllers/getCandidats';
 import deleteCandidatById from './controllers/deleteCandidatById';
 import candidatRelanceInvitation from './controllers/candidatRelanceInvitation';
+import getCandidatsStructure from './controllers/getCandidatsStructure';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -26,6 +27,12 @@ export default class Conseillers extends Service {
       authenticateMode(app),
       createAbilities(app),
       getCandidats(app, options),
+    );
+    app.get(
+      '/candidats/structure/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      getCandidatsStructure(app, options),
     );
     app.get(
       '/candidat/:id',
