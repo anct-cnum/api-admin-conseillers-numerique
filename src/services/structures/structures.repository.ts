@@ -68,6 +68,13 @@ const formatAdresseStructure = (insee) => {
   return adresse.replace(/["']/g, '');
 };
 
+const filterSortColonne = (nomOrdre: string, ordre: number) => {
+  if (nomOrdre === 'idPG') {
+    return JSON.parse(`{"${nomOrdre}":${ordre}}`);
+  }
+  return JSON.parse(`{"${nomOrdre}":${ordre}, "idPG": 1}`);
+};
+
 const formatQpv = (qpv: string) => (qpv === 'Oui' ? 'Oui' : 'Non');
 
 const formatType = (type: string) => (type === 'PRIVATE' ? 'Privée' : 'Public');
@@ -85,4 +92,5 @@ export {
   formatAdresseStructure,
   formatQpv,
   formatType,
+  filterSortColonne,
 };
