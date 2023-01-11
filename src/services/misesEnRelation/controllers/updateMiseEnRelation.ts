@@ -20,7 +20,7 @@ const updateMiseEnRelation =
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: miseEnRelationVerif.structure.oid });
+        .findOne();
       if (!structure) {
         res.status(403).json({ message: "La structure n'existe pas" });
         return;
@@ -33,16 +33,15 @@ const updateMiseEnRelation =
           });
           return;
         }
-        // eslint-disable-next-line no-case-declarations
         const dernierCoselec = getCoselec(structure);
         if (dernierCoselec !== null) {
           // Nombre de candidats déjà recrutés pour cette structure
           const misesEnRelationRecrutees = await app
             .service(service.misesEnRelation)
-            .Model.find({
+            .Model.accessibleBy(req.ability, action.read)
+            .find({
               query: {
                 statut: { $in: ['recrutee', 'finalisee'] },
-                'structure.$id': structure._id,
               },
             });
           if (

@@ -364,6 +364,8 @@ const generateCsvSatistiques = async (
   type,
   idType,
   codePostal,
+  nom,
+  prenom,
   res: Response,
 ) => {
   try {
@@ -500,9 +502,11 @@ const generateCsvSatistiques = async (
     ];
 
     const buildExportStatistiquesCsvFileContent = [
-      `Statistiques ${type} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(
-        dateDebut,
-      ).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
+      `Statistiques ${type}  ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        idType ?? ''
+      } ${formatDate(dateDebut).toLocaleString()}-${formatDate(
+        dateFin,
+      ).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,

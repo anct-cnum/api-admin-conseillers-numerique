@@ -9,10 +9,11 @@ import {
   getConseillersIdsByStructure,
   getConseillersIdsByTerritoire,
 } from '../../cras/cras.repository';
+import service from '../../../helpers/services';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let { idType, codePostal, ville } = req.query;
+    let { idType, codePostal, ville, nom, prenom } = req.query;
     const { type } = req.query;
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -21,6 +22,8 @@ const getExportStatistiquesCsv =
     idType = idType === 'undefined' ? '' : idType;
     codePostal = codePostal === 'undefined' ? '' : codePostal;
     ville = ville === 'undefined' ? '' : ville;
+    nom = nom === 'undefined' ? '' : nom;
+    prenom = prenom === 'undefined' ? '' : prenom;
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
     let conseillerIds: ObjectId[];
@@ -65,6 +68,12 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          // eslint-disable-next-line no-case-declarations
+          const structure = await app
+            .service(service.structures)
+            .Model.findOne({ _id: idStructure }, { nom: 1, _id: 0 });
+          nom = structure.nom;
+          idType = undefined;
           break;
         case 'conseiller':
           idConseiller = new ObjectId(String(idType));
@@ -87,6 +96,7 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          idType = undefined;
           break;
         case 'codeDepartement' || 'codeRegion':
           conseillerIds = await getConseillersIdsByTerritoire(
@@ -120,6 +130,8 @@ const getExportStatistiquesCsv =
         type,
         idType,
         codePostal,
+        nom,
+        prenom,
         res,
       );
     } catch (error) {
