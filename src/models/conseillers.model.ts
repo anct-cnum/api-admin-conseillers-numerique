@@ -100,7 +100,7 @@ export default function (app: Application): Model<any> {
       },
       emailCN: {
         address: String,
-        deleteMailboxCNError: String,
+        deleteMailboxCNError: { type: Boolean },
       },
       emailCNError: { type: Boolean },
 

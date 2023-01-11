@@ -237,7 +237,7 @@ const updateConseillerRupture =
             },
           },
         );
-      return { miseEnRelationUpdated, conseillerUpdated };
+      return miseEnRelationUpdated;
     } catch (error) {
       throw new Error(error);
     }
@@ -324,12 +324,11 @@ const validationRuptureConseiller =
         return;
       }
       await updateConseillersPG(pool)(conseiller.email, true);
-      const { miseEnRelationUpdated, conseillerUpdated } =
-        await updateConseillerRupture(app, req)(
-          conseiller,
-          miseEnRelation,
-          dateFinDeContrat,
-        );
+      const miseEnRelationUpdated = await updateConseillerRupture(app, req)(
+        conseiller,
+        miseEnRelation,
+        dateFinDeContrat,
+      );
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
         .service(service.users)
@@ -343,7 +342,6 @@ const validationRuptureConseiller =
           userCoop._id,
           conseiller._id,
         );
-        conseillerUpdated.userCreated = false;
       }
       // Suppression compte Gandi
       if (login !== undefined) {
@@ -414,7 +412,7 @@ const validationRuptureConseiller =
           .json({ message: errorSmtpMailRuptureStructure.message });
         return;
       }
-      res.send({ miseEnRelationUpdated, conseillerUpdated });
+      res.send(miseEnRelationUpdated);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
