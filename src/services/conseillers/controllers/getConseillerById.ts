@@ -60,6 +60,7 @@ const getConseillerById =
                     dateRupture: 1,
                     motifRupture: 1,
                     dossierIncompletRupture: 1,
+                    emetteurRupture: 1,
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
                   },

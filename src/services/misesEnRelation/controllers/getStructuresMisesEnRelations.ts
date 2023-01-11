@@ -14,6 +14,7 @@ import {
   filterStatut,
 } from '../misesEnRelation.repository';
 import validMiseEnRelation from '../../../schemas/miseEnRelation.schemas';
+import { getCoselec } from '../../../utils';
 
 const countMisesEnRelation =
   (app: Application, checkAccess) =>
@@ -136,11 +137,13 @@ const getStructuresMisesEnRelations =
         data: object;
         limit: number;
         skip: number;
+        coselec: object;
       } = {
         total: 0,
         data: [],
         limit: 0,
         skip: 0,
+        coselec: {},
       };
       const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":1}`);
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
@@ -164,6 +167,7 @@ const getStructuresMisesEnRelations =
         items.total = totalMiseEnRelation[0]?.countMiseEnRelation;
         items.limit = options.paginate.default;
         items.skip = Number(skip);
+        items.coselec = getCoselec(structure);
       }
 
       res.send(items);

@@ -15,6 +15,7 @@ import {
   filterDiplome,
 } from '../conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
+import { getCoselec } from '../../../utils';
 
 const getTotalCandidatsStructure =
   (app: Application) =>
@@ -106,13 +107,19 @@ const getCandidatsStructure =
       res.status(400).json({ message: candidatValidation.error.message });
       return;
     }
-    const items: { total: number; data: object; limit: number; skip: number } =
-      {
-        total: 0,
-        data: [],
-        limit: 0,
-        skip: 0,
-      };
+    const items: {
+      total: number;
+      data: object;
+      limit: number;
+      skip: number;
+      coselec: object;
+    } = {
+      total: 0,
+      data: [],
+      limit: 0,
+      skip: 0,
+      coselec: {},
+    };
     const sortColonne = JSON.parse(`{"${nomOrdre}":1}`);
 
     try {
@@ -145,6 +152,7 @@ const getCandidatsStructure =
         items.total = totalCandidats[0]?.count_candidats;
         items.limit = options.paginate.default;
         items.skip = Number(skip);
+        items.coselec = getCoselec(structure);
       }
       res.status(200).json(items);
     } catch (error) {

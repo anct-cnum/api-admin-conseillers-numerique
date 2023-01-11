@@ -25,7 +25,10 @@ const updateMiseEnRelation =
         res.status(403).json({ message: "La structure n'existe pas" });
         return;
       }
-      if (miseEnRelationVerif.statut === 'recrutee') {
+      if (
+        miseEnRelationVerif.statut === 'recrutee' ||
+        miseEnRelationVerif.statut === 'finalisee'
+      ) {
         if (!miseEnRelationVerif.dateRecrutement) {
           res.status(400).json({
             message:
@@ -54,6 +57,22 @@ const updateMiseEnRelation =
             });
             return;
           }
+        }
+      }
+      if (miseEnRelationVerif.statut === 'nouvelle_rupture') {
+        if (miseEnRelationVerif.dateRupture === null) {
+          res.status(400).json({
+            message:
+              'La date de rupture doit être obligatoirement renseignée !',
+          });
+          return;
+        }
+        if (miseEnRelationVerif.motifRupture === null) {
+          res.status(400).json({
+            message:
+              'Le motif de rupture doit être obligatoirement renseigné !',
+          });
+          return;
         }
       }
       const miseEnRelation: IMisesEnRelation = await app

@@ -13,6 +13,11 @@ const getCandidatById =
         .service(service.conseillers)
         .Model.findOne({ _id: new ObjectId(idConseiller) });
 
+      if (!conseiller) {
+        res.status(404).json({ message: 'Conseiller non trouvé' });
+        return;
+      }
+
       const possedeCompteCandidat = await app
         .service(service.users)
         .Model.countDocuments({

@@ -53,7 +53,7 @@ const preSelectionnerCandidat =
       await app.service(service.misesEnRelation).create(objMiseEnRelation);
 
       res.status(201).send({
-        message: `vous avez pré-sélectionner le candidat ${conseiller.nom} ${conseiller.prenom}}`,
+        message: `vous avez pré-sélectionner le candidat ${conseiller.nom} ${conseiller.prenom}`,
       });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
