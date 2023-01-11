@@ -26,8 +26,8 @@
 	"scripts": {
 		"test": "npm run jest",
 		"lint": "tsc --project tsconfig.json --noEmit && eslint src/. --ignore-path .gitignore",
-    "dev:ic": "nodemon src/index.ts",
-    "dev:local": "NODE_ENV=development nodemon src/index.ts",
+		"dev:ic": "nodemon src/index.ts",
+		"dev:local": "NODE_ENV=development nodemon src/index.ts",
 		"start": "npm run build && npm run copy-files && node dist/",
 		"jest": "jest --forceExit",
 		"copy-files": "copyfiles -u 1 src/**/*.mjml.ejs dist/",
@@ -73,7 +73,6 @@
 		"jsonwebtoken": "^8.5.1",
 		"lodash": "^4.17.21",
 		"mjml": "^4.13.0",
-		"moment": "^2.29.4",
 		"mongodb": "^4.8.0",
 		"mongodb-core": "^3.2.7",
 		"mongoose": "^6.4.4",
