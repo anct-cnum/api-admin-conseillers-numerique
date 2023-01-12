@@ -2,7 +2,8 @@ import feathers from '@feathersjs/feathers';
 import configuration from '@feathersjs/configuration';
 import express from '@feathersjs/express';
 import * as Sentry from '@sentry/node';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import logger from '../logger';
 import services from '../services';
 import appHooks from '../app.hooks';
@@ -14,6 +15,8 @@ import createMailer from '../mailer';
 const config = configuration();
 const f = feathers();
 const app = express(f);
+
+dayjs.extend(utc);
 
 app.configure(config);
 app.configure(mongoose);
@@ -67,7 +70,7 @@ const execute = async (name: string, job: any) => {
   try {
     const launchTime = new Date().getTime();
     await job(jobComponents);
-    const duration = moment
+    const duration = dayjs
       .utc(new Date().getTime() - launchTime)
       .format('HH:mm:ss.SSS');
     logger.info(`Completed in ${duration}`);
