@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
+import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import {
   IConseillers,
@@ -28,16 +28,16 @@ const preSelectionnerCandidat =
         res.status(404).json({ message: "Le conseiller n'existe pas" });
         return;
       }
-      // const canCreate = req.ability.can(
-      //   action.create,
-      //   ressource.misesEnRelation,
-      // );
-      // if (!canCreate) {
-      //   res.status(403).json({
-      //     message: `Accès refusé, vous n'êtes pas autorisé à pré-sélectionner un candidat`,
-      //   });
-      //   return;
-      // }
+      const canCreate = req.ability.can(
+        action.create,
+        ressource.misesEnRelation,
+      );
+      if (!canCreate) {
+        res.status(403).json({
+          message: `Accès refusé, vous n'êtes pas autorisé à présélectionner un candidat`,
+        });
+        return;
+      }
       const connect = app.get('mongodb');
       const database = connect.substr(connect.lastIndexOf('/') + 1);
       const objMiseEnRelation = {
@@ -53,7 +53,7 @@ const preSelectionnerCandidat =
       await app.service(service.misesEnRelation).create(objMiseEnRelation);
 
       res.status(201).send({
-        message: `vous avez pré-sélectionner le candidat ${conseiller.nom} ${conseiller.prenom}`,
+        message: `vous avez présélectionné le candidat ${conseiller.nom} ${conseiller.prenom}`,
       });
     } catch (error) {
       if (error.name === 'ForbiddenError') {

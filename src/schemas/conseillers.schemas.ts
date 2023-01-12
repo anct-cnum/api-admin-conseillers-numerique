@@ -58,7 +58,7 @@ const validExportConseillers = Joi.object({
 const validCandidats = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
   searchByNomCandidat: Joi.string().error(
-    new Error('La recherche par nom est invalide'),
+    new Error('La recherche par nom du candidat est invalide'),
   ),
   departement: Joi.string().error(
     new Error('Le filtre département est invalide'),
@@ -73,7 +73,7 @@ const validCandidatsStructure = Joi.object({
     .required()
     .error(new Error('Le nom du tri est invalide')),
   search: Joi.string().error(
-    new Error('La recherche par conseiller est invalide'),
+    new Error('La recherche par nom du candidat est invalide'),
   ),
   pix: Joi.string().error(new Error('Le filtre pix est invalide')),
   cv: Joi.string().error(new Error('Le filtre cv est invalide')),

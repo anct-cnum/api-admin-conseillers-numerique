@@ -6,7 +6,7 @@ const validMiseEnRelation = Joi.object({
     .required()
     .error(new Error('Le nom du tri est invalide')),
   search: Joi.string().error(
-    new Error('La recherche par conseiller est invalide'),
+    new Error('La recherche par nom du candidat est invalide'),
   ),
   filter: Joi.string()
     .valid(
