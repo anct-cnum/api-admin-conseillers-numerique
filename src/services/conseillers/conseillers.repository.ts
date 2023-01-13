@@ -31,22 +31,24 @@ const formatStatutMisesEnRelation = (
 };
 
 const filterNomConseiller = (nom: string) => {
-  if (/^\d+$/.test(nom)) {
-    return { idPG: { $eq: parseInt(nom, 10) } };
+  const formatNom = nom?.trim();
+  if (/^\d+$/.test(formatNom)) {
+    return { idPG: { $eq: parseInt(formatNom, 10) } };
   }
-  if (nom) {
-    return { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } };
+  if (formatNom) {
+    return { nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' } };
   }
   return {};
 };
 
 const filterNomStructure = (nom: string) => {
-  if (/^\d+$/.test(nom)) {
-    return { 'structureObj.idPG': { $eq: parseInt(nom, 10) } };
+  const formatNom = nom?.trim();
+  if (/^\d+$/.test(formatNom)) {
+    return { 'structureObj.idPG': { $eq: parseInt(formatNom, 10) } };
   }
-  if (nom) {
+  if (formatNom) {
     return {
-      'structureObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' },
+      'structureObj.nom': { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' },
     };
   }
   return {};

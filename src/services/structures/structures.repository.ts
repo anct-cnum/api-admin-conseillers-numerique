@@ -31,12 +31,13 @@ const checkAccessReadRequestStructures = async (
     .getQuery();
 
 const filterNomStructure = (nom: string) => {
-  if (/^\d+$/.test(nom)) {
+  const formatNom = nom?.trim();
+  if (/^\d+$/.test(formatNom)) {
     return { idPG: { $eq: parseInt(nom, 10) } };
   }
-  if (nom) {
+  if (formatNom) {
     return {
-      nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' },
+      nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' },
     };
   }
   return {};
