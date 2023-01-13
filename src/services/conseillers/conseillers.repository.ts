@@ -31,13 +31,25 @@ const formatStatutMisesEnRelation = (
 };
 
 const filterNomConseiller = (nom: string) => {
-  return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
+  if (/^\d+$/.test(nom)) {
+    return { idPG: { $eq: parseInt(nom, 10) } };
+  }
+  if (nom) {
+    return { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } };
+  }
+  return {};
 };
 
 const filterNomStructure = (nom: string) => {
-  return nom
-    ? { 'structureObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
-    : {};
+  if (/^\d+$/.test(nom)) {
+    return { 'structureObj.idPG': { $eq: parseInt(nom, 10) } };
+  }
+  if (nom) {
+    return {
+      'structureObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' },
+    };
+  }
+  return {};
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
