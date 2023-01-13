@@ -573,6 +573,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Id long de la structure',
       'Id de la structure',
       'Nom de la structure',
+      'Code postal de la structure',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -595,6 +596,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
             miseEnRelation.structureObj.nom,
+            miseEnRelation.structureObj.codePostal,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
