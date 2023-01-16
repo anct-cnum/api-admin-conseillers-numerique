@@ -50,7 +50,7 @@ const structureByMisesEnRelation = async (
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date prévisionnelle de recrutement;Date d’entrée en formation;Date de sortie de formation;prenom;nom;expérience;téléphone;email;email professionnel;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection\n',
+    'Date candidature;Date prévisionnelle de recrutement;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
   );
   try {
     await Promise.all(
@@ -59,18 +59,12 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
             miseEnrelation?.dateRecrutement,
-          )};${formatDate(
-            miseEnrelation.conseiller?.datePrisePoste,
-          )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
-            miseEnrelation.conseiller?.prenom
-          };${miseEnrelation.conseiller?.nom};${
+          )};${miseEnrelation.conseiller?.prenom};${
+            miseEnrelation.conseiller?.nom
+          };${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${
             miseEnrelation.conseiller?.email
-          };${
-            miseEnrelation.conseiller?.emailCN
-              ? miseEnrelation.conseiller?.emailCN?.address
-              : ''
           };${miseEnrelation.conseiller?.codePostal};${
             miseEnrelation.conseiller?.nomCommune
           };${miseEnrelation.conseiller?.codeDepartement};${
@@ -93,7 +87,15 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.structure?.contact?.email
           };${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
-          };${coselec !== null ? coselec?.nombreConseillersCoselec : 0};\n`,
+          };${
+            coselec !== null ? coselec?.nombreConseillersCoselec : 0
+          };${formatDate(
+            miseEnrelation.conseiller?.datePrisePoste,
+          )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
+            miseEnrelation.conseiller?.emailCN
+              ? miseEnrelation.conseiller?.emailCN?.address
+              : ''
+          };\n`,
         );
       }),
     );
