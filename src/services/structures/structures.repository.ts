@@ -72,6 +72,7 @@ const filterSortColonne = (nomOrdre: string, ordre: number) => {
   if (nomOrdre === 'idPG') {
     return JSON.parse(`{"${nomOrdre}":${ordre}}`);
   }
+  // Pour éviter le problème de pagination sur une colonne qui peut contenir des valeurs communes
   return JSON.parse(`{"${nomOrdre}":${ordre}, "idPG": 1}`);
 };
 

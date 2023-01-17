@@ -502,11 +502,8 @@ const generateCsvSatistiques = async (
     ];
 
     const buildExportStatistiquesCsvFileContent = [
-      `Statistiques ${type}  ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
-        idType ?? ''
-      } ${formatDate(dateDebut).toLocaleString()}-${formatDate(
-        dateFin,
-      ).toLocaleString()}\n`,
+      // eslint-disable-next-line prettier/prettier
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(dateDebut).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,

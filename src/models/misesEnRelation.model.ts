@@ -33,9 +33,6 @@ export default function (app: Application): Model<any> {
     {
       strict: false,
       versionKey: false,
-      timestamps: {
-        createdAt: 'createdAt',
-      },
       collection: 'misesEnRelation',
     },
   );
