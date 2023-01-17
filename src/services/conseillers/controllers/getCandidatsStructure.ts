@@ -17,6 +17,10 @@ import {
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 
+interface IConseillersWithMiseEnRelation extends IConseillers {
+  miseEnRelation: object;
+}
+
 const getTotalCandidatsStructure =
   (app: Application) =>
   async (
@@ -69,6 +73,7 @@ const getCandidatsStructureAvecFiltre =
           prenom: 1,
           codePostal: 1,
           createdAt: 1,
+          structureId: 1,
           statut: 1,
           email: 1,
           pix: 1,
@@ -128,19 +133,33 @@ const getCandidatsStructure =
         .Model.accessibleBy(req.ability, action.read)
         .find()
         .select({ 'conseillerObj._id': 1, _id: 0 });
-      const candidats: IConseillers[] = await getCandidatsStructureAvecFiltre(
-        app,
-      )(
-        conseillerIds.map((conseiller) => conseiller.conseillerObj._id),
-        pix as string,
-        diplome as string,
-        cv as string,
-        search as string,
-        sortColonne,
-        skip as string,
-        options.paginate.default,
-      );
+      let candidats: IConseillersWithMiseEnRelation[] =
+        await getCandidatsStructureAvecFiltre(app)(
+          conseillerIds.map((conseiller) => conseiller.conseillerObj._id),
+          pix as string,
+          diplome as string,
+          cv as string,
+          search as string,
+          sortColonne,
+          skip as string,
+          options.paginate.default,
+        );
       if (candidats.length > 0) {
+        candidats = await Promise.all(
+          candidats.map(async (candidat) => {
+            const item = { ...candidat };
+            if (item.statut === 'RECRUTE') {
+              item.miseEnRelation = await app
+                .service(service.misesEnRelation)
+                .Model.findOne({
+                  'conseiller.$id': item._id,
+                  'structure.$id': item.structureId,
+                })
+                .select({ statut: 1, _id: 0 });
+            }
+            return item;
+          }),
+        );
         const totalCandidats = await getTotalCandidatsStructure(app)(
           conseillerIds.map((conseiller) => conseiller.conseillerObj._id),
           pix as string,
