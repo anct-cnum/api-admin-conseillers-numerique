@@ -31,7 +31,16 @@ const checkAccessReadRequestStructures = async (
     .getQuery();
 
 const filterNomStructure = (nom: string) => {
-  return nom ? { nom: { $regex: `(?'name'${nom}.*$)`, $options: 'i' } } : {};
+  const formatNom = nom?.trim();
+  if (/^\d+$/.test(formatNom)) {
+    return { idPG: { $eq: parseInt(nom, 10) } };
+  }
+  if (formatNom) {
+    return {
+      nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' },
+    };
+  }
+  return {};
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
