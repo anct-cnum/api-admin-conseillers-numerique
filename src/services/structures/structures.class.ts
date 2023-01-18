@@ -5,6 +5,7 @@ import {
   getDetailStructureById,
   getStructureById,
   getStructures,
+  preSelectionnerCandidat,
   updateEmailStructure,
   updateSiretStructure,
   updateStructure,
@@ -59,11 +60,17 @@ export default class Structures extends Service {
       createAbilities(app),
       updateEmailStructure(app),
     );
+    app.patch(
+      '/structure/pre-selectionner/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      preSelectionnerCandidat(app),
+    );
     app.get(
       '/structures/:id/misesEnRelation',
       authenticateMode(app),
       createAbilities(app),
-      getStructuresMisesEnRelations(app),
+      getStructuresMisesEnRelations(app, options),
     );
     app.get(
       '/structures/:id/misesEnRelation/stats',

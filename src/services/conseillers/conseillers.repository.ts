@@ -67,6 +67,35 @@ const filterIsCoordinateur = (coordinateur: string) => {
   return {};
 };
 
+const filterPix = (pix: string) => {
+  if (pix) {
+    const pixInt = pix.split(',').map((k: string) => parseInt(k, 10));
+    return { 'pix.palier': { $in: pixInt } };
+  }
+  return {};
+};
+
+const filterDiplome = (diplome: string) => {
+  if (diplome === 'true') {
+    return { estDiplomeMedNum: { $eq: true } };
+  }
+  if (diplome === 'false') {
+    return { estDiplomeMedNum: { $ne: true } };
+  }
+  return {};
+};
+
+const filterCv = (cv: string) => {
+  if (cv === 'true') {
+    return { cv: { $exists: true } };
+  }
+  if (cv === 'false') {
+    return { cv: { $exists: false } };
+  }
+
+  return {};
+};
+
 const filterDepartement = (departement: string) =>
   departement ? { codeDepartement: departement } : {};
 
@@ -168,4 +197,7 @@ export {
   filterRegion,
   filterDepartement,
   filterComs,
+  filterCv,
+  filterDiplome,
+  filterPix,
 };

@@ -1,94 +1,176 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { BadRequest, NotFound } from '@feathersjs/errors';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import {
+  filterCv,
+  filterDiplome,
+  filterPix,
+  checkAccessReadRequestMisesEnRelation,
+  filterNomConseiller,
+  filterStatut,
+} from '../misesEnRelation.repository';
+import validMiseEnRelation from '../../../schemas/miseEnRelation.schemas';
+import { getCoselec } from '../../../utils';
+
+const countMisesEnRelation =
+  (app: Application, checkAccess) =>
+  async (
+    structureId: ObjectId,
+    cv: string,
+    pix: string,
+    diplome: string,
+    filter: string,
+    searchByNom: string,
+  ) =>
+    app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $match: {
+          'structure.$id': structureId,
+          ...filterPix(pix),
+          ...filterCv(cv),
+          ...filterDiplome(diplome),
+          ...filterNomConseiller(searchByNom),
+          ...filterStatut(filter),
+          $and: [checkAccess],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          statut: 1,
+          'conseillerObj.cv': 1,
+          'conseillerObj.prenom': 1,
+          'conseillerObj.nom': 1,
+          'conseillerObj.email': 1,
+          'conseillerObj.createdAt': 1,
+          'conseillerObj.codePostal': 1,
+          'conseillerObj.pix': 1,
+          'conseillerObj._id': 1,
+        },
+      },
+      { $group: { _id: null, count: { $sum: 1 } } },
+      { $project: { _id: 0, countMiseEnRelation: '$count' } },
+    ]);
+
+const getMisesEnRelation =
+  (app: Application, checkAccess) =>
+  async (
+    structureId: ObjectId,
+    cv: string,
+    pix: string,
+    diplome: string,
+    filter: string,
+    searchByNom: string,
+    sortColonne: object,
+    skip: string,
+    limit: number,
+  ) =>
+    app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $match: {
+          'structure.$id': structureId,
+          ...filterPix(pix),
+          ...filterCv(cv),
+          ...filterDiplome(diplome),
+          ...filterNomConseiller(searchByNom),
+          ...filterStatut(filter),
+          $and: [checkAccess],
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          statut: 1,
+          'conseillerObj.cv': 1,
+          'conseillerObj.prenom': 1,
+          'conseillerObj.nom': 1,
+          'conseillerObj.email': 1,
+          'conseillerObj.createdAt': 1,
+          'conseillerObj.codePostal': 1,
+          'conseillerObj.pix': 1,
+          'conseillerObj._id': 1,
+        },
+      },
+      { $sort: sortColonne },
+      {
+        $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
+      },
+      { $limit: Number(limit) },
+    ]);
 
 const getStructuresMisesEnRelations =
-  (app: Application) => async (req: IRequest, res: Response) => {
+  (app: Application, options) => async (req: IRequest, res: Response) => {
     try {
-      let structureId = null;
-      structureId = req.params.id;
+      const structureId = req.params.id;
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(structureId) });
       if (structure === null) {
-        res.status(404).json(
-          new NotFound('Structure not found', {
-            id: req.params.id,
-          }),
-        );
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
-      }
-      let queryFilter = {};
-      const { filter } = req.query;
-      const search = req.query.$search;
-      if (filter) {
-        const allowedFilters = [
-          'nouvelle',
-          'interessee',
-          'nonInteressee',
-          'recrutee',
-          'finalisee',
-          'nouvelle_rupture',
-          'finalisee_rupture',
-          'toutes',
-        ];
-        if (allowedFilters.includes(filter)) {
-          if (filter !== 'toutes') {
-            queryFilter = { statut: filter };
-          } else {
-            queryFilter = { statut: { $ne: 'non_disponible' } };
-          }
-        } else {
-          res.status(400).send(
-            new BadRequest('Invalid filter', {
-              filter,
-            }).toJSON(),
-          );
-          return;
-        }
-      }
-
-      if (search) {
-        queryFilter['$text'] = { $search: `"${search}"` }; // eslint-disable-line @typescript-eslint/dot-notation
       }
 
       // User Filters
-      const { pix, diplome, cv } = req.query;
-      if (pix !== undefined) {
-        const pixInt = pix.split(',').map((k: string) => parseInt(k, 10));
-        queryFilter['conseillerObj.pix.palier'] = { $in: pixInt };
-      }
-      if (diplome !== undefined) {
-        queryFilter['conseillerObj.estDiplomeMedNum'] = diplome === 'true';
-      }
-      if (cv !== undefined) {
-        queryFilter['conseillerObj.cv'] =
-          cv === 'true' ? { $ne: null } : { $in: [null] };
-      }
-
-      const skip = req.query.$skip;
-      if (skip) {
-        queryFilter['$skip'] = skip; // eslint-disable-line @typescript-eslint/dot-notation
-      }
-      const sort = req.query.$sort;
-      if (sort) {
-        queryFilter['$sort'] = sort; // eslint-disable-line @typescript-eslint/dot-notation
-      }
-
-      const misesEnRelation = await app.service(service.misesEnRelation).find({
-        query: {
-          'structure.$id': new ObjectId(structureId),
-          ...queryFilter,
-        },
+      const { pix, diplome, cv, skip, search, filter, nomOrdre } = req.query;
+      const emailValidation = validMiseEnRelation.validate({
+        skip,
+        diplome,
+        cv,
+        pix,
+        search,
+        filter,
+        nomOrdre,
       });
 
-      res.send(misesEnRelation);
+      if (emailValidation.error) {
+        res.statusMessage = emailValidation.error.message;
+        res.status(400).end();
+        return;
+      }
+      const items: {
+        total: number;
+        data: object;
+        limit: number;
+        skip: number;
+        coselec: object;
+      } = {
+        total: 0,
+        data: [],
+        limit: 0,
+        skip: 0,
+        coselec: {},
+      };
+      const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":1}`);
+      const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
+      const misesEnRelation = await getMisesEnRelation(app, checkAccess)(
+        structure._id,
+        cv as string,
+        pix,
+        diplome as string,
+        filter,
+        search,
+        sortColonne,
+        skip as string,
+        options.paginate.default,
+      );
+      if (misesEnRelation.length > 0) {
+        const totalMiseEnRelation = await countMisesEnRelation(
+          app,
+          checkAccess,
+        )(structure._id, cv as string, pix, diplome as string, filter, search);
+        items.data = misesEnRelation;
+        items.total = totalMiseEnRelation[0]?.countMiseEnRelation;
+        items.limit = options.paginate.default;
+        items.skip = Number(skip);
+        items.coselec = getCoselec(structure);
+      }
+
+      res.send(items);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

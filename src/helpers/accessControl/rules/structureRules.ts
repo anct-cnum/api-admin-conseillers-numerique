@@ -17,7 +17,7 @@ export default async function structureRules(
   can([action.read, action.update], ressource.users, {
     _id: user?._id,
   });
-  can([action.read, action.update], ressource.misesEnRelation, {
+  can([action.read, action.update, action.create], ressource.misesEnRelation, {
     'structure.$id': user?.entity.oid,
   });
   // Restreindre les permissions : les structures ne peuvent voir que les conseillers appartenant à leur organisation

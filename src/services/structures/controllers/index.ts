@@ -5,8 +5,8 @@ import getStructureById from './getStructureById';
 import verifySiretStructure from './verifySiretStructure';
 import updateSiretStructure from './updateSiretStructure';
 import updateEmailStructure from './updateEmailStructure';
+import preSelectionnerCandidat from './preSelectionnerCandidat';
 
-// eslint-disable-next-line import/prefer-default-export
 export {
   getStructures,
   updateStructure,
@@ -15,4 +15,5 @@ export {
   verifySiretStructure,
   updateSiretStructure,
   updateEmailStructure,
+  preSelectionnerCandidat,
 };
