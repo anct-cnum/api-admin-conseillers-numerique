@@ -79,6 +79,7 @@ const getStructures = async (
     .service(service.structures)
     .Model.aggregate([
       { $match: { ...structuresQuery, $and: [queryAccess] } },
+      { $sort: { nom: 1 } },
       { $project: { nom: 1 } },
     ]);
 };
@@ -104,6 +105,7 @@ const getConseillers = async (
     .service(service.conseillers)
     .Model.aggregate([
       { $match: { ...conseillersQuery, $and: [queryAccess] } },
+      { $sort: { email: 1 } },
       { $project: { email: 1 } },
     ]);
 };

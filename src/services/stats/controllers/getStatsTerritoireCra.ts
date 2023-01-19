@@ -34,7 +34,9 @@ const getStatsTerritoireCra =
         const stats = await getStatsGlobales(
           query,
           req.ability,
+          null,
           action.read,
+          'statsNationales',
           app,
         );
         res.status(200).json(stats);

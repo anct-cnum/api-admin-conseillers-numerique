@@ -33,7 +33,9 @@ const getStatsStructure =
       const donneesStats = await getStatsGlobales(
         query,
         req.ability,
+        null,
         action.read,
+        'statsNationales',
         app,
       );
 

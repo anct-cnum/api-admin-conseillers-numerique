@@ -38,7 +38,9 @@ const getExportStatistiquesCsv =
           statistiques = await getStatsGlobales(
             query,
             req.ability,
+            null,
             action.read,
+            'statsNationales',
             app,
           );
           break;
@@ -58,7 +60,9 @@ const getExportStatistiquesCsv =
           statistiques = await getStatsGlobales(
             query,
             req.ability,
+            null,
             action.read,
+            'statsNationales',
             app,
           );
           break;
@@ -74,7 +78,9 @@ const getExportStatistiquesCsv =
           statistiques = await getStatsGlobales(
             query,
             req.ability,
+            null,
             action.read,
+            'statsNationales',
             app,
           );
           break;
@@ -95,7 +101,9 @@ const getExportStatistiquesCsv =
           statistiques = await getStatsGlobales(
             query,
             req.ability,
+            null,
             action.read,
+            'statsNationales',
             app,
           );
           break;
