@@ -53,6 +53,7 @@ const getExportConseillersWithoutCRACsv =
             'structure.idPG': 1,
             'structure.siret': 1,
             'structure.nom': 1,
+            'structure.codePostal': 1,
           },
         },
       ]);
