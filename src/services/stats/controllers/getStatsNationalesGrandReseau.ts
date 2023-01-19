@@ -121,10 +121,10 @@ const getStatsNationalesGrandReseau =
       const donneesStats = await getStatsGlobales(
         query,
         req.ability,
-        codesPostauxQuery,
         action.read,
-        'statsNationalesGrandReseau',
         app,
+        true,
+        codesPostauxQuery,
       );
       res.status(200).json(donneesStats);
     } catch (error) {

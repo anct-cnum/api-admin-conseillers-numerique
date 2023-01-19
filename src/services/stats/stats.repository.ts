@@ -1,11 +1,7 @@
 import dayjs from 'dayjs';
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import {
-  ICodesPostauxQuery,
-  IStructuresQuery,
-  IConseillersQuery,
-} from '../../ts/interfaces/global.interfaces';
+import { ICodesPostauxQuery } from '../../ts/interfaces/global.interfaces';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -64,12 +60,13 @@ const getStructures = async (
   read: string,
   app: Application,
 ) => {
-  const structuresQuery: IStructuresQuery = {};
+  const structuresQuery: any = {};
   if (query['cra.codePostal']) {
     structuresQuery.codePostal = query['cra.codePostal'];
   }
   if (query['cra.nomCommune']) {
-    structuresQuery.nomCommune = query['cra.nomCommune'];
+    const regexNomCommune = new RegExp(`^${query['cra.nomCommune']}$`, 'i');
+    structuresQuery.nomCommune = { $regex: regexNomCommune };
   }
   const queryAccess = await app
     .service(service.structures)
@@ -90,12 +87,13 @@ const getConseillers = async (
   read: string,
   app: Application,
 ) => {
-  const conseillersQuery: IConseillersQuery = {};
+  const conseillersQuery: any = {};
   if (query['cra.codePostal']) {
     conseillersQuery.codePostal = query['cra.codePostal'];
   }
   if (query['cra.nomCommune']) {
-    conseillersQuery.nomCommune = query['cra.nomCommune'];
+    const regexNomCommune = new RegExp(`^${query['cra.nomCommune']}$`, 'i');
+    conseillersQuery.nomCommune = { $regex: regexNomCommune };
   }
   const queryAccess = await app
     .service(service.conseillers)

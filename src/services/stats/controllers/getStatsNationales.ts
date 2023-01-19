@@ -21,9 +21,7 @@ const getStatsNationales =
       const donneesStats = await getStatsGlobales(
         query,
         req.ability,
-        null,
         action.read,
-        'statsNationales',
         app,
       );
       res.status(200).json(donneesStats);

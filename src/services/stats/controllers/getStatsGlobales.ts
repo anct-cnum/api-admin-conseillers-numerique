@@ -22,17 +22,17 @@ import {
 const getStatsGlobales = async (
   query,
   ability,
-  codesPostauxQuery,
   action,
-  type: string,
   app,
+  pilotage = false,
+  codesPostauxQuery = null,
 ) => {
   try {
     let codesPostaux = [];
     let structures = [];
     let conseillers = [];
 
-    if (type === 'statsNationalesGrandReseau') {
+    if (pilotage) {
       codesPostaux = await getCodesPostauxGrandReseau(
         codesPostauxQuery,
         ability,

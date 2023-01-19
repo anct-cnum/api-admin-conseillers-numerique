@@ -60,13 +60,3 @@ export interface ICodesPostauxQuery {
     $regex: string;
   };
 }
-
-export interface IStructuresQuery {
-  codePostal?: string;
-  nomCommune?: string;
-}
-
-export interface IConseillersQuery {
-  codePostal?: string;
-  nomCommune?: string;
-}
