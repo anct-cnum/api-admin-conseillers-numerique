@@ -143,7 +143,7 @@ const getStatsLieux = async (query, ability, read, app) => {
     { nom: 'domicile', valeur: 0 },
     { nom: 'distance', valeur: 0 },
     { nom: 'rattachement', valeur: 0 },
-    { nom: 'autre', valeur: 0 },
+    { nom: 'autre lieu', valeur: 0 },
   ];
 
   const queryAccess = await app

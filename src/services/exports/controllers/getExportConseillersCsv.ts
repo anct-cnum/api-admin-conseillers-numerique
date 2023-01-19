@@ -15,7 +15,7 @@ import {
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
-import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
+import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
 const getConseillersRecruter =
   (app: Application, checkAccess) =>
@@ -84,6 +84,7 @@ const getMisesEnRelationRecruter =
           'structureObj.idPG': 1,
           'structureObj._id': 1,
           'structureObj.nom': 1,
+          'structureObj.codePostal': 1,
           'conseillerObj.telephonePro': 1,
           'conseillerObj.email': 1,
           'conseillerObj.datePrisePoste': 1,

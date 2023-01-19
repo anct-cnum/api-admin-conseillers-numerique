@@ -30,7 +30,11 @@ export default function (app: Application): Model<any> {
 
       structureObj: { type: Object },
     },
-    { strict: false, collection: 'misesEnRelation' },
+    {
+      strict: false,
+      versionKey: false,
+      collection: 'misesEnRelation',
+    },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

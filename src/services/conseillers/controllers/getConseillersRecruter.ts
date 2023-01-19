@@ -15,7 +15,7 @@ import {
   formatStatutMisesEnRelation,
 } from '../conseillers.repository';
 import { getNombreCras } from '../../cras/cras.repository';
-import checkAccessReadRequestMisesEnRelation from '../../misesEnRelation/misesEnRelation.repository';
+import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
 const getTotalConseillersRecruter =
   (app: Application, checkAccess) =>

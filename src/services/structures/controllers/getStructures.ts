@@ -12,6 +12,7 @@ import {
   filterNomStructure,
   checkAccessReadRequestStructures,
   filterComs,
+  filterSortColonne,
 } from '../structures.repository';
 
 const getTotalStructures =
@@ -130,7 +131,7 @@ const getStructures =
         limit: 0,
         skip: 0,
       };
-    const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
+    const sortColonne = filterSortColonne(nomOrdre, ordre);
     try {
       const checkAccess = await checkAccessReadRequestStructures(app, req);
       const structures: IStructures[] = await getStructuresAvecFiltre(

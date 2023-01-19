@@ -5,7 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { updateEmail } from '../../../schemas/structures.schemas';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 
 const { Pool } = require('pg');
 
@@ -31,8 +31,8 @@ const updateEmailStructure =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      const emailExists: IStructures = await app
-        .service(service.structures)
+      const emailExists: IUser = await app
+        .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email });
       if (emailExists !== null) {

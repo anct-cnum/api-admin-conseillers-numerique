@@ -366,6 +366,8 @@ const generateCsvSatistiques = async (
   type,
   idType,
   codePostal,
+  nom,
+  prenom,
   res: Response,
 ) => {
   try {
@@ -502,9 +504,8 @@ const generateCsvSatistiques = async (
     ];
 
     const buildExportStatistiquesCsvFileContent = [
-      `Statistiques ${type} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(
-        dateDebut,
-      ).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
+      // eslint-disable-next-line prettier/prettier
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(dateDebut).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,
@@ -571,6 +572,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Id long de la structure',
       'Id de la structure',
       'Nom de la structure',
+      'Code postal de la structure',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -593,6 +595,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
             miseEnRelation.structureObj.nom,
+            miseEnRelation.structureObj.codePostal,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
