@@ -69,6 +69,7 @@ const getCandidatsStructureAvecFiltre =
       {
         $project: {
           _id: 1,
+          idPG: 1,
           nom: 1,
           prenom: 1,
           codePostal: 1,
