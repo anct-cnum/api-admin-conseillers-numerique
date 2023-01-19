@@ -20,9 +20,8 @@ const getExportConseillersWithoutCRACsv =
         {
           $match: {
             $and: [query],
-            groupeCRA: { $eq: 4 },
             statut: { $eq: 'RECRUTE' },
-            estCoordinateur: { $exists: false },
+            estCoordinateur: { $ne: true },
             groupeCRAHistorique: {
               $elemMatch: {
                 nbJourDansGroupe: { $exists: false },
