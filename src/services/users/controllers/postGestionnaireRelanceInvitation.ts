@@ -31,7 +31,6 @@ const gestionnaireRelanceInvitation =
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
           { returnOriginal: false },
         );
-      console.log(gestionnaireRefreshed);
       const mailerInstance = mailer(app);
       const message = invitationActiveCompte(app, mailerInstance);
       const errorSmtpMail = await message
