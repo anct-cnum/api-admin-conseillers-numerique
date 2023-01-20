@@ -14,7 +14,11 @@ const checkAccessReadRequestGestionnaires = async (
 
 const filterRole = (role: string) => {
   if (role === 'ROLE_TOUS') {
-    return { roles: { '$in': ['admin', 'grandReseau', 'prefet', 'hub_coop', 'structure']} };
+    return {
+      roles: {
+        '$in': ['admin', 'grandReseau', 'prefet', 'hub_coop', 'structure']
+      }
+    };
   }
   if (role === 'ROLE_ADMIN') {
     return { roles: 'admin' };
