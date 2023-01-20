@@ -9,10 +9,7 @@ const deleteAccount =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idUser = req.params.id;
     try {
-      if (
-        req.user?.roles.length > 1 &&
-        req.user?.roles.includes('admin')
-      ) {
+      if (req.user?.roles.length > 1 && req.user?.roles.includes('admin')) {
         await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.delete)

@@ -16,14 +16,14 @@ const getExportListeGestionnairesCsv =
       app,
       req,
     );
-    const { search_role,searchByName } = req.query;
+    const { searchRole, searchByName } = req.query;
     let gestionnaires: IUser[];
     try {
       gestionnaires = await app.service(service.users).Model.aggregate([
         {
           $match: {
             $and: [checkAccessGestionnaire],
-            ...filterRole(search_role),
+            ...filterRole(searchRole),
             ...filterNomGestionnaire(searchByName),
           },
         },
@@ -39,7 +39,7 @@ const getExportListeGestionnairesCsv =
             passwordCreated: 1,
           },
         },
-//     { $sort: sortColonne },
+       // { $sort: sortColonne },
       ]);
 
       generateCsvListeGestionnaires(gestionnaires, res);

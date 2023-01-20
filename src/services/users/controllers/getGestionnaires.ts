@@ -6,13 +6,13 @@ import service from '../../../helpers/services';
 import {
   checkAccessReadRequestGestionnaires,
   filterRole,
-  filterNomGestionnaire
+  filterNomGestionnaire,
 } from '../users.repository';
 
 const getGestionnairesAvecFiltre =
   (app: Application, checkAccess) =>
   async (
-    search_role: string,
+    searchRole: string,
     searchByName: string,
     sortColonne: object,
     skip: string,
@@ -22,7 +22,7 @@ const getGestionnairesAvecFiltre =
       {
         $match: {
           $and: [checkAccess],
-          ...filterRole(search_role),
+          ...filterRole(searchRole),
           ...filterNomGestionnaire(searchByName),
         },
       },
@@ -47,15 +47,12 @@ const getGestionnairesAvecFiltre =
 
 const getTotalGestionnaires =
   (app: Application, checkAccess) =>
-  async (
-    search_role: string,
-    searchByName: string,
-  ) =>
+  async (searchRole: string, searchByName: string) =>
     app.service(service.users).Model.aggregate([
       {
         $match: {
           $and: [checkAccess],
-          ...filterRole(search_role),
+          ...filterRole(searchRole),
           ...filterNomGestionnaire(searchByName),
         },
       },
@@ -65,7 +62,7 @@ const getTotalGestionnaires =
 
 const getGestionnaires =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { skip, ordre, nomOrdre, searchByNom, search_role } = req.query;
+    const { skip, ordre, nomOrdre, searchByNom, searchRole } = req.query;
     const items: { total: number; data: object; limit: number; skip: number } =
       {
         total: 0,
@@ -80,14 +77,17 @@ const getGestionnaires =
         app,
         checkAccess,
       )(
-        search_role as string,
+        searchRole as string,
         searchByNom as string,
         sortColonne,
         skip as string,
         options.paginate.default,
       );
       if (gestionnaires.length > 0) {
-        const totalGestionnaires = await getTotalGestionnaires(app, checkAccess)( search_role as string, searchByNom as string);
+        const totalGestionnaires = await getTotalGestionnaires(
+          app,
+          checkAccess
+        )( searchRole as string, searchByNom as string);
         items.data = gestionnaires;
         items.total = totalGestionnaires[0]?.count_gestionnaires;
         items.limit = options.paginate.default;

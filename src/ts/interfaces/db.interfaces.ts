@@ -5,7 +5,6 @@ import { Types } from 'mongoose';
 import { Reseau } from '../types';
 
 const mongoose = require('mongoose');
-const dbref = require('mongoose-dbref');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { DBRef } = mongoose.SchemaTypes;
 
