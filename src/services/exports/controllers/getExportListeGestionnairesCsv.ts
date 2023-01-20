@@ -16,10 +16,7 @@ const getExportListeGestionnairesCsv =
       app,
       req,
     );
-    const {
-      search_role,
-      searchByName,
-    } = req.query;
+    const { search_role,searchByName } = req.query;
     let gestionnaires: IUser[];
     try {
       gestionnaires = await app.service(service.users).Model.aggregate([
