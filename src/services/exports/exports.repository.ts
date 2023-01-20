@@ -677,6 +677,44 @@ const generateCsvListeStructures = async (structures, res: Response) => {
   }
 };
 
+const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id du gestionnaire',
+      'Rôle du gestionnaire',
+      'Email du gestionnaire',
+      'Réseau',
+      'Nom',
+      'Prénom',
+      "Date d'invitation",
+      'Actif',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...gestionnaires.map((gestionnaire) =>
+          [
+            gestionnaire._id,
+            `"${gestionnaire.roles.join(',')}"`,
+            gestionnaire.name,
+            gestionnaire.reseau,
+            gestionnaire.nom,
+            gestionnaire.prenom,
+            gestionnaires?.tokenCreatedAt ? dayjs(gestionnaire.tokenCreatedAt).format('DD/MM/YYYY') : '-',
+            gestionnaire?.passwordCreated ? 'Oui' : 'Non' || '-',
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.statusMessage =
+      "Une erreur s'est produite au niveau de la création du csv";
+    res.status(500).end();
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -688,4 +726,5 @@ export {
   generateCsvTerritoires,
   generateCsvConseillers,
   generateCsvListeStructures,
+  generateCsvListeGestionnaires,
 };

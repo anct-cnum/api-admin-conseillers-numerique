@@ -3,4 +3,5 @@ import { action, ressource } from '../accessList';
 
 export default function adminRules(app: Application, can: any) {
   can(action.manage, ressource.all);
+  can(action.read, ressource.users);
 }
