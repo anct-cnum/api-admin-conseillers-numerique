@@ -88,6 +88,7 @@ const getMisesEnRelation =
           'conseillerObj.cv': 1,
           'conseillerObj.prenom': 1,
           'conseillerObj.nom': 1,
+          'conseillerObj.idPG': 1,
           'conseillerObj.email': 1,
           'conseillerObj.createdAt': 1,
           'conseillerObj.codePostal': 1,
