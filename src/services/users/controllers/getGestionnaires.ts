@@ -86,8 +86,8 @@ const getGestionnaires =
       if (gestionnaires.length > 0) {
         const totalGestionnaires = await getTotalGestionnaires(
           app,
-          checkAccess
-        )( searchRole as string, searchByNom as string);
+          checkAccess,
+        )(searchRole as string, searchByNom as string);
         items.data = gestionnaires;
         items.total = totalGestionnaires[0]?.count_gestionnaires;
         items.limit = options.paginate.default;

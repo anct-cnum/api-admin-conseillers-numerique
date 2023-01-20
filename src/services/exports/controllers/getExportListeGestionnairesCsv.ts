@@ -39,7 +39,7 @@ const getExportListeGestionnairesCsv =
             passwordCreated: 1,
           },
         },
-       // { $sort: sortColonne },
+        // { $sort: sortColonne },
       ]);
 
       generateCsvListeGestionnaires(gestionnaires, res);
