@@ -17,9 +17,8 @@ const getExportListeGestionnairesCsv =
       req,
     );
     const { searchRole, searchByName } = req.query;
-    let gestionnaires: IUser[];
     try {
-      gestionnaires = await app.service(service.users).Model.aggregate([
+      const gestionnaires: IUser[] = await app.service(service.users).Model.aggregate([
         {
           $match: {
             $and: [checkAccessGestionnaire],
