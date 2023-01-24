@@ -2,6 +2,7 @@ const Joi = require('@hapi/joi');
 
 const validMiseEnRelation = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
   nomOrdre: Joi.string()
     .required()
     .error(new Error('Le nom du tri est invalide')),

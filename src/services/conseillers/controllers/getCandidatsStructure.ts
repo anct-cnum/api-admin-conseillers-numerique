@@ -99,7 +99,7 @@ const getCandidatsStructure =
       res.status(404).json({ message: "La structure n'existe pas" });
       return;
     }
-    const { pix, diplome, cv, skip, search, nomOrdre } = req.query;
+    const { pix, diplome, cv, skip, search, nomOrdre, ordre } = req.query;
     const candidatValidation = validCandidatsStructure.validate({
       skip,
       pix,
@@ -107,6 +107,7 @@ const getCandidatsStructure =
       cv,
       search,
       nomOrdre,
+      ordre,
     });
 
     if (candidatValidation.error) {
@@ -126,7 +127,7 @@ const getCandidatsStructure =
       skip: 0,
       coselec: {},
     };
-    const sortColonne = JSON.parse(`{"${nomOrdre}":1}`);
+    const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
 
     try {
       const conseillerIds = await app

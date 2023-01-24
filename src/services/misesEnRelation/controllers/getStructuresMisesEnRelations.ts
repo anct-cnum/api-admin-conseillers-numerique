@@ -117,7 +117,8 @@ const getStructuresMisesEnRelations =
       }
 
       // User Filters
-      const { pix, diplome, cv, skip, search, filter, nomOrdre } = req.query;
+      const { pix, diplome, cv, skip, search, filter, nomOrdre, ordre } =
+        req.query;
       const emailValidation = validMiseEnRelation.validate({
         skip,
         diplome,
@@ -126,6 +127,7 @@ const getStructuresMisesEnRelations =
         search,
         filter,
         nomOrdre,
+        ordre,
       });
 
       if (emailValidation.error) {
@@ -146,7 +148,7 @@ const getStructuresMisesEnRelations =
         skip: 0,
         coselec: {},
       };
-      const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":1}`);
+      const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const misesEnRelation = await getMisesEnRelation(app, checkAccess)(
         structure._id,
