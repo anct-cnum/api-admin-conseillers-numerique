@@ -10,6 +10,10 @@ const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     try {
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const checkAccess = await checkAccessReadRequestConseillers(app, req);
       const conseiller: IConseillers[] = await app
         .service(service.conseillers)
@@ -119,12 +123,15 @@ const getConseillerById =
           },
         ]);
       if (conseiller.length === 0) {
-        return res.status(404).json({ message: 'Conseiller non trouvé' });
+        res.status(404).json({ message: 'Conseiller non trouvé' });
+        return;
       }
-      return res.status(200).json(conseiller[0]);
+      res.status(200).json(conseiller[0]);
+      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        return res.status(403).json({ message: 'Accès refusé' });
+        res.status(403).json({ message: 'Accès refusé' });
+        return;
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

@@ -20,6 +20,10 @@ const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     try {
+      if (!ObjectId.isValid(idStructure)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const checkAccessStructure = await checkAccessReadRequestStructures(
         app,
         req,
@@ -99,13 +103,16 @@ const getDetailStructureById =
       structure[0].users = users;
 
       if (structure.length === 0) {
-        return res.status(404).json({ message: 'Structure non trouvée' });
+        res.status(404).json({ message: 'Structure non trouvée' });
+        return;
       }
 
-      return res.status(200).json(structure[0]);
+      res.status(200).json(structure[0]);
+      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        return res.status(403).json({ message: 'Accès refusé' });
+        res.status(403).json({ message: 'Accès refusé' });
+        return;
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
