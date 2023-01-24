@@ -91,6 +91,10 @@ const getCandidatsStructureAvecFiltre =
 const getCandidatsStructure =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const structureId = req.params.id;
+    if (!ObjectId.isValid(structureId)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
     const structure: IStructures = await app
       .service(service.structures)
       .Model.accessibleBy(req.ability, action.read)
