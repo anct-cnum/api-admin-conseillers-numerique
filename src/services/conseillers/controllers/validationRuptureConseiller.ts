@@ -99,7 +99,7 @@ const updateConseillerRupture =
             $push: {
               ruptures: {
                 structureId: conseiller.structureId,
-                dateRupture: dateFinDeContrat,
+                dateRupture: new Date(dateFinDeContrat),
                 motifRupture: miseEnRelation.motifRupture,
               },
             },
