@@ -10,7 +10,15 @@ import { getCoselec } from '../../../utils';
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const filter = { _id: req.params.id };
+
+    if (req.body.dateRecrutement) {
+      req.body.dateRecrutement = new Date(req.body.dateRecrutement);
+    }
+    if (req.body.dateRupture) {
+      req.body.dateRupture = new Date(req.body.dateRupture);
+    }
     const update = req.body;
+    let remove = {};
 
     try {
       const miseEnRelationVerif: IMisesEnRelation = await app
@@ -58,22 +66,31 @@ const updateMiseEnRelation =
             return;
           }
         }
+        remove = {
+          emetteurRupture: '',
+          dateRupture: '',
+          motifRupture: '',
+        };
       }
-      if (miseEnRelationVerif.statut === 'nouvelle_rupture') {
-        if (miseEnRelationVerif.dateRupture === null) {
+      if (req.body.statut === 'nouvelle_rupture') {
+        if (req.body.dateRupture === null) {
           res.status(400).json({
             message:
               'La date de rupture doit être obligatoirement renseignée !',
           });
           return;
         }
-        if (miseEnRelationVerif.motifRupture === null) {
+        if (req.body.motifRupture === null) {
           res.status(400).json({
             message:
               'Le motif de rupture doit être obligatoirement renseigné !',
           });
           return;
         }
+        req.body.emetteurRupture = {
+          email: req.user.name,
+          date: new Date(),
+        };
       }
       const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
@@ -81,7 +98,8 @@ const updateMiseEnRelation =
         .findOneAndUpdate(
           { _id: filter },
           {
-            $set: { ...update },
+            $set: update,
+            $unset: remove,
           },
           { new: true },
         );
