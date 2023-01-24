@@ -11,6 +11,10 @@ const getCandidatByIdStructure =
     const idConseiller = req.params.id;
 
     try {
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)

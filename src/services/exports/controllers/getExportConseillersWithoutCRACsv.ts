@@ -20,9 +20,8 @@ const getExportConseillersWithoutCRACsv =
         {
           $match: {
             $and: [query],
-            groupeCRA: { $eq: 4 },
             statut: { $eq: 'RECRUTE' },
-            estCoordinateur: { $exists: false },
+            estCoordinateur: { $ne: true },
             groupeCRAHistorique: {
               $elemMatch: {
                 nbJourDansGroupe: { $exists: false },
@@ -54,6 +53,7 @@ const getExportConseillersWithoutCRACsv =
             'structure.idPG': 1,
             'structure.siret': 1,
             'structure.nom': 1,
+            'structure.codePostal': 1,
           },
         },
       ]);

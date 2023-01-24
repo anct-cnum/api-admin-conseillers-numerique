@@ -12,6 +12,10 @@ const getCandidatCV =
     try {
       // Verification rôle candidat / structure / admin pour accéder au CV : si candidat alors il ne peut avoir accès qu'à son CV
       const userId = req.user._id;
+      if (!ObjectId.isValid(userId)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const user = await app
         .service(service.users)
         .Model.findOne({ _id: new ObjectId(userId) });

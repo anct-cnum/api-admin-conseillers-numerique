@@ -13,9 +13,19 @@ const checkAccessReadRequestMisesEnRelation = async (
     .getQuery();
 
 const filterNomConseiller = (nom: string) => {
-  return nom
-    ? { 'conseillerObj.nom': { $regex: `(?'name'${nom}.*$)`, $options: 'i' } }
-    : {};
+  const formatNom = nom?.trim();
+  if (/^\d+$/.test(formatNom)) {
+    return { 'conseillerObj.idPG': { $eq: parseInt(formatNom, 10) } };
+  }
+  if (formatNom) {
+    return {
+      'conseillerObj.nom': {
+        $regex: `(?'name'${formatNom}.*$)`,
+        $options: 'i',
+      },
+    };
+  }
+  return {};
 };
 
 const filterPix = (pix: string) => {

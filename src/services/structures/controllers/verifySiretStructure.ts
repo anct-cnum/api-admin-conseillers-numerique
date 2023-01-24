@@ -16,7 +16,9 @@ const verifySiretStructure =
         object: 'checkSiret',
       };
       const result = await axios.get(urlSiret, { params });
-
+      if (result.data?.errors?.length > 0) {
+        return res.status(400).json({ message: result.data.errors[0] });
+      }
       return res.send({ nomStructure: result.data.etablissement.adresse.l1 });
     } catch (error) {
       if (error.name === 'AxiosError') {

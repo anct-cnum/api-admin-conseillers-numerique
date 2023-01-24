@@ -189,6 +189,7 @@ const generateCsvConseillersWithoutCRA = async (
       'Id de la structure',
       'Siret de la structure',
       'Nom de la structure',
+      'Code postal de la structure',
     ];
     res.write(
       [
@@ -197,7 +198,7 @@ const generateCsvConseillersWithoutCRA = async (
           [
             statCnfsWithoutCRA.nom,
             statCnfsWithoutCRA.prenom,
-            statCnfsWithoutCRA.emailCN.address,
+            statCnfsWithoutCRA.emailCN?.address,
             statCnfsWithoutCRA.codePostal,
             statCnfsWithoutCRA.codeDepartement,
             statCnfsWithoutCRA.telephone,
@@ -216,6 +217,7 @@ const generateCsvConseillersWithoutCRA = async (
             statCnfsWithoutCRA.structure.idPG,
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
+            statCnfsWithoutCRA.structure.codePostal,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

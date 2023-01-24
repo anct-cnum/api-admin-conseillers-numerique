@@ -9,6 +9,10 @@ const getCandidatById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     try {
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const conseiller = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
