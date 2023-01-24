@@ -66,6 +66,8 @@ const updateMiseEnRelation =
             return;
           }
         }
+      }
+      if (req.body.statut === 'finalisee') {
         remove = {
           emetteurRupture: '',
           dateRupture: '',
@@ -87,7 +89,7 @@ const updateMiseEnRelation =
           });
           return;
         }
-        req.body.emetteurRupture = {
+        update.emetteurRupture = {
           email: req.user.name,
           date: new Date(),
         };
