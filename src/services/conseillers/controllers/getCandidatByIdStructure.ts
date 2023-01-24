@@ -64,6 +64,7 @@ const getCandidatByIdStructure =
               pix: '$conseiller.pix',
               cv: '$conseiller.cv',
               idConseiller: '$conseiller._id',
+              idPG: '$conseiller.idPG',
             },
           },
         ]);

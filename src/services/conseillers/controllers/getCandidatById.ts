@@ -29,8 +29,17 @@ const getCandidatById =
           'entity.$id': new ObjectId(idConseiller),
           roles: { $in: ['candidat'] },
         });
+      const miseEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          'conseiller.$id': conseiller._id,
+          statut: 'recrutee',
+        });
       const conseillerFormat = conseiller.toObject();
       conseillerFormat.possedeCompteCandidat = possedeCompteCandidat > 0;
+      conseillerFormat.miseEnRelation = miseEnRelation;
+
       res.status(200).json(conseillerFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
