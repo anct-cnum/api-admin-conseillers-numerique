@@ -65,13 +65,18 @@ const getStructures = async (
     structuresQuery.codePostal = query['cra.codePostal'];
   }
   if (query['cra.nomCommune']) {
-    const regexNomCommune = new RegExp(`^${query['cra.nomCommune']}$`, 'i');
-    structuresQuery.nomCommune = { $regex: regexNomCommune };
+    if (query['cra.nomCommune'].split(' ')[0] === 'PARIS') {
+      structuresQuery.nomCommune = { $regex: 'Paris', $options: 'i' };
+    } else {
+      const regexNomCommune = query['cra.nomCommune'].replace(/ /g, '.');
+      structuresQuery.nomCommune = { $regex: regexNomCommune, $options: 'i' };
+    }
   }
   const queryAccess = await app
     .service(service.structures)
     .Model.accessibleBy(ability, read)
     .getQuery();
+
   return app
     .service(service.structures)
     .Model.aggregate([
@@ -92,8 +97,12 @@ const getConseillers = async (
     conseillersQuery.codePostal = query['cra.codePostal'];
   }
   if (query['cra.nomCommune']) {
-    const regexNomCommune = new RegExp(`^${query['cra.nomCommune']}$`, 'i');
-    conseillersQuery.nomCommune = { $regex: regexNomCommune };
+    if (query['cra.nomCommune'].split(' ')[0] === 'PARIS') {
+      conseillersQuery.nomCommune = { $regex: 'Paris', $options: 'i' };
+    } else {
+      const regexNomCommune = query['cra.nomCommune'].replace(/ /g, '.');
+      conseillersQuery.nomCommune = { $regex: regexNomCommune, $options: 'i' };
+    }
   }
   const queryAccess = await app
     .service(service.conseillers)
