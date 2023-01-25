@@ -32,7 +32,7 @@ const getCandidatById =
       const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({
+        .find({
           'conseiller.$id': conseiller._id,
           statut: 'recrutee',
         });
