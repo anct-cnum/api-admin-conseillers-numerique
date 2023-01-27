@@ -26,7 +26,7 @@ const getExportListeGestionnairesCsv =
     });
 
     if (fieldsValidation.error) {
-      res.status(400).json({message: fieldsValidation.error.message});
+      res.status(400).json({ message: fieldsValidation.error.message });
     }
     try {
       const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
