@@ -18,7 +18,10 @@ const gestionnaireRelanceInvitation =
       const gestionnaire: IUser = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: new ObjectId(idGestionnaire) });
+        .findOne({
+          _id: new ObjectId(idGestionnaire),
+          migrationDashboard: true,
+        });
       if (!gestionnaire) {
         res.status(404).json({ message: "Le gestionnaire n'existe pas" });
         return;

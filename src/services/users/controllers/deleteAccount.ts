@@ -9,15 +9,15 @@ const deleteAccount =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idUser = req.params.id;
     try {
-      if (req.user?.roles.length > 1 && req.user?.roles.includes('admin')) {
-        await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.delete)
-          .deleteOne({
-            _id: new ObjectId(idUser),
-            roles: { $all: ['admin'] },
-          });
-      }
+      // xxx pour le moment on n'autorise que les admins à supprimer un user
+      // à voir : suppression d'un rôle et non du user complet si multi rôle
+      await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.delete)
+        .deleteOne({
+          _id: new ObjectId(idUser),
+          roles: { $all: ['admin'] },
+        });
       res.status(200).json({ deleteSuccess: true, idUser });
     } catch (error) {
       res.status(500).json({ message: error.message });
