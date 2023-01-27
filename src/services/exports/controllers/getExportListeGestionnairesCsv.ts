@@ -4,6 +4,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvListeGestionnaires } from '../exports.repository';
+import { validExportGestionnaires } from '../../../schemas/users.schemas';
 import {
   checkAccessReadRequestGestionnaires,
   filterRole,
@@ -16,8 +17,24 @@ const getExportListeGestionnairesCsv =
       app,
       req,
     );
-    const { searchRole, searchByName } = req.query;
+    const {
+      searchRole,
+      searchByName,
+      ordre,
+      nomOrdre,
+    } = req.query;
+    const fieldsValidation = validExportGestionnaires.validate({
+      ordre,
+      nomOrdre,
+      searchRole,
+      searchByName,
+    });
+
+    if (fieldsValidation.error) {
+      res.status(400).json({message: fieldsValidation.error.message});
+    }
     try {
+      const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
       const gestionnaires: IUser[] = await app
         .service(service.users)
         .Model.aggregate([
@@ -40,7 +57,7 @@ const getExportListeGestionnairesCsv =
               passwordCreated: 1,
             },
           },
-          // { $sort: sortColonne },
+          { $sort: sortColonne },
         ]);
 
       generateCsvListeGestionnaires(gestionnaires, res);
