@@ -17,12 +17,7 @@ const getExportListeGestionnairesCsv =
       app,
       req,
     );
-    const {
-      searchRole,
-      searchByName,
-      ordre,
-      nomOrdre,
-    } = req.query;
+    const { searchRole, searchByName, ordre, nomOrdre } = req.query;
     const fieldsValidation = validExportGestionnaires.validate({
       ordre,
       nomOrdre,

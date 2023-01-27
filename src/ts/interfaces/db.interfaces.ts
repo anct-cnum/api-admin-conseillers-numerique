@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 import { Reseau } from '../types';
 
 const mongoose = require('mongoose');
+
 const { DBRef } = mongoose.SchemaTypes;
 
 export interface IUser {

@@ -11,7 +11,6 @@ import {
   postInvitationGrandReseau,
   postInvitationHub,
   postInvitationPrefet,
-  postInvitationStructure,
   postGestionnaireRelanceInvitation,
   updateAccessibleData,
   verifyToken,

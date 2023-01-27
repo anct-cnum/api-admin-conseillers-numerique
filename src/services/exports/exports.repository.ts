@@ -101,7 +101,11 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -135,7 +139,11 @@ const generateCsvCandidatByStructure = async (
     await Promise.all(promises);
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -158,7 +166,11 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
     }
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -218,7 +230,11 @@ const generateCsvConseillersWithoutCRA = async (
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -309,7 +325,11 @@ const generateCsvStructure = async (
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -344,7 +364,11 @@ const generateCsvRupture = async (
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -509,7 +533,11 @@ const generateCsvSatistiques = async (
     res.write(buildExportStatistiquesCsvFileContent);
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -546,7 +574,11 @@ const generateCsvTerritoires = async (
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -604,7 +636,11 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -652,7 +688,11 @@ const generateCsvListeStructures = async (structures, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
@@ -690,7 +730,11 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.status(500).json({message: "Une erreur s'est produite au niveau de la création du csv"});
+    res
+      .status(500)
+      .json({
+        message: "Une erreur s'est produite au niveau de la création du csv"
+      });
     throw new Error(error);
   }
 };
