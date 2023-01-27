@@ -10,7 +10,6 @@ import {
   postInvitationGrandReseau,
   postInvitationHub,
   postInvitationPrefet,
-  postInvitationStructure,
   updateAccessibleData,
   verifyToken,
   signIn,
@@ -54,12 +53,12 @@ export default class Users extends Service {
       createAbilities(app),
       postInvitationAdmin(app),
     );
-    app.post(
+    /*     app.post(
       '/inviteStructure',
       authenticateMode(app),
       createAbilities(app),
       postInvitationStructure(app),
-    );
+    ); */
     app.get('/users/verifyToken/:token', verifyToken(app));
     app.get(
       '/users',
