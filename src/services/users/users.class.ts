@@ -10,7 +10,6 @@ import {
   postInvitationGrandReseau,
   postInvitationHub,
   postInvitationPrefet,
-  postInvitationStructure,
   updateAccessibleData,
   verifyToken,
   signIn,
