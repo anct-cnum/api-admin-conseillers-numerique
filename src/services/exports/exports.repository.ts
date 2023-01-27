@@ -192,7 +192,7 @@ const generateCsvConseillersWithoutCRA = async (
           [
             statCnfsWithoutCRA.nom,
             statCnfsWithoutCRA.prenom,
-            statCnfsWithoutCRA.emailCN.address,
+            statCnfsWithoutCRA.emailCN?.address,
             statCnfsWithoutCRA.codePostal,
             statCnfsWithoutCRA.codeDepartement,
             statCnfsWithoutCRA.telephone,

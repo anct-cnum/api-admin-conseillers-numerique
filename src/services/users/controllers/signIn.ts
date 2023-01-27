@@ -118,6 +118,11 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 )
               : user.roles;
 
+          // HOTFIX TEMPORAIRE
+          if (user.roles.includes('structure') && user.roles.length === 1) {
+            return res.status(401).json('Connexion refusée');
+          }
+
           // envoi de l'access token
           return res.status(200).json({ user, accessToken });
         } catch (error) {

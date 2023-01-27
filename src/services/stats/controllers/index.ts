@@ -5,6 +5,7 @@ import getStatsTerritoires from './getStatsTerritoires';
 import getStatsTerritoire from './getStatsTerritoire';
 import getStatsTerritoireCra from './getStatsTerritoireCra';
 import getStatsConseiller from './getStatsConseiller';
+import getStatsNationalesGrandReseau from './getStatsNationalesGrandReseau';
 
 export {
   getStatsNationales,
@@ -14,4 +15,5 @@ export {
   getStatsStructure,
   getStatsConseiller,
   getDatasStructures,
+  getStatsNationalesGrandReseau,
 };

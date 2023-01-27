@@ -14,10 +14,36 @@ import {
   getStatsReorientations,
   getStatsEvolutions,
   conversionPourcentage,
+  getCodesPostauxGrandReseau,
+  getStructures,
+  getConseillers,
 } from '../stats.repository';
 
-const getStatsGlobales = async (query, ability, action, app) => {
+const getStatsGlobales = async (
+  query,
+  ability,
+  action,
+  app,
+  pilotage = false,
+  codesPostauxQuery = null,
+) => {
   try {
+    let codesPostaux = [];
+    let structures = [];
+    let conseillers = [];
+
+    if (pilotage) {
+      codesPostaux = await getCodesPostauxGrandReseau(
+        codesPostauxQuery,
+        ability,
+        action,
+        app,
+      );
+
+      structures = await getStructures(query, ability, action, app);
+
+      conseillers = await getConseillers(query, ability, action, app);
+    }
     const nbAccompagnement = await getNombreCra(query, app);
 
     const statsAccompagnements = await getStatsAccompagnements(
@@ -88,6 +114,9 @@ const getStatsGlobales = async (query, ability, action, app) => {
       statsUsagers,
       statsReorientations,
       statsEvolutions,
+      codesPostaux,
+      structures,
+      conseillers,
     };
 
     const totalParticipants = await getStatsTotalParticipants(donneesStats);
