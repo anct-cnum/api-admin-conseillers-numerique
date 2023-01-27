@@ -9,6 +9,10 @@ const getStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     try {
+      if (!ObjectId.isValid(idStructure)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       // Attention : pas d'access control car tout le monde peut voir tous les candidats
       const structure: IStructures = await app
         .service(service.structures)

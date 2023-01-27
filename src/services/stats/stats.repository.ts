@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
+import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
+import { ICodesPostauxQuery } from '../../ts/interfaces/global.interfaces';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -21,6 +23,90 @@ const sortByValueThenName = (a, b) => {
 
 const getNombreCra = async (query, app) =>
   app.service(service.cras).Model.countDocuments(query);
+
+const getCodesPostauxGrandReseau = async (
+  codesPostauxQuery: ICodesPostauxQuery,
+  ability,
+  read: string,
+  app: Application,
+) => {
+  const queryAccess = await app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+
+  return app.service(service.cras).Model.aggregate([
+    { $match: { ...codesPostauxQuery, $and: [queryAccess] } },
+    {
+      $group: {
+        _id: '$cra.codePostal',
+        villes: { $addToSet: '$cra.nomCommune' },
+      },
+    },
+    { $sort: { _id: 1, villes: 1 } },
+    {
+      $project: {
+        _id: 0,
+        codePostal: '$_id',
+        villes: '$villes',
+      },
+    },
+  ]);
+};
+
+const getStructures = async (
+  query,
+  ability,
+  read: string,
+  app: Application,
+) => {
+  const structuresQuery: any = {};
+  if (query['cra.codePostal']) {
+    structuresQuery.codePostal = query['cra.codePostal'];
+  }
+  if (query['cra.nomCommune']) {
+    const regexNomCommune = new RegExp(`^${query['cra.nomCommune']}$`, 'i');
+    structuresQuery.nomCommune = { $regex: regexNomCommune };
+  }
+  const queryAccess = await app
+    .service(service.structures)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+  return app
+    .service(service.structures)
+    .Model.aggregate([
+      { $match: { ...structuresQuery, $and: [queryAccess] } },
+      { $sort: { nom: 1 } },
+      { $project: { nom: 1 } },
+    ]);
+};
+
+const getConseillers = async (
+  query,
+  ability,
+  read: string,
+  app: Application,
+) => {
+  const conseillersQuery: any = {};
+  if (query['cra.codePostal']) {
+    conseillersQuery.codePostal = query['cra.codePostal'];
+  }
+  if (query['cra.nomCommune']) {
+    const regexNomCommune = new RegExp(`^${query['cra.nomCommune']}$`, 'i');
+    conseillersQuery.nomCommune = { $regex: regexNomCommune };
+  }
+  const queryAccess = await app
+    .service(service.conseillers)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+  return app
+    .service(service.conseillers)
+    .Model.aggregate([
+      { $match: { ...conseillersQuery, $and: [queryAccess] } },
+      { $sort: { email: 1 } },
+      { $project: { email: 1 } },
+    ]);
+};
 
 const getPersonnesRecurrentes = async (query, ability, read, app) => {
   const queryAccess = await app
@@ -508,4 +594,7 @@ export {
   getStatsEvolutions,
   conversionPourcentage,
   getPersonnesAccompagnees,
+  getCodesPostauxGrandReseau,
+  getStructures,
+  getConseillers,
 };

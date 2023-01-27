@@ -36,7 +36,29 @@ export interface Ressource {
   conseillersSupprimes: string;
   conseillersRuptures: string;
 }
+
 export interface IStructuresConseillers {
   _id: ObjectId;
   conseiller: ObjectId[];
+}
+
+export interface ICodeRegion {
+  nom: string;
+  code: string;
+}
+
+export interface IDepartement {
+  num_dep: string;
+  dep_name: string;
+  region_name: string;
+}
+
+export interface ICodesPostauxQuery {
+  'cra.dateAccompagnement'?: {
+    $gte: Date;
+    $lte: Date;
+  };
+  'cra.codePostal'?: {
+    $regex: string;
+  };
 }

@@ -9,6 +9,10 @@ const getCandidatById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     try {
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const conseiller = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -25,8 +29,17 @@ const getCandidatById =
           'entity.$id': new ObjectId(idConseiller),
           roles: { $in: ['candidat'] },
         });
+      const miseEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          'conseiller.$id': conseiller._id,
+          statut: 'recrutee',
+        });
       const conseillerFormat = conseiller.toObject();
       conseillerFormat.possedeCompteCandidat = possedeCompteCandidat > 0;
+      conseillerFormat.miseEnRelation = miseEnRelation;
+
       res.status(200).json(conseillerFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
