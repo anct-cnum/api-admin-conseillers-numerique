@@ -60,30 +60,49 @@ const getStructures = async (
   read: string,
   app: Application,
 ) => {
-  const structuresQuery: any = {};
+  const crasQuery: any = {};
   if (query['cra.codePostal']) {
-    structuresQuery.codePostal = query['cra.codePostal'];
+    crasQuery['cra.codePostal'] = query['cra.codePostal'];
   }
   if (query['cra.nomCommune']) {
-    if (query['cra.nomCommune'].split(' ')[0] === 'PARIS') {
-      structuresQuery.nomCommune = { $regex: 'Paris', $options: 'i' };
-    } else {
-      const regexNomCommune = query['cra.nomCommune'].replace(/ /g, '.');
-      structuresQuery.nomCommune = { $regex: regexNomCommune, $options: 'i' };
-    }
+    crasQuery['cra.nomCommune'] = query['cra.nomCommune'];
   }
+
   const queryAccess = await app
-    .service(service.structures)
+    .service(service.cras)
     .Model.accessibleBy(ability, read)
     .getQuery();
+  const structures = await app.service(service.cras).Model.aggregate([
+    { $match: { ...crasQuery, $and: [queryAccess] } },
+    {
+      $project: {
+        structureArray: { $objectToArray: '$structure' },
+      },
+    },
+    {
+      $unwind: '$structureArray',
+    },
+    {
+      $match: { 'structureArray.k': '$id' },
+    },
+    {
+      $group: {
+        _id: null,
+        uniqueStructures: { $addToSet: '$structureArray.v' },
+      },
+    },
+    {
+      $lookup: {
+        from: 'structures',
+        localField: 'uniqueStructures',
+        foreignField: '_id',
+        as: 'structures',
+      },
+    },
+    { $project: { structures: 1, _id: 0 } },
+  ]);
 
-  return app
-    .service(service.structures)
-    .Model.aggregate([
-      { $match: { ...structuresQuery, $and: [queryAccess] } },
-      { $sort: { nom: 1 } },
-      { $project: { nom: 1 } },
-    ]);
+  return structures;
 };
 
 const getConseillers = async (
@@ -92,29 +111,48 @@ const getConseillers = async (
   read: string,
   app: Application,
 ) => {
-  const conseillersQuery: any = {};
+  const crasQuery: any = {};
   if (query['cra.codePostal']) {
-    conseillersQuery.codePostal = query['cra.codePostal'];
+    crasQuery['cra.codePostal'] = query['cra.codePostal'];
   }
   if (query['cra.nomCommune']) {
-    if (query['cra.nomCommune'].split(' ')[0] === 'PARIS') {
-      conseillersQuery.nomCommune = { $regex: 'Paris', $options: 'i' };
-    } else {
-      const regexNomCommune = query['cra.nomCommune'].replace(/ /g, '.');
-      conseillersQuery.nomCommune = { $regex: regexNomCommune, $options: 'i' };
-    }
+    crasQuery['cra.nomCommune'] = query['cra.nomCommune'];
   }
   const queryAccess = await app
-    .service(service.conseillers)
+    .service(service.cras)
     .Model.accessibleBy(ability, read)
     .getQuery();
-  return app
-    .service(service.conseillers)
-    .Model.aggregate([
-      { $match: { ...conseillersQuery, $and: [queryAccess] } },
-      { $sort: { email: 1 } },
-      { $project: { email: 1 } },
-    ]);
+
+  const conseillers = await app.service(service.cras).Model.aggregate([
+    { $match: { ...crasQuery, $and: [queryAccess] } },
+    {
+      $project: {
+        conseillerArray: { $objectToArray: '$conseiller' },
+      },
+    },
+    {
+      $unwind: '$conseillerArray',
+    },
+    {
+      $match: { 'conseillerArray.k': '$id' },
+    },
+    {
+      $group: {
+        _id: null,
+        uniqueConseillers: { $addToSet: '$conseillerArray.v' },
+      },
+    },
+    {
+      $lookup: {
+        from: 'conseillers',
+        localField: 'uniqueConseillers',
+        foreignField: '_id',
+        as: 'conseillers',
+      },
+    },
+    { $project: { conseillers: 1, _id: 0 } },
+  ]);
+  return conseillers;
 };
 
 const getPersonnesRecurrentes = async (query, ability, read, app) => {
