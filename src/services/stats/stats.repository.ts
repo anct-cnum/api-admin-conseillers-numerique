@@ -99,7 +99,14 @@ const getStructures = async (
         as: 'structures',
       },
     },
-    { $project: { structures: 1, _id: 0 } },
+    {
+      $project: {
+        'structures._id': 1,
+        'structures.nom': 1,
+        'structures.codePostal': 1,
+        _id: 0,
+      },
+    },
   ]);
 
   return structures;
@@ -150,7 +157,7 @@ const getConseillers = async (
         as: 'conseillers',
       },
     },
-    { $project: { conseillers: 1, _id: 0 } },
+    { $project: { 'conseillers.emailCN': 1, 'conseillers._id': 1, _id: 0 } },
   ]);
   return conseillers;
 };
