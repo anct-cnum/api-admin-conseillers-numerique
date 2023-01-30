@@ -43,9 +43,7 @@ export default async function grandReseauRules(
     },
   );
   can([action.read], ressource.cras, {
-    'structure.$id': {
-      $in: structuresIds,
-    },
+    'structure.$id': { $in: structuresIds },
     'conseiller.$id': { $in: conseillersIds },
   });
   can([action.read], ressource.statsConseillersCras, {
