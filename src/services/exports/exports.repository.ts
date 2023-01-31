@@ -713,7 +713,7 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
             gestionnaire.reseau,
             gestionnaire.nom,
             gestionnaire.prenom,
-            gestionnaires?.tokenCreatedAt
+            gestionnaire.tokenCreatedAt
               ? dayjs(gestionnaire.tokenCreatedAt).format('DD/MM/YYYY')
               : '-',
             compteActif(gestionnaire),
