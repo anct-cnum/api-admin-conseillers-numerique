@@ -361,7 +361,7 @@ const generateCsvRupture = async (
   }
 };
 
-const generateCsvSatistiques = async (
+const generateCsvStatistiques = async (
   statistiques,
   dateDebut,
   dateFin,
@@ -684,7 +684,7 @@ export {
   generateCsvStructure,
   generateCsvRupture,
   generateCsvConseillersHub,
-  generateCsvSatistiques,
+  generateCsvStatistiques,
   generateCsvTerritoires,
   generateCsvConseillers,
   generateCsvListeStructures,

@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from '../../stats/controllers/getStatsGlobales';
-import { generateCsvSatistiques } from '../exports.repository';
+import { generateCsvStatistiques } from '../exports.repository';
 import {
   getConseillersIdsByStructure,
   getConseillersIdsByTerritoire,
@@ -98,7 +98,8 @@ const getExportStatistiquesCsv =
           );
           idType = undefined;
           break;
-        case 'codeDepartement' || 'codeRegion':
+        case 'codeDepartement':
+        case 'codeRegion':
           conseillerIds = await getConseillersIdsByTerritoire(
             type,
             idType,
@@ -123,7 +124,7 @@ const getExportStatistiquesCsv =
           break;
       }
 
-      generateCsvSatistiques(
+      generateCsvStatistiques(
         statistiques,
         dateDebut,
         dateFin,
