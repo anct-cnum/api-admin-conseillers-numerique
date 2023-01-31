@@ -101,9 +101,9 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -137,9 +137,9 @@ const generateCsvCandidatByStructure = async (
     await Promise.all(promises);
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -162,9 +162,9 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
     }
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -224,9 +224,9 @@ const generateCsvConseillersWithoutCRA = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -317,9 +317,9 @@ const generateCsvStructure = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -354,9 +354,9 @@ const generateCsvRupture = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -521,9 +521,9 @@ const generateCsvStatistiques = async (
     res.write(buildExportStatistiquesCsvFileContent);
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -560,9 +560,9 @@ const generateCsvTerritoires = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -620,9 +620,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -670,9 +670,62 @@ const generateCsvListeStructures = async (structures, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
+const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
+  try {
+    const compteActif = (gestionnaire) => {
+      if (gestionnaire?.migrationDashboard) {
+        if (gestionnaire?.sub) {
+          return 'Oui';
+        }
+        return 'Non';
+      }
+      if (gestionnaire?.passwordCreated) {
+        return 'Oui';
+      }
+      return 'Non';
+    };
+
+    const fileHeaders = [
+      'Id du gestionnaire',
+      'Rôle du gestionnaire',
+      'Email du gestionnaire',
+      'Réseau',
+      'Nom',
+      'Prénom',
+      "Date d'invitation",
+      'Actif',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...gestionnaires.map((gestionnaire) =>
+          [
+            gestionnaire._id,
+            `"${gestionnaire.roles.join(',')}"`,
+            gestionnaire.name,
+            gestionnaire.reseau,
+            gestionnaire.nom,
+            gestionnaire.prenom,
+            gestionnaire.tokenCreatedAt
+              ? dayjs(gestionnaire.tokenCreatedAt).format('DD/MM/YYYY')
+              : '-',
+            compteActif(gestionnaire),
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -688,4 +741,5 @@ export {
   generateCsvTerritoires,
   generateCsvConseillers,
   generateCsvListeStructures,
+  generateCsvListeGestionnaires,
 };

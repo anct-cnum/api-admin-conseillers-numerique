@@ -5,6 +5,7 @@ import postInvitationAdmin from './postInvitationAdmin';
 import postInvitationStructure from './postInvitationStructure';
 import verifyToken from './verifyToken';
 import getUsers from './getUsers';
+import getGestionnaires from './getGestionnaires';
 import postInvitationHub from './postInvitationHub';
 import postInvitationGrandReseau from './postInvitationGrandReseau';
 import postInvitationPrefet from './postInvitationPrefet';
@@ -12,7 +13,9 @@ import signIn from './signIn';
 import signOut from './signOut';
 import getRefreshToken from './getRefreshToken';
 import deleteAccountGrandReseau from './deleteAccountGrandReseau';
-// eslint-disable-next-line import/prefer-default-export
+import deleteAccount from './deleteAccount';
+import postGestionnaireRelanceInvitation from './postGestionnaireRelanceInvitation';
+
 export {
   getAccessibleData,
   getAccessibleDataAggregate,
@@ -21,6 +24,7 @@ export {
   postInvitationStructure,
   verifyToken,
   getUsers,
+  getGestionnaires,
   postInvitationHub,
   postInvitationGrandReseau,
   postInvitationPrefet,
@@ -28,4 +32,6 @@ export {
   signOut,
   getRefreshToken,
   deleteAccountGrandReseau,
+  deleteAccount,
+  postGestionnaireRelanceInvitation,
 };
