@@ -16,7 +16,14 @@ const filterRole = (role: string) => {
   if (role === 'ROLE_TOUS') {
     return {
       roles: {
-        $in: ['admin', 'grandReseau', 'prefet', 'hub_coop', 'coordinateur_coop', 'structure'],
+        $in: [
+          'admin',
+          'grandReseau',
+          'prefet',
+          'hub_coop',
+          'coordinateur_coop',
+          'structure',
+        ],
       },
     };
   }

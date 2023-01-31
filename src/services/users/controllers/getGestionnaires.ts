@@ -85,12 +85,13 @@ const getGestionnaires =
         skip as string,
         options.paginate.default,
       );
-      const gestionnaires = gestionnairesEnClair.map( g => {
+      const gestionnaires = gestionnairesEnClair.map((g) => {
         // Anonymise le sub
-        if (g.sub) {
-          g.sub = 'xxxxxxxx';;
+        const gg = g;
+        if (gg.sub) {
+          gg.sub = 'xxxxxxxx';
         }
-        return g;
+        return gg;
       });
       if (gestionnaires.length > 0) {
         const totalGestionnaires = await getTotalGestionnaires(

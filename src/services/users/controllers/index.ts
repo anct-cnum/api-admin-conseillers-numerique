@@ -15,6 +15,7 @@ import getRefreshToken from './getRefreshToken';
 import deleteAccountGrandReseau from './deleteAccountGrandReseau';
 import deleteAccount from './deleteAccount';
 import postGestionnaireRelanceInvitation from './postGestionnaireRelanceInvitation';
+
 export {
   getAccessibleData,
   getAccessibleDataAggregate,

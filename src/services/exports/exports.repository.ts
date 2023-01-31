@@ -679,19 +679,17 @@ const generateCsvListeStructures = async (structures, res: Response) => {
 
 const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
   try {
-    const compteActif = gestionnaire => {
+    const compteActif = (gestionnaire) => {
       if (gestionnaire?.migrationDashboard) {
         if (gestionnaire?.sub) {
           return 'Oui';
-        } else {
-          return 'Non';
         }
+        return 'Non';
       }
       if (gestionnaire?.passwordCreated) {
         return 'Oui';
-      } else {
-        return 'Non';
       }
+      return 'Non';
     };
 
     const fileHeaders = [
