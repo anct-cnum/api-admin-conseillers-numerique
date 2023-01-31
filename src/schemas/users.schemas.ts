@@ -48,12 +48,12 @@ const createUserAdmin = Joi.object({
 });
 
 const validExportGestionnaires = Joi.object({
-  ordre: Joi.number().required().error(new Error('Sort est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
   nomOrdre: Joi.string()
     .required()
-    .error(new Error('Nom du sort est invalide')),
+    .error(new Error('Le nom du tri est invalide')),
   searchRole: Joi.string().error(
-    new Error('La recherche par role est invalide'),
+    new Error('La recherche par rôle est invalide'),
   ),
   searchByName: Joi.string().error(
     new Error('La recherche par nom est invalide'),

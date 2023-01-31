@@ -15,7 +15,6 @@ import getRefreshToken from './getRefreshToken';
 import deleteAccountGrandReseau from './deleteAccountGrandReseau';
 import deleteAccount from './deleteAccount';
 import postGestionnaireRelanceInvitation from './postGestionnaireRelanceInvitation';
-// eslint-disable-next-line import/prefer-default-export
 export {
   getAccessibleData,
   getAccessibleDataAggregate,

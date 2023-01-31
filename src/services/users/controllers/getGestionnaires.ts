@@ -36,6 +36,8 @@ const getGestionnairesAvecFiltre =
           prenom: 1,
           tokenCreatedAt: 1,
           passwordCreated: 1,
+          migrationDashboard: 1,
+          sub: 1,
         },
       },
       { $sort: sortColonne },
@@ -73,7 +75,7 @@ const getGestionnaires =
     const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
     try {
       const checkAccess = await checkAccessReadRequestGestionnaires(app, req);
-      const gestionnaires: IUser[] = await getGestionnairesAvecFiltre(
+      const gestionnairesEnClair: IUser[] = await getGestionnairesAvecFiltre(
         app,
         checkAccess,
       )(
@@ -83,6 +85,13 @@ const getGestionnaires =
         skip as string,
         options.paginate.default,
       );
+      const gestionnaires = gestionnairesEnClair.map( g => {
+        // Anonymise le sub
+        if (g.sub) {
+          g.sub = 'xxxxxxxx';;
+        }
+        return g;
+      });
       if (gestionnaires.length > 0) {
         const totalGestionnaires = await getTotalGestionnaires(
           app,

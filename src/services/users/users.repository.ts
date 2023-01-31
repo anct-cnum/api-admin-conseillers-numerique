@@ -16,7 +16,7 @@ const filterRole = (role: string) => {
   if (role === 'ROLE_TOUS') {
     return {
       roles: {
-        $in: ['admin', 'grandReseau', 'prefet', 'hub_coop', 'structure'],
+        $in: ['admin', 'grandReseau', 'prefet', 'hub_coop', 'coordinateur_coop', 'structure'],
       },
     };
   }
@@ -31,6 +31,9 @@ const filterRole = (role: string) => {
   }
   if (role === 'ROLE_HUB') {
     return { roles: 'hup_coop' };
+  }
+  if (role === 'ROLE_COORDINATEUR') {
+    return { roles: 'coordinateur_coop' };
   }
   if (role === 'ROLE_STRUCTURE') {
     return { roles: 'structure' };
