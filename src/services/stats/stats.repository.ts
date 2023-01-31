@@ -157,7 +157,21 @@ const getConseillers = async (
         as: 'conseillers',
       },
     },
-    { $project: { 'conseillers.emailCN': 1, 'conseillers._id': 1, _id: 0 } },
+    {
+      $project: {
+        conseillers: {
+          $map: {
+            input: '$conseillers',
+            as: 'conseiller',
+            in: {
+              _id: '$$conseiller._id',
+              emailCN: '$$conseiller.emailCN.address',
+            },
+          },
+        },
+        _id: 0,
+      },
+    },
   ]);
   return conseillers;
 };
