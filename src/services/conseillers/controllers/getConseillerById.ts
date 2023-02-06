@@ -67,6 +67,7 @@ const getConseillerById =
                     emetteurRupture: 1,
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
+                    'structureObj._id': 1,
                   },
                 },
               ],
