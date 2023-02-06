@@ -13,7 +13,9 @@ const departements = require('../../../../datas/imports/departements-region.json
 const codesRegions = require('../../../../datas/imports/code_region.json');
 
 const getStatsNationalesGrandReseau =
-  (app: Application) => async (req: IRequest, res: Response) => {
+  (app: Application, exportStats = false) =>
+  // eslint-disable-next-line consistent-return
+  async (req: IRequest, res: Response) => {
     try {
       const dateDebut = new Date(String(req.query.dateDebut));
       dateDebut.setUTCHours(0, 0, 0, 0);
@@ -126,11 +128,15 @@ const getStatsNationalesGrandReseau =
         true,
         codesPostauxQuery,
       );
+
+      if (exportStats) {
+        return donneesStats;
+      }
+
       res.status(200).json(donneesStats);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

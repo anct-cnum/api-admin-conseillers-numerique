@@ -1,11 +1,7 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import {
-  IRequest,
-  ICodeRegion,
-  IDepartement,
-} from '../../../ts/interfaces/global.interfaces';
+import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from '../../stats/controllers/getStatsGlobales';
 import { generateCsvStatistiques } from '../exports.repository';
@@ -14,15 +10,12 @@ import {
   getConseillersIdsByTerritoire,
 } from '../../cras/cras.repository';
 import service from '../../../helpers/services';
-
-const departements = require('../../../../datas/imports/departements-region.json');
-const codesRegions = require('../../../../datas/imports/code_region.json');
+import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     let { idType, codePostal, ville, nom, prenom } = req.query;
-    const { type, codeRegion, numeroDepartement, structureId, conseillerId } =
-      req.query;
+    const { type } = req.query;
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
     const dateFin = new Date(String(req.query.dateFin));
@@ -37,8 +30,6 @@ const getExportStatistiquesCsv =
     let conseillerIds: ObjectId[];
     let query: Object;
     let statistiques = {};
-    let numerosDepartements: number[];
-    let codesPostauxQuery = {};
 
     try {
       switch (type) {
@@ -131,101 +122,9 @@ const getExportStatistiquesCsv =
           );
           break;
         case 'grandReseau':
-          query = {
-            'cra.dateAccompagnement': {
-              $gte: dateDebut,
-              $lte: dateFin,
-            },
-          };
-          // Si la requête contient un code région, on l'ajoute à la requête
-          if (
-            codeRegion !== '' &&
-            codeRegion !== 'undefined' &&
-            codeRegion !== 'tous'
-          ) {
-            const regionInfos = codesRegions.find(
-              (region: ICodeRegion) => codeRegion === region.code,
-            );
-            // Si la région est la Corse, on ajoute les codes postaux de la Corse du Sud et de la Haute-Corse
-            if (codeRegion === '94') {
-              query['cra.codePostal'] = {
-                $regex: `^200.*|^201.*|^202.*|^206.*`,
-              };
-              // Sinon on ajoute les codes postaux des départements de la région
-            } else if (codeRegion === '00') {
-              query['cra.codePostal'] = '97150';
-            } else {
-              numerosDepartements = departements
-                .filter(
-                  (departement: IDepartement) =>
-                    departement.region_name === regionInfos?.nom,
-                )
-                .map((departement: IDepartement) => departement.num_dep);
-
-              const regexListDeps = numerosDepartements
-                .map((e: Number) => `^${e}.*`)
-                .join('|');
-              query['cra.codePostal'] = { $regex: regexListDeps };
-            }
-          }
-          // Si la requête contient un numéro de département, on l'ajoute à la requête
-          if (
-            numeroDepartement !== '' &&
-            numeroDepartement !== 'undefined' &&
-            numeroDepartement !== 'tous'
-          ) {
-            // Si le numéro de département est la Corse du Sud 2A, on ajoute les codes postaux de la Corse du Sud
-            if (numeroDepartement === '2A') {
-              query['cra.codePostal'] = { $regex: `^200.*|^201.*` };
-            }
-            // Si le numéro de département est la Haute-Corse 2B, on ajoute les codes postaux de la Haute-Corse
-            else if (numeroDepartement === '2B') {
-              query['cra.codePostal'] = { $regex: `^202.*|^206.*` };
-            }
-            // Si le numéro de département est Saint-Martin 978, on ajoute le code postal de Saint-Martin
-            else if (numeroDepartement === '978') {
-              query['cra.codePostal'] = '97150';
-            }
-            // Sinon on ajoute les codes postaux du département
-            else {
-              query['cra.codePostal'] = { $regex: `^${numeroDepartement}.*` };
-            }
-          }
-
-          if (query['cra.codePostal']) {
-            codesPostauxQuery = {
-              'cra.codePostal': query['cra.codePostal'],
-            };
-          }
-          // Si la requête contient une ville, on l'ajoute à la requête avec le code postal associé
-          if (ville !== '' && ville !== 'undefined' && codePostal !== 'tous') {
-            query['cra.codePostal'] = codePostal;
-            query['cra.nomCommune'] = ville;
-          }
-          // Si la requête contient une structure, on l'ajoute à la requête
-          if (
-            structureId !== '' &&
-            structureId !== 'undefined' &&
-            structureId !== 'tous'
-          ) {
-            query['structure.$id'] = new ObjectId(structureId);
-          }
-          // Si la requête contient un conseiller, on l'ajoute à la requête
-          if (
-            conseillerId !== '' &&
-            conseillerId !== 'undefined' &&
-            conseillerId !== 'tous'
-          ) {
-            query['conseiller.$id'] = new ObjectId(conseillerId);
-          }
-
-          statistiques = await getStatsGlobales(
-            query,
-            req.ability,
-            action.read,
-            app,
-            true,
-            codesPostauxQuery,
+          statistiques = await getStatsNationalesGrandReseau(app, true)(
+            req,
+            res,
           );
           break;
         default:
