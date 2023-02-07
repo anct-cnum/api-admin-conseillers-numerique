@@ -21,14 +21,9 @@ const getStatsNationalesGrandReseau =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
-      const {
-        codePostal,
-        ville,
-        codeRegion,
-        numeroDepartement,
-        structureId,
-        conseillerId,
-      } = req.query;
+      const { codePostal, ville, codeRegion, numeroDepartement } = req.query;
+      const structureIds = JSON.parse(req.query.structureIds);
+      const conseillerIds = JSON.parse(req.query.conseillerIds);
 
       let numerosDepartements: number[];
 
@@ -104,20 +99,16 @@ const getStatsNationalesGrandReseau =
         query['cra.nomCommune'] = ville;
       }
       // Si la requête contient une structure, on l'ajoute à la requête
-      if (
-        structureId !== '' &&
-        structureId !== 'undefined' &&
-        structureId !== 'tous'
-      ) {
-        query['structure.$id'] = new ObjectId(structureId);
+      if (structureIds.length > 0) {
+        query['structure.$id'] = {
+          $in: structureIds.map((id: string) => new ObjectId(id)),
+        };
       }
       // Si la requête contient un conseiller, on l'ajoute à la requête
-      if (
-        conseillerId !== '' &&
-        conseillerId !== 'undefined' &&
-        conseillerId !== 'tous'
-      ) {
-        query['conseiller.$id'] = new ObjectId(conseillerId);
+      if (conseillerIds.length > 0) {
+        query['conseiller.$id'] = {
+          $in: conseillerIds.map((id: string) => new ObjectId(id)),
+        };
       }
       // Récupération des données
       const donneesStats = await getStatsGlobales(
