@@ -13,20 +13,17 @@ const departements = require('../../../../datas/imports/departements-region.json
 const codesRegions = require('../../../../datas/imports/code_region.json');
 
 const getStatsNationalesGrandReseau =
-  (app: Application) => async (req: IRequest, res: Response) => {
+  (app: Application, exportStats = false) =>
+  // eslint-disable-next-line consistent-return
+  async (req: IRequest, res: Response) => {
     try {
       const dateDebut = new Date(String(req.query.dateDebut));
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
-      const {
-        codePostal,
-        ville,
-        codeRegion,
-        numeroDepartement,
-        structureId,
-        conseillerId,
-      } = req.query;
+      const { codePostal, ville, codeRegion, numeroDepartement } = req.query;
+      const structureIds = JSON.parse(req.query.structureIds);
+      const conseillerIds = JSON.parse(req.query.conseillerIds);
 
       let numerosDepartements: number[];
 
@@ -102,20 +99,16 @@ const getStatsNationalesGrandReseau =
         query['cra.nomCommune'] = ville;
       }
       // Si la requête contient une structure, on l'ajoute à la requête
-      if (
-        structureId !== '' &&
-        structureId !== 'undefined' &&
-        structureId !== 'tous'
-      ) {
-        query['structure.$id'] = new ObjectId(structureId);
+      if (structureIds.length > 0) {
+        query['structure.$id'] = {
+          $in: structureIds.map((id: string) => new ObjectId(id)),
+        };
       }
       // Si la requête contient un conseiller, on l'ajoute à la requête
-      if (
-        conseillerId !== '' &&
-        conseillerId !== 'undefined' &&
-        conseillerId !== 'tous'
-      ) {
-        query['conseiller.$id'] = new ObjectId(conseillerId);
+      if (conseillerIds.length > 0) {
+        query['conseiller.$id'] = {
+          $in: conseillerIds.map((id: string) => new ObjectId(id)),
+        };
       }
       // Récupération des données
       const donneesStats = await getStatsGlobales(
@@ -126,11 +119,15 @@ const getStatsNationalesGrandReseau =
         true,
         codesPostauxQuery,
       );
+
+      if (exportStats) {
+        return donneesStats;
+      }
+
       res.status(200).json(donneesStats);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
