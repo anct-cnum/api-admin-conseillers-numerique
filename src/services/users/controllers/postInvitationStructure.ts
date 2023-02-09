@@ -14,14 +14,8 @@ const { DBRef, ObjectId } = require('mongodb');
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, structureId } = req.body;
+    let errorSmtpMail: Error | null = null;
     try {
-      const canCreate = req.ability.can(action.create, ressource.users);
-      if (!canCreate) {
-        res.status(403).json({
-          message: `Accès refusé, vous n'êtes pas autorisé à inviter un compte structure multicompte`,
-        });
-        return;
-      }
       const errorJoi = await validationEmail.validate(email);
       if (errorJoi?.error) {
         res.status(400).json({ message: String(errorJoi?.error) });
@@ -29,18 +23,63 @@ const postInvitationStructure =
       }
       const connect = app.get('mongodb');
       const database = connect.substr(connect.lastIndexOf('/') + 1);
-      const user: IUser = await app.service(service.users).create({
-        name: email.toLowerCase(),
-        roles: ['structure'],
-        entity: new DBRef('structures', new ObjectId(structureId), database),
-        password: uuidv4(),
-        token: uuidv4(),
-        tokenCreatedAt: new Date(),
-        passwordCreated: false,
-        mailSentDate: null,
-        resend: false,
-      });
-      const errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+      const oldUser = await app
+        .service(service.users)
+        .findOne({ name: email.toLowerCase() });
+      if (oldUser === null) {
+        const canCreate = req.ability.can(action.create, ressource.users);
+        if (!canCreate) {
+          res.status(403).json({
+            message: `Accès refusé, vous n'êtes pas autorisé à inviter un compte structure multicompte`,
+          });
+          return;
+        }
+        const user: IUser = await app.service(service.users).create({
+          name: email.toLowerCase(),
+          roles: ['structure'],
+          entity: new DBRef('structures', new ObjectId(structureId), database),
+          password: uuidv4(),
+          token: uuidv4(),
+          tokenCreatedAt: new Date(),
+          passwordCreated: false,
+          mailSentDate: null,
+          resend: false,
+        });
+
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+      } else {
+        if (oldUser.roles.includes('structure')) {
+          res.status(409).json({
+            message: `Ce compte posséde déjà le rôle structure`,
+          });
+          return;
+        }
+        if (oldUser.roles.includes('coordinateur_coop')) {
+          res.status(409).json({
+            message: `Les comptes coordinateur ne peuvent pas être invités en tant que structure`,
+          });
+          return;
+        }
+        const user = await app.service(service.users).findOneAndUpdate(
+          oldUser._id,
+          {
+            $set: {
+              entity: new DBRef(
+                'structures',
+                new ObjectId(structureId),
+                database,
+              ),
+            },
+            $push: {
+              roles: 'structure',
+            },
+          },
+          { new: true },
+        );
+        if (!oldUser.sub) {
+          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        }
+      }
       if (errorSmtpMail instanceof Error) {
         await deleteUser(app, req, email);
         res.status(503).json({
@@ -49,11 +88,7 @@ const postInvitationStructure =
         });
         return;
       }
-      res.status(200).json({
-        message:
-          'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui à été envoyé',
-        account: user,
-      });
+      res.status(200).json(`Le compte structure ${email} a bien été invité`);
       return;
     } catch (error) {
       if (error?.code === 409) {

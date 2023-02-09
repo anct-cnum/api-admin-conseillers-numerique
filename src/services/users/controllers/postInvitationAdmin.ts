@@ -13,6 +13,7 @@ const { v4: uuidv4 } = require('uuid');
 const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, nom, prenom } = req.body;
+    let errorSmtpMail: Error | null = null;
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -26,18 +27,47 @@ const postInvitationAdmin =
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
-      const user: IUser = await app.service(service.users).create({
-        name: email.toLowerCase(),
-        roles: ['admin'],
-        nom,
-        prenom,
-        password: uuidv4(),
-        token: uuidv4(),
-        tokenCreatedAt: new Date(),
-        mailSentDate: null,
-        passwordCreated: false,
-      });
-      const errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+      const oldUser = await app
+        .service(service.users)
+        .findOne({ name: email.toLowerCase() });
+      if (oldUser === null) {
+        const user: IUser = await app.service(service.users).create({
+          name: email.toLowerCase(),
+          roles: ['admin'],
+          nom,
+          prenom,
+          password: uuidv4(),
+          token: uuidv4(),
+          tokenCreatedAt: new Date(),
+          mailSentDate: null,
+          passwordCreated: false,
+        });
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+      } else {
+        if (oldUser.roles.includes('admin')) {
+          res.status(409).json({
+            message: `Ce compte posséde déjà le rôle admin`,
+          });
+          return;
+        }
+        const user = await app.service(service.users).findOneAndUpdate(
+          oldUser._id,
+          {
+            $set: {
+              nom,
+              prenom,
+            },
+            $push: {
+              roles: 'admin',
+            },
+          },
+          { new: true },
+        );
+        if (!oldUser.sub) {
+          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        }
+      }
+
       if (errorSmtpMail instanceof Error) {
         await deleteUser(app, req, email);
         res.status(503).json({
