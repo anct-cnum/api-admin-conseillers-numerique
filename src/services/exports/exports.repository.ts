@@ -374,7 +374,7 @@ const generateCsvStatistiques = async (
 ) => {
   try {
     const general = [
-      `Général\nPersonnes totales accompagnées durant cette période;${
+      `Général\nNouveaux usagers accompagnés durant cette période;${
         statistiques.nbTotalParticipant +
         statistiques.nbAccompagnementPerso +
         statistiques.nbDemandePonctuel -
