@@ -683,18 +683,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
 
 const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
   try {
-    const compteActif = (gestionnaire) => {
-      if (gestionnaire?.migrationDashboard) {
-        if (gestionnaire?.sub) {
-          return 'Oui';
-        }
-        return 'Non';
-      }
-      if (gestionnaire?.passwordCreated) {
-        return 'Oui';
-      }
-      return 'Non';
-    };
+    const compteActif = (gestionnaire) => (gestionnaire?.sub ? 'Oui' : 'Non');
 
     const fileHeaders = [
       'Id du gestionnaire',
@@ -717,8 +706,8 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
             gestionnaire.reseau,
             gestionnaire.nom,
             gestionnaire.prenom,
-            gestionnaire.tokenCreatedAt
-              ? dayjs(gestionnaire.tokenCreatedAt).format('DD/MM/YYYY')
+            gestionnaire.mailSentDate
+              ? dayjs(gestionnaire.mailSentDate).format('DD/MM/YYYY')
               : '-',
             compteActif(gestionnaire),
           ].join(csvCellSeparator),
