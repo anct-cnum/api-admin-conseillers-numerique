@@ -53,37 +53,23 @@ const postInvitationHub =
           });
           return;
         }
-        let query = {
+        const query = {
           $push: {
             roles: 'hub_coop',
           },
+          $set: {
+            nom,
+            prenom,
+            migrationDashboard: true,
+            hub,
+          },
         };
         if (!oldUser.sub) {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                nom,
-                prenom,
-                hub,
-                migrationDashboard: true,
-                token: uuidv4(),
-                tokenCreatedAt: new Date(),
-                mailSentDate: null,
-              },
-            },
-          };
-        } else {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                nom,
-                prenom,
-                hub,
-              },
-            },
-          };
+          Object.assign(query.$set, {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+          });
         }
         const user = await app
           .service(service.users)

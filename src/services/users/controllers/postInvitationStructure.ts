@@ -62,41 +62,25 @@ const postInvitationStructure =
           });
           return;
         }
-        let query = {
+        const query = {
           $push: {
             roles: 'structure',
           },
+          $set: {
+            migrationDashboard: true,
+            entity: new DBRef(
+              'structures',
+              new ObjectId(structureId),
+              database,
+            ),
+          },
         };
         if (!oldUser.sub) {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                entity: new DBRef(
-                  'structures',
-                  new ObjectId(structureId),
-                  database,
-                ),
-                migrationDashboard: true,
-                token: uuidv4(),
-                tokenCreatedAt: new Date(),
-                mailSentDate: null,
-              },
-            },
-          };
-        } else {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                entity: new DBRef(
-                  'structures',
-                  new ObjectId(structureId),
-                  database,
-                ),
-              },
-            },
-          };
+          Object.assign(query.$set, {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+          });
         }
         const user = await app
           .service(service.users)

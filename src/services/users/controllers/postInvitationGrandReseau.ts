@@ -57,37 +57,23 @@ const postInvitationGrandReseau =
           });
           return;
         }
-        let query = {
+        const query = {
           $push: {
             roles: 'grandReseau',
           },
+          $set: {
+            nom,
+            prenom,
+            migrationDashboard: true,
+            reseau,
+          },
         };
         if (!oldUser.sub) {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                nom,
-                prenom,
-                reseau,
-                migrationDashboard: true,
-                token: uuidv4(),
-                tokenCreatedAt: new Date(),
-                mailSentDate: null,
-              },
-            },
-          };
-        } else {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                nom,
-                prenom,
-                reseau,
-              },
-            },
-          };
+          Object.assign(query.$set, {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+          });
         }
         user = await app
           .service(service.users)

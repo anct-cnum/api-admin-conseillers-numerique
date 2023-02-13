@@ -53,33 +53,21 @@ const postInvitationPrefet =
           });
           return;
         }
-        let query = {
+        const query = {
           $push: {
             roles: 'prefet',
           },
+          $set: {
+            ...localite,
+            migrationDashboard: true,
+          },
         };
         if (!oldUser.sub) {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                ...localite,
-                migrationDashboard: true,
-                token: uuidv4(),
-                tokenCreatedAt: new Date(),
-                mailSentDate: null,
-              },
-            },
-          };
-        } else {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                ...localite,
-              },
-            },
-          };
+          Object.assign(query.$set, {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+          });
         }
         const user = await app
           .service(service.users)

@@ -52,35 +52,22 @@ const postInvitationAdmin =
           });
           return;
         }
-        let query = {
+        const query = {
           $push: {
             roles: 'admin',
           },
+          $set: {
+            nom,
+            prenom,
+            migrationDashboard: true,
+          },
         };
         if (!oldUser.sub) {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                nom,
-                prenom,
-                migrationDashboard: true,
-                token: uuidv4(),
-                tokenCreatedAt: new Date(),
-                mailSentDate: null,
-              },
-            },
-          };
-        } else {
-          query = {
-            ...query,
-            ...{
-              $set: {
-                nom,
-                prenom,
-              },
-            },
-          };
+          Object.assign(query.$set, {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+          });
         }
         const user = await app
           .service(service.users)
