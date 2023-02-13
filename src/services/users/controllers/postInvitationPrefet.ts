@@ -53,12 +53,15 @@ const postInvitationPrefet =
           });
           return;
         }
-        const user = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            oldUser._id,
-            {
+        let query = {
+          $push: {
+            roles: 'prefet',
+          },
+        };
+        if (!oldUser.sub) {
+          query = {
+            ...query,
+            ...{
               $set: {
                 ...localite,
                 migrationDashboard: true,
@@ -66,12 +69,22 @@ const postInvitationPrefet =
                 tokenCreatedAt: new Date(),
                 mailSentDate: null,
               },
-              $push: {
-                roles: 'prefet',
+            },
+          };
+        } else {
+          query = {
+            ...query,
+            ...{
+              $set: {
+                ...localite,
               },
             },
-            { new: true },
-          );
+          };
+        }
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }

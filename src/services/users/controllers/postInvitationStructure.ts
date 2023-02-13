@@ -62,12 +62,15 @@ const postInvitationStructure =
           });
           return;
         }
-        const user = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            oldUser._id,
-            {
+        let query = {
+          $push: {
+            roles: 'structure',
+          },
+        };
+        if (!oldUser.sub) {
+          query = {
+            ...query,
+            ...{
               $set: {
                 entity: new DBRef(
                   'structures',
@@ -79,12 +82,26 @@ const postInvitationStructure =
                 tokenCreatedAt: new Date(),
                 mailSentDate: null,
               },
-              $push: {
-                roles: 'structure',
+            },
+          };
+        } else {
+          query = {
+            ...query,
+            ...{
+              $set: {
+                entity: new DBRef(
+                  'structures',
+                  new ObjectId(structureId),
+                  database,
+                ),
               },
             },
-            { new: true },
-          );
+          };
+        }
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }

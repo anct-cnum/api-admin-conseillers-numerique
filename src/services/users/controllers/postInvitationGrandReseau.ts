@@ -57,12 +57,15 @@ const postInvitationGrandReseau =
           });
           return;
         }
-        user = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            oldUser._id,
-            {
+        let query = {
+          $push: {
+            roles: 'grandReseau',
+          },
+        };
+        if (!oldUser.sub) {
+          query = {
+            ...query,
+            ...{
               $set: {
                 nom,
                 prenom,
@@ -72,12 +75,24 @@ const postInvitationGrandReseau =
                 tokenCreatedAt: new Date(),
                 mailSentDate: null,
               },
-              $push: {
-                roles: 'grandReseau',
+            },
+          };
+        } else {
+          query = {
+            ...query,
+            ...{
+              $set: {
+                nom,
+                prenom,
+                reseau,
               },
             },
-            { new: true },
-          );
+          };
+        }
+        user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }

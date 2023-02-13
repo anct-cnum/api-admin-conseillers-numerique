@@ -53,12 +53,15 @@ const postInvitationHub =
           });
           return;
         }
-        const user = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            oldUser._id,
-            {
+        let query = {
+          $push: {
+            roles: 'hub_coop',
+          },
+        };
+        if (!oldUser.sub) {
+          query = {
+            ...query,
+            ...{
               $set: {
                 nom,
                 prenom,
@@ -68,12 +71,24 @@ const postInvitationHub =
                 tokenCreatedAt: new Date(),
                 mailSentDate: null,
               },
-              $push: {
-                roles: 'hub_coop',
+            },
+          };
+        } else {
+          query = {
+            ...query,
+            ...{
+              $set: {
+                nom,
+                prenom,
+                hub,
               },
             },
-            { new: true },
-          );
+          };
+        }
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }
