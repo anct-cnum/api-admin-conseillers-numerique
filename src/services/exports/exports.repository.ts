@@ -479,27 +479,23 @@ const generateCsvStatistiques = async (
     ];
     const statsEvolutions = [
       `\nÉvolution·des·comptes·rendus·d'activité`,
-      // eslint-disable-next-line no-unsafe-optional-chaining
-      ...Object.keys(statistiques.statsEvolutions)
-        ?.map(
-          (year) =>
-            [
-              `\n${year}`,
-              ...statistiques.statsEvolutions[year]
-                .sort(
-                  (statEvolutionA, statEvolutionB) =>
-                    statEvolutionA.mois - statEvolutionB.mois,
-                )
-                .map(
-                  (orderedStatEvolution) =>
-                    `\n${mois[orderedStatEvolution.mois]};${
-                      orderedStatEvolution.totalCras
-                    }`,
-                ),
-              '',
-            ] ?? [],
-        )
-        .flat(),
+      ...(
+        Object.keys(statistiques.statsEvolutions)?.map((year) => [
+          `\n${year}`,
+          ...statistiques.statsEvolutions[year]
+            .sort(
+              (statEvolutionA, statEvolutionB) =>
+                statEvolutionA.mois - statEvolutionB.mois,
+            )
+            .map(
+              (orderedStatEvolution) =>
+                `\n${mois[orderedStatEvolution.mois]};${
+                  orderedStatEvolution.totalCras
+                }`,
+            ),
+          '',
+        ]) ?? []
+      ).flat(),
     ];
     const statsReorientations = [
       '\nUsager.ères réorienté.es',
