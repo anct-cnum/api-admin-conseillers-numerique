@@ -22,6 +22,7 @@ const getGestionnairesAvecFiltre =
       {
         $match: {
           $and: [checkAccess],
+          migrationDashboard: true,
           ...filterRole(searchRole),
           ...filterNomGestionnaire(searchByName),
         },
@@ -34,9 +35,8 @@ const getGestionnairesAvecFiltre =
           reseau: 1,
           nom: 1,
           prenom: 1,
-          tokenCreatedAt: 1,
-          passwordCreated: 1,
           migrationDashboard: 1,
+          mailSentDate: 1,
           sub: 1,
         },
       },
@@ -54,6 +54,7 @@ const getTotalGestionnaires =
       {
         $match: {
           $and: [checkAccess],
+          migrationDashboard: true,
           ...filterRole(searchRole),
           ...filterNomGestionnaire(searchByName),
         },

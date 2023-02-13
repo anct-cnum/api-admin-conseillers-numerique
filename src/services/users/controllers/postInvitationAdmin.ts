@@ -38,6 +38,7 @@ const postInvitationAdmin =
           nom,
           prenom,
           password: uuidv4(),
+          migrationDashboard: true,
           token: uuidv4(),
           tokenCreatedAt: new Date(),
           mailSentDate: null,
@@ -60,6 +61,10 @@ const postInvitationAdmin =
               $set: {
                 nom,
                 prenom,
+                migrationDashboard: true,
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
               },
               $push: {
                 roles: 'admin',

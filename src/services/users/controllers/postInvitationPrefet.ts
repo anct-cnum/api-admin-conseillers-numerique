@@ -41,6 +41,7 @@ const postInvitationPrefet =
           token: uuidv4(),
           tokenCreatedAt: new Date(),
           mailSentDate: null,
+          migrationDashboard: true,
           passwordCreated: false,
           ...localite,
         });
@@ -60,6 +61,10 @@ const postInvitationPrefet =
             {
               $set: {
                 ...localite,
+                migrationDashboard: true,
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
               },
               $push: {
                 roles: 'prefet',

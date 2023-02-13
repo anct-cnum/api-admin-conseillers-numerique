@@ -42,6 +42,7 @@ const postInvitationGrandReseau =
           roles: ['grandReseau'],
           password: uuidv4(),
           token: uuidv4(),
+          migrationDashboard: true,
           tokenCreatedAt: new Date(),
           mailSentDate: null,
           passwordCreated: false,
@@ -66,6 +67,10 @@ const postInvitationGrandReseau =
                 nom,
                 prenom,
                 reseau,
+                migrationDashboard: true,
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
               },
               $push: {
                 roles: 'grandReseau',

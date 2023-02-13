@@ -40,6 +40,7 @@ const postInvitationHub =
           roles: ['hub_coop'],
           password: uuidv4(),
           token: uuidv4(),
+          migrationDashboard: true,
           tokenCreatedAt: new Date(),
           mailSentDate: null,
           passwordCreated: false,
@@ -62,6 +63,10 @@ const postInvitationHub =
                 nom,
                 prenom,
                 hub,
+                migrationDashboard: true,
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
               },
               $push: {
                 roles: 'hub_coop',

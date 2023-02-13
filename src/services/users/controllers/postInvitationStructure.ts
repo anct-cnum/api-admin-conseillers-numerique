@@ -43,6 +43,7 @@ const postInvitationStructure =
           token: uuidv4(),
           tokenCreatedAt: new Date(),
           passwordCreated: false,
+          migrationDashboard: true,
           mailSentDate: null,
           resend: false,
         });
@@ -73,6 +74,10 @@ const postInvitationStructure =
                   new ObjectId(structureId),
                   database,
                 ),
+                migrationDashboard: true,
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
               },
               $push: {
                 roles: 'structure',
