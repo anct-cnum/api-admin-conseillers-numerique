@@ -100,7 +100,7 @@ const getStatsGlobales = async (
       nbDemandePonctuel:
         statsActivites?.find((activite) => activite._id === 'ponctuel')
           ?.count ?? 0,
-      nbParticipantsRecurrents: statsRecurrence[0]?.count ?? 0,
+      nbParticipantsRecurrents: statsRecurrence[0]?.valeur ?? 0,
       nbUsagersAccompagnementIndividuel:
         statsAccompagnements[0]?.individuel ?? 0,
       nbUsagersAtelierCollectif: statsAccompagnements[0]?.atelier ?? 0,
