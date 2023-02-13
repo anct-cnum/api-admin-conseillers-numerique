@@ -399,7 +399,7 @@ const generateCsvStatistiques = async (
         statistiques.nbUsagersAccompagnementIndividuel
       }\nAccompagnements en atelier collectif;${
         statistiques.nbUsagersAtelierCollectif
-      }\nRedirections vers une autre structure agréée${
+      }\nRedirections vers une autre structure agréée;${
         statistiques.nbReconduction
       }`,
     ];
