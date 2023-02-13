@@ -405,20 +405,20 @@ const generateCsvStatistiques = async (
     ];
     const statsThemes = [
       '\nThèmes des accompagnements',
-      ...statistiques.statsThemes.map(
+      ...(statistiques.statsThemes?.map(
         (theme) =>
           `\n${
             labelsCorrespondance.find((label) => label.nom === theme.nom)
               ?.correspondance ?? theme.nom
           };${theme.valeur}`,
-      ),
+      ) ?? []),
       '',
     ];
     const statsLieux = [
       `\nCanaux d'accompagnements (en %)'`,
       ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
         (statLieux, index) =>
-          `\n${statLieux};${statistiques.statsLieux[index].valeur}`,
+          `\n${statLieux};${statistiques?.statsLieux[index].valeur}`,
       ),
       '',
     ];
@@ -431,7 +431,7 @@ const generateCsvStatistiques = async (
         'Plus de 120 minutes',
       ].map(
         (statsDuree, index) =>
-          `\n${statsDuree};${statistiques.statsDurees[index].valeur}`,
+          `\n${statsDuree};${statistiques?.statsDurees[index].valeur}`,
       ),
       '',
     ];
@@ -445,7 +445,7 @@ const generateCsvStatistiques = async (
         'Plus de 60 ans',
       ].map(
         (statsAge, index) =>
-          `\n${statsAge};${statistiques.statsAges[index].valeur}`,
+          `\n${statsAge};${statistiques?.statsAges[index].valeur}`,
       ),
       '',
     ];
@@ -459,7 +459,7 @@ const generateCsvStatistiques = async (
         'Non renseigné',
       ].map(
         (statsUsager, index) =>
-          `\n${statsUsager};${statistiques.statsUsagers[index].valeur}`,
+          `\n${statsUsager};${statistiques?.statsUsagers[index].valeur}`,
       ),
       '',
     ];
@@ -479,35 +479,43 @@ const generateCsvStatistiques = async (
     ];
     const statsEvolutions = [
       `\nÉvolution·des·comptes·rendus·d'activité`,
+      // eslint-disable-next-line no-unsafe-optional-chaining
       ...Object.keys(statistiques.statsEvolutions)
-        .map((year) => [
-          `\n${year}`,
-          ...statistiques.statsEvolutions[year]
-            .sort(
-              (statEvolutionA, statEvolutionB) =>
-                statEvolutionA.mois - statEvolutionB.mois,
-            )
-            .map(
-              (orderedStatEvolution) =>
-                `\n${mois[orderedStatEvolution.mois]};${
-                  orderedStatEvolution.totalCras
-                }`,
-            ),
-          '',
-        ])
+        ?.map(
+          (year) =>
+            [
+              `\n${year}`,
+              ...statistiques.statsEvolutions[year]
+                .sort(
+                  (statEvolutionA, statEvolutionB) =>
+                    statEvolutionA.mois - statEvolutionB.mois,
+                )
+                .map(
+                  (orderedStatEvolution) =>
+                    `\n${mois[orderedStatEvolution.mois]};${
+                      orderedStatEvolution.totalCras
+                    }`,
+                ),
+              '',
+            ] ?? [],
+        )
         .flat(),
     ];
     const statsReorientations = [
       '\nUsager.ères réorienté.es',
-      ...statistiques.statsReorientations.map(
+      ...(statistiques.statsReorientations?.map(
         (statReorientation) =>
           `\n${statReorientation.nom};${statReorientation.valeur}`,
-      ),
+      ) ?? []),
     ];
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(dateDebut).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        idType ?? ''
+      } ${formatDate(dateDebut).toLocaleString()}-${formatDate(
+        dateFin,
+      ).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,
