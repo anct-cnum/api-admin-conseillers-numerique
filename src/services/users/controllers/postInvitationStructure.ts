@@ -25,6 +25,7 @@ const postInvitationStructure =
       const database = connect.substr(connect.lastIndexOf('/') + 1);
       const oldUser = await app
         .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
@@ -60,22 +61,25 @@ const postInvitationStructure =
           });
           return;
         }
-        const user = await app.service(service.users).findOneAndUpdate(
-          oldUser._id,
-          {
-            $set: {
-              entity: new DBRef(
-                'structures',
-                new ObjectId(structureId),
-                database,
-              ),
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            oldUser._id,
+            {
+              $set: {
+                entity: new DBRef(
+                  'structures',
+                  new ObjectId(structureId),
+                  database,
+                ),
+              },
+              $push: {
+                roles: 'structure',
+              },
             },
-            $push: {
-              roles: 'structure',
-            },
-          },
-          { new: true },
-        );
+            { new: true },
+          );
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }

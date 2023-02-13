@@ -15,6 +15,7 @@ const postInvitationGrandReseau =
     const { email, reseau, nom, prenom } = req.body;
     let errorSmtpMail: Error | null = null;
     let user: IUser | null = null;
+    let messageSuccess: string = '';
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -30,6 +31,7 @@ const postInvitationGrandReseau =
       }
       const oldUser = await app
         .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         user = await app.service(service.users).create({
@@ -45,6 +47,8 @@ const postInvitationGrandReseau =
           passwordCreated: false,
         });
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        messageSuccess =
+          'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui à été envoyé';
       } else {
         if (oldUser.roles.includes('grandReseau')) {
           res.status(409).json({
@@ -52,23 +56,27 @@ const postInvitationGrandReseau =
           });
           return;
         }
-        user = await app.service(service.users).findOneAndUpdate(
-          oldUser._id,
-          {
-            $set: {
-              nom,
-              prenom,
-              reseau,
+        user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            oldUser._id,
+            {
+              $set: {
+                nom,
+                prenom,
+                reseau,
+              },
+              $push: {
+                roles: 'grandReseau',
+              },
             },
-            $push: {
-              roles: 'grandReseau',
-            },
-          },
-          { new: true },
-        );
+            { new: true },
+          );
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }
+        messageSuccess = 'Le rôle grand réseau a été ajouté à ce compte';
       }
       if (errorSmtpMail instanceof Error) {
         await deleteUser(app, req, email);
@@ -79,8 +87,7 @@ const postInvitationGrandReseau =
         return;
       }
       res.status(200).json({
-        message:
-          'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui à été envoyé',
+        message: messageSuccess,
         account: user,
       });
       return;

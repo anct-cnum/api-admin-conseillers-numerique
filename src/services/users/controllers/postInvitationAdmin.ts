@@ -29,6 +29,7 @@ const postInvitationAdmin =
       }
       const oldUser = await app
         .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         const user: IUser = await app.service(service.users).create({
@@ -50,19 +51,22 @@ const postInvitationAdmin =
           });
           return;
         }
-        const user = await app.service(service.users).findOneAndUpdate(
-          oldUser._id,
-          {
-            $set: {
-              nom,
-              prenom,
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            oldUser._id,
+            {
+              $set: {
+                nom,
+                prenom,
+              },
+              $push: {
+                roles: 'admin',
+              },
             },
-            $push: {
-              roles: 'admin',
-            },
-          },
-          { new: true },
-        );
+            { new: true },
+          );
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }

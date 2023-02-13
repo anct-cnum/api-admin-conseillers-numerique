@@ -24,6 +24,7 @@ const postInvitationPrefet =
 
       const oldUser = await app
         .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: body.email.toLowerCase() });
       if (oldUser === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
@@ -51,18 +52,21 @@ const postInvitationPrefet =
           });
           return;
         }
-        const user = await app.service(service.users).findOneAndUpdate(
-          oldUser._id,
-          {
-            $set: {
-              ...localite,
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            oldUser._id,
+            {
+              $set: {
+                ...localite,
+              },
+              $push: {
+                roles: 'prefet',
+              },
             },
-            $push: {
-              roles: 'prefet',
-            },
-          },
-          { new: true },
-        );
+            { new: true },
+          );
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         }
