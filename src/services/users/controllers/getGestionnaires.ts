@@ -86,13 +86,12 @@ const getGestionnaires =
         skip as string,
         options.paginate.default,
       );
-      const gestionnaires = gestionnairesEnClair.map((g) => {
-        // Anonymise le sub
-        const gg = g;
-        if (gg.sub) {
-          gg.sub = 'xxxxxxxx';
+      const gestionnaires = gestionnairesEnClair.map((gestionnaire) => {
+        if (gestionnaire.sub) {
+          // Anonymise le sub
+          return { ...gestionnaire, sub: 'xxxxxxxx' };
         }
-        return gg;
+        return gestionnaire;
       });
       if (gestionnaires.length > 0) {
         const totalGestionnaires = await getTotalGestionnaires(
