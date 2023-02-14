@@ -81,8 +81,10 @@ const postInvitationGrandReseau =
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui à été envoyé`;
+        } else {
+          messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}`;
         }
-        messageSuccess = 'Le rôle grand réseau a été ajouté à ce compte';
       }
       if (errorSmtpMail instanceof Error) {
         await deleteUser(app, req, email);
@@ -92,6 +94,7 @@ const postInvitationGrandReseau =
         });
         return;
       }
+      user.sub = 'xxxxxxxxx';
       res.status(200).json({
         message: messageSuccess,
         account: user,

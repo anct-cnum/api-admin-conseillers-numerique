@@ -14,6 +14,7 @@ const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, nom, prenom } = req.body;
     let errorSmtpMail: Error | null = null;
+    let messageSuccess: string = '';
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -45,6 +46,7 @@ const postInvitationAdmin =
           passwordCreated: false,
         });
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        messageSuccess = `L'admin ${email} a bien été invité, un mail de création de compte lui à été envoyé`;
       } else {
         if (oldUser.roles.includes('admin')) {
           res.status(409).json({
@@ -75,6 +77,9 @@ const postInvitationAdmin =
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          messageSuccess = `Le rôle admin a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui à été envoyé`;
+        } else {
+          messageSuccess = `Le rôle admin a été ajouté au compte ${email}`;
         }
       }
 
@@ -86,7 +91,7 @@ const postInvitationAdmin =
         });
         return;
       }
-      res.status(200).json(`L'admin ${email} a bien été invité`);
+      res.status(200).json(messageSuccess);
       return;
     } catch (error) {
       if (error?.code === 409) {

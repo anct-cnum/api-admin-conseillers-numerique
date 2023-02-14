@@ -14,6 +14,7 @@ const postInvitationHub =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, nom, prenom, hub } = req.body;
     let errorSmtpMail: Error | null = null;
+    let messageSuccess: string = '';
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -46,6 +47,7 @@ const postInvitationHub =
           passwordCreated: false,
         });
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        messageSuccess = `Le hub ${email} a bien été invité, un mail de création de compte lui à été envoyé`;
       } else {
         if (oldUser.roles.includes('hub_coop')) {
           res.status(409).json({
@@ -77,6 +79,9 @@ const postInvitationHub =
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          messageSuccess = `Le rôle hub a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui à été envoyé`;
+        } else {
+          messageSuccess = `Le rôle hub a été ajouté au compte ${email}`;
         }
       }
       if (errorSmtpMail instanceof Error) {
@@ -87,7 +92,7 @@ const postInvitationHub =
         });
         return;
       }
-      res.status(200).json(`Hub : ${email} a bien été invité`);
+      res.status(200).json(messageSuccess);
       return;
     } catch (error) {
       if (error?.code === 409) {

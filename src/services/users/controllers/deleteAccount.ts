@@ -28,17 +28,18 @@ const checkIfUserIsContactStructure =
 const deleteAccount =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idUser = req.params.id;
-    const { actionSuppression } = req.query;
+    const { roleSuppression } = req.query;
     let user: undefined | IUser;
     try {
-      if (actionSuppression === 'tous') {
+      if (roleSuppression === 'tous') {
         const isContactStructure = await checkIfUserIsContactStructure(
           app,
           req,
         )(idUser);
         if (isContactStructure) {
           return res.status(409).json({
-            message: 'le gestionnaire ne peut pas être supprimé',
+            message:
+              "le gestionnaire ne peut pas perdre son rôle structure, il s'agit du compte principal de la structure",
           });
         }
         await app
@@ -47,7 +48,7 @@ const deleteAccount =
           .deleteOne({ _id: new ObjectId(idUser) });
       } else {
         let query = {};
-        switch (actionSuppression) {
+        switch (roleSuppression) {
           case 'grandReseau':
             query = {
               $unset: {
@@ -58,7 +59,7 @@ const deleteAccount =
               },
             };
             break;
-          case 'structure' || 'structure_coop':
+          case 'structure':
             // eslint-disable-next-line no-case-declarations
             const isContactStructure = await checkIfUserIsContactStructure(
               app,
@@ -67,7 +68,7 @@ const deleteAccount =
             if (isContactStructure) {
               return res.status(409).json({
                 message:
-                  'le gestionnaire ne peut pas perdre son rôle structure',
+                  "le gestionnaire ne peut pas perdre son rôle structure, il s'agit du compte principal de la structure",
               });
             }
             query = {
@@ -100,7 +101,7 @@ const deleteAccount =
               },
             };
             break;
-          case 'admin' || 'admin_coop':
+          case 'admin':
             query = {
               $pull: {
                 roles: { $in: ['admin', 'admin_coop'] },
@@ -108,10 +109,7 @@ const deleteAccount =
             };
             break;
           default:
-            break;
-        }
-        if (Object.keys(query).length === 0) {
-          return res.status(409).json({ message: 'le rôle est invalide' });
+            return res.status(409).json({ message: 'le rôle est invalide' });
         }
         user = await app
           .service(service.users)
@@ -120,6 +118,7 @@ const deleteAccount =
             new: true,
           });
       }
+      user.sub = 'xxxxxxxxx';
       return res.status(200).json({ deleteSuccess: true, idUser, user });
     } catch (error) {
       res.status(500).json({ message: error.message });

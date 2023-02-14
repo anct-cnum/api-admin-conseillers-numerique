@@ -14,6 +14,7 @@ const postInvitationPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { body } = req;
     let errorSmtpMail: Error | null = null;
+    let messageSuccess: string = '';
     try {
       const { email, ...localite } = body;
       const errorJoi = await createUserPrefet.validate(body);
@@ -46,6 +47,7 @@ const postInvitationPrefet =
           ...localite,
         });
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        messageSuccess = `Le préfet ${email} a bien été invité, un mail de création de compte lui à été envoyé`;
       } else {
         if (oldUser.roles.includes('prefet')) {
           res.status(409).json({
@@ -75,6 +77,9 @@ const postInvitationPrefet =
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          messageSuccess = `Le rôle préfet a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui à été envoyé`;
+        } else {
+          messageSuccess = `Le rôle préfet a été ajouté au compte ${email}`;
         }
       }
       if (errorSmtpMail instanceof Error) {
@@ -85,7 +90,7 @@ const postInvitationPrefet =
         });
         return;
       }
-      res.status(200).json(`Le préfet ${body.email} a bien été invité`);
+      res.status(200).json(messageSuccess);
     } catch (error) {
       if (error?.code === 409) {
         res.status(409).json({

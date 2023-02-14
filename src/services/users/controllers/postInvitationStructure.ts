@@ -15,6 +15,7 @@ const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, structureId } = req.body;
     let errorSmtpMail: Error | null = null;
+    let messageSuccess: string = '';
     try {
       const errorJoi = await validationEmail.validate(email);
       if (errorJoi?.error) {
@@ -49,6 +50,7 @@ const postInvitationStructure =
         });
 
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui à été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {
           res.status(409).json({
@@ -88,6 +90,9 @@ const postInvitationStructure =
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          messageSuccess = `Le rôle structure a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui à été envoyé`;
+        } else {
+          messageSuccess = `Le rôle structure a été ajouté au compte ${email}`;
         }
       }
       if (errorSmtpMail instanceof Error) {
@@ -98,7 +103,7 @@ const postInvitationStructure =
         });
         return;
       }
-      res.status(200).json(`Le compte structure ${email} a bien été invité`);
+      res.status(200).json(messageSuccess);
       return;
     } catch (error) {
       if (error?.code === 409) {
