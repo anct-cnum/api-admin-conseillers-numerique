@@ -58,9 +58,9 @@ const postInvitationStructure =
           });
           return;
         }
-        if (oldUser.roles.includes('coordinateur_coop')) {
+        if (oldUser.roles.includes('conseiller')) {
           res.status(409).json({
-            message: `Les comptes coordinateur ne peuvent pas être invités en tant que structure`,
+            message: `Les comptes conseillers ne peuvent pas être invités en tant que structure`,
           });
           return;
         }
@@ -106,12 +106,11 @@ const postInvitationStructure =
       res.status(200).json(messageSuccess);
       return;
     } catch (error) {
-      if (error?.code === 409) {
-        res.status(409).json({
-          message: `Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail`,
-        });
+      if (error.name === 'ForbiddenError') {
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };

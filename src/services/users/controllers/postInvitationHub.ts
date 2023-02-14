@@ -55,6 +55,12 @@ const postInvitationHub =
           });
           return;
         }
+        if (oldUser.roles.includes('conseiller')) {
+          res.status(409).json({
+            message: `Les comptes conseillers ne peuvent pas être invités en tant que structure`,
+          });
+          return;
+        }
         const query = {
           $push: {
             roles: 'hub_coop',
@@ -95,12 +101,11 @@ const postInvitationHub =
       res.status(200).json(messageSuccess);
       return;
     } catch (error) {
-      if (error?.code === 409) {
-        res.status(409).json({
-          message: `Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail`,
-        });
+      if (error.name === 'ForbiddenError') {
+        res.status(403).json({ message: 'Accès refusé' });
         return;
       }
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
