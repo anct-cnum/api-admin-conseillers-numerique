@@ -405,20 +405,20 @@ const generateCsvStatistiques = async (
     ];
     const statsThemes = [
       '\nThèmes des accompagnements',
-      ...statistiques.statsThemes.map(
+      ...(statistiques.statsThemes?.map(
         (theme) =>
           `\n${
             labelsCorrespondance.find((label) => label.nom === theme.nom)
               ?.correspondance ?? theme.nom
           };${theme.valeur}`,
-      ),
+      ) ?? []),
       '',
     ];
     const statsLieux = [
       `\nCanaux d'accompagnements (en %)'`,
       ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
         (statLieux, index) =>
-          `\n${statLieux};${statistiques.statsLieux[index].valeur}`,
+          `\n${statLieux};${statistiques?.statsLieux[index].valeur}`,
       ),
       '',
     ];
@@ -431,7 +431,7 @@ const generateCsvStatistiques = async (
         'Plus de 120 minutes',
       ].map(
         (statsDuree, index) =>
-          `\n${statsDuree};${statistiques.statsDurees[index].valeur}`,
+          `\n${statsDuree};${statistiques?.statsDurees[index].valeur}`,
       ),
       '',
     ];
@@ -445,7 +445,7 @@ const generateCsvStatistiques = async (
         'Plus de 60 ans',
       ].map(
         (statsAge, index) =>
-          `\n${statsAge};${statistiques.statsAges[index].valeur}`,
+          `\n${statsAge};${statistiques?.statsAges[index].valeur}`,
       ),
       '',
     ];
@@ -459,7 +459,7 @@ const generateCsvStatistiques = async (
         'Non renseigné',
       ].map(
         (statsUsager, index) =>
-          `\n${statsUsager};${statistiques.statsUsagers[index].valeur}`,
+          `\n${statsUsager};${statistiques?.statsUsagers[index].valeur}`,
       ),
       '',
     ];
@@ -479,8 +479,8 @@ const generateCsvStatistiques = async (
     ];
     const statsEvolutions = [
       `\nÉvolution·des·comptes·rendus·d'activité`,
-      ...Object.keys(statistiques.statsEvolutions)
-        .map((year) => [
+      ...(
+        Object.keys(statistiques.statsEvolutions)?.map((year) => [
           `\n${year}`,
           ...statistiques.statsEvolutions[year]
             .sort(
@@ -494,15 +494,15 @@ const generateCsvStatistiques = async (
                 }`,
             ),
           '',
-        ])
-        .flat(),
+        ]) ?? []
+      ).flat(),
     ];
     const statsReorientations = [
       '\nUsager.ères réorienté.es',
-      ...statistiques.statsReorientations.map(
+      ...(statistiques.statsReorientations?.map(
         (statReorientation) =>
           `\n${statReorientation.nom};${statReorientation.valeur}`,
-      ),
+      ) ?? []),
     ];
 
     const buildExportStatistiquesCsvFileContent = [
@@ -679,18 +679,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
 
 const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
   try {
-    const compteActif = (gestionnaire) => {
-      if (gestionnaire?.migrationDashboard) {
-        if (gestionnaire?.sub) {
-          return 'Oui';
-        }
-        return 'Non';
-      }
-      if (gestionnaire?.passwordCreated) {
-        return 'Oui';
-      }
-      return 'Non';
-    };
+    const compteActif = (gestionnaire) => (gestionnaire?.sub ? 'Oui' : 'Non');
 
     const fileHeaders = [
       'Id du gestionnaire',
@@ -713,8 +702,8 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
             gestionnaire.reseau,
             gestionnaire.nom,
             gestionnaire.prenom,
-            gestionnaire.tokenCreatedAt
-              ? dayjs(gestionnaire.tokenCreatedAt).format('DD/MM/YYYY')
+            gestionnaire.mailSentDate
+              ? dayjs(gestionnaire.mailSentDate).format('DD/MM/YYYY')
               : '-',
             compteActif(gestionnaire),
           ].join(csvCellSeparator),

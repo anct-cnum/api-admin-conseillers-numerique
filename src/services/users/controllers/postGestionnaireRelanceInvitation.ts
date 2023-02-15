@@ -21,9 +21,13 @@ const gestionnaireRelanceInvitation =
         .findOne({
           _id: new ObjectId(idGestionnaire),
           migrationDashboard: true,
+          sub: { $exists: false },
         });
       if (!gestionnaire) {
-        res.status(404).json({ message: "Le gestionnaire n'existe pas" });
+        res.status(404).json({
+          message:
+            "Le gestionnaire a déjà activé son compte, s'il a oublié son mot de passe, il pourra le réinitialiser via inclusion connect",
+        });
         return;
       }
       const gestionnaireRefreshed = await app
@@ -47,7 +51,7 @@ const gestionnaireRelanceInvitation =
         res
           .status(200)
           .json(
-            `L'email d'invitation au tableau de pilotage a bien été envoyé à ${gestionnaireRefreshed.nom} ${gestionnaireRefreshed.prenom} ${gestionnaireRefreshed.name}`,
+            `L'email d'invitation au tableau de pilotage a bien été envoyé à ${gestionnaireRefreshed.name}`,
           );
       }
     } catch (error) {

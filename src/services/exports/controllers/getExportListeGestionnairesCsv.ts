@@ -35,6 +35,7 @@ const getExportListeGestionnairesCsv =
         .Model.aggregate([
           {
             $match: {
+              migrationDashboard: true,
               $and: [checkAccessGestionnaire],
               ...filterRole(searchRole),
               ...filterNomGestionnaire(searchByName),
@@ -48,8 +49,8 @@ const getExportListeGestionnairesCsv =
               reseau: 1,
               nom: 1,
               prenom: 1,
-              tokenCreatedAt: 1,
-              passwordCreated: 1,
+              mailSentDate: 1,
+              sub: 1,
             },
           },
           { $sort: sortColonne },
