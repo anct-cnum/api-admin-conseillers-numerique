@@ -53,7 +53,7 @@ const postInvitationGrandReseau =
       } else {
         if (oldUser.roles.includes('grandReseau')) {
           res.status(409).json({
-            message: `Ce compte posséde déjà le rôle grand réseau`,
+            message: `Ce compte possède déjà le rôle grand réseau`,
           });
           return;
         }

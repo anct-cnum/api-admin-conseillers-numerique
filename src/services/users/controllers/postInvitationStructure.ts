@@ -54,7 +54,7 @@ const postInvitationStructure =
       } else {
         if (oldUser.roles.includes('structure')) {
           res.status(409).json({
-            message: `Ce compte posséde déjà le rôle structure`,
+            message: `Ce compte possède déjà le rôle structure`,
           });
           return;
         }

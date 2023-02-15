@@ -51,7 +51,7 @@ const postInvitationPrefet =
       } else {
         if (oldUser.roles.includes('prefet')) {
           res.status(409).json({
-            message: `Ce compte posséde déjà le rôle préfet`,
+            message: `Ce compte possède déjà le rôle préfet`,
           });
           return;
         }

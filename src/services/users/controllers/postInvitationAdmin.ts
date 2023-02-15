@@ -50,7 +50,7 @@ const postInvitationAdmin =
       } else {
         if (oldUser.roles.includes('admin')) {
           res.status(409).json({
-            message: `Ce compte posséde déjà le rôle admin`,
+            message: `Ce compte possède déjà le rôle admin`,
           });
           return;
         }

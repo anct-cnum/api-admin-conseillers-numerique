@@ -51,7 +51,7 @@ const postInvitationHub =
       } else {
         if (oldUser.roles.includes('hub_coop')) {
           res.status(409).json({
-            message: `Ce compte posséde déjà le rôle hub`,
+            message: `Ce compte possède déjà le rôle hub`,
           });
           return;
         }
