@@ -46,7 +46,7 @@ const postInvitationAdmin =
           passwordCreated: false,
         });
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
-        messageSuccess = `L'admin ${email} a bien été invité, un mail de création de compte lui à été envoyé`;
+        messageSuccess = `L'admin ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('admin')) {
           res.status(409).json({
@@ -54,9 +54,12 @@ const postInvitationAdmin =
           });
           return;
         }
-        if (oldUser.roles.includes('conseiller')) {
+        if (
+          oldUser.roles.includes('conseiller') ||
+          oldUser.roles.includes('candidat')
+        ) {
           res.status(409).json({
-            message: `Les comptes conseillers ne peuvent pas être invités en tant que structure`,
+            message: 'Le compte est déjà utilisé par un candidat ou conseiller',
           });
           return;
         }
@@ -83,7 +86,7 @@ const postInvitationAdmin =
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
-          messageSuccess = `Le rôle admin a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui à été envoyé`;
+          messageSuccess = `Le rôle admin a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
         } else {
           messageSuccess = `Le rôle admin a été ajouté au compte ${email}`;
         }

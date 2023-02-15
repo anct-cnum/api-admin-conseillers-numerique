@@ -109,7 +109,7 @@ const deleteAccount =
             };
             break;
           default:
-            return res.status(409).json({ message: 'le rôle est invalide' });
+            return res.status(400).json({ message: 'le rôle est invalide' });
         }
         user = await app
           .service(service.users)
