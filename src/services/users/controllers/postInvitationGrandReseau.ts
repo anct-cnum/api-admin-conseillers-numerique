@@ -92,6 +92,7 @@ const postInvitationGrandReseau =
           errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
           messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
         } else {
+          user.sub = 'xxxxxxxxx';
           messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}`;
         }
       }
@@ -103,7 +104,6 @@ const postInvitationGrandReseau =
         });
         return;
       }
-      user.sub = 'xxxxxxxxx';
       res.status(200).json({
         message: messageSuccess,
         account: user,

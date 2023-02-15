@@ -30,6 +30,7 @@ const deleteAccount =
     const idUser = req.params.id;
     const { roleSuppression } = req.query;
     let user: undefined | IUser;
+    let deleteMessageSuccess: string = '';
     try {
       if (roleSuppression === 'tous') {
         const isContactStructure = await checkIfUserIsContactStructure(
@@ -46,6 +47,7 @@ const deleteAccount =
           .service(service.users)
           .Model.accessibleBy(req.ability, action.delete)
           .deleteOne({ _id: new ObjectId(idUser) });
+        deleteMessageSuccess = 'le compte a été supprimé';
       } else {
         let query = {};
         switch (roleSuppression) {
@@ -117,9 +119,12 @@ const deleteAccount =
           .findOneAndUpdate({ _id: new ObjectId(idUser) }, query, {
             new: true,
           });
+        deleteMessageSuccess = `le rôle ${roleSuppression} a été supprimé du compte`;
       }
-      user.sub = 'xxxxxxxxx';
-      return res.status(200).json({ deleteSuccess: true, idUser, user });
+      if (user?.sub) {
+        user.sub = 'xxxxxxxxx';
+      }
+      return res.status(200).json({ deleteMessageSuccess, idUser, user });
     } catch (error) {
       res.status(500).json({ message: error.message });
       throw new Error(error);
