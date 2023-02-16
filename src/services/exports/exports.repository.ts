@@ -550,7 +550,7 @@ const generateCsvTerritoires = async (
           [
             ...codeAndNomTerritoire(territoire, statsTerritoire),
             statsTerritoire.personnesAccompagnees -
-            statsTerritoire.personnesRecurrentes,
+              statsTerritoire.personnesRecurrentes,
             statsTerritoire.nombreConseillersCoselec,
             statsTerritoire.cnfsActives,
             statsTerritoire.cnfsInactives,

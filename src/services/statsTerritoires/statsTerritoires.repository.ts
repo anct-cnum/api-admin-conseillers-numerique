@@ -29,11 +29,13 @@ const getPersonnesAccompagnees =
       ]);
 const getPersonnesRecurrentes =
   (app: Application, checkRoleAccessStatsTerritoires) => (query: object) =>
-      app.
-      service(service.cras)
+    app
+      .service(service.cras)
       .Model.aggregate([
         { $match: { ...query, $and: [checkRoleAccessStatsTerritoires] } },
-        { $group: { _id: null, count: { $sum: '$cra.nbParticipantsRecurrents' } } },
+        {
+          $group: { _id: null, count: { $sum: '$cra.nbParticipantsRecurrents' } },
+        },
         { $project: { count: '$count' } },
       ]);
 
