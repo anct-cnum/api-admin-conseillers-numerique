@@ -9,6 +9,7 @@ import {
   checkAccessRequestStatsTerritoires,
   countPersonnesAccompagnees,
   getTauxActivation,
+  countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
 
 const getRegion =
@@ -130,8 +131,14 @@ const getExportTerritoiresCsv =
               req,
               query,
             );
+            item.personnesRecurrentes = await countPersonnesRecurrentes(
+              app,
+              req,
+              query,
+            );
           } else {
             item.personnesAccompagnees = 0;
+            item.personnesRecurrentes = 0;
           }
 
           return item;
