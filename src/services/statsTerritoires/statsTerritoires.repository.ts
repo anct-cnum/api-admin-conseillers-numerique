@@ -29,11 +29,13 @@ const getPersonnesAccompagnees =
       ]);
 const getPersonnesRecurrentes =
   (app: Application, checkRoleAccessStatsTerritoires) => (query: object) =>
-    app.service(service.cras).Model.aggregate([
-      { $match: { ...query, $and: [checkRoleAccessStatsTerritoires] } },
-      { $group: { _id: null, count: { $sum: '$cra.nbParticipantsRecurrents' } } },
-      { $project: { count: '$count' } },
-    ]);
+      app.
+      service(service.cras)
+      .Model.aggregate([
+        { $match: { ...query, $and: [checkRoleAccessStatsTerritoires] } },
+        { $group: { _id: null, count: { $sum: '$cra.nbParticipantsRecurrents' } } },
+        { $project: { count: '$count' } },
+      ]);
 
 const countPersonnesAccompagnees = async (
   app: Application,
@@ -66,5 +68,5 @@ export {
   checkAccessRequestStatsTerritoires,
   countPersonnesAccompagnees,
   getTauxActivation,
-  countPersonnesRecurrentes
+  countPersonnesRecurrentes,
 };

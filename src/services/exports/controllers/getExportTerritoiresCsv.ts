@@ -9,7 +9,7 @@ import {
   checkAccessRequestStatsTerritoires,
   countPersonnesAccompagnees,
   getTauxActivation,
-  countPersonnesRecurrentes
+  countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
 
 const getRegion =

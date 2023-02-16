@@ -549,7 +549,8 @@ const generateCsvTerritoires = async (
         ...statsTerritoires.map((statsTerritoire) =>
           [
             ...codeAndNomTerritoire(territoire, statsTerritoire),
-            statsTerritoire.personnesAccompagnees - statsTerritoire.personnesRecurrentes,
+            statsTerritoire.personnesAccompagnees -
+            statsTerritoire.personnesRecurrentes,
             statsTerritoire.nombreConseillersCoselec,
             statsTerritoire.cnfsActives,
             statsTerritoire.cnfsInactives,
