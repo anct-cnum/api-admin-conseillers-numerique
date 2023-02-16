@@ -63,6 +63,15 @@ const postInvitationAdmin =
           });
           return;
         }
+
+        if (!oldUser.roles.includes('grandReseau')) {
+          res.status(409).json({
+            message:
+              'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
+          });
+          return;
+        }
+
         const query = {
           $push: {
             roles: 'admin',
