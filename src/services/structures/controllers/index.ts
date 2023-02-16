@@ -6,6 +6,7 @@ import verifySiretStructure from './verifySiretStructure';
 import updateSiretStructure from './updateSiretStructure';
 import updateEmailStructure from './updateEmailStructure';
 import preSelectionnerCandidat from './preSelectionnerCandidat';
+import getDossiersReconventionnement from './getDossiersReconventionnement';
 
 export {
   getStructures,
@@ -16,4 +17,5 @@ export {
   updateSiretStructure,
   updateEmailStructure,
   preSelectionnerCandidat,
+  getDossiersReconventionnement,
 };
