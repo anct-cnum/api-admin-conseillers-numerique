@@ -117,6 +117,8 @@ const getStatsTerritoires =
     const { page, territoire, nomOrdre, ordre } = req.query;
     const dateFin: Date = new Date(req.query.dateFin as string);
     const dateDebut: Date = new Date(req.query.dateDebut as string);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
     const emailValidation = validTerritoires.validate({
       territoire,
