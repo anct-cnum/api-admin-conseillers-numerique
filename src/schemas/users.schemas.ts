@@ -47,10 +47,24 @@ const createUserAdmin = Joi.object({
   prenom: Joi.string().required().error(new Error('Le prénom est invalide')),
 });
 
+const validExportGestionnaires = Joi.object({
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  searchRole: Joi.string().error(
+    new Error('La recherche par rôle est invalide'),
+  ),
+  searchByName: Joi.string().error(
+    new Error('La recherche par nom est invalide'),
+  ),
+});
+
 export {
   createUserPrefet,
   validationEmail,
   createUserHub,
   createUserGrandReseau,
   createUserAdmin,
+  validExportGestionnaires,
 };

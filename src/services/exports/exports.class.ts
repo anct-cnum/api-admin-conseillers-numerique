@@ -20,6 +20,7 @@ import {
   getExportStatistiquesCsv,
   getExportTerritoiresCsv,
   getExportListeStructuresCsv,
+  getExportListeGestionnairesCsv,
 } from './controllers';
 import getExportConseillersCsv from './controllers/getExportConseillersCsv';
 
@@ -108,6 +109,12 @@ export class Exports implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getExportListeStructuresCsv(app),
+    );
+    app.get(
+      '/exports/liste-gestionnaires-csv',
+      authenticateMode(app),
+      createAbilities(app),
+      getExportListeGestionnairesCsv(app),
     );
   }
 

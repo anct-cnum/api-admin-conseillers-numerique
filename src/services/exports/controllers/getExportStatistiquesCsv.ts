@@ -10,6 +10,7 @@ import {
   getConseillersIdsByTerritoire,
 } from '../../cras/cras.repository';
 import service from '../../../helpers/services';
+import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -118,6 +119,12 @@ const getExportStatistiquesCsv =
             req.ability,
             action.read,
             app,
+          );
+          break;
+        case 'grandReseau':
+          statistiques = await getStatsNationalesGrandReseau(app, true)(
+            req,
+            res,
           );
           break;
         default:

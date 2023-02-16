@@ -101,9 +101,9 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -137,9 +137,9 @@ const generateCsvCandidatByStructure = async (
     await Promise.all(promises);
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -162,9 +162,9 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
     }
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -224,9 +224,9 @@ const generateCsvConseillersWithoutCRA = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -317,9 +317,9 @@ const generateCsvStructure = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -354,9 +354,9 @@ const generateCsvRupture = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -399,26 +399,26 @@ const generateCsvStatistiques = async (
         statistiques.nbUsagersAccompagnementIndividuel
       }\nAccompagnements en atelier collectif;${
         statistiques.nbUsagersAtelierCollectif
-      }\nRedirections vers une autre structure agréée${
+      }\nRedirections vers une autre structure agréée;${
         statistiques.nbReconduction
       }`,
     ];
     const statsThemes = [
       '\nThèmes des accompagnements',
-      ...statistiques.statsThemes.map(
+      ...(statistiques.statsThemes?.map(
         (theme) =>
           `\n${
             labelsCorrespondance.find((label) => label.nom === theme.nom)
               ?.correspondance ?? theme.nom
           };${theme.valeur}`,
-      ),
+      ) ?? []),
       '',
     ];
     const statsLieux = [
       `\nCanaux d'accompagnements (en %)'`,
       ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
         (statLieux, index) =>
-          `\n${statLieux};${statistiques.statsLieux[index].valeur}`,
+          `\n${statLieux};${statistiques?.statsLieux[index].valeur}`,
       ),
       '',
     ];
@@ -431,7 +431,7 @@ const generateCsvStatistiques = async (
         'Plus de 120 minutes',
       ].map(
         (statsDuree, index) =>
-          `\n${statsDuree};${statistiques.statsDurees[index].valeur}`,
+          `\n${statsDuree};${statistiques?.statsDurees[index].valeur}`,
       ),
       '',
     ];
@@ -445,7 +445,7 @@ const generateCsvStatistiques = async (
         'Plus de 60 ans',
       ].map(
         (statsAge, index) =>
-          `\n${statsAge};${statistiques.statsAges[index].valeur}`,
+          `\n${statsAge};${statistiques?.statsAges[index].valeur}`,
       ),
       '',
     ];
@@ -459,7 +459,7 @@ const generateCsvStatistiques = async (
         'Non renseigné',
       ].map(
         (statsUsager, index) =>
-          `\n${statsUsager};${statistiques.statsUsagers[index].valeur}`,
+          `\n${statsUsager};${statistiques?.statsUsagers[index].valeur}`,
       ),
       '',
     ];
@@ -479,8 +479,8 @@ const generateCsvStatistiques = async (
     ];
     const statsEvolutions = [
       `\nÉvolution·des·comptes·rendus·d'activité`,
-      ...Object.keys(statistiques.statsEvolutions)
-        .map((year) => [
+      ...(
+        Object.keys(statistiques.statsEvolutions)?.map((year) => [
           `\n${year}`,
           ...statistiques.statsEvolutions[year]
             .sort(
@@ -494,15 +494,15 @@ const generateCsvStatistiques = async (
                 }`,
             ),
           '',
-        ])
-        .flat(),
+        ]) ?? []
+      ).flat(),
     ];
     const statsReorientations = [
       '\nUsager.ères réorienté.es',
-      ...statistiques.statsReorientations.map(
+      ...(statistiques.statsReorientations?.map(
         (statReorientation) =>
           `\n${statReorientation.nom};${statReorientation.valeur}`,
-      ),
+      ) ?? []),
     ];
 
     const buildExportStatistiquesCsvFileContent = [
@@ -521,9 +521,9 @@ const generateCsvStatistiques = async (
     res.write(buildExportStatistiquesCsvFileContent);
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -560,9 +560,9 @@ const generateCsvTerritoires = async (
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -620,9 +620,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -670,9 +670,51 @@ const generateCsvListeStructures = async (structures, res: Response) => {
     );
     res.end();
   } catch (error) {
-    res.statusMessage =
-      "Une erreur s'est produite au niveau de la création du csv";
-    res.status(500).end();
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
+const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
+  try {
+    const compteActif = (gestionnaire) => (gestionnaire?.sub ? 'Oui' : 'Non');
+
+    const fileHeaders = [
+      'Id du gestionnaire',
+      'Rôle du gestionnaire',
+      'Email du gestionnaire',
+      'Réseau',
+      'Nom',
+      'Prénom',
+      "Date d'invitation",
+      'Actif',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...gestionnaires.map((gestionnaire) =>
+          [
+            gestionnaire._id,
+            `"${gestionnaire.roles.join(',')}"`,
+            gestionnaire.name,
+            gestionnaire.reseau,
+            gestionnaire.nom,
+            gestionnaire.prenom,
+            gestionnaire.mailSentDate
+              ? dayjs(gestionnaire.mailSentDate).format('DD/MM/YYYY')
+              : '-',
+            compteActif(gestionnaire),
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
     throw new Error(error);
   }
 };
@@ -688,4 +730,5 @@ export {
   generateCsvTerritoires,
   generateCsvConseillers,
   generateCsvListeStructures,
+  generateCsvListeGestionnaires,
 };

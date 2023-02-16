@@ -6,16 +6,19 @@ import {
   getAccessibleData,
   getAccessibleDataAggregate,
   getUsers,
+  getGestionnaires,
   postInvitationAdmin,
   postInvitationGrandReseau,
   postInvitationHub,
   postInvitationPrefet,
+  postGestionnaireRelanceInvitation,
   updateAccessibleData,
   verifyToken,
   signIn,
   signOut,
   getRefreshToken,
   deleteAccountGrandReseau,
+  deleteAccount,
 } from './controllers';
 
 export default class Users extends Service {
@@ -66,11 +69,23 @@ export default class Users extends Service {
       createAbilities(app),
       getUsers(app),
     );
+    app.get(
+      '/gestionnaires',
+      authenticateMode(app),
+      createAbilities(app),
+      getGestionnaires(app, options),
+    );
     app.delete(
       '/user/grandReseau/:id',
       authenticateMode(app),
       createAbilities(app),
       deleteAccountGrandReseau(app),
+    );
+    app.delete(
+      '/user/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      deleteAccount(app),
     );
     app.post(
       '/inviteAccountHub',
@@ -83,6 +98,12 @@ export default class Users extends Service {
       authenticateMode(app),
       createAbilities(app),
       postInvitationGrandReseau(app),
+    );
+    app.post(
+      '/gestionnaire/relance-invitation/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      postGestionnaireRelanceInvitation(app),
     );
     // Sentry test
     app.get('/debug-sentry', function mainHandler() {

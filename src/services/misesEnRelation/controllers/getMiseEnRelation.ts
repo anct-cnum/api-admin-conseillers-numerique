@@ -6,12 +6,12 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 
-const getCandidatByIdStructure =
+const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const idConseiller = req.params.id;
+    const idMiseEnRelation = req.params.id;
 
     try {
-      if (!ObjectId.isValid(idConseiller)) {
+      if (!ObjectId.isValid(idMiseEnRelation)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
@@ -30,7 +30,7 @@ const getCandidatByIdStructure =
         .Model.aggregate([
           {
             $match: {
-              'conseiller.$id': new ObjectId(idConseiller),
+              _id: new ObjectId(idMiseEnRelation),
               'structure.$id': structure._id,
             },
           },
@@ -64,6 +64,7 @@ const getCandidatByIdStructure =
               pix: '$conseiller.pix',
               cv: '$conseiller.cv',
               idConseiller: '$conseiller._id',
+              idPG: '$conseiller.idPG',
             },
           },
         ]);
@@ -100,4 +101,4 @@ const getCandidatByIdStructure =
     }
   };
 
-export default getCandidatByIdStructure;
+export default getMiseEnRelation;

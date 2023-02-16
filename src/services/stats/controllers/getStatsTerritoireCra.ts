@@ -10,6 +10,8 @@ const getStatsTerritoireCra =
   (app: Application) => async (req: IRequest, res: Response) => {
     const dateFin: Date = new Date(req.query.dateFin as string);
     const dateDebut: Date = new Date(req.query.dateDebut as string);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     const conseillerIds = JSON.parse(req.query?.conseillerIds as string);
     const emailValidation = validTerritoireCra.validate({
       conseillerIds,

@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
+import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
+import { ICodesPostauxQuery } from '../../ts/interfaces/global.interfaces';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -21,6 +23,158 @@ const sortByValueThenName = (a, b) => {
 
 const getNombreCra = async (query, app) =>
   app.service(service.cras).Model.countDocuments(query);
+
+const getCodesPostauxGrandReseau = async (
+  codesPostauxQuery: ICodesPostauxQuery,
+  ability,
+  read: string,
+  app: Application,
+) => {
+  const queryAccess = await app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+
+  return app.service(service.cras).Model.aggregate([
+    { $match: { ...codesPostauxQuery, $and: [queryAccess] } },
+    {
+      $group: {
+        _id: '$cra.codePostal',
+        villes: { $addToSet: '$cra.nomCommune' },
+      },
+    },
+    { $sort: { _id: 1, villes: 1 } },
+    {
+      $project: {
+        _id: 0,
+        codePostal: '$_id',
+        villes: '$villes',
+      },
+    },
+  ]);
+};
+
+const getStructures = async (
+  query,
+  ability,
+  read: string,
+  app: Application,
+) => {
+  const crasQuery: any = {};
+  if (query['cra.codePostal']) {
+    crasQuery['cra.codePostal'] = query['cra.codePostal'];
+  }
+  if (query['cra.nomCommune']) {
+    crasQuery['cra.nomCommune'] = query['cra.nomCommune'];
+  }
+
+  const queryAccess = await app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+  const structures = await app.service(service.cras).Model.aggregate([
+    { $match: { ...crasQuery, $and: [queryAccess] } },
+    {
+      $project: {
+        structureArray: { $objectToArray: '$structure' },
+      },
+    },
+    {
+      $unwind: '$structureArray',
+    },
+    {
+      $match: { 'structureArray.k': '$id' },
+    },
+    {
+      $group: {
+        _id: null,
+        uniqueStructures: { $addToSet: '$structureArray.v' },
+      },
+    },
+    {
+      $lookup: {
+        from: 'structures',
+        localField: 'uniqueStructures',
+        foreignField: '_id',
+        as: 'structures',
+      },
+    },
+    {
+      $project: {
+        'structures._id': 1,
+        'structures.nom': 1,
+        'structures.codePostal': 1,
+        _id: 0,
+      },
+    },
+  ]);
+
+  return structures;
+};
+
+const getConseillers = async (
+  query,
+  ability,
+  read: string,
+  app: Application,
+) => {
+  const crasQuery: any = {};
+  if (query['cra.codePostal']) {
+    crasQuery['cra.codePostal'] = query['cra.codePostal'];
+  }
+  if (query['cra.nomCommune']) {
+    crasQuery['cra.nomCommune'] = query['cra.nomCommune'];
+  }
+  const queryAccess = await app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+
+  const conseillers = await app.service(service.cras).Model.aggregate([
+    { $match: { ...crasQuery, $and: [queryAccess] } },
+    {
+      $project: {
+        conseillerArray: { $objectToArray: '$conseiller' },
+      },
+    },
+    {
+      $unwind: '$conseillerArray',
+    },
+    {
+      $match: { 'conseillerArray.k': '$id' },
+    },
+    {
+      $group: {
+        _id: null,
+        uniqueConseillers: { $addToSet: '$conseillerArray.v' },
+      },
+    },
+    {
+      $lookup: {
+        from: 'conseillers',
+        localField: 'uniqueConseillers',
+        foreignField: '_id',
+        as: 'conseillers',
+      },
+    },
+    {
+      $project: {
+        conseillers: {
+          $map: {
+            input: '$conseillers',
+            as: 'conseiller',
+            in: {
+              _id: '$$conseiller._id',
+              emailCN: '$$conseiller.emailCN.address',
+            },
+          },
+        },
+        _id: 0,
+      },
+    },
+  ]);
+  return conseillers;
+};
 
 const getPersonnesRecurrentes = async (query, ability, read, app) => {
   const queryAccess = await app
@@ -508,4 +662,7 @@ export {
   getStatsEvolutions,
   conversionPourcentage,
   getPersonnesAccompagnees,
+  getCodesPostauxGrandReseau,
+  getStructures,
+  getConseillers,
 };
