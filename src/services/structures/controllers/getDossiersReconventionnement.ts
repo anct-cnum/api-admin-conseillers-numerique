@@ -12,6 +12,7 @@ interface IDossier {
   dateFinProchainContrat: Date;
   nbPostesAttribuees: number;
   nomStructure: string;
+  type: string;
 }
 
 const getNameStructure =
@@ -67,7 +68,7 @@ const checkIfLastPagination = (pageInfo: any) => {
 const getDossiersReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const endpoint = 'https://www.demarches-simplifiees.fr/api/v2/graphql';
-    const { skip } = req.body;
+    const { page } = req.body;
     try {
       const graphQLClient = new GraphQLClient(endpoint, {
         headers: {
@@ -164,15 +165,15 @@ const getDossiersReconventionnement =
       };
       const demarcheStructurePublique = await graphQLClient.request(
         query,
-        skip[0],
+        page[0],
       );
-      const demarcheEntrepriseEss = await graphQLClient.request(query, skip[1]);
-      const demarcheStructure = await graphQLClient.request(query, skip[2]);
+      const demarcheEntrepriseEss = await graphQLClient.request(query, page[1]);
+      const demarcheStructure = await graphQLClient.request(query, page[2]);
 
       const dossierStructurePublique = await Promise.all(
         demarcheStructurePublique.demarche.dossiers.nodes.map(
           async (dossier) => {
-            const { champs, id, datePassageEnConstruction } = dossier;
+            const { champs, number, datePassageEnConstruction } = dossier;
             const item: IDossier = {
               _id: '',
               idPG: 0,
@@ -180,8 +181,9 @@ const getDossiersReconventionnement =
               dateFinProchainContrat: undefined,
               nbPostesAttribuees: 0,
               nomStructure: '',
+              type: 'Reconventionnement',
             };
-            item._id = id;
+            item._id = number;
             item.dateDeCreation = datePassageEnConstruction;
             item.idPG = parseInt(
               champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg1MTgwNA==')
@@ -206,7 +208,7 @@ const getDossiersReconventionnement =
 
       const dossierEntrepriseEss = await Promise.all(
         demarcheEntrepriseEss.demarche.dossiers.nodes.map(async (dossier) => {
-          const { champs, id, datePassageEnConstruction } = dossier;
+          const { champs, number, datePassageEnConstruction } = dossier;
           const item: IDossier = {
             _id: '',
             idPG: 0,
@@ -214,8 +216,9 @@ const getDossiersReconventionnement =
             dateFinProchainContrat: undefined,
             nbPostesAttribuees: 0,
             nomStructure: '',
+            type: 'Reconventionnement',
           };
-          item._id = id;
+          item._id = number;
           item.dateDeCreation = datePassageEnConstruction;
           item.idPG = champs.find(
             (champ: any) => champ.id === 'Q2hhbXAtMjg1MjA1OQ==',
@@ -235,7 +238,7 @@ const getDossiersReconventionnement =
 
       const dossierStructure = await Promise.all(
         demarcheStructure.demarche.dossiers.nodes.map(async (dossier) => {
-          const { champs, id, datePassageEnConstruction } = dossier;
+          const { champs, number, datePassageEnConstruction } = dossier;
           const item: IDossier = {
             _id: '',
             idPG: 0,
@@ -243,8 +246,9 @@ const getDossiersReconventionnement =
             dateFinProchainContrat: undefined,
             nbPostesAttribuees: 0,
             nomStructure: '',
+            type: 'Reconventionnement',
           };
-          item._id = id;
+          item._id = number;
           item.dateDeCreation = datePassageEnConstruction;
           item.idPG = champs.find(
             (champ: any) => champ.id === 'Q2hhbXAtMjg0ODE4Ng==',
@@ -267,18 +271,18 @@ const getDossiersReconventionnement =
       );
       items.total = await getTotalDossiersReconventionnement(graphQLClient);
       items.limit = 45;
-      items.skip[0].after = checkIfLastPagination(
+      page[0].after = checkIfLastPagination(
         demarcheStructure.demarche.dossiers.pageInfo,
       );
-      items.skip[1].after = checkIfLastPagination(
+      page[1].after = checkIfLastPagination(
         demarcheStructurePublique.demarche.dossiers.pageInfo,
       );
-      items.skip[2].after = checkIfLastPagination(
+      page[2].after = checkIfLastPagination(
         demarcheEntrepriseEss.demarche.dossiers.pageInfo,
       );
       items.data = dossiers;
 
-      res.status(200).json(items);
+      res.status(200).json({ items, page });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
