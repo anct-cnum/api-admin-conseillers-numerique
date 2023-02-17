@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
+import dayjs from 'dayjs';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
@@ -74,36 +75,15 @@ const getNombreCrasByArrayConseillerId =
         'conseiller.$id': { $in: conseillersIds },
       });
 
-const getConseillersIdsByTerritoire = async (type, idType, app) => {
-  const conseillersIds = [];
+const getConseillersIdsByTerritoire = async (dateFin, type, idType, app) => {
   const query = {
+    date: dayjs(dateFin).format('DD/MM/YYYY'),
     [type]: idType,
   };
-
-  const structures: IStructures[] = await app
-    .service(service.structures)
-    .Model.find(query);
-  const promises = [];
-
-  structures?.forEach((structure) => {
-    // eslint-disable-next-line
-    const p = new Promise(async (resolve) => {
-      const conseillersStructure = await app
-        .service(service.conseillers)
-        .Model.find({
-          structureId: structure._id,
-        });
-      if (conseillersStructure.length > 0) {
-        conseillersStructure?.forEach((conseiller) => {
-          conseillersIds.push(conseiller._id);
-        });
-      }
-      resolve(conseillersIds);
-    });
-    promises.push(p);
-  });
-
-  await Promise.all(promises);
+  const conseillersIds = await app
+    .service(service.statsTerritoires)
+    .Model.find(query)
+    .distinct('conseillerIds');
   return conseillersIds;
 };
 
