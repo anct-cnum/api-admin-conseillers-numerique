@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb';
 import dayjs from 'dayjs';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
-import { IStructures } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 
 const checkAccessRequestCras = async (app: Application, req: IRequest) =>
