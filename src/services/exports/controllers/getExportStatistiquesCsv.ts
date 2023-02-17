@@ -102,6 +102,7 @@ const getExportStatistiquesCsv =
         case 'codeDepartement':
         case 'codeRegion':
           conseillerIds = await getConseillersIdsByTerritoire(
+            dateFin,
             type,
             idType,
             app,
