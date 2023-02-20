@@ -13,7 +13,7 @@ export default function (app: Application): Model<any> {
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const schema = new mongooseClient.Schema<AccessLogs>(
     {
-      email: { type: String },
+      name: { type: String },
       createdAt: { type: Date },
       ip: { type: String },
       ipTest: { type: String },

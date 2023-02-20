@@ -425,7 +425,7 @@ export interface ConseillersRuptures {
 }
 export interface AccessLogs {
   createdAt: Date;
-  email: string;
+  name: string;
   ip: string;
   ipTest: string;
   connexionError: boolean;
