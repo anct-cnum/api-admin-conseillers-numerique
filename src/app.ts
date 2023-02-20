@@ -59,6 +59,11 @@ app.use(express.urlencoded({ extended: true }));
 app.configure(express.rest());
 app.configure(socketio());
 
+app.use((req, res, next) => {
+  req.feathers.ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  next();
+});
+
 app.configure(mongoose);
 app.use(cors({ origin: config().dashboard_hostname, credentials: true }));
 

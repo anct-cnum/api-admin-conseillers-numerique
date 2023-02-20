@@ -81,12 +81,31 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           return res.status(500).json(error);
         }
         if (!userInDB) {
+          try {
+            await app.service('accessLogs').create({
+              email: keycloakUser.email,
+              createdAt: new Date(),
+              ip: req.ip,
+              ipTest: req.feathers.ip,
+              connexionError: true,
+            });
+          } catch (error) {
+            res.status(500).json(error.message);
+          }
           return res.status(401).json('Connexion refusée');
         }
         try {
           // création de l'access token et du refresh token
           const accessToken = await createAccessToken(app)(userInDB);
           const refreshToken = await createRefreshToken(app)(userInDB);
+
+          // création d'une entrée dans la collection accessLogs
+          await app.service('accessLogs').create({
+            email: keycloakUser.email,
+            createdAt: new Date(),
+            ip: req.ip,
+            ipTest: req.feathers.ip,
+          });
 
           // mise à jour de l'utilisateur avec son nouveau refresh token et sa dernière date de connexion
           const user = await app

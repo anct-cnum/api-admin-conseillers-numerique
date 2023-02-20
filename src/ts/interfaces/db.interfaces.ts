@@ -423,6 +423,13 @@ export interface ConseillersRuptures {
   dateRupture: Date;
   motifRupture: string;
 }
+export interface AccessLogs {
+  createdAt: Date;
+  email: string;
+  ip: string;
+  ipTest: string;
+  connexionError: boolean;
+}
 
 export interface IStatsTerritoires {
   date: string;
