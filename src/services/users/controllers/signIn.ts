@@ -97,7 +97,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
 
           // création d'une entrée dans la collection accessLogs
           await app.service('accessLogs').create({
-            name: keycloakUser.email,
+            name: userInDB.name,
             createdAt: new Date(),
             ip: req.ip,
             ipTest: req.feathers.ip,
