@@ -4,6 +4,9 @@ import { GraphQLClient, gql } from 'graphql-request';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../structures.repository';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+
+const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
 interface IReconventionnement {
   idDossier?: string;
@@ -12,8 +15,17 @@ interface IReconventionnement {
   dateFinProchainContrat?: Date;
   nbPostesAttribuees?: number;
   statut?: string;
-  structure?: object;
+  structure?: IStructures;
+  url?: string;
 }
+
+const getUrlDossierReconventionnement = (formJuridique: string) =>
+  categoriesCorrespondances.find((categorieCorrespondance) => {
+    if (categorieCorrespondance.categorie.includes(formJuridique)) {
+      return categorieCorrespondance.url;
+    }
+    return null;
+  });
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: number) =>
@@ -52,6 +64,7 @@ const getDetailStructureWithConseillers =
           nom: 1,
           coselec: 1,
           contact: 1,
+          'insee.entreprise.forme_juridique': 1,
           conseillers: '$conseillers',
         },
       },
@@ -126,7 +139,6 @@ const getDetailDossierReconventionnement =
       const dossier = await graphQLClient.request(query, {
         dossierNumber: parseInt(idDossier, 10),
       });
-      console.log(dossier);
       const reconventionnement: IReconventionnement = {};
       const checkAccessStructures = await checkAccessReadRequestStructures(
         app,
@@ -151,6 +163,17 @@ const getDetailDossierReconventionnement =
       );
       reconventionnement.dateFinProchainContrat =
         dossier.dossier.champs[5]?.date;
+      const urlDossierReconventionnement = getUrlDossierReconventionnement(
+        reconventionnement.structure.insee.entreprise.forme_juridique,
+      );
+      if (urlDossierReconventionnement === null) {
+        res.status(500).json({
+          message:
+            "Erreur lors de la récupération de l'url du dossier de reconventionnement",
+        });
+        return;
+      }
+      reconventionnement.url = `${urlDossierReconventionnement.url}${reconventionnement.structure.idPG}`;
 
       res.status(200).json(reconventionnement);
     } catch (error) {

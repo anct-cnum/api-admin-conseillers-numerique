@@ -80,7 +80,7 @@ export default class Structures extends Service {
       createAbilities(app),
       getStructuresMisesEnRelationsStats(app),
     );
-    app.post(
+    app.get(
       '/reconventionnements/',
       authenticateMode(app),
       createAbilities(app),

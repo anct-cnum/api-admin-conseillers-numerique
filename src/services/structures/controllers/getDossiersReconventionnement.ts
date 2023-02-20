@@ -51,24 +51,26 @@ const getTotalDossiersReconventionnement = async (
   const demarcheStructure = await graphQLClient.request(query, {
     demarcheNumber: 69687,
   });
-  return (
-    demarcheStructurePublique.demarche.dossiers.nodes.length +
-    demarcheEntrepriseEss.demarche.dossiers.nodes.length +
-    demarcheStructure.demarche.dossiers.nodes.length
-  );
-};
-
-const checkIfLastPagination = (pageInfo: any) => {
-  if (pageInfo.hasNextPage === false) {
-    return '';
-  }
-  return pageInfo.endCursor;
+  return [
+    {
+      type: 'structurePublique',
+      total: demarcheStructurePublique.demarche.dossiers.nodes.length,
+    },
+    {
+      type: 'entrepriseEss',
+      total: demarcheEntrepriseEss.demarche.dossiers.nodes.length,
+    },
+    {
+      type: 'structure',
+      total: demarcheStructure.demarche.dossiers.nodes.length,
+    },
+  ];
 };
 
 const getDossiersReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const endpoint = 'https://www.demarches-simplifiees.fr/api/v2/graphql';
-    const { page } = req.body;
+    const { page } = req.query;
     try {
       const graphQLClient = new GraphQLClient(endpoint, {
         headers: {
@@ -77,6 +79,35 @@ const getDossiersReconventionnement =
         },
       });
 
+      const items: {
+        total: number;
+        data: object;
+        limit: number;
+        skip: number;
+      } = {
+        total: 0,
+        data: [],
+        limit: 0,
+        skip: 0,
+      };
+      let b: String = '';
+      let first = 15;
+      const totalDossierEachType = await getTotalDossiersReconventionnement(
+        graphQLClient,
+      );
+      if (page > 1) {
+        const nbDossier = page * first;
+        const result = totalDossierEachType.filter(
+          (word) => word.total > nbDossier,
+        );
+        if (result.length === 1) {
+          first = 45;
+        }
+        if (result.length === 2) {
+          first = 30;
+        }
+        b = Buffer.from(nbDossier.toString()).toString('base64');
+      }
       const query = gql`
         query getDemarche(
           $demarcheNumber: Int!
@@ -88,7 +119,7 @@ const getDossiersReconventionnement =
             id
             number
             title
-            dossiers(state: $state, order: $order, first: 15, after: $after) {
+            dossiers(state: $state, order: $order, first: ${first}, after: $after) {
               pageInfo {
                 endCursor
                 hasNextPage
@@ -151,24 +182,18 @@ const getDossiersReconventionnement =
           }
         }
       `;
-
-      const items: {
-        total: number;
-        data: object;
-        limit: number;
-        skip: object;
-      } = {
-        total: 0,
-        data: [],
-        limit: 0,
-        skip: [],
-      };
-      const demarcheStructurePublique = await graphQLClient.request(
-        query,
-        page[0],
-      );
-      const demarcheEntrepriseEss = await graphQLClient.request(query, page[1]);
-      const demarcheStructure = await graphQLClient.request(query, page[2]);
+      const demarcheStructurePublique = await graphQLClient.request(query, {
+        demarcheNumber: 69665,
+        after: b,
+      });
+      const demarcheEntrepriseEss = await graphQLClient.request(query, {
+        demarcheNumber: 69686,
+        after: b,
+      });
+      const demarcheStructure = await graphQLClient.request(query, {
+        demarcheNumber: 69687,
+        after: b,
+      });
 
       const dossierStructurePublique = await Promise.all(
         demarcheStructurePublique.demarche.dossiers.nodes.map(
@@ -269,20 +294,15 @@ const getDossiersReconventionnement =
         dossierEntrepriseEss,
         dossierStructure,
       );
-      items.total = await getTotalDossiersReconventionnement(graphQLClient);
+      items.total =
+        totalDossierEachType[0].total +
+        totalDossierEachType[1].total +
+        totalDossierEachType[2].total;
       items.limit = 45;
-      page[0].after = checkIfLastPagination(
-        demarcheStructure.demarche.dossiers.pageInfo,
-      );
-      page[1].after = checkIfLastPagination(
-        demarcheStructurePublique.demarche.dossiers.pageInfo,
-      );
-      page[2].after = checkIfLastPagination(
-        demarcheEntrepriseEss.demarche.dossiers.pageInfo,
-      );
+      items.skip = page;
       items.data = dossiers;
 
-      res.status(200).json({ items, page });
+      res.status(200).json(items);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
