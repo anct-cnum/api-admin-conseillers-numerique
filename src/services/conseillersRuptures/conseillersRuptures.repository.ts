@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import dayjs from 'dayjs';
 import { Response } from 'express';
 
@@ -23,7 +24,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
             rupture.conseiller?.prenom ?? 'Anonyme'
           };${rupture.conseiller?.email ?? 'Anonyme'};${
             rupture.structure?.idPG
-          };${rupture.structure?.nom};${formatDate(rupture.dateRupture)};${
+          };${rupture.structure?.nom?.replace(/["',]/g, ' ')};${formatDate(rupture.dateRupture)};${
             rupture.motifRupture
           };${
             rupture.conseillerSupprime?.conseiller?.idPG
