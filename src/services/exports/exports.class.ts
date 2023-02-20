@@ -21,8 +21,8 @@ import {
   getExportTerritoiresCsv,
   getExportListeStructuresCsv,
   getExportListeGestionnairesCsv,
+  getExportConseillersCsv,
 } from './controllers';
-import getExportConseillersCsv from './controllers/getExportConseillersCsv';
 
 interface Data {}
 
