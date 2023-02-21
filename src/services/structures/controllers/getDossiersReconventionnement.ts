@@ -52,29 +52,20 @@ const getTotalDossiersReconventionnement = async (
     demarcheNumber: 69687,
   });
   return [
-    {
-      type: 'structurePublique',
-      total: demarcheStructurePublique.demarche.dossiers.nodes.length,
-    },
-    {
-      type: 'entrepriseEss',
-      total: demarcheEntrepriseEss.demarche.dossiers.nodes.length,
-    },
-    {
-      type: 'structure',
-      total: demarcheStructure.demarche.dossiers.nodes.length,
-    },
+    demarcheStructurePublique.demarche.dossiers.nodes.length,
+    demarcheEntrepriseEss.demarche.dossiers.nodes.length,
+    demarcheStructure.demarche.dossiers.nodes.length,
   ];
 };
 
 const getDossiersReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const endpoint = 'https://www.demarches-simplifiees.fr/api/v2/graphql';
+    const demarcheSimplifiee = app.get('demarche_simplifiee');
     const { page } = req.query;
     try {
-      const graphQLClient = new GraphQLClient(endpoint, {
+      const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
         headers: {
-          authorization: `Bearer ${app.get('api_demarche_simplifiee')}`,
+          authorization: `Bearer ${demarcheSimplifiee.token_api}`,
           'content-type': 'application/json',
         },
       });
@@ -90,23 +81,23 @@ const getDossiersReconventionnement =
         limit: 0,
         skip: 0,
       };
-      let b: String = '';
-      let first = 15;
+      let paginationCursor: String = '';
+      let limitDossier = 15;
       const totalDossierEachType = await getTotalDossiersReconventionnement(
         graphQLClient,
       );
       if (page > 1) {
-        const nbDossier = page * first;
+        const nbDossier = page * limitDossier;
         const result = totalDossierEachType.filter(
-          (word) => word.total > nbDossier,
+          (totalDossier) => totalDossier > nbDossier,
         );
         if (result.length === 1) {
-          first = 45;
+          limitDossier = 45;
         }
         if (result.length === 2) {
-          first = 30;
+          limitDossier = 22;
         }
-        b = Buffer.from(nbDossier.toString()).toString('base64');
+        paginationCursor = Buffer.from(nbDossier.toString()).toString('base64');
       }
       const query = gql`
         query getDemarche(
@@ -119,7 +110,7 @@ const getDossiersReconventionnement =
             id
             number
             title
-            dossiers(state: $state, order: $order, first: ${first}, after: $after) {
+            dossiers(state: $state, order: $order, first: ${limitDossier}, after: $after) {
               pageInfo {
                 endCursor
                 hasNextPage
@@ -184,15 +175,15 @@ const getDossiersReconventionnement =
       `;
       const demarcheStructurePublique = await graphQLClient.request(query, {
         demarcheNumber: 69665,
-        after: b,
+        after: paginationCursor,
       });
       const demarcheEntrepriseEss = await graphQLClient.request(query, {
         demarcheNumber: 69686,
-        after: b,
+        after: paginationCursor,
       });
       const demarcheStructure = await graphQLClient.request(query, {
         demarcheNumber: 69687,
-        after: b,
+        after: paginationCursor,
       });
 
       const dossierStructurePublique = await Promise.all(
@@ -294,10 +285,10 @@ const getDossiersReconventionnement =
         dossierEntrepriseEss,
         dossierStructure,
       );
-      items.total =
-        totalDossierEachType[0].total +
-        totalDossierEachType[1].total +
-        totalDossierEachType[2].total;
+      items.total = totalDossierEachType.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0,
+      );
       items.limit = 45;
       items.skip = page;
       items.data = dossiers;

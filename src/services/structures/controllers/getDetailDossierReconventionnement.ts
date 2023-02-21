@@ -19,13 +19,34 @@ interface IReconventionnement {
   url?: string;
 }
 
-const getUrlDossierReconventionnement = (formJuridique: string) =>
+const getTypeDossierReconventionnement = (formJuridique: string) =>
   categoriesCorrespondances.find((categorieCorrespondance) => {
     if (categorieCorrespondance.categorie.includes(formJuridique)) {
-      return categorieCorrespondance.url;
+      return categorieCorrespondance.type;
     }
     return null;
   });
+
+const getUrlDossierReconventionnement = (
+  idPG: number,
+  type: string,
+  demarcheSimplifiee: {
+    url_association: string;
+    url_entreprise: string;
+    url_structure_publique: string;
+  },
+) => {
+  switch (type) {
+    case 'association':
+      return `${demarcheSimplifiee.url_association}${idPG}`;
+    case 'entreprise':
+      return `${demarcheSimplifiee.url_entreprise}${idPG}`;
+    case 'structure_publique':
+      return `${demarcheSimplifiee.url_structure_publique}${idPG}`;
+    default:
+      return '';
+  }
+};
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: number) =>
@@ -72,12 +93,12 @@ const getDetailStructureWithConseillers =
 
 const getDetailDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const endpoint = 'https://www.demarches-simplifiees.fr/api/v2/graphql';
+    const demarcheSimplifiee = app.get('demarche_simplifiee');
     const idDossier = req.params.id;
     try {
-      const graphQLClient = new GraphQLClient(endpoint, {
+      const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
         headers: {
-          authorization: `Bearer ${app.get('api_demarche_simplifiee')}`,
+          authorization: `Bearer ${demarcheSimplifiee.token_api}`,
           'content-type': 'application/json',
         },
       });
@@ -163,17 +184,21 @@ const getDetailDossierReconventionnement =
       );
       reconventionnement.dateFinProchainContrat =
         dossier.dossier.champs[5]?.date;
-      const urlDossierReconventionnement = getUrlDossierReconventionnement(
+      const typeDossierReconventionnement = getTypeDossierReconventionnement(
         reconventionnement.structure.insee.entreprise.forme_juridique,
       );
-      if (urlDossierReconventionnement === null) {
+      if (typeDossierReconventionnement === null) {
         res.status(500).json({
           message:
             "Erreur lors de la récupération de l'url du dossier de reconventionnement",
         });
         return;
       }
-      reconventionnement.url = `${urlDossierReconventionnement.url}${reconventionnement.structure.idPG}`;
+      reconventionnement.url = getUrlDossierReconventionnement(
+        reconventionnement.structure.idPG,
+        typeDossierReconventionnement.type,
+        demarcheSimplifiee,
+      );
 
       res.status(200).json(reconventionnement);
     } catch (error) {
