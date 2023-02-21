@@ -84,8 +84,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           await app.service('accessLogs').create({
             name: keycloakUser.email,
             createdAt: new Date(),
-            ip: req.ip,
-            ipTest: req.feathers.ip,
+            ip: req.feathers.ip,
             connexionError: true,
           });
           return res.status(401).json('Connexion refusée');
@@ -99,8 +98,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           await app.service('accessLogs').create({
             name: userInDB.name,
             createdAt: new Date(),
-            ip: req.ip,
-            ipTest: req.feathers.ip,
+            ip: req.feathers.ip,
           });
 
           // mise à jour de l'utilisateur avec son nouveau refresh token et sa dernière date de connexion

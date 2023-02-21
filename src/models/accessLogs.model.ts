@@ -16,7 +16,6 @@ export default function (app: Application): Model<any> {
       name: { type: String },
       createdAt: { type: Date },
       ip: { type: String },
-      ipTest: { type: String },
       connexionError: { type: Boolean },
     },
     { strict: false, collection: 'accessLogs', versionKey: false },
