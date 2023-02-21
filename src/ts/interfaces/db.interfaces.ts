@@ -427,7 +427,6 @@ export interface AccessLogs {
   createdAt: Date;
   name: string;
   ip: string;
-  ipTest: string;
   connexionError: boolean;
 }
 
