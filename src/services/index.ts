@@ -11,6 +11,7 @@ import statsConseillersCras from './statsConseillersCras/statsConseillersCras.se
 import permanences from './permanences/permanences.service';
 import conseillersSupprimes from './conseillersSupprimes/conseillersSupprimes.service';
 import conseillersRuptures from './conseillersRuptures/conseillersRuptures.service';
+import accessLogs from './accessLogs/accessLogs.service';
 
 export default function (app: Application): void {
   app.configure(users);
@@ -25,4 +26,5 @@ export default function (app: Application): void {
   app.configure(permanences);
   app.configure(conseillersSupprimes);
   app.configure(conseillersRuptures);
+  app.configure(accessLogs);
 }
