@@ -40,6 +40,13 @@
     "access_token_duration": "INCLUSION_CONNECT_ACCESSTOKENDURATION",
     "refresh_token_duration": "INCLUSION_CONNECT_REFRESHTOKENDURATION"
   },
+  "demarche_simplifiee": {
+    "token_api": "DEMARCHE_SIMPLIFIEE_TOKEN",
+    "url_entreprise": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE",
+    "url_association": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION",
+    "url_structure_publique": "DEMARCHE_SIMPLIFIEE_URL_STRUCTURE_PUBLIQUE",
+    "endpoint": "DEMARCHE_SIMPLIFIEE_ENDPOINT"
+  },
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {
     "endpoint": "AWS_ENDPOINT",
