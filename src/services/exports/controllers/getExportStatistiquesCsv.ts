@@ -19,7 +19,7 @@ const getExportStatistiquesCsv =
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
     const dateFin = new Date(String(req.query.dateFin));
-    dateFin.setUTCHours(23, 59, 59, 59);
+    dateFin.setUTCHours(20, 59, 59, 59);
     idType = idType === 'undefined' ? '' : idType;
     codePostal = codePostal === 'undefined' ? '' : codePostal;
     ville = ville === 'undefined' ? '' : ville;
