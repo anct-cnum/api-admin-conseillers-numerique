@@ -42,15 +42,36 @@ const getTotalDossiersReconventionnement = async (
       id
     }
   `;
-  const demarcheStructurePublique = await graphQLClient.request(query, {
-    demarcheNumber: 69665,
-  });
-  const demarcheEntrepriseEss = await graphQLClient.request(query, {
-    demarcheNumber: 69686,
-  });
-  const demarcheStructure = await graphQLClient.request(query, {
-    demarcheNumber: 69687,
-  });
+  const demarcheStructurePublique = await graphQLClient
+    .request(query, {
+      demarcheNumber: 69665,
+    })
+    .catch(() => {
+      return new Error("La démarche n'existe pas");
+    });
+  if (demarcheStructurePublique instanceof Error) {
+    return demarcheStructurePublique;
+  }
+  const demarcheEntrepriseEss = await graphQLClient
+    .request(query, {
+      demarcheNumber: 69686,
+    })
+    .catch(() => {
+      return new Error("La démarche n'existe pas");
+    });
+  if (demarcheEntrepriseEss instanceof Error) {
+    return demarcheEntrepriseEss;
+  }
+  const demarcheStructure = await graphQLClient
+    .request(query, {
+      demarcheNumber: 69687,
+    })
+    .catch(() => {
+      return new Error("La démarche n'existe pas");
+    });
+  if (demarcheStructure instanceof Error) {
+    return demarcheStructure;
+  }
   return [
     demarcheStructurePublique.demarche.dossiers.nodes.length,
     demarcheEntrepriseEss.demarche.dossiers.nodes.length,
@@ -86,6 +107,10 @@ const getDossiersReconventionnement =
       const totalDossierEachType = await getTotalDossiersReconventionnement(
         graphQLClient,
       );
+      if (totalDossierEachType instanceof Error) {
+        res.status(404).json({ message: totalDossierEachType.message });
+        return;
+      }
       if (page > 1) {
         const nbDossier = page * limitDossier;
         const result = totalDossierEachType.filter(
@@ -173,18 +198,42 @@ const getDossiersReconventionnement =
           }
         }
       `;
-      const demarcheStructurePublique = await graphQLClient.request(query, {
-        demarcheNumber: 69665,
-        after: paginationCursor,
-      });
-      const demarcheEntrepriseEss = await graphQLClient.request(query, {
-        demarcheNumber: 69686,
-        after: paginationCursor,
-      });
-      const demarcheStructure = await graphQLClient.request(query, {
-        demarcheNumber: 69687,
-        after: paginationCursor,
-      });
+      const demarcheStructurePublique = await graphQLClient
+        .request(query, {
+          demarcheNumber: 69665,
+          after: paginationCursor,
+        })
+        .catch(() => {
+          return new Error("La démarche n'existe pas");
+        });
+      if (demarcheStructurePublique instanceof Error) {
+        res.status(404).json({ message: demarcheStructurePublique.message });
+        return;
+      }
+      const demarcheEntrepriseEss = await graphQLClient
+        .request(query, {
+          demarcheNumber: 69686,
+          after: paginationCursor,
+        })
+        .catch(() => {
+          return new Error("La démarche n'existe pas");
+        });
+      if (demarcheEntrepriseEss instanceof Error) {
+        res.status(404).json({ message: demarcheEntrepriseEss.message });
+        return;
+      }
+      const demarcheStructure = await graphQLClient
+        .request(query, {
+          demarcheNumber: 69687,
+          after: paginationCursor,
+        })
+        .catch(() => {
+          return new Error("La démarche n'existe pas");
+        });
+      if (demarcheStructure instanceof Error) {
+        res.status(404).json({ message: demarcheStructure.message });
+        return;
+      }
 
       const dossierStructurePublique = await Promise.all(
         demarcheStructurePublique.demarche.dossiers.nodes.map(

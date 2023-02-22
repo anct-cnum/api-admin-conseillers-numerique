@@ -157,9 +157,19 @@ const getDetailDossierReconventionnement =
         }
       `;
 
-      const dossier = await graphQLClient.request(query, {
-        dossierNumber: parseInt(idDossier, 10),
-      });
+      const dossier: any | Error = await graphQLClient
+        .request(query, {
+          dossierNumber: parseInt(idDossier, 10),
+        })
+        .catch(() => {
+          return new Error("Le dossier n'existe pas");
+        });
+      if (dossier instanceof Error) {
+        res.status(404).json({
+          message: dossier.message,
+        });
+        return;
+      }
       const reconventionnement: IReconventionnement = {};
       const checkAccessStructures = await checkAccessReadRequestStructures(
         app,
@@ -169,6 +179,12 @@ const getDetailDossierReconventionnement =
         app,
         checkAccessStructures,
       )(parseInt(dossier.dossier.champs[1]?.integerNumber, 10));
+      if (structure.length === 0) {
+        res.status(404).json({
+          message: "La structure n'existe pas",
+        });
+        return;
+      }
       reconventionnement.structure = {
         ...reconventionnement.structure,
         ...structure[0],
