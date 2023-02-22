@@ -112,14 +112,14 @@ const getDossiersReconventionnement =
         return;
       }
       if (page > 1) {
-        const nbDossier = page * limitDossier;
-        const result = totalDossierEachType.filter(
+        const nbDossier = (page - 1) * limitDossier;
+        const nbTypeDossierSuperieurLimit = totalDossierEachType.filter(
           (totalDossier) => totalDossier > nbDossier,
         );
-        if (result.length === 1) {
+        if (nbTypeDossierSuperieurLimit.length === 1) {
           limitDossier = 45;
         }
-        if (result.length === 2) {
+        if (nbTypeDossierSuperieurLimit.length === 2) {
           limitDossier = 22;
         }
         paginationCursor = Buffer.from(nbDossier.toString()).toString('base64');

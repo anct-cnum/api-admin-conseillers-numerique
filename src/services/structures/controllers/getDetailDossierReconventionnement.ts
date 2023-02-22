@@ -204,7 +204,7 @@ const getDetailDossierReconventionnement =
         reconventionnement.structure.insee.entreprise.forme_juridique,
       );
       if (typeDossierReconventionnement === null) {
-        res.status(500).json({
+        res.status(409).json({
           message:
             "Erreur lors de la récupération de l'url du dossier de reconventionnement",
         });
