@@ -1,6 +1,7 @@
 [
   {
     "type": "entreprise",
+    "demarche_number": 69686,
     "categorie": [
       "Autre SARL coopérative",
       "SA d'économie mixte à conseil d'administration",
@@ -24,6 +25,7 @@
   },
   {
     "type": "association",
+    "demarche_number": 69687,
     "categorie": [
       "Association déclarée",
       "Association de droit local (Bas-Rhin, Haut-Rhin et Moselle)",
@@ -35,6 +37,7 @@
   },
   {
     "type": "structure_publique",
+    "demarche_number": 69665,
     "categorie": [
       "Commune et commune nouvelle",
       "Syndicat mixte ouvert",

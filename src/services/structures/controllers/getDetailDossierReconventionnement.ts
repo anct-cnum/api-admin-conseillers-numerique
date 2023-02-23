@@ -1,23 +1,16 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { GraphQLClient, gql } from 'graphql-request';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { GraphQLClient } from 'graphql-request';
+import {
+  IReconventionnementDS,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { checkAccessReadRequestStructures } from '../structures.repository';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { checkAccessReadRequestStructures } from '../repository/structures.repository';
+import { queryGetDossierReconventionnement } from '../repository/reconventionnement.repository';
+import TypeDossierReconventionnement from '../../../ts/enum';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
-
-interface IReconventionnement {
-  idDossier?: string;
-  numeroDossier?: number;
-  dateDeCreation?: Date;
-  dateFinProchainContrat?: Date;
-  nbPostesAttribuees?: number;
-  statut?: string;
-  structure?: IStructures;
-  url?: string;
-}
 
 const getTypeDossierReconventionnement = (formJuridique: string) =>
   categoriesCorrespondances.find((categorieCorrespondance) => {
@@ -37,11 +30,11 @@ const getUrlDossierReconventionnement = (
   },
 ) => {
   switch (type) {
-    case 'association':
+    case TypeDossierReconventionnement.Association:
       return `${demarcheSimplifiee.url_association}${idPG}`;
-    case 'entreprise':
+    case TypeDossierReconventionnement.Entreprise:
       return `${demarcheSimplifiee.url_entreprise}${idPG}`;
-    case 'structure_publique':
+    case TypeDossierReconventionnement.StructurePublique:
       return `${demarcheSimplifiee.url_structure_publique}${idPG}`;
     default:
       return '';
@@ -103,62 +96,8 @@ const getDetailDossierReconventionnement =
         },
       });
 
-      const query = gql`
-        query getDossier($dossierNumber: Int!) {
-          dossier(number: $dossierNumber) {
-            ...DossierFragment
-          }
-        }
-
-        fragment DossierFragment on Dossier {
-          id
-          number
-          archived
-          state
-          dateDerniereModification
-          dateDepot
-          datePassageEnConstruction
-          datePassageEnInstruction
-          dateTraitement
-          champs {
-            ...ChampFragment
-          }
-        }
-
-        fragment ChampFragment on Champ {
-          id
-          label
-          stringValue
-          ... on DateChamp {
-            date
-          }
-          ... on DatetimeChamp {
-            datetime
-          }
-          ... on CheckboxChamp {
-            checked: value
-          }
-          ... on DecimalNumberChamp {
-            decimalNumber: value
-          }
-          ... on IntegerNumberChamp {
-            integerNumber: value
-          }
-          ... on CiviliteChamp {
-            civilite: value
-          }
-          ... on LinkedDropDownListChamp {
-            primaryValue
-            secondaryValue
-          }
-          ... on MultipleDropDownListChamp {
-            values
-          }
-        }
-      `;
-
       const dossier: any | Error = await graphQLClient
-        .request(query, {
+        .request(queryGetDossierReconventionnement, {
           dossierNumber: parseInt(idDossier, 10),
         })
         .catch(() => {
@@ -170,7 +109,7 @@ const getDetailDossierReconventionnement =
         });
         return;
       }
-      const reconventionnement: IReconventionnement = {};
+      const reconventionnement: IReconventionnementDS = {};
       const checkAccessStructures = await checkAccessReadRequestStructures(
         app,
         req,
@@ -204,7 +143,7 @@ const getDetailDossierReconventionnement =
         reconventionnement.structure.insee.entreprise.forme_juridique,
       );
       if (typeDossierReconventionnement === null) {
-        res.status(409).json({
+        res.status(500).json({
           message:
             "Erreur lors de la récupération de l'url du dossier de reconventionnement",
         });

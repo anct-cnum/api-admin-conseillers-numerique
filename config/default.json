@@ -52,7 +52,7 @@
     "refresh_token_duration": "1d"
   },
   "demarche_simplifiee": {
-    "token_api": "DEMARCHE_SIMPLIFIEE_TOKEN",
+    "token_api": "DEMARCHE_SIMPLIFIEE_TOKEN_API",
     "url_entreprise": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE",
     "url_association": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION",
     "url_structure_publique": "DEMARCHE_SIMPLIFIEE_URL_STRUCTURE_PUBLIQUE",

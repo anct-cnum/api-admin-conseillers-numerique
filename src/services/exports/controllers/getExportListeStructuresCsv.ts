@@ -12,7 +12,7 @@ import {
   filterRegion,
   filterStatut,
   filterType,
-} from '../../structures/structures.repository';
+} from '../../structures/repository/structures.repository';
 import { getConseillersById } from '../../../helpers/commonQueriesFunctions';
 import { getNombreCrasByArrayConseillerId } from '../../cras/cras.repository';
 

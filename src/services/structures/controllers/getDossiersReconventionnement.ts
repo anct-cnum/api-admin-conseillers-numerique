@@ -1,81 +1,102 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { GraphQLClient, gql } from 'graphql-request';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import service from '../../../helpers/services';
-import { action } from '../../../helpers/accessControl/accessList';
+import { GraphQLClient } from 'graphql-request';
+import { IDossierDS, IRequest } from '../../../ts/interfaces/global.interfaces';
+import validReconventionnement from '../../../schemas/reconventionnement.schemas';
+import {
+  queryGetDemarcheReconventionnement,
+  queryGetDemarcheReconventionnementWithoutAttributDossier,
+} from '../repository/reconventionnement.repository';
+import TypeDossierReconventionnement from '../../../ts/enum';
+import { getNameStructure } from '../repository/structures.repository';
 
-interface IDossier {
-  _id: string;
-  idPG: number;
-  dateDeCreation: Date;
-  dateFinProchainContrat: Date;
-  nbPostesAttribuees: number;
-  nomStructure: string;
-  type: string;
-}
+const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
-const getNameStructure =
-  (app: Application, req: IRequest) => async (idStructure: number) =>
-    app
-      .service(service.structures)
-      .Model.accessibleBy(req.ability, action.read)
-      .findOne({ idPG: idStructure })
-      .select({ nom: 1, _id: 0 });
+const getDemarcheNumber = (type: string) =>
+  categoriesCorrespondances.find((categorie) => categorie.type === type)
+    .demarche_number;
+
+const requestGraphQLForGetDemarcheDS = (
+  graphQLClient: GraphQLClient,
+  limitDossier: number,
+  paginationCursor: String,
+  type: string,
+) =>
+  graphQLClient
+    .request(queryGetDemarcheReconventionnement(limitDossier), {
+      demarcheNumber: getDemarcheNumber(type),
+      after: paginationCursor,
+    })
+    .catch(() => {
+      return new Error("La démarche n'existe pas");
+    });
+
+const requestGraphQLForTotalDossiers = (
+  graphQLClient: GraphQLClient,
+  type: string,
+) =>
+  graphQLClient
+    .request(queryGetDemarcheReconventionnementWithoutAttributDossier, {
+      demarcheNumber: getDemarcheNumber(type),
+    })
+    .catch(() => {
+      return new Error("La démarche n'existe pas");
+    });
+
+const createDossierReconventionnement =
+  (app: Application, req: IRequest) => async (demarcheSimplifiee) =>
+    Promise.all(
+      demarcheSimplifiee.demarche.dossiers.nodes.map(async (dossier) => {
+        const { champs, number, datePassageEnConstruction } = dossier;
+        const item: IDossierDS = {
+          _id: '',
+          idPG: 0,
+          dateDeCreation: undefined,
+          dateFinProchainContrat: undefined,
+          nbPostesAttribuees: 0,
+          nomStructure: '',
+          type: 'Reconventionnement',
+        };
+        item._id = number;
+        item.dateDeCreation = datePassageEnConstruction;
+        item.idPG = parseInt(champs[1]?.integerNumber, 10);
+        item.nbPostesAttribuees = parseInt(champs[4]?.integerNumber, 10);
+        item.dateFinProchainContrat = champs[5]?.date;
+        const structure = await getNameStructure(app, req)(item.idPG);
+        item.nomStructure = structure?.nom;
+
+        return item;
+      }),
+    );
 
 const getTotalDossiersReconventionnement = async (
   graphQLClient: GraphQLClient,
 ) => {
-  const query = gql`
-    query getDemarche($demarcheNumber: Int!, $state: DossierState) {
-      demarche(number: $demarcheNumber) {
-        id
-        dossiers(state: $state) {
-          nodes {
-            ...DossierFragment
-          }
-        }
-      }
-    }
-
-    fragment DossierFragment on Dossier {
-      id
-    }
-  `;
-  const demarcheStructurePublique = await graphQLClient
-    .request(query, {
-      demarcheNumber: 69665,
-    })
-    .catch(() => {
-      return new Error("La démarche n'existe pas");
-    });
+  const demarcheStructurePublique = await requestGraphQLForTotalDossiers(
+    graphQLClient,
+    TypeDossierReconventionnement.StructurePublique,
+  );
   if (demarcheStructurePublique instanceof Error) {
     return demarcheStructurePublique;
   }
-  const demarcheEntrepriseEss = await graphQLClient
-    .request(query, {
-      demarcheNumber: 69686,
-    })
-    .catch(() => {
-      return new Error("La démarche n'existe pas");
-    });
+  const demarcheEntrepriseEss = await requestGraphQLForTotalDossiers(
+    graphQLClient,
+    TypeDossierReconventionnement.Entreprise,
+  );
   if (demarcheEntrepriseEss instanceof Error) {
     return demarcheEntrepriseEss;
   }
-  const demarcheStructure = await graphQLClient
-    .request(query, {
-      demarcheNumber: 69687,
-    })
-    .catch(() => {
-      return new Error("La démarche n'existe pas");
-    });
-  if (demarcheStructure instanceof Error) {
-    return demarcheStructure;
+  const demarcheAssociation = await requestGraphQLForTotalDossiers(
+    graphQLClient,
+    TypeDossierReconventionnement.Association,
+  );
+  if (demarcheAssociation instanceof Error) {
+    return demarcheAssociation;
   }
   return [
     demarcheStructurePublique.demarche.dossiers.nodes.length,
     demarcheEntrepriseEss.demarche.dossiers.nodes.length,
-    demarcheStructure.demarche.dossiers.nodes.length,
+    demarcheAssociation.demarche.dossiers.nodes.length,
   ];
 };
 
@@ -84,6 +105,11 @@ const getDossiersReconventionnement =
     const demarcheSimplifiee = app.get('demarche_simplifiee');
     const { page } = req.query;
     try {
+      const pageValidation = validReconventionnement.validate(page);
+      if (pageValidation.error) {
+        res.status(400).json({ message: pageValidation.error.message });
+        return;
+      }
       const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
         headers: {
           authorization: `Bearer ${demarcheSimplifiee.token_api}`,
@@ -124,215 +150,56 @@ const getDossiersReconventionnement =
         }
         paginationCursor = Buffer.from(nbDossier.toString()).toString('base64');
       }
-      const query = gql`
-        query getDemarche(
-          $demarcheNumber: Int!
-          $state: DossierState
-          $order: Order
-          $after: String
-        ) {
-          demarche(number: $demarcheNumber) {
-            id
-            number
-            title
-            dossiers(state: $state, order: $order, first: ${limitDossier}, after: $after) {
-              pageInfo {
-                endCursor
-                hasNextPage
-              }
-              nodes {
-                ...DossierFragment
-              }
-            }
-          }
-        }
 
-        fragment DossierFragment on Dossier {
-          id
-          number
-          archived
-          state
-          dateDerniereModification
-          dateDepot
-          datePassageEnConstruction
-          datePassageEnInstruction
-          dateTraitement
-          instructeurs {
-            email
-          }
-          usager {
-            email
-          }
-          champs {
-            ...ChampFragment
-          }
-        }
-
-        fragment ChampFragment on Champ {
-          id
-          stringValue
-          ... on DateChamp {
-            date
-          }
-          ... on DatetimeChamp {
-            datetime
-          }
-          ... on CheckboxChamp {
-            checked: value
-          }
-          ... on DecimalNumberChamp {
-            decimalNumber: value
-          }
-          ... on IntegerNumberChamp {
-            integerNumber: value
-          }
-          ... on CiviliteChamp {
-            civilite: value
-          }
-          ... on LinkedDropDownListChamp {
-            primaryValue
-            secondaryValue
-          }
-          ... on MultipleDropDownListChamp {
-            values
-          }
-        }
-      `;
-      const demarcheStructurePublique = await graphQLClient
-        .request(query, {
-          demarcheNumber: 69665,
-          after: paginationCursor,
-        })
-        .catch(() => {
-          return new Error("La démarche n'existe pas");
-        });
+      const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
+        graphQLClient,
+        limitDossier,
+        paginationCursor,
+        TypeDossierReconventionnement.StructurePublique,
+      );
       if (demarcheStructurePublique instanceof Error) {
         res.status(404).json({ message: demarcheStructurePublique.message });
         return;
       }
-      const demarcheEntrepriseEss = await graphQLClient
-        .request(query, {
-          demarcheNumber: 69686,
-          after: paginationCursor,
-        })
-        .catch(() => {
-          return new Error("La démarche n'existe pas");
-        });
+      const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
+        graphQLClient,
+        limitDossier,
+        paginationCursor,
+        TypeDossierReconventionnement.Entreprise,
+      );
       if (demarcheEntrepriseEss instanceof Error) {
         res.status(404).json({ message: demarcheEntrepriseEss.message });
         return;
       }
-      const demarcheStructure = await graphQLClient
-        .request(query, {
-          demarcheNumber: 69687,
-          after: paginationCursor,
-        })
-        .catch(() => {
-          return new Error("La démarche n'existe pas");
-        });
-      if (demarcheStructure instanceof Error) {
-        res.status(404).json({ message: demarcheStructure.message });
+      const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
+        graphQLClient,
+        limitDossier,
+        paginationCursor,
+        TypeDossierReconventionnement.Association,
+      );
+      if (demarcheAssociation instanceof Error) {
+        res.status(404).json({ message: demarcheAssociation.message });
         return;
       }
 
-      const dossierStructurePublique = await Promise.all(
-        demarcheStructurePublique.demarche.dossiers.nodes.map(
-          async (dossier) => {
-            const { champs, number, datePassageEnConstruction } = dossier;
-            const item: IDossier = {
-              _id: '',
-              idPG: 0,
-              dateDeCreation: undefined,
-              dateFinProchainContrat: undefined,
-              nbPostesAttribuees: 0,
-              nomStructure: '',
-              type: 'Reconventionnement',
-            };
-            item._id = number;
-            item.dateDeCreation = datePassageEnConstruction;
-            item.idPG = parseInt(
-              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg1MTgwNA==')
-                ?.stringValue,
-              10,
-            );
-            item.nbPostesAttribuees = parseInt(
-              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyMw==')
-                ?.stringValue,
-              10,
-            );
-            item.dateFinProchainContrat = champs.find(
-              (champ: any) => champ.id === 'Q2hhbXAtMjk0MDAwNg==',
-            )?.date;
-            const structure = await getNameStructure(app, req)(item.idPG);
-            item.nomStructure = structure?.nom;
+      const dossierStructurePublique = await createDossierReconventionnement(
+        app,
+        req,
+      )(demarcheStructurePublique);
 
-            return item;
-          },
-        ),
-      );
+      const dossierEntrepriseEss = await createDossierReconventionnement(
+        app,
+        req,
+      )(demarcheEntrepriseEss);
 
-      const dossierEntrepriseEss = await Promise.all(
-        demarcheEntrepriseEss.demarche.dossiers.nodes.map(async (dossier) => {
-          const { champs, number, datePassageEnConstruction } = dossier;
-          const item: IDossier = {
-            _id: '',
-            idPG: 0,
-            dateDeCreation: undefined,
-            dateFinProchainContrat: undefined,
-            nbPostesAttribuees: 0,
-            nomStructure: '',
-            type: 'Reconventionnement',
-          };
-          item._id = number;
-          item.dateDeCreation = datePassageEnConstruction;
-          item.idPG = champs.find(
-            (champ: any) => champ.id === 'Q2hhbXAtMjg1MjA1OQ==',
-          )?.stringValue;
-          item.nbPostesAttribuees = champs.find(
-            (champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1Mg==',
-          )?.stringValue;
-          item.dateFinProchainContrat = champs.find(
-            (champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1OA==',
-          )?.date;
-          const structure = await getNameStructure(app, req)(item.idPG);
-          item.nomStructure = structure?.nom;
+      const dossierAssociation = await createDossierReconventionnement(
+        app,
+        req,
+      )(demarcheAssociation);
 
-          return item;
-        }),
-      );
-
-      const dossierStructure = await Promise.all(
-        demarcheStructure.demarche.dossiers.nodes.map(async (dossier) => {
-          const { champs, number, datePassageEnConstruction } = dossier;
-          const item: IDossier = {
-            _id: '',
-            idPG: 0,
-            dateDeCreation: undefined,
-            dateFinProchainContrat: undefined,
-            nbPostesAttribuees: 0,
-            nomStructure: '',
-            type: 'Reconventionnement',
-          };
-          item._id = number;
-          item.dateDeCreation = datePassageEnConstruction;
-          item.idPG = champs.find(
-            (champ: any) => champ.id === 'Q2hhbXAtMjg0ODE4Ng==',
-          )?.stringValue;
-          item.nbPostesAttribuees = champs.find(
-            (champ: any) => champ.id === 'Q2hhbXAtMjg3MzQ4Mw==',
-          )?.stringValue;
-          item.dateFinProchainContrat = champs.find(
-            (champ: any) => champ.id === 'Q2hhbXAtMjg3NDM2Mw==',
-          )?.date;
-          const structure = await getNameStructure(app, req)(item.idPG);
-          item.nomStructure = structure?.nom;
-
-          return item;
-        }),
-      );
       const dossiers = dossierStructurePublique.concat(
         dossierEntrepriseEss,
-        dossierStructure,
+        dossierAssociation,
       );
       items.total = totalDossierEachType.reduce(
         (accumulator, currentValue) => accumulator + currentValue,

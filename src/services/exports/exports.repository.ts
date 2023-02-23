@@ -13,7 +13,7 @@ import {
 import {
   formatAdresseStructure,
   formatQpv,
-} from '../structures/structures.repository';
+} from '../structures/repository/structures.repository';
 import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
@@ -507,7 +507,11 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(dateDebut).toLocaleString()}-${formatDate(dateFin).toLocaleString()}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        idType ?? ''
+      } ${formatDate(dateDebut).toLocaleString()}-${formatDate(
+        dateFin,
+      ).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,
