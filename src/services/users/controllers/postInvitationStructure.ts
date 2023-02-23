@@ -26,8 +26,7 @@ const postInvitationStructure =
       const database = connect.substr(connect.lastIndexOf('/') + 1);
       const oldUser = await app
         .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ name: email.toLowerCase() });
+        .Model.findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
         if (!canCreate) {
@@ -58,15 +57,14 @@ const postInvitationStructure =
           });
           return;
         }
-        if (
-          oldUser.roles.includes('conseiller') ||
-          oldUser.roles.includes('candidat')
-        ) {
+        if (!oldUser.roles.includes('grandReseau')) {
           res.status(409).json({
-            message: 'Le compte est déjà utilisé par un candidat ou conseiller',
+            message:
+              'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
           });
           return;
         }
+
         const query = {
           $push: {
             roles: 'structure',

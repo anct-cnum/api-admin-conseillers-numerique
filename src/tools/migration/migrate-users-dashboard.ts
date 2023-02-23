@@ -23,7 +23,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   }
 
   // pas de users existants grandReseau à migrer & 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
-  const allowedRoles = ['admin'];
+  const allowedRoles = ['admin', 'structure'];
 
   if (options.email) {
     const user: IUser = await app.service(service.users).Model.findOne({

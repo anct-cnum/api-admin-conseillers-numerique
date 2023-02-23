@@ -31,8 +31,7 @@ const postInvitationGrandReseau =
       }
       const oldUser = await app
         .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ name: email.toLowerCase() });
+        .Model.findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         user = await app.service(service.users).create({
           name: email.toLowerCase(),
@@ -57,17 +56,8 @@ const postInvitationGrandReseau =
           });
           return;
         }
-        if (
-          oldUser.roles.includes('conseiller') ||
-          oldUser.roles.includes('candidat')
-        ) {
-          res.status(409).json({
-            message: 'Le compte est déjà utilisé par un candidat ou conseiller',
-          });
-          return;
-        }
 
-        if (!oldUser.roles.includes('admin')) {
+        if (!oldUser.roles.includes('structure')) {
           res.status(409).json({
             message:
               'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
