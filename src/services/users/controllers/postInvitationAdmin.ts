@@ -52,9 +52,11 @@ const postInvitationAdmin =
           });
           return;
         }
-        res.status(200).json({
-          messageSuccess: `L'admin ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
-        });
+        res
+          .status(200)
+          .json(
+            `L'admin ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
+          );
         return;
       }
       res.status(409).json({
