@@ -10,6 +10,7 @@ import getExportStatistiquesCsv from './getExportStatistiquesCsv';
 import getExportTerritoiresCsv from './getExportTerritoiresCsv';
 import getExportListeStructuresCsv from './getExportListeStructuresCsv';
 import getExportListeGestionnairesCsv from './getExportListeGestionnairesCsv';
+import getExportConseillersCsv from './getExportConseillersCsv';
 
 export {
   getExportCandidatsByStructureCsv,
@@ -24,4 +25,5 @@ export {
   getExportTerritoiresCsv,
   getExportListeStructuresCsv,
   getExportListeGestionnairesCsv,
+  getExportConseillersCsv,
 };

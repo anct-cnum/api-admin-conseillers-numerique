@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { Response } from 'express';
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
@@ -15,6 +16,8 @@ import {
   formatQpv,
 } from '../structures/repository/structures.repository';
 import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
+
+dayjs.extend(utc);
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -34,6 +37,13 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 const formatDate = (date: Date) => {
   if (date !== undefined && date !== null) {
     return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+  }
+  return 'non renseignée';
+};
+
+const formatDateWithoutGetTime = (date: Date) => {
+  if (date !== undefined && date !== null) {
+    return dayjs.utc(date).format('DD/MM/YYYY');
   }
   return 'non renseignée';
 };
@@ -374,7 +384,7 @@ const generateCsvStatistiques = async (
 ) => {
   try {
     const general = [
-      `Général\nNouveaux usagers accompagnés durant cette période;${
+      `Général\nPersonnes totales accompagnées durant cette période;${
         statistiques.nbTotalParticipant +
         statistiques.nbAccompagnementPerso +
         statistiques.nbDemandePonctuel -
@@ -507,11 +517,7 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
-        idType ?? ''
-      } ${formatDate(dateDebut).toLocaleString()}-${formatDate(
-        dateFin,
-      ).toLocaleString()}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut).toLocaleString()}-${formatDateWithoutGetTime(dateFin).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,
@@ -553,7 +559,8 @@ const generateCsvTerritoires = async (
         ...statsTerritoires.map((statsTerritoire) =>
           [
             ...codeAndNomTerritoire(territoire, statsTerritoire),
-            statsTerritoire.personnesAccompagnees,
+            statsTerritoire.personnesAccompagnees -
+              statsTerritoire.personnesRecurrentes,
             statsTerritoire.nombreConseillersCoselec,
             statsTerritoire.cnfsActives,
             statsTerritoire.cnfsInactives,

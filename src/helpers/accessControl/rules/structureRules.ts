@@ -45,4 +45,8 @@ export default async function structureRules(
     },
   });
   can([action.read], ressource.statsTerritoires);
+
+  can([action.read], ressource.conseillersRuptures, {
+    structureId: user?.entity.oid,
+  });
 }

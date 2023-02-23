@@ -9,6 +9,7 @@ import {
   checkAccessRequestStatsTerritoires,
   countPersonnesAccompagnees,
   getTauxActivation,
+  countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
 
 const getRegion =
@@ -78,6 +79,8 @@ const getExportTerritoiresCsv =
     const { territoire, nomOrdre, ordre } = req.query;
     const dateFin: Date = new Date(req.query.dateFin as string);
     const dateDebut: Date = new Date(req.query.dateDebut as string);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
     const emailValidation = validExportTerritoires.validate({
       territoire,
@@ -128,8 +131,14 @@ const getExportTerritoiresCsv =
               req,
               query,
             );
+            item.personnesRecurrentes = await countPersonnesRecurrentes(
+              app,
+              req,
+              query,
+            );
           } else {
             item.personnesAccompagnees = 0;
+            item.personnesRecurrentes = 0;
           }
 
           return item;
