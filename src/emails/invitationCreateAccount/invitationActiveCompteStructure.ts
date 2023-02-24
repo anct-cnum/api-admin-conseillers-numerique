@@ -90,8 +90,7 @@ export default function (app: Application, mailer, req: IRequest = null) {
       return mailer
         .createMailer()
         .sendEmail(user.name, {
-          subject:
-            'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique France Services',
+          subject: 'Activation de votre espace structure',
           body: await render(user),
         })
         .then(onSuccess)
