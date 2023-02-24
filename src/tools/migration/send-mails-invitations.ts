@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
 // Lancement de ce script : ts-node src/tools/migration/send-mails-invitations.ts <option>
 
