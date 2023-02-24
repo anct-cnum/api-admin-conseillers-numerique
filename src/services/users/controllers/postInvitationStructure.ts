@@ -7,6 +7,7 @@ import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { deleteUser, envoiEmailInvit } from '../../../utils/index';
+import invitationActiveCompteStructure from '../../../emails/invitationCreateAccount/invitationActiveCompteStructure';
 
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
@@ -49,7 +50,15 @@ const postInvitationStructure =
           resend: false,
         });
 
-        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        const mailerInstance = mailer(app);
+        const message = invitationActiveCompteStructure(
+          app,
+          mailerInstance,
+          req,
+        );
+        errorSmtpMail = await message.send(user).catch((errSmtp: Error) => {
+          return errSmtp;
+        });
         messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {

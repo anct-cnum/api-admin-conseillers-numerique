@@ -1,0 +1,77 @@
+<mjml>
+
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+      <mj-wrapper css-class="wrapper">
+        <mj-section>
+          <mj-column>
+            <mj-text css-class="text-primary">
+              Créez sans attendre votre compte structure pour recruter votre Conseiller numérique France Services !
+            </mj-text>
+            <mj-text>
+              Madame, Monsieur,
+            </mj-text>
+            <mj-text>
+              Après délibération du Comité national de sélection, et sur le fondement de l'avis formulé par votre préfecture de département, nous vous informons que votre structure est éligible à l'accueil de <%= nombreConseillersCoselec %> Conseiller(s) numérique(s) France Services.
+            </mj-text>
+            <mj-text>
+              Afin de procéder au recrutement de votre (vos) Conseiller(s) numérique(s), vous pouvez désormais accéder à votre espace « structure d’accueil » sur la plateforme <a href="https://www.conseiller-numerique.gouv.fr/">www.conseiller-numerique.gouv.fr</a>. Pour prendre connaissance des prochaines étapes du processus de dépôt du dossier de demande de subvention, nous vous invitons à <strong>activer votre espace dès à présent</strong> en cliquant <a href="<%= link %>">ici</a> ou bien en entrant le lien suivant dans votre navigateur : <a href="<%= link %>"><%= link %></a>
+            </mj-text>
+            <mj-text>
+              Cet espace contient une liste de condidatures qui vous permettra de consulter les profils qui correspondent à vos critères (zone géographique et disponibilité) et de contacter directement les candidats qui auront retenu votre attention pour procéder à des entretiens d’embauche. Si vous avez identifié un candidat hors de la plateforme dont le profil vous intéresse, demandez-lui de s’inscrire sur <a href="https://www.conseiller-numerique.gouv.fr/">www.conseiller-numerique.gouv.fr</a>.
+            </mj-text>
+            <mj-text>
+              Vous aurez aussi accès à des modèles de documents, à la présentation de l’offre de formation des Conseillers numériques et aux coordonnées des organismes de formation.
+            </mj-text>
+            <mj-text>
+              Lorsque votre choix est arrêté sur un ou des candidat(s), vous devez cliquer sur « Valider cette candidature » pour déclencher la suite de la procédure et accéder à l’espace sur lequel vous déposerez votre dossier de demande de subvention auprès de la Banque des Territoires.
+            </mj-text>
+            <mj-text>
+              <strong>Nous comptons sur votre mobilisation pour recruter le ou les conseiller(s) numérique(s) France Services dans les meilleurs délais</strong>. En tout état de cause, si le recrutement devait intervenir dans un délai supérieur à un mois, la validation de votre structure pourrait être réévaluée pour privilégier les recrutements les plus rapides dans le cadre de ce dispositif France Relance.
+            </mj-text>
+            <mj-text>
+              Afin de vous accompagner dans vos démarches, n’hésitez pas à consulter <a href="https://cdn.conseiller-numerique.gouv.fr/Guide_pas_a_pas.pdf">notre guide « pas-à-pas »</a> qui vous présentera l’ensemble des étapes.
+            </mj-text>
+            <mj-text>
+              Nous restons à votre disposition si vous avez la moindre question,
+            </mj-text>
+          </mj-column>
+        </mj-section>
+
+        <mj-section css-class="box" padding-top="0" padding-left="100px" padding-right="100px">
+          <mj-column border="1px solid #C8CBCE">
+            <mj-text font-size="18px" font-weight="bold" line-height="22px" padding-bottom="0">
+              Votre identifiant
+            </mj-text>
+            <mj-text font-size="14px" line-height="21px">
+              <%= structure.name %>
+            </mj-text>
+
+            <mj-text padding="0" css-class="text-secondary">
+              Suivez ce lien pour créer votre mot de passe
+            </mj-text>
+
+            <mj-button href="<%= link %>" background-color="#24303A" color="#F4F4F5" font-size="16px" font-weight="bold"
+              text-transform="uppercase">
+              Accéder à mon espace
+            </mj-button>
+
+            <mj-text font-size="14px" line-height="21px">
+              (Ce lien expire dans 4 semaines)
+            </mj-text>
+          </mj-column>
+        </mj-section>
+      </mj-wrapper>
+      <mj-wrapper css-class="wrapper">
+        <mj-section>
+          <mj-column>
+            <%- include('../commun/signature.mjml.ejs'); %>
+          </mj-column>
+        </mj-section>
+      </mj-wrapper>
+  </mj-body>
+</mjml>
