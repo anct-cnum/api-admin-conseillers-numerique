@@ -63,6 +63,7 @@ const postInvitationAdmin =
         message:
           'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
       });
+      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
