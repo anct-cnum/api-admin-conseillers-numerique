@@ -43,12 +43,20 @@ const postInvitationAdmin =
           mailSentDate: null,
           passwordCreated: false,
         });
-        const errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
-        if (errorSmtpMail instanceof Error) {
+        const errorSmtpMail = await envoiEmailInvit(
+          app,
+          req,
+          mailer,
+          user,
+        ).catch(async () => {
           await deleteUser(app, req, email);
+          return new Error(
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+          );
+        });
+        if (errorSmtpMail instanceof Error) {
           res.status(503).json({
-            message:
-              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+            message: errorSmtpMail.message,
           });
           return;
         }

@@ -6,7 +6,11 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserGrandReseau } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser, envoiEmailInvit } from '../../../utils/index';
+import {
+  deleteRoleUser,
+  deleteUser,
+  envoiEmailInvit,
+} from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -46,7 +50,14 @@ const postInvitationGrandReseau =
           mailSentDate: null,
           passwordCreated: false,
         });
-        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user).catch(
+          async () => {
+            await deleteUser(app, req, email);
+            return new Error(
+              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+            );
+          },
+        );
         messageSuccess =
           'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui a été envoyé';
       } else {
@@ -88,7 +99,25 @@ const postInvitationGrandReseau =
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
-          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user).catch(
+            async () => {
+              const queryRoleGrandReseau = {
+                $pull: {
+                  roles: 'grandReseau',
+                },
+                $unset: {
+                  reseau: '',
+                  nom: '',
+                  prenom: '',
+                  migrationDashboard: '',
+                },
+              };
+              await deleteRoleUser(app, req, email, queryRoleGrandReseau);
+              return new Error(
+                "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+              );
+            },
+          );
           messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
         } else {
           user.sub = 'xxxxxxxxx';
@@ -96,10 +125,8 @@ const postInvitationGrandReseau =
         }
       }
       if (errorSmtpMail instanceof Error) {
-        await deleteUser(app, req, email);
         res.status(503).json({
-          message:
-            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+          message: errorSmtpMail.message,
         });
         return;
       }

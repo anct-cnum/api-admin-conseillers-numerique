@@ -1,7 +1,9 @@
 /* eslint-disable no-bitwise */
+import { Application } from '@feathersjs/express';
 import { invitationActiveCompte } from '../emails';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
+import { IRequest } from '../ts/interfaces/global.interfaces';
 
 /**
  * On cherche le bon coselec avec avis POSITIF :
@@ -54,17 +56,29 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
-const deleteUser = async (app, req, email) => {
+const deleteUser = async (app: Application, req: IRequest, email: string) => {
   await app
     .service(service.users)
     .Model.accessibleBy(req.ability, action.delete)
     .deleteOne({ name: email.toLowerCase() });
 };
 
+const deleteRoleUser = async (
+  app: Application,
+  req: IRequest,
+  email: string,
+  query: object,
+) => {
+  await app
+    .service(service.users)
+    .Model.accessibleBy(req.ability, action.update)
+    .updateOne({ name: email.toLowerCase() }, query);
+};
+
 const envoiEmailInvit = (app, req, mailer, user) => {
   const mailerInstance = mailer(app);
   const message = invitationActiveCompte(app, mailerInstance, req);
-  return message.send(user).catch((errSmtp: Error) => errSmtp);
+  return message.send(user);
 };
 
 export {
@@ -73,4 +87,5 @@ export {
   getCoselec,
   deleteUser,
   envoiEmailInvit,
+  deleteRoleUser,
 };
