@@ -14,7 +14,7 @@ const categoriesCorrespondances = require('../../../../datas/categorieFormCorres
 
 const getDemarcheNumber = (type: string) =>
   categoriesCorrespondances.find((categorie) => categorie.type === type)
-    .demarche_number;
+    .numero_demarche;
 
 const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
