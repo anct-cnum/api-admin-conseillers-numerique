@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Application } from '@feathersjs/express';
-import { invitationActiveCompte } from '../emails';
+import { invitationActiveCompte, invitationMultiRoleCompte } from '../emails';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 import { IRequest } from '../ts/interfaces/global.interfaces';
@@ -81,6 +81,12 @@ const envoiEmailInvit = (app, req, mailer, user) => {
   return message.send(user);
 };
 
+const envoiEmailMultiRole = (app, mailer, user) => {
+  const mailerInstance = mailer(app);
+  const message = invitationMultiRoleCompte(mailerInstance);
+  return message.send(user);
+};
+
 export {
   getCoselecPositif,
   getLastCoselec,
@@ -88,4 +94,5 @@ export {
   deleteUser,
   envoiEmailInvit,
   deleteRoleUser,
+  envoiEmailMultiRole,
 };

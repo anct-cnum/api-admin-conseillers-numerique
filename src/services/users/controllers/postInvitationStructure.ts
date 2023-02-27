@@ -10,6 +10,7 @@ import {
   deleteRoleUser,
   deleteUser,
   envoiEmailInvit,
+  envoiEmailMultiRole,
 } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
@@ -120,6 +121,7 @@ const postInvitationStructure =
           );
           messageSuccess = `Le rôle structure a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
         } else {
+          await envoiEmailMultiRole(app, mailer, user);
           messageSuccess = `Le rôle structure a été ajouté au compte ${email}`;
         }
       }

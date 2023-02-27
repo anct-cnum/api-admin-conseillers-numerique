@@ -10,6 +10,7 @@ import {
   deleteRoleUser,
   deleteUser,
   envoiEmailInvit,
+  envoiEmailMultiRole,
 } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
@@ -120,6 +121,7 @@ const postInvitationGrandReseau =
           );
           messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
         } else {
+          await envoiEmailMultiRole(app, mailer, user);
           user.sub = 'xxxxxxxxx';
           messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}`;
         }

@@ -1,0 +1,40 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            Bonjour,
+          </mj-text>
+          <mj-text>
+            Une demande d’accès multi-compte à été effectuée avec votre adresse mail.
+          </mj-text>
+          <mj-text font-weight="bold">À quoi sert un multi-compte ?</mj-text>
+          <mj-text>
+            Cet accès multi-compte vous permet de sélectionner un compte en fonction des données
+            que vous souhaitez visualiser sur le tableau de pilotage.Vous pouvez ainsi
+            consulter un large panel d'informations.
+          </mj-text>
+          <mj-text font-weight="bold">Comment ça marche ?</mj-text>
+          <mj-text>
+            C’est très simple, il suffit de vous rendre sur le tableau de pilotage, de vous connecter avec
+            vos identifiants Inclusion Connect habituels. Ensuite dans le menu en haut à droite,
+            sélectionnez le rôle souhaité.
+          </mj-text>
+          <mj-text>
+            En vous souhaitant une bonne utilisation de votre muti-compte.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
