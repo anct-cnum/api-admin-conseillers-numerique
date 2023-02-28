@@ -8,7 +8,7 @@ import {
   formatAdresseStructure,
   formatQpv,
   formatType,
-} from '../structures.repository';
+} from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
   getNombreAccompagnementsByArrayConseillerId,

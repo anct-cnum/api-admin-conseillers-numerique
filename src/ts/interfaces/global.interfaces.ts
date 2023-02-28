@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { IUser } from './db.interfaces';
+import { IUser, IStructures } from './db.interfaces';
 
 export interface IRequest extends Request {
   ability: any;
@@ -61,4 +61,25 @@ export interface ICodesPostauxQuery {
   'cra.codePostal'?: {
     $regex: string;
   };
+}
+
+export interface IDossierDS {
+  _id: string;
+  idPG: number;
+  dateDeCreation: Date;
+  dateFinProchainContrat: Date;
+  nbPostesAttribuees: number;
+  nomStructure: string;
+  type: string;
+}
+
+export interface IReconventionnementDS {
+  idDossier?: string;
+  numeroDossier?: number;
+  dateDeCreation?: Date;
+  dateFinProchainContrat?: Date;
+  nbPostesAttribuees?: number;
+  statut?: string;
+  structure?: IStructures;
+  url?: string;
 }

@@ -1,7 +1,7 @@
 import { Application } from '@feathersjs/express';
-import service from '../../helpers/services';
-import { action } from '../../helpers/accessControl/accessList';
-import { IRequest } from '../../ts/interfaces/global.interfaces';
+import service from '../../../helpers/services';
+import { action } from '../../../helpers/accessControl/accessList';
+import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -89,6 +89,14 @@ const formatQpv = (qpv: string) => (qpv === 'Oui' ? 'Oui' : 'Non');
 
 const formatType = (type: string) => (type === 'PRIVATE' ? 'Privée' : 'Public');
 
+const getNameStructure =
+  (app: Application, req: IRequest) => async (idStructure: number) =>
+    app
+      .service(service.structures)
+      .Model.accessibleBy(req.ability, action.read)
+      .findOne({ idPG: idStructure })
+      .select({ nom: 1, _id: 0 });
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -103,4 +111,5 @@ export {
   formatQpv,
   formatType,
   filterSortColonne,
+  getNameStructure,
 };

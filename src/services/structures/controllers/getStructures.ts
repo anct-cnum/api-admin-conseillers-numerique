@@ -13,7 +13,7 @@ import {
   checkAccessReadRequestStructures,
   filterComs,
   filterSortColonne,
-} from '../structures.repository';
+} from '../repository/structures.repository';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>

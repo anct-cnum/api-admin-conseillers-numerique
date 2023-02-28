@@ -6,7 +6,7 @@ import { getConseillersIdsByStructure } from '../../cras/cras.repository';
 import {
   countStructures,
   getStructuresIds,
-} from '../../structures/structures.repository';
+} from '../../structures/repository/structures.repository';
 import {
   getNombreCra,
   getPersonnesAccompagnees,
