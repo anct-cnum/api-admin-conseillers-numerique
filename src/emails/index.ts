@@ -4,6 +4,7 @@ import invitationMultiRoleCompte from './invitation/invitationMultiRoleCompte';
 import conseillerRupturePix from './pix/conseillerRupturePix';
 import conseillerRuptureStructure from './structures/conseillerRuptureStructure';
 import candidatSupprimePix from './pix/candidatSupprimePix';
+import informationValidationCoselec from './structures/informationValidationCoselec';
 
 export {
   creationCompteCandidat,
@@ -12,4 +13,5 @@ export {
   conseillerRupturePix,
   conseillerRuptureStructure,
   candidatSupprimePix,
+  informationValidationCoselec,
 };

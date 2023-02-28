@@ -12,6 +12,7 @@ import {
   envoiEmailInvit,
   envoiEmailMultiRole,
 } from '../../../utils/index';
+import { informationValidationCoselec } from '../../../emails';
 
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
@@ -21,6 +22,7 @@ const postInvitationStructure =
     const { email, structureId } = req.body;
     let errorSmtpMail: Error | null = null;
     let messageSuccess: string = '';
+    let user: IUser | null = null;
     try {
       const errorJoi = await validationEmail.validate(email);
       if (errorJoi?.error) {
@@ -40,7 +42,7 @@ const postInvitationStructure =
           });
           return;
         }
-        const user: IUser = await app.service(service.users).create({
+        user = await app.service(service.users).create({
           name: email.toLowerCase(),
           roles: ['structure'],
           entity: new DBRef('structures', new ObjectId(structureId), database),
@@ -61,6 +63,9 @@ const postInvitationStructure =
             );
           },
         );
+        const mailerInstance = mailer(app);
+        const message = informationValidationCoselec(app, mailerInstance, req);
+        message.send(user);
         messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {
@@ -97,7 +102,7 @@ const postInvitationStructure =
             mailSentDate: null,
           });
         }
-        const user = await app
+        user = await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate(oldUser._id, query, { new: true });
@@ -131,7 +136,10 @@ const postInvitationStructure =
         });
         return;
       }
-      res.status(200).json(messageSuccess);
+      res.status(200).json({
+        message: messageSuccess,
+        account: user,
+      });
       return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
