@@ -62,10 +62,10 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve) => {
       try {
-        await messageInvitation.send(user);
         if (messageInformationCoselec && !user.mailSentCoselecDate) {
           await messageInformationCoselec.send(user);
         }
+        await messageInvitation.send(user);
         logger.info(`Invitation envoyée pour ${user.name}`);
         resolve(p);
       } catch (e) {
