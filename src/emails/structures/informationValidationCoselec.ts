@@ -1,19 +1,15 @@
 import { Application } from '@feathersjs/express';
-import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
-import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { getCoselec } from '../../utils';
-import logger from '../../logger';
 
-export default function (app: Application, mailer, req: IRequest = null) {
+export default function (app: Application, mailer) {
   const templateName = 'informationValidationCoselec';
 
   const render = async (user: IUser) => {
     const structure: IStructures = await app
       .service(service.structures)
-      .Model.accessibleBy(req.ability, action.read)
-      .findOne({ _id: user.entity.oid });
+      .Model.findOne({ _id: user.entity.oid });
     const coselec = getCoselec(structure);
     const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
 
@@ -27,19 +23,35 @@ export default function (app: Application, mailer, req: IRequest = null) {
     render,
     send: async (user: IUser) => {
       const onSuccess = async () => {
-        logger.info(
-          `Email envoyé avec succès à ${user.name}, pour informer la structure du nombre de postes obtenus de l'utilisateur`,
+        await app.service(service.users).Model.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              mailSentInformationCoselecDate: new Date(),
+            },
+            $unset: {
+              mailErrorSentInformationCoselec: '',
+              mailErrorDetailSentInformationCoselec: '',
+            },
+          },
         );
       };
       const onError = async (err: Error) => {
-        logger.info(err.message);
+        await app.service(service.users).Model.updateOne(
+          { _id: user._id },
+          {
+            mailErrorSentInformationCoselec: 'smtpError',
+            mailErrorDetailSentInformationCoselec: err.message,
+          },
+        );
+        throw err;
       };
 
       return mailer
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Bonne nouvelle, vous avez obtenu des postes pour recruter des conseillers Numériques France Services !',
+            'Réponse à candidature : recrutement de Conseiller(s) numérique(s) France Services',
           body: await render(user),
         })
         .then(onSuccess)

@@ -12,7 +12,6 @@ import {
   envoiEmailInvit,
   envoiEmailMultiRole,
 } from '../../../utils/index';
-import { informationValidationCoselec } from '../../../emails';
 
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
@@ -63,9 +62,6 @@ const postInvitationStructure =
             );
           },
         );
-        const mailerInstance = mailer(app);
-        const message = informationValidationCoselec(app, mailerInstance, req);
-        message.send(user);
         messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {
