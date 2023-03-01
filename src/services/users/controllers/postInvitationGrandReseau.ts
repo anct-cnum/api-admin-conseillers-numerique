@@ -108,9 +108,6 @@ const postInvitationGrandReseau =
                 },
                 $unset: {
                   reseau: '',
-                  nom: '',
-                  prenom: '',
-                  migrationDashboard: '',
                 },
               };
               await deleteRoleUser(app, req, email, queryRoleGrandReseau);

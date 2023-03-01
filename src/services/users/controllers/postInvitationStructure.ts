@@ -111,7 +111,6 @@ const postInvitationStructure =
                 },
                 $unset: {
                   entity: '',
-                  migrationDashboard: '',
                 },
               };
               await deleteRoleUser(app, req, email, queryRoleStructure);
