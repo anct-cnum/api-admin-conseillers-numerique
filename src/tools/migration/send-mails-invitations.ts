@@ -63,7 +63,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     const p = new Promise<void>(async (resolve) => {
       try {
         await messageInvitation.send(user);
-        if (messageInformationCoselec) {
+        if (messageInformationCoselec && !user.mailSentCoselecDate) {
           await messageInformationCoselec.send(user);
         }
         logger.info(`Invitation envoyée pour ${user.name}`);

@@ -27,11 +27,11 @@ export default function (app: Application, mailer) {
           { _id: user._id },
           {
             $set: {
-              mailSentInformationCoselecDate: new Date(),
+              mailSentCoselecDate: new Date(),
             },
             $unset: {
-              mailErrorSentInformationCoselec: '',
-              mailErrorDetailSentInformationCoselec: '',
+              mailErrorSentCoselec: '',
+              mailErrorDetailSentCoselec: '',
             },
           },
         );
@@ -40,8 +40,8 @@ export default function (app: Application, mailer) {
         await app.service(service.users).Model.updateOne(
           { _id: user._id },
           {
-            mailErrorSentInformationCoselec: 'smtpError',
-            mailErrorDetailSentInformationCoselec: err.message,
+            mailErrorSentCoselec: 'smtpError',
+            mailErrorDetailSentCoselec: err.message,
           },
         );
         throw err;
