@@ -17,6 +17,11 @@ import mongoose from './mongoose';
 
 const app = express(feathers());
 
+app.use('/', (req, res) => {
+  logger.info(req.originalUrl);
+  res.status(404).send("Désoler, cette page n'existe pas");
+});
+
 // Init Sentry
 const config = configuration();
 if (config().sentry.enabled === 'true') {
