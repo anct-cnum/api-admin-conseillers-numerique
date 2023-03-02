@@ -18,7 +18,7 @@ import mongoose from './mongoose';
 const app = express(feathers());
 
 app.use('/', (req, res) => {
-  logger.info(req.originalUrl);
+  logger.info('%o', req);
   res.status(404).send("Désoler, cette page n'existe pas");
 });
 
