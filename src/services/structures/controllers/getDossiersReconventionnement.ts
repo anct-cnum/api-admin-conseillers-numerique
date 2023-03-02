@@ -72,21 +72,21 @@ const createDossierReconventionnement =
 const getTotalDossiersReconventionnement = async (
   graphQLClient: GraphQLClient,
 ) => {
-  const demarcheStructurePublique = await requestGraphQLForTotalDossiers(
+  const demarcheStructurePublique: any = await requestGraphQLForTotalDossiers(
     graphQLClient,
     TypeDossierReconventionnement.StructurePublique,
   );
   if (demarcheStructurePublique instanceof Error) {
     return demarcheStructurePublique;
   }
-  const demarcheEntrepriseEss = await requestGraphQLForTotalDossiers(
+  const demarcheEntrepriseEss: any = await requestGraphQLForTotalDossiers(
     graphQLClient,
     TypeDossierReconventionnement.Entreprise,
   );
   if (demarcheEntrepriseEss instanceof Error) {
     return demarcheEntrepriseEss;
   }
-  const demarcheAssociation = await requestGraphQLForTotalDossiers(
+  const demarcheAssociation: any = await requestGraphQLForTotalDossiers(
     graphQLClient,
     TypeDossierReconventionnement.Association,
   );
