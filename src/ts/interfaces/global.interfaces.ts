@@ -64,13 +64,13 @@ export interface ICodesPostauxQuery {
 }
 
 export interface IDossierDS {
-  _id: string;
-  idPG: number;
-  dateDeCreation: Date;
-  dateFinProchainContrat: Date;
-  nbPostesAttribuees: number;
-  nomStructure: string;
-  type: string;
+  _id?: string;
+  idPG?: number;
+  dateDeCreation?: Date;
+  dateFinProchainContrat?: Date;
+  dateDerniereModification?: Date;
+  nbPostesAttribuees?: number;
+  statut?: string;
 }
 
 export interface IReconventionnementDS {

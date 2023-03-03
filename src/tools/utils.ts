@@ -4,6 +4,7 @@ import express from '@feathersjs/express';
 import * as Sentry from '@sentry/node';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { GraphQLClient } from 'graphql-request';
 import logger from '../logger';
 import services from '../services';
 import appHooks from '../app.hooks';
@@ -65,7 +66,24 @@ const execute = async (name: string, job: any) => {
 
   const mailer = createMailer(app);
 
-  const jobComponents = { feathers: f, logger, exit, mailer, app, Sentry };
+  const demarcheSimplifiee = app.get('demarche_simplifiee');
+
+  const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
+    headers: {
+      authorization: `Bearer ${demarcheSimplifiee.token_api}`,
+      'content-type': 'application/json',
+    },
+  });
+
+  const jobComponents = {
+    feathers: f,
+    logger,
+    exit,
+    mailer,
+    app,
+    Sentry,
+    graphQLClient,
+  };
 
   try {
     const launchTime = new Date().getTime();

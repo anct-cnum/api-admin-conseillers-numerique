@@ -7,18 +7,11 @@ import {
 } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
-import { queryGetDossierReconventionnement } from '../repository/reconventionnement.repository';
+import {
+  getTypeDossierReconventionnement,
+  queryGetDossierReconventionnement,
+} from '../repository/reconventionnement.repository';
 import TypeDossierReconventionnement from '../../../ts/enum';
-
-const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
-
-const getTypeDossierReconventionnement = (formJuridique: string) =>
-  categoriesCorrespondances.find((categorieCorrespondance) => {
-    if (categorieCorrespondance.categorie.includes(formJuridique)) {
-      return categorieCorrespondance.type;
-    }
-    return null;
-  });
 
 const getUrlDossierReconventionnement = (
   idPG: number,

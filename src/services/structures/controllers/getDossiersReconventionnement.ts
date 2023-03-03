@@ -1,213 +1,128 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { GraphQLClient } from 'graphql-request';
-import { IDossierDS, IRequest } from '../../../ts/interfaces/global.interfaces';
+import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import validReconventionnement from '../../../schemas/reconventionnement.schemas';
+import { filterStatut } from '../repository/reconventionnement.repository';
 import {
-  queryGetDemarcheReconventionnement,
-  queryGetDemarcheReconventionnementWithoutAttributDossier,
-} from '../repository/reconventionnement.repository';
-import TypeDossierReconventionnement from '../../../ts/enum';
-import { getNameStructure } from '../repository/structures.repository';
+  checkAccessReadRequestStructures,
+  countStructures,
+} from '../repository/structures.repository';
+import service from '../../../helpers/services';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { action } from '../../../helpers/accessControl/accessList';
 
-const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
+const getTotalStructures =
+  (app: Application, checkAccess) => async (typeConvention: string) =>
+    app.service(service.structures).Model.aggregate([
+      {
+        $match: {
+          ...filterStatut(typeConvention),
+          $and: [checkAccess],
+        },
+      },
+      { $group: { _id: null, count: { $sum: 1 } } },
+      { $project: { _id: 0, count_structures: '$count' } },
+    ]);
 
-const getDemarcheNumber = (type: string) =>
-  categoriesCorrespondances.find((categorie) => categorie.type === type)
-    .numero_demarche;
-
-const requestGraphQLForGetDemarcheDS = (
-  graphQLClient: GraphQLClient,
-  limitDossier: number,
-  paginationCursor: String,
-  type: string,
-) =>
-  graphQLClient
-    .request(queryGetDemarcheReconventionnement(limitDossier), {
-      demarcheNumber: getDemarcheNumber(type),
-      after: paginationCursor,
-    })
-    .catch(() => {
-      return new Error("La démarche n'existe pas");
-    });
-
-const requestGraphQLForTotalDossiers = (
-  graphQLClient: GraphQLClient,
-  type: string,
-) =>
-  graphQLClient
-    .request(queryGetDemarcheReconventionnementWithoutAttributDossier, {
-      demarcheNumber: getDemarcheNumber(type),
-    })
-    .catch(() => {
-      return new Error("La démarche n'existe pas");
-    });
-
-const createDossierReconventionnement =
-  (app: Application, req: IRequest) => async (demarcheSimplifiee) =>
-    Promise.all(
-      demarcheSimplifiee.demarche.dossiers.nodes.map(async (dossier) => {
-        const { champs, number, datePassageEnConstruction } = dossier;
-        const item: IDossierDS = {
-          _id: '',
-          idPG: 0,
-          dateDeCreation: undefined,
-          dateFinProchainContrat: undefined,
-          nbPostesAttribuees: 0,
-          nomStructure: '',
-          type: 'Reconventionnement',
-        };
-        item._id = number;
-        item.dateDeCreation = datePassageEnConstruction;
-        item.idPG = parseInt(champs[1]?.integerNumber, 10);
-        item.nbPostesAttribuees = parseInt(champs[4]?.integerNumber, 10);
-        item.dateFinProchainContrat = champs[5]?.date;
-        const structure = await getNameStructure(app, req)(item.idPG);
-        item.nomStructure = structure?.nom;
-
-        return item;
-      }),
-    );
-
-const getTotalDossiersReconventionnement = async (
-  graphQLClient: GraphQLClient,
-) => {
-  const demarcheStructurePublique = await requestGraphQLForTotalDossiers(
-    graphQLClient,
-    TypeDossierReconventionnement.StructurePublique,
-  );
-  if (demarcheStructurePublique instanceof Error) {
-    return demarcheStructurePublique;
-  }
-  const demarcheEntrepriseEss = await requestGraphQLForTotalDossiers(
-    graphQLClient,
-    TypeDossierReconventionnement.Entreprise,
-  );
-  if (demarcheEntrepriseEss instanceof Error) {
-    return demarcheEntrepriseEss;
-  }
-  const demarcheAssociation = await requestGraphQLForTotalDossiers(
-    graphQLClient,
-    TypeDossierReconventionnement.Association,
-  );
-  if (demarcheAssociation instanceof Error) {
-    return demarcheAssociation;
-  }
-  return [
-    demarcheStructurePublique.demarche.dossiers.nodes.length,
-    demarcheEntrepriseEss.demarche.dossiers.nodes.length,
-    demarcheAssociation.demarche.dossiers.nodes.length,
-  ];
-};
+const getStructures =
+  (app: Application, checkAccess) =>
+  async (skip: string, limit: number, typeConvention: string) =>
+    app.service(service.structures).Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
+          ...filterStatut(typeConvention),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          nom: 1,
+          idPG: 1,
+          nombreConseillersSouhaites: 1,
+          statut: 1,
+          dossierDemarcheSimplifiee: 1,
+        },
+      },
+      { $sort: { idPG: 1 } },
+      {
+        $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
+      },
+      { $limit: Number(limit) },
+    ]);
 
 const getDossiersReconventionnement =
-  (app: Application) => async (req: IRequest, res: Response) => {
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
-    const { page } = req.query;
+  (app: Application, options) => async (req: IRequest, res: Response) => {
+    const { page, type } = req.query;
     try {
-      const pageValidation = validReconventionnement.validate(page);
+      const pageValidation = validReconventionnement.validate({ page, type });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
         return;
       }
-      const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
-        headers: {
-          authorization: `Bearer ${demarcheSimplifiee.token_api}`,
-          'content-type': 'application/json',
-        },
-      });
-
       const items: {
         total: number;
         data: object;
+        totalParConvention: {
+          reconventionnement: number;
+          conventionnement: number;
+          avenantAjoutPoste: number;
+          avenantRenduPoste: number;
+          total: number;
+        };
         limit: number;
         skip: number;
       } = {
         total: 0,
         data: [],
+        totalParConvention: {
+          reconventionnement: 0,
+          conventionnement: 0,
+          avenantAjoutPoste: 0,
+          avenantRenduPoste: 0,
+          total: 0,
+        },
         limit: 0,
         skip: 0,
       };
-      let paginationCursor: String = '';
-      let limitDossier = 15;
-      const totalDossierEachType = await getTotalDossiersReconventionnement(
-        graphQLClient,
-      );
-      if (totalDossierEachType instanceof Error) {
-        res.status(404).json({ message: totalDossierEachType.message });
-        return;
-      }
-      if (page > 1) {
-        const nbDossier = (page - 1) * limitDossier;
-        const nbTypeDossierSuperieurLimit = totalDossierEachType.filter(
-          (totalDossier) => totalDossier > nbDossier,
-        );
-        if (nbTypeDossierSuperieurLimit.length === 1) {
-          limitDossier = 45;
-        }
-        if (nbTypeDossierSuperieurLimit.length === 2) {
-          limitDossier = 22;
-        }
-        paginationCursor = Buffer.from(nbDossier.toString()).toString('base64');
-      }
 
-      const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
-        graphQLClient,
-        limitDossier,
-        paginationCursor,
-        TypeDossierReconventionnement.StructurePublique,
+      const checkAccess = await checkAccessReadRequestStructures(app, req);
+      const structures = await getStructures(app, checkAccess)(
+        page,
+        options.paginate.default,
+        type,
       );
-      if (demarcheStructurePublique instanceof Error) {
-        res.status(404).json({ message: demarcheStructurePublique.message });
-        return;
-      }
-      const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
-        graphQLClient,
-        limitDossier,
-        paginationCursor,
-        TypeDossierReconventionnement.Entreprise,
-      );
-      if (demarcheEntrepriseEss instanceof Error) {
-        res.status(404).json({ message: demarcheEntrepriseEss.message });
-        return;
-      }
-      const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
-        graphQLClient,
-        limitDossier,
-        paginationCursor,
-        TypeDossierReconventionnement.Association,
-      );
-      if (demarcheAssociation instanceof Error) {
-        res.status(404).json({ message: demarcheAssociation.message });
-        return;
-      }
+      const conventions = await Promise.all(
+        structures.map((structure: IStructures) => {
+          const item = { ...structure };
+          item.type = item.dossierDemarcheSimplifiee
+            ? 'Reconventionnement'
+            : 'Conventionnement';
 
-      const dossierStructurePublique = await createDossierReconventionnement(
+          return item;
+        }),
+      );
+      const totalStructures = await getTotalStructures(app, checkAccess)(type);
+      items.total = totalStructures[0]?.count_structures;
+      items.totalParConvention.reconventionnement = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({
+          dossierDemarcheSimplifiee: { $exists: true },
+        });
+      const totalConventionnement = await countStructures(
+        req.ability,
+        action.read,
         app,
-        req,
-      )(demarcheStructurePublique);
-
-      const dossierEntrepriseEss = await createDossierReconventionnement(
-        app,
-        req,
-      )(demarcheEntrepriseEss);
-
-      const dossierAssociation = await createDossierReconventionnement(
-        app,
-        req,
-      )(demarcheAssociation);
-
-      const dossiers = dossierStructurePublique.concat(
-        dossierEntrepriseEss,
-        dossierAssociation,
       );
-      items.total = totalDossierEachType.reduce(
-        (accumulator, currentValue) => accumulator + currentValue,
-        0,
-      );
-      items.limit = 45;
+      items.totalParConvention.conventionnement =
+        totalConventionnement - items.totalParConvention.reconventionnement;
+      items.totalParConvention.total =
+        items.totalParConvention.conventionnement +
+        items.totalParConvention.reconventionnement;
+      items.data = conventions;
+      items.limit = options.paginate.default;
       items.skip = page;
-      items.data = dossiers;
 
       res.status(200).json(items);
     } catch (error) {

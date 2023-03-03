@@ -84,7 +84,7 @@ export default class Structures extends Service {
       '/reconventionnements/',
       authenticateMode(app),
       createAbilities(app),
-      getDossiersReconventionnement(app),
+      getDossiersReconventionnement(app, options),
     );
     app.get(
       '/reconventionnement/:id',

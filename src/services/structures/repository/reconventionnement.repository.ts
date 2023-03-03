@@ -1,78 +1,80 @@
 import { gql } from 'graphql-request';
 
-const queryGetDemarcheReconventionnement = (limitDossier: number) => gql`
-query getDemarche(
-  $demarcheNumber: Int!
-  $state: DossierState
-  $order: Order
-  $after: String
-) {
-  demarche(number: $demarcheNumber) {
-    id
-    number
-    title
-    dossiers(state: $state, order: $order, first: ${limitDossier}, after: $after) {
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      nodes {
-        ...DossierFragment
+const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
+
+const queryGetDemarcheReconventionnement = () => gql`
+  query getDemarche(
+    $demarcheNumber: Int!
+    $state: DossierState
+    $order: Order
+    $after: String
+  ) {
+    demarche(number: $demarcheNumber) {
+      id
+      number
+      title
+      dossiers(state: $state, order: $order, after: $after) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          ...DossierFragment
+        }
       }
     }
   }
-}
 
-fragment DossierFragment on Dossier {
-  id
-  number
-  archived
-  state
-  dateDerniereModification
-  dateDepot
-  datePassageEnConstruction
-  datePassageEnInstruction
-  dateTraitement
-  instructeurs {
-    email
+  fragment DossierFragment on Dossier {
+    id
+    number
+    archived
+    state
+    dateDerniereModification
+    dateDepot
+    datePassageEnConstruction
+    datePassageEnInstruction
+    dateTraitement
+    instructeurs {
+      email
+    }
+    usager {
+      email
+    }
+    champs {
+      ...ChampFragment
+    }
   }
-  usager {
-    email
-  }
-  champs {
-    ...ChampFragment
-  }
-}
 
-fragment ChampFragment on Champ {
-  id
-  stringValue
-  ... on DateChamp {
-    date
+  fragment ChampFragment on Champ {
+    id
+    stringValue
+    ... on DateChamp {
+      date
+    }
+    ... on DatetimeChamp {
+      datetime
+    }
+    ... on CheckboxChamp {
+      checked: value
+    }
+    ... on DecimalNumberChamp {
+      decimalNumber: value
+    }
+    ... on IntegerNumberChamp {
+      integerNumber: value
+    }
+    ... on CiviliteChamp {
+      civilite: value
+    }
+    ... on LinkedDropDownListChamp {
+      primaryValue
+      secondaryValue
+    }
+    ... on MultipleDropDownListChamp {
+      values
+    }
   }
-  ... on DatetimeChamp {
-    datetime
-  }
-  ... on CheckboxChamp {
-    checked: value
-  }
-  ... on DecimalNumberChamp {
-    decimalNumber: value
-  }
-  ... on IntegerNumberChamp {
-    integerNumber: value
-  }
-  ... on CiviliteChamp {
-    civilite: value
-  }
-  ... on LinkedDropDownListChamp {
-    primaryValue
-    secondaryValue
-  }
-  ... on MultipleDropDownListChamp {
-    values
-  }
-}
 `;
 
 const queryGetDossierReconventionnement = gql`
@@ -146,8 +148,40 @@ const queryGetDemarcheReconventionnementWithoutAttributDossier = gql`
   }
 `;
 
+const getTypeDossierReconventionnement = (formJuridique: string) =>
+  categoriesCorrespondances.find((categorieCorrespondance) => {
+    if (categorieCorrespondance.categorie.includes(formJuridique)) {
+      return categorieCorrespondance.type;
+    }
+    return null;
+  });
+
+const filterStatut = (typeConvention: string) => {
+  if (typeConvention === 'reconventionnement') {
+    return {
+      statut: { $eq: 'VALIDATION_COSELEC' },
+      dossierDemarcheSimplifiee: { $exists: true },
+    };
+  }
+  if (typeConvention === 'conventionnement') {
+    return { statut: { $nin: ['VALIDATION_COSELEC', 'ABANDON', 'ANNULEE'] } };
+  }
+
+  return {
+    $or: [
+      { statut: { $nin: ['ABANDON', 'ANNULEE', 'VALIDATION_COSELEC'] } },
+      {
+        statut: { $eq: 'VALIDATION_COSELEC' },
+        dossierDemarcheSimplifiee: { $exists: true },
+      },
+    ],
+  };
+};
+
 export {
   queryGetDemarcheReconventionnement,
   queryGetDossierReconventionnement,
   queryGetDemarcheReconventionnementWithoutAttributDossier,
+  getTypeDossierReconventionnement,
+  filterStatut,
 };

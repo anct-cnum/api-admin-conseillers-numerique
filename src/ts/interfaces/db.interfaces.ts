@@ -308,6 +308,14 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  dossierDemarcheSimplifiee: {
+    numero: number;
+    dateDeCreation: Date;
+    dateFinProchainContrat: Date;
+    nbPostesAttribuees: number;
+    statut: string;
+    dateDernierModification: Date;
+  };
 }
 
 interface IEtablissement {
