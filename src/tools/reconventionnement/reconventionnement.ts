@@ -193,9 +193,18 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           .Model.updateOne(
             {
               idPG: dossier.idPG,
-              'dossierDemarcheSimplifiee.dateDernierModification': {
-                $gt: new Date(dossier.dateDerniereModification),
-              },
+              $or: [
+                {
+                  'dossierDemarcheSimplifiee.dateDernierModification': {
+                    $gt: new Date(dossier.dateDerniereModification),
+                  },
+                },
+                {
+                  'dossierDemarcheSimplifiee.dateDernierModification': {
+                    $exists: false,
+                  },
+                },
+              ],
             },
             {
               dossierDemarcheSimplifiee: {
