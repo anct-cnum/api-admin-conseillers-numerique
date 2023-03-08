@@ -1,4 +1,5 @@
 import { gql } from 'graphql-request';
+import TypeDossierReconventionnement from '../../../ts/enum';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -148,33 +149,67 @@ const queryGetDemarcheReconventionnementWithoutAttributDossier = gql`
   }
 `;
 
-const getTypeDossierReconventionnement = (formJuridique: string) =>
+const getTypeDossierDemarcheSimplifiee = (formJuridique: string) =>
   categoriesCorrespondances.find((categorieCorrespondance) => {
     if (categorieCorrespondance.categorie.includes(formJuridique)) {
-      return categorieCorrespondance.type;
+      return categorieCorrespondance;
     }
     return null;
   });
 
+const getUrlDossierReconventionnement = (
+  idPG: number,
+  type: string,
+  demarcheSimplifiee: {
+    url_association_reconventionnement: string;
+    url_entreprise_reconventionnement: string;
+    url_structure_publique_reconventionnement: string;
+  },
+) => {
+  switch (type) {
+    case TypeDossierReconventionnement.Association:
+      return `${demarcheSimplifiee.url_association_reconventionnement}${idPG}`;
+    case TypeDossierReconventionnement.Entreprise:
+      return `${demarcheSimplifiee.url_entreprise_reconventionnement}${idPG}`;
+    case TypeDossierReconventionnement.StructurePublique:
+      return `${demarcheSimplifiee.url_structure_publique_reconventionnement}${idPG}`;
+    default:
+      return '';
+  }
+};
+
+const getUrlDossierConventionnement = (
+  type: string,
+  demarcheSimplifiee: {
+    url_association_conventionnement: string;
+    url_entreprise_conventionnement: string;
+    url_structure_publique_conventionnement: string;
+  },
+) => {
+  switch (type) {
+    case TypeDossierReconventionnement.Association:
+      return demarcheSimplifiee.url_association_conventionnement;
+    case TypeDossierReconventionnement.Entreprise:
+      return demarcheSimplifiee.url_entreprise_conventionnement;
+    case TypeDossierReconventionnement.StructurePublique:
+      return demarcheSimplifiee.url_structure_publique_conventionnement;
+    default:
+      return '';
+  }
+};
+
 const filterStatut = (typeConvention: string) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      statut: { $eq: 'VALIDATION_COSELEC' },
-      dossierDemarcheSimplifiee: { $exists: true },
+      statutConventionnement: 'Reconventionnement',
     };
   }
   if (typeConvention === 'conventionnement') {
-    return { statut: { $nin: ['VALIDATION_COSELEC', 'ABANDON', 'ANNULEE'] } };
+    return { statutConventionnement: 'Conventionnement' };
   }
 
   return {
-    $or: [
-      { statut: { $nin: ['ABANDON', 'ANNULEE', 'VALIDATION_COSELEC'] } },
-      {
-        statut: { $eq: 'VALIDATION_COSELEC' },
-        dossierDemarcheSimplifiee: { $exists: true },
-      },
-    ],
+    statutConventionnement: { $in: ['Reconventionnement', 'Conventionnement'] },
   };
 };
 
@@ -182,6 +217,8 @@ export {
   queryGetDemarcheReconventionnement,
   queryGetDossierReconventionnement,
   queryGetDemarcheReconventionnementWithoutAttributDossier,
-  getTypeDossierReconventionnement,
+  getTypeDossierDemarcheSimplifiee,
+  getUrlDossierReconventionnement,
+  getUrlDossierConventionnement,
   filterStatut,
 };

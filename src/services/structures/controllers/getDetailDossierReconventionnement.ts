@@ -4,51 +4,9 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
-import { getTypeDossierReconventionnement } from '../repository/reconventionnement.repository';
-import TypeDossierReconventionnement from '../../../ts/enum';
+import { getTypeDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec } from '../../../utils';
-
-const getUrlDossierReconventionnement = (
-  idPG: number,
-  type: string,
-  demarcheSimplifiee: {
-    url_association_reconventionnement: string;
-    url_entreprise_reconventionnement: string;
-    url_structure_publique_reconventionnement: string;
-  },
-) => {
-  switch (type) {
-    case TypeDossierReconventionnement.Association:
-      return `${demarcheSimplifiee.url_association_reconventionnement}${idPG}`;
-    case TypeDossierReconventionnement.Entreprise:
-      return `${demarcheSimplifiee.url_entreprise_reconventionnement}${idPG}`;
-    case TypeDossierReconventionnement.StructurePublique:
-      return `${demarcheSimplifiee.url_structure_publique_reconventionnement}${idPG}`;
-    default:
-      return '';
-  }
-};
-
-const getUrlDossierConventionnement = (
-  type: string,
-  demarcheSimplifiee: {
-    url_association_conventionnement: string;
-    url_entreprise_conventionnement: string;
-    url_structure_publique_conventionnement: string;
-  },
-) => {
-  switch (type) {
-    case TypeDossierReconventionnement.Association:
-      return demarcheSimplifiee.url_association_conventionnement;
-    case TypeDossierReconventionnement.Entreprise:
-      return demarcheSimplifiee.url_entreprise_conventionnement;
-    case TypeDossierReconventionnement.StructurePublique:
-      return demarcheSimplifiee.url_structure_publique_conventionnement;
-    default:
-      return '';
-  }
-};
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -119,7 +77,9 @@ const getDetailStructureWithConseillers =
           nom: 1,
           coselec: 1,
           contact: 1,
-          dossierDemarcheSimplifiee: 1,
+          dossierReconventionnement: 1,
+          dossierConventionnement: 1,
+          statutConventionnement: 1,
           nombreConseillersSouhaites: 1,
           'insee.entreprise.forme_juridique': 1,
           conseillers: '$conseillers',
@@ -152,7 +112,6 @@ const miseEnRelationConseillerStructure =
 
 const getDetailDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
     const idStructure = req.params.id;
     try {
       const checkAccessStructures = await checkAccessReadRequestStructures(
@@ -169,13 +128,13 @@ const getDetailDossierReconventionnement =
         });
         return;
       }
-      const typeDossierReconventionnement = getTypeDossierReconventionnement(
+
+      const typeDossierDs = getTypeDossierDemarcheSimplifiee(
         structure[0].insee.entreprise.forme_juridique,
       );
-      if (typeDossierReconventionnement === null) {
+      if (typeDossierDs === null) {
         res.status(500).json({
-          message:
-            "Erreur lors de la récupération de l'url du dossier de reconventionnement",
+          message: 'Erreur lors de la récupération du numéro de la démarche',
         });
         return;
       }
@@ -190,15 +149,10 @@ const getDetailDossierReconventionnement =
           idStructure,
           structure[0].conseillers.map((conseiller) => conseiller._id),
         );
-        structure[0].type = 'reconventionnement';
+        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].dossierReconventionnement.numero}`;
         structure[0].nombreConseillersCoselec = getCoselec(
           structure[0],
         ).nombreConseillersCoselec;
-        structure[0].url = getUrlDossierReconventionnement(
-          structure.idPG,
-          typeDossierReconventionnement.type,
-          demarcheSimplifiee,
-        );
         structure[0].conseillers = await Promise.all(
           structure[0].conseillers.map(async (conseiller) => {
             const item = { ...conseiller };
@@ -211,11 +165,7 @@ const getDetailDossierReconventionnement =
           }),
         );
       } else {
-        structure[0].type = 'conventionnement';
-        structure[0].url = getUrlDossierConventionnement(
-          typeDossierReconventionnement.type,
-          demarcheSimplifiee,
-        );
+        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_conventionnement}/dossiers/${structure[0].dossierConventionnement.numero}`;
       }
 
       res.status(200).json(structure[0]);

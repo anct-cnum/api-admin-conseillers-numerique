@@ -3,10 +3,7 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import validReconventionnement from '../../../schemas/reconventionnement.schemas';
 import { filterStatut } from '../repository/reconventionnement.repository';
-import {
-  checkAccessReadRequestStructures,
-  countStructures,
-} from '../repository/structures.repository';
+import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
@@ -41,7 +38,9 @@ const getStructures =
           idPG: 1,
           nombreConseillersSouhaites: 1,
           statut: 1,
-          dossierDemarcheSimplifiee: 1,
+          dossierReconventionnement: 1,
+          dossierConventionnement: 1,
+          statutConventionnement: 1,
         },
       },
       { $sort: { idPG: 1 } },
@@ -87,20 +86,10 @@ const getDossiersReconventionnement =
       };
 
       const checkAccess = await checkAccessReadRequestStructures(app, req);
-      const structures = await getStructures(app, checkAccess)(
+      const structures: IStructures = await getStructures(app, checkAccess)(
         page,
         options.paginate.default,
         type,
-      );
-      const conventions = await Promise.all(
-        structures.map((structure: IStructures) => {
-          const item = { ...structure };
-          item.type = item.dossierDemarcheSimplifiee
-            ? 'Reconventionnement'
-            : 'Conventionnement';
-
-          return item;
-        }),
       );
       const totalStructures = await getTotalStructures(app, checkAccess)(type);
       items.total = totalStructures[0]?.count_structures;
@@ -108,19 +97,18 @@ const getDossiersReconventionnement =
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
-          dossierDemarcheSimplifiee: { $exists: true },
+          statutConventionnement: 'Reconventionnement',
         });
-      const totalConventionnement = await countStructures(
-        req.ability,
-        action.read,
-        app,
-      );
-      items.totalParConvention.conventionnement =
-        totalConventionnement - items.totalParConvention.reconventionnement;
+      items.totalParConvention.conventionnement = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({
+          statutConventionnement: 'Conventionnement',
+        });
       items.totalParConvention.total =
         items.totalParConvention.conventionnement +
         items.totalParConvention.reconventionnement;
-      items.data = conventions;
+      items.data = structures;
       items.limit = options.paginate.default;
       items.skip = page;
 

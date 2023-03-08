@@ -13,7 +13,7 @@ const categoriesCorrespondances = require('../../../datas/categorieFormCorrespon
 
 const getDemarcheNumber = (type: string) =>
   categoriesCorrespondances.find((categorie) => categorie.type === type)
-    .numero_demarche;
+    .numero_demarche_reconventionnement;
 
 const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
@@ -193,31 +193,37 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           .Model.updateOne(
             {
               idPG: dossier.idPG,
-              $or: [
-                {
-                  'dossierDemarcheSimplifiee.dateDernierModification': {
-                    $gt: new Date(dossier.dateDerniereModification),
-                  },
-                },
-                {
-                  'dossierDemarcheSimplifiee.dateDernierModification': {
-                    $exists: false,
-                  },
-                },
-              ],
+              // $or: [
+              //   {
+              //     'dossierDemarcheSimplifiee.dateDernierModification': {
+              //       $gt: new Date(dossier.dateDerniereModification),
+              //     },
+              //   },
+              //   {
+              //     'dossierDemarcheSimplifiee.dateDernierModification': {
+              //       $exists: false,
+              //     },
+              //   },
+              // ],
             },
             {
-              dossierDemarcheSimplifiee: {
-                numero: dossier._id,
-                dateDeCreation: new Date(dossier.dateDeCreation),
-                dateFinProchainContrat: dossier.dateFinProchainContrat
-                  ? new Date(dossier.dateFinProchainContrat)
-                  : null,
-                nbPostesAttribuees: dossier.nbPostesAttribuees,
-                statut: dossier.statut,
-                dateDernierModification: new Date(
-                  dossier.dateDerniereModification,
-                ),
+              $set: {
+                statutConventionnement: 'Reconventionnement',
+                dossierReconventionnement: {
+                  numero: dossier._id,
+                  dateDeCreation: new Date(dossier.dateDeCreation),
+                  dateFinProchainContrat: dossier.dateFinProchainContrat
+                    ? new Date(dossier.dateFinProchainContrat)
+                    : null,
+                  nbPostesAttribuees: dossier.nbPostesAttribuees,
+                  statut: dossier.statut,
+                  dateDernierModification: new Date(
+                    dossier.dateDerniereModification,
+                  ),
+                },
+              },
+              $unset: {
+                dossierDemarcheSimplifiee: '',
               },
             },
           );
