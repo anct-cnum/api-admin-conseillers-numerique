@@ -4,17 +4,12 @@ import TypeDossierReconventionnement from '../../../ts/enum';
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
 const queryGetDemarcheReconventionnement = () => gql`
-  query getDemarche(
-    $demarcheNumber: Int!
-    $state: DossierState
-    $order: Order
-    $after: String
-  ) {
+  query getDemarche($demarcheNumber: Int!, $after: String) {
     demarche(number: $demarcheNumber) {
       id
       number
       title
-      dossiers(state: $state, order: $order, after: $after) {
+      dossiers(first: 100, after: $after) {
         pageInfo {
           endCursor
           hasNextPage
@@ -179,6 +174,7 @@ const getUrlDossierReconventionnement = (
 };
 
 const getUrlDossierConventionnement = (
+  idPG: number,
   type: string,
   demarcheSimplifiee: {
     url_association_conventionnement: string;
@@ -188,11 +184,11 @@ const getUrlDossierConventionnement = (
 ) => {
   switch (type) {
     case TypeDossierReconventionnement.Association:
-      return demarcheSimplifiee.url_association_conventionnement;
+      return `${demarcheSimplifiee.url_association_conventionnement}${idPG}`;
     case TypeDossierReconventionnement.Entreprise:
-      return demarcheSimplifiee.url_entreprise_conventionnement;
+      return `${demarcheSimplifiee.url_entreprise_conventionnement}${idPG}`;
     case TypeDossierReconventionnement.StructurePublique:
-      return demarcheSimplifiee.url_structure_publique_conventionnement;
+      return `${demarcheSimplifiee.url_structure_publique_conventionnement}${idPG}`;
     default:
       return '';
   }
@@ -201,15 +197,90 @@ const getUrlDossierConventionnement = (
 const filterStatut = (typeConvention: string) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      statutConventionnement: 'Reconventionnement',
+      statutConventionnement: 'RECONVENTIONNEMENT_EN_COURS',
     };
   }
   if (typeConvention === 'conventionnement') {
-    return { statutConventionnement: 'Conventionnement' };
+    return { statutConventionnement: 'CONVENTIONNEMENT_EN_COURS' };
   }
 
   return {
-    statutConventionnement: { $in: ['Reconventionnement', 'Conventionnement'] },
+    statutConventionnement: {
+      $in: ['RECONVENTIONNEMENT_EN_COURS', 'CONVENTIONNEMENT_EN_COURS'],
+    },
+  };
+};
+
+const filterStatutHistorique = (typeConvention: string) => {
+  if (typeConvention === 'reconventionnement') {
+    return {
+      statutConventionnement: 'RECONVENTIONNEMENT_VALIDÉ',
+    };
+  }
+  if (typeConvention === 'conventionnement') {
+    return {
+      statutConventionnement: {
+        $in: ['CONVENTIONNEMENT_VALIDÉ', 'RECONVENTIONNEMENT_EN_COURS'],
+      },
+    };
+  }
+
+  return {
+    statutConventionnement: {
+      $in: [
+        'RECONVENTIONNEMENT_VALIDÉ',
+        'CONVENTIONNEMENT_VALIDÉ',
+        'RECONVENTIONNEMENT_EN_COURS',
+      ],
+    },
+  };
+};
+
+const filterDateDemandeHistorique = (
+  typeConvention: string,
+  dateDebut: Date,
+  dateFin: Date,
+) => {
+  if (typeConvention === 'reconventionnement') {
+    return {
+      statutConventionnement: 'RECONVENTIONNEMENT_VALIDÉ',
+      'dossierReconventionnement.dateDeCreation': {
+        $gt: dateDebut,
+        $lt: dateFin,
+      },
+    };
+  }
+  if (typeConvention === 'conventionnement') {
+    return {
+      statutConventionnement: {
+        $in: ['CONVENTIONNEMENT_VALIDÉ', 'RECONVENTIONNEMENT_EN_COURS'],
+      },
+      // 'dossierConventionnement.dateDeCreation': {
+      //   $gt: dateDebut,
+      //   $lt: dateFin,
+      // },
+    };
+  }
+
+  return {
+    $or: [
+      {
+        statutConventionnement: 'RECONVENTIONNEMENT_VALIDÉ',
+        'dossierReconventionnement.dateDeCreation': {
+          $gt: dateDebut,
+          $lt: dateFin,
+        },
+      },
+      {
+        statutConventionnement: {
+          $in: ['CONVENTIONNEMENT_VALIDÉ', 'RECONVENTIONNEMENT_EN_COURS'],
+        },
+        // 'dossierConventionnement.dateDeCreation': {
+        //   $gt: dateDebut,
+        //   $lt: dateFin,
+        // },
+      },
+    ],
   };
 };
 
@@ -221,4 +292,6 @@ export {
   getUrlDossierReconventionnement,
   getUrlDossierConventionnement,
   filterStatut,
+  filterStatutHistorique,
+  filterDateDemandeHistorique,
 };

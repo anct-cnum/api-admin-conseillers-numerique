@@ -517,7 +517,13 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut).toLocaleString()}-${formatDateWithoutGetTime(dateFin).toLocaleString()}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        idType ?? ''
+      } ${formatDateWithoutGetTime(
+        dateDebut,
+      ).toLocaleString()}-${formatDateWithoutGetTime(
+        dateFin,
+      ).toLocaleString()}\n`,
       general,
       statsThemes,
       statsLieux,
@@ -730,6 +736,50 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
   }
 };
 
+const generateCsvHistoriqueDossiersConvention = async (
+  structures: IStructures[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Date de la demande',
+      'Date de fin du prochain contrat',
+      'Nombre de postes',
+      'Type de la demande',
+    ];
+    const dossierDemarcheSimplifiee = (structure) =>
+      structure?.statutConventionnement === 'CONVENTIONNEMENT_VALIDER'
+        ? structure?.dossierConventionnement
+        : structure?.dossierReconventionnement;
+
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...structures.map((structure) =>
+          [
+            structure._id,
+            structure.nom,
+            dossierDemarcheSimplifiee(structure).dateDeCreation,
+            dossierDemarcheSimplifiee(structure).dateFinProchainContrat,
+            dossierDemarcheSimplifiee(structure).nbPostesAttribuees,
+            structure.statutConventionnement === 'CONVENTIONNEMENT_VALIDER'
+              ? 'Conventionnement'
+              : 'Reconventionnement',
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -742,4 +792,5 @@ export {
   generateCsvConseillers,
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
+  generateCsvHistoriqueDossiersConvention,
 };

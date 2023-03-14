@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+/* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/reconventionnement/reconventionnement.ts
+// Lancement de ce script : ts-node src/tools/demarcheSimplifiee/reconventionnement.ts
 
 import { GraphQLClient } from 'graphql-request';
 import execute from '../utils';
@@ -18,43 +19,73 @@ const getDemarcheNumber = (type: string) =>
 const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
   type: string,
+  cursor: string,
 ) =>
   graphQLClient
     .request(queryGetDemarcheReconventionnement(), {
       demarcheNumber: getDemarcheNumber(type),
+      after: cursor,
     })
     .catch(() => {
       return new Error("La démarche n'existe pas");
     });
 
 execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
-  const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
-    graphQLClient,
-    TypeDossierReconventionnement.StructurePublique,
-  );
-  if (demarcheStructurePublique instanceof Error) {
-    logger.info(demarcheStructurePublique.message);
-    return;
-  }
-  const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
-    graphQLClient,
-    TypeDossierReconventionnement.Entreprise,
-  );
-  if (demarcheEntrepriseEss instanceof Error) {
-    logger.info(demarcheEntrepriseEss.message);
-    return;
-  }
-  const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
-    graphQLClient,
-    TypeDossierReconventionnement.Association,
-  );
-  if (demarcheAssociation instanceof Error) {
-    logger.info(demarcheAssociation.message);
-    return;
-  }
+  const arrayCursor: string[] = ['', '', ''];
+  const arrayHasNextPage: boolean[] = [true, true, true];
+  let dossiersStructurePubliqueBrut = [];
+  let dossiersEntrepriseEssBrut = [];
+  let dossiersAssociationsBrut = [];
+
+  do {
+    if (arrayHasNextPage[0] === true) {
+      const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
+        graphQLClient,
+        TypeDossierReconventionnement.StructurePublique,
+        arrayCursor[0],
+      );
+      dossiersStructurePubliqueBrut = [
+        ...dossiersStructurePubliqueBrut,
+        ...demarcheStructurePublique.demarche.dossiers.nodes,
+      ];
+      arrayCursor[0] =
+        demarcheStructurePublique.demarche.dossiers.pageInfo.endCursor;
+      arrayHasNextPage[0] =
+        demarcheStructurePublique.demarche.dossiers.pageInfo.hasNextPage;
+    }
+    if (arrayHasNextPage[1] === true) {
+      const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
+        graphQLClient,
+        TypeDossierReconventionnement.Association,
+        arrayCursor[1],
+      );
+      dossiersAssociationsBrut = [
+        ...dossiersAssociationsBrut,
+        ...demarcheAssociation.demarche.dossiers.nodes,
+      ];
+      arrayCursor[1] = demarcheAssociation.demarche.dossiers.pageInfo.endCursor;
+      arrayHasNextPage[1] =
+        demarcheAssociation.demarche.dossiers.pageInfo.hasNextPage;
+    }
+    if (arrayHasNextPage[2] === true) {
+      const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
+        graphQLClient,
+        TypeDossierReconventionnement.Entreprise,
+        arrayCursor[2],
+      );
+      dossiersEntrepriseEssBrut = [
+        ...dossiersEntrepriseEssBrut,
+        ...demarcheEntrepriseEss.demarche.dossiers.nodes,
+      ];
+      arrayCursor[2] =
+        demarcheEntrepriseEss.demarche.dossiers.pageInfo.endCursor;
+      arrayHasNextPage[2] =
+        demarcheEntrepriseEss.demarche.dossiers.pageInfo.hasNextPage;
+    }
+  } while (arrayHasNextPage.some((x) => x === true));
 
   const dossierStructurePublique = await Promise.all(
-    demarcheStructurePublique.demarche.dossiers.nodes.map((dossier) => {
+    dossiersStructurePubliqueBrut.map((dossier) => {
       const {
         champs,
         number,
@@ -69,7 +100,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       item.statut = state;
       item.idPG = parseInt(
         champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg1MTgwNA==')
-          ?.stringValue,
+          ?.integerNumber,
         10,
       );
       item.nbPostesAttribuees = Math.abs(
@@ -95,7 +126,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
   );
 
   const dossierEntrepriseEss = await Promise.all(
-    demarcheEntrepriseEss.demarche.dossiers.nodes.map((dossier) => {
+    dossiersEntrepriseEssBrut.map((dossier) => {
       const {
         champs,
         number,
@@ -108,9 +139,11 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       item.dateDeCreation = datePassageEnConstruction;
       item.dateDerniereModification = dateDerniereModification;
       item.statut = state;
-      item.idPG = champs.find(
-        (champ: any) => champ.id === 'Q2hhbXAtMjg1MjA1OQ==',
-      )?.stringValue;
+      item.idPG = parseInt(
+        champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg1MjA1OQ==')
+          ?.integerNumber,
+        10,
+      );
       item.nbPostesAttribuees = Math.abs(
         parseInt(
           champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1Mg==')
@@ -134,7 +167,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
   );
 
   const dossierAssociation = await Promise.all(
-    demarcheAssociation.demarche.dossiers.nodes.map((dossier) => {
+    dossiersAssociationsBrut.map((dossier) => {
       const {
         champs,
         number,
@@ -147,9 +180,11 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       item.dateDeCreation = datePassageEnConstruction;
       item.dateDerniereModification = dateDerniereModification;
       item.statut = state;
-      item.idPG = champs.find(
-        (champ: any) => champ.id === 'Q2hhbXAtMjg0ODE4Ng==',
-      )?.stringValue;
+      item.idPG = parseInt(
+        champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg0ODE4Ng==')
+          ?.integerNumber,
+        10,
+      );
       item.nbPostesAttribuees = Math.abs(
         parseInt(
           champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg3MzQ4Mw==')
@@ -193,22 +228,22 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           .Model.updateOne(
             {
               idPG: dossier.idPG,
-              // $or: [
-              //   {
-              //     'dossierDemarcheSimplifiee.dateDernierModification': {
-              //       $gt: new Date(dossier.dateDerniereModification),
-              //     },
-              //   },
-              //   {
-              //     'dossierDemarcheSimplifiee.dateDernierModification': {
-              //       $exists: false,
-              //     },
-              //   },
-              // ],
+              $or: [
+                {
+                  'dossierReconventionnement.dateDernierModification': {
+                    $gt: new Date(dossier.dateDerniereModification),
+                  },
+                },
+                {
+                  'dossierReconventionnement.dateDernierModification': {
+                    $exists: false,
+                  },
+                },
+              ],
             },
             {
               $set: {
-                statutConventionnement: 'Reconventionnement',
+                statutConventionnement: 'RECONVENTIONNEMENT_EN_COURS',
                 dossierReconventionnement: {
                   numero: dossier._id,
                   dateDeCreation: new Date(dossier.dateDeCreation),

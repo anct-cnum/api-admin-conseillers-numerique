@@ -5,10 +5,15 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
+import {
+  getTypeDossierDemarcheSimplifiee,
+  getUrlDossierConventionnement,
+} from '../../structures/repository/reconventionnement.repository';
 
 const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
+    const demarcheSimplifiee = app.get('demarche_simplifiee');
 
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
@@ -73,6 +78,9 @@ const getMiseEnRelation =
         res.status(404).json({ message: 'Candidat non trouvé' });
         return;
       }
+      const typeStructure = getTypeDossierDemarcheSimplifiee(
+        structure.insee.entreprise.forme_juridique,
+      );
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -84,6 +92,11 @@ const getMiseEnRelation =
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
+        urlDossierConventionnement: getUrlDossierConventionnement(
+          structure.idPG,
+          typeStructure.type,
+          demarcheSimplifiee,
+        ),
       };
       delete candidatFormat.idConseiller;
       delete candidatFormat.statut;
