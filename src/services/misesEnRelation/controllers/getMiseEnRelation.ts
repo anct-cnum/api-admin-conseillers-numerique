@@ -79,7 +79,7 @@ const getMiseEnRelation =
         return;
       }
       const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure.insee.entreprise.forme_juridique,
+        structure?.insee?.entreprise?.forme_juridique,
       );
       const candidatFormat = {
         ...candidat[0],
