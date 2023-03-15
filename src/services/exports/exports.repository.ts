@@ -737,7 +737,7 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
 };
 
 const generateCsvHistoriqueDossiersConvention = async (
-  structures: IStructures[],
+  structures: any[],
   res: Response,
 ) => {
   try {
@@ -749,10 +749,6 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Nombre de postes',
       'Type de la demande',
     ];
-    const dossierDemarcheSimplifiee = (structure) =>
-      structure?.statutConventionnement === 'CONVENTIONNEMENT_VALIDER'
-        ? structure?.dossierConventionnement
-        : structure?.dossierReconventionnement;
 
     res.write(
       [
@@ -761,12 +757,10 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure._id,
             structure.nom,
-            dossierDemarcheSimplifiee(structure).dateDeCreation,
-            dossierDemarcheSimplifiee(structure).dateFinProchainContrat,
-            dossierDemarcheSimplifiee(structure).nbPostesAttribuees,
-            structure.statutConventionnement === 'CONVENTIONNEMENT_VALIDER'
-              ? 'Conventionnement'
-              : 'Reconventionnement',
+            formatDate(structure?.conventionnement?.dateDeCreation),
+            formatDate(structure?.conventionnement?.dateFinProchainContrat),
+            structure?.conventionnement?.nbPostesAttribuees ?? 'Non renseigné',
+            structure?.conventionnement?.statut,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

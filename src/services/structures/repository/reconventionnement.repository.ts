@@ -127,23 +127,6 @@ const queryGetDossierReconventionnement = gql`
   }
 `;
 
-const queryGetDemarcheReconventionnementWithoutAttributDossier = gql`
-  query getDemarche($demarcheNumber: Int!, $state: DossierState) {
-    demarche(number: $demarcheNumber) {
-      id
-      dossiers(state: $state) {
-        nodes {
-          ...DossierFragment
-        }
-      }
-    }
-  }
-
-  fragment DossierFragment on Dossier {
-    id
-  }
-`;
-
 const getTypeDossierDemarcheSimplifiee = (formJuridique: string) =>
   categoriesCorrespondances.find((categorieCorrespondance) => {
     if (categorieCorrespondance.categorie.includes(formJuridique)) {
@@ -197,15 +180,15 @@ const getUrlDossierConventionnement = (
 const filterStatut = (typeConvention: string) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      statutConventionnement: 'RECONVENTIONNEMENT_EN_COURS',
+      'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
     };
   }
   if (typeConvention === 'conventionnement') {
-    return { statutConventionnement: 'CONVENTIONNEMENT_EN_COURS' };
+    return { 'conventionnement.statut': 'CONVENTIONNEMENT_EN_COURS' };
   }
 
   return {
-    statutConventionnement: {
+    'conventionnement.statut': {
       $in: ['RECONVENTIONNEMENT_EN_COURS', 'CONVENTIONNEMENT_EN_COURS'],
     },
   };
@@ -214,24 +197,18 @@ const filterStatut = (typeConvention: string) => {
 const filterStatutHistorique = (typeConvention: string) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      statutConventionnement: 'RECONVENTIONNEMENT_VALIDÉ',
+      'conventionnement.statut': 'RECONVENTIONNEMENT_VALIDÉ',
     };
   }
   if (typeConvention === 'conventionnement') {
     return {
-      statutConventionnement: {
-        $in: ['CONVENTIONNEMENT_VALIDÉ', 'RECONVENTIONNEMENT_EN_COURS'],
-      },
+      'conventionnement.statut': 'CONVENTIONNEMENT_VALIDÉ',
     };
   }
 
   return {
-    statutConventionnement: {
-      $in: [
-        'RECONVENTIONNEMENT_VALIDÉ',
-        'CONVENTIONNEMENT_VALIDÉ',
-        'RECONVENTIONNEMENT_EN_COURS',
-      ],
+    'conventionnement.statut': {
+      $in: ['RECONVENTIONNEMENT_VALIDÉ', 'CONVENTIONNEMENT_VALIDÉ'],
     },
   };
 };
@@ -243,8 +220,8 @@ const filterDateDemandeHistorique = (
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      statutConventionnement: 'RECONVENTIONNEMENT_VALIDÉ',
-      'dossierReconventionnement.dateDeCreation': {
+      'conventionnement.statut': 'RECONVENTIONNEMENT_VALIDÉ',
+      'conventionnement.dossierReconventionnement.dateDeValidation': {
         $gt: dateDebut,
         $lt: dateFin,
       },
@@ -252,33 +229,29 @@ const filterDateDemandeHistorique = (
   }
   if (typeConvention === 'conventionnement') {
     return {
-      statutConventionnement: {
-        $in: ['CONVENTIONNEMENT_VALIDÉ', 'RECONVENTIONNEMENT_EN_COURS'],
+      'conventionnement.statut': 'CONVENTIONNEMENT_VALIDÉ',
+      'conventionnement.dossierConventionnement.dateDeValidation': {
+        $gt: dateDebut,
+        $lt: dateFin,
       },
-      // 'dossierConventionnement.dateDeCreation': {
-      //   $gt: dateDebut,
-      //   $lt: dateFin,
-      // },
     };
   }
 
   return {
     $or: [
       {
-        statutConventionnement: 'RECONVENTIONNEMENT_VALIDÉ',
-        'dossierReconventionnement.dateDeCreation': {
+        'conventionnement.statut': 'RECONVENTIONNEMENT_VALIDÉ',
+        'conventionnement.dossierReconventionnement.dateDeValidation': {
           $gt: dateDebut,
           $lt: dateFin,
         },
       },
       {
-        statutConventionnement: {
-          $in: ['CONVENTIONNEMENT_VALIDÉ', 'RECONVENTIONNEMENT_EN_COURS'],
+        'conventionnement.statut': 'CONVENTIONNEMENT_VALIDÉ',
+        'conventionnement.dossierConventionnement.dateDeValidation': {
+          $gt: dateDebut,
+          $lt: dateFin,
         },
-        // 'dossierConventionnement.dateDeCreation': {
-        //   $gt: dateDebut,
-        //   $lt: dateFin,
-        // },
       },
     ],
   };
@@ -287,7 +260,6 @@ const filterDateDemandeHistorique = (
 export {
   queryGetDemarcheReconventionnement,
   queryGetDossierReconventionnement,
-  queryGetDemarcheReconventionnementWithoutAttributDossier,
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierReconventionnement,
   getUrlDossierConventionnement,

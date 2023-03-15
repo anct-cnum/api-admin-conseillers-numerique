@@ -77,9 +77,7 @@ const getDetailStructureWithConseillers =
           nom: 1,
           coselec: 1,
           contact: 1,
-          dossierReconventionnement: 1,
-          dossierConventionnement: 1,
-          statutConventionnement: 1,
+          conventionnement: 1,
           nombreConseillersSouhaites: 1,
           'insee.entreprise.forme_juridique': 1,
           conseillers: '$conseillers',
@@ -106,6 +104,7 @@ const miseEnRelationConseillerStructure =
           'conseillerObj.idPG': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,
+          reconventionnement: 1,
         },
       },
     ]);
@@ -139,7 +138,9 @@ const getDetailDossierReconventionnement =
         return;
       }
 
-      if (structure[0].conseillers.length > 0) {
+      if (
+        structure[0].conventionnement.statut.match(/\bRECONVENTIONNEMENT\B/)
+      ) {
         const checkAccessMiseEnRelation =
           await checkAccessReadRequestMisesEnRelation(app, req);
         structure[0].conseillers = await miseEnRelationConseillerStructure(
@@ -149,7 +150,7 @@ const getDetailDossierReconventionnement =
           idStructure,
           structure[0].conseillers.map((conseiller) => conseiller._id),
         );
-        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].dossierReconventionnement.numero}`;
+        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].conventionnement.dossierReconventionnement.numero}`;
         structure[0].nombreConseillersCoselec = getCoselec(
           structure[0],
         ).nombreConseillersCoselec;
@@ -164,8 +165,12 @@ const getDetailDossierReconventionnement =
             return item;
           }),
         );
+        structure[0].conseillersRenouveller = structure[0].conseillers.filter(
+          (conseiller) =>
+            conseiller.reconventionnement === 'RECONVENTIONNEMENT_EN_COURS',
+        );
       } else {
-        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_conventionnement}/dossiers/${structure[0].dossierConventionnement.numero}`;
+        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_conventionnement}/dossiers/${structure[0].conventionnement.dossierConventionnement.numero}`;
       }
 
       res.status(200).json(structure[0]);

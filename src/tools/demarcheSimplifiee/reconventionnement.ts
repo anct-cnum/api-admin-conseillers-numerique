@@ -230,35 +230,32 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               idPG: dossier.idPG,
               $or: [
                 {
-                  'dossierReconventionnement.dateDernierModification': {
-                    $gt: new Date(dossier.dateDerniereModification),
-                  },
+                  'conventionnement.dossierReconventionnement.dateDernierModification':
+                    {
+                      $gt: new Date(dossier.dateDerniereModification),
+                    },
                 },
                 {
-                  'dossierReconventionnement.dateDernierModification': {
-                    $exists: false,
-                  },
+                  'conventionnement.dossierReconventionnement.dateDernierModification':
+                    {
+                      $exists: false,
+                    },
                 },
               ],
             },
             {
-              $set: {
-                statutConventionnement: 'RECONVENTIONNEMENT_EN_COURS',
-                dossierReconventionnement: {
-                  numero: dossier._id,
-                  dateDeCreation: new Date(dossier.dateDeCreation),
-                  dateFinProchainContrat: dossier.dateFinProchainContrat
-                    ? new Date(dossier.dateFinProchainContrat)
-                    : null,
-                  nbPostesAttribuees: dossier.nbPostesAttribuees,
-                  statut: dossier.statut,
-                  dateDernierModification: new Date(
-                    dossier.dateDerniereModification,
-                  ),
-                },
-              },
-              $unset: {
-                dossierDemarcheSimplifiee: '',
+              'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
+              'conventionnement.dossierReconventionnement': {
+                numero: dossier._id,
+                dateDeCreation: new Date(dossier.dateDeCreation),
+                dateFinProchainContrat: dossier.dateFinProchainContrat
+                  ? new Date(dossier.dateFinProchainContrat)
+                  : null,
+                nbPostesAttribuees: dossier.nbPostesAttribuees,
+                statut: dossier.statut,
+                dateDernierModification: new Date(
+                  dossier.dateDerniereModification,
+                ),
               },
             },
           );

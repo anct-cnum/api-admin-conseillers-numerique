@@ -38,9 +38,7 @@ const getStructures =
           idPG: 1,
           nombreConseillersSouhaites: 1,
           statut: 1,
-          dossierReconventionnement: 1,
-          dossierConventionnement: 1,
-          statutConventionnement: 1,
+          conventionnement: 1,
         },
       },
       { $sort: { idPG: 1 } },
@@ -97,13 +95,13 @@ const getDossiersReconventionnement =
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
-          statutConventionnement: 'RECONVENTIONNEMENT_EN_COURS',
+          'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
         });
       items.totalParConvention.conventionnement = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
-          statutConventionnement: 'CONVENTIONNEMENT_EN_COURS',
+          'conventionnement.statut': 'CONVENTIONNEMENT_EN_COURS',
         });
       items.totalParConvention.total =
         items.totalParConvention.conventionnement +

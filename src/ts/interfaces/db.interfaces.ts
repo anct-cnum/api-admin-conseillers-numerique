@@ -308,20 +308,22 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
-  statutConventionnement: string;
-  dossierReconventionnement: {
-    numero: number;
-    dateDeCreation: Date;
-    dateFinProchainContrat: Date;
-    nbPostesAttribuees: number;
+  conventionnement: {
     statut: string;
-    dateDernierModification: Date;
-  };
-  dossierConventionnement: {
-    numero: number;
-    dateDeCreation: Date;
-    statut: string;
-    dateDernierModification: Date;
+    dossierReconventionnement: {
+      numero: number;
+      dateDeCreation: Date;
+      dateFinProchainContrat: Date;
+      nbPostesAttribuees: number;
+      statut: string;
+      dateDernierModification: Date;
+    };
+    dossierConventionnement: {
+      numero: number;
+      dateDeCreation: Date;
+      statut: string;
+      dateDernierModification: Date;
+    };
   };
 }
 
