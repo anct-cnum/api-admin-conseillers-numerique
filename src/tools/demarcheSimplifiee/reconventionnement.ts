@@ -82,7 +82,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       arrayHasNextPage[2] =
         demarcheEntrepriseEss.demarche.dossiers.pageInfo.hasNextPage;
     }
-  } while (arrayHasNextPage.some((x) => x === true));
+  } while (arrayHasNextPage.some((hasNextPage) => hasNextPage === true));
 
   const dossierStructurePublique = await Promise.all(
     dossiersStructurePubliqueBrut.map((dossier) => {
