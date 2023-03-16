@@ -2,11 +2,13 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validReconventionnement } from '../../../schemas/reconventionnement.schemas';
-import { filterStatut } from '../repository/reconventionnement.repository';
+import {
+  filterStatut,
+  totalParConvention,
+} from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
 
 const getTotalStructures =
   (app: Application, checkAccess) => async (typeConvention: string) =>
@@ -90,22 +92,12 @@ const getDossiersReconventionnement =
         type,
       );
       const totalStructures = await getTotalStructures(app, checkAccess)(type);
-      items.total = totalStructures[0]?.count_structures;
-      items.totalParConvention.reconventionnement = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({
-          'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
-        });
-      items.totalParConvention.conventionnement = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({
-          'conventionnement.statut': 'CONVENTIONNEMENT_EN_COURS',
-        });
-      items.totalParConvention.total =
-        items.totalParConvention.conventionnement +
-        items.totalParConvention.reconventionnement;
+      items.total = totalStructures[0]?.count_structures ?? 0;
+      const totalConvention = await totalParConvention(app, req);
+      items.totalParConvention = {
+        ...items.totalParConvention,
+        ...totalConvention,
+      };
       items.data = structures;
       items.limit = options.paginate.default;
       items.skip = page;

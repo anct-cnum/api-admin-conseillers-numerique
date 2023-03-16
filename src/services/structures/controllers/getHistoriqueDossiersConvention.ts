@@ -5,11 +5,11 @@ import { validHistoriqueConvention } from '../../../schemas/reconventionnement.s
 import {
   filterDateDemandeHistorique,
   filterStatutHistorique,
+  totalParConvention,
 } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -115,23 +115,12 @@ const getHistoriqueDossiersConvention =
         dateDebut,
         dateFin,
       );
-      items.total = totalStructures[0]?.count_structures;
-      items.totalParConvention.reconventionnement = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({
-          'conventionnement.statutConventionnement':
-            'RECONVENTIONNEMENT_VALIDÉ',
-        });
-      items.totalParConvention.conventionnement = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({
-          'conventionnement.statutConventionnement': 'CONVENTIONNEMENT_VALIDÉ',
-        });
-      items.totalParConvention.total =
-        items.totalParConvention.conventionnement +
-        items.totalParConvention.reconventionnement;
+      items.total = totalStructures[0]?.count_structures ?? 0;
+      const totalConvention = await totalParConvention(app, req);
+      items.totalParConvention = {
+        ...items.totalParConvention,
+        ...totalConvention,
+      };
       items.data = structures;
       items.limit = options.paginate.default;
       items.skip = page;

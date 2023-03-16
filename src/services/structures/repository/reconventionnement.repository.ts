@@ -1,5 +1,9 @@
+import { Application } from '@feathersjs/express';
 import { gql } from 'graphql-request';
+import { action } from '../../../helpers/accessControl/accessList';
+import service from '../../../helpers/services';
 import TypeDossierReconventionnement from '../../../ts/enum';
+import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -222,8 +226,8 @@ const filterDateDemandeHistorique = (
     return {
       'conventionnement.statut': 'RECONVENTIONNEMENT_VALIDÉ',
       'conventionnement.dossierReconventionnement.dateDeValidation': {
-        $gt: dateDebut,
-        $lt: dateFin,
+        $gte: dateDebut,
+        $lte: dateFin,
       },
     };
   }
@@ -231,8 +235,8 @@ const filterDateDemandeHistorique = (
     return {
       'conventionnement.statut': 'CONVENTIONNEMENT_VALIDÉ',
       'conventionnement.dossierConventionnement.dateDeValidation': {
-        $gt: dateDebut,
-        $lt: dateFin,
+        $gte: dateDebut,
+        $lte: dateFin,
       },
     };
   }
@@ -242,18 +246,40 @@ const filterDateDemandeHistorique = (
       {
         'conventionnement.statut': 'RECONVENTIONNEMENT_VALIDÉ',
         'conventionnement.dossierReconventionnement.dateDeValidation': {
-          $gt: dateDebut,
-          $lt: dateFin,
+          $gte: dateDebut,
+          $lte: dateFin,
         },
       },
       {
         'conventionnement.statut': 'CONVENTIONNEMENT_VALIDÉ',
         'conventionnement.dossierConventionnement.dateDeValidation': {
-          $gt: dateDebut,
-          $lt: dateFin,
+          $gte: dateDebut,
+          $lte: dateFin,
         },
       },
     ],
+  };
+};
+
+const totalParConvention = async (app: Application, req: IRequest) => {
+  const reconventionnement = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
+    });
+  const conventionnement = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'conventionnement.statut': 'CONVENTIONNEMENT_EN_COURS',
+    });
+  const total = conventionnement + reconventionnement;
+
+  return {
+    conventionnement,
+    reconventionnement,
+    total,
   };
 };
 
@@ -266,4 +292,5 @@ export {
   filterStatut,
   filterStatutHistorique,
   filterDateDemandeHistorique,
+  totalParConvention,
 };

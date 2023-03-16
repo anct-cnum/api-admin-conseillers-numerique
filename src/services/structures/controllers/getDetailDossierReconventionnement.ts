@@ -129,7 +129,7 @@ const getDetailDossierReconventionnement =
       }
 
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure[0].insee.entreprise.forme_juridique,
+        structure[0]?.insee?.entreprise?.forme_juridique,
       );
       if (typeDossierDs === null) {
         res.status(500).json({
@@ -139,7 +139,7 @@ const getDetailDossierReconventionnement =
       }
 
       if (
-        structure[0].conventionnement.statut.match(/\bRECONVENTIONNEMENT\B/)
+        structure[0]?.conventionnement?.statut.match(/\bRECONVENTIONNEMENT\B/)
       ) {
         const checkAccessMiseEnRelation =
           await checkAccessReadRequestMisesEnRelation(app, req);
@@ -148,7 +148,7 @@ const getDetailDossierReconventionnement =
           checkAccessMiseEnRelation,
         )(
           idStructure,
-          structure[0].conseillers.map((conseiller) => conseiller._id),
+          structure[0]?.conseillers?.map((conseiller) => conseiller._id),
         );
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].conventionnement.dossierReconventionnement.numero}`;
         structure[0].nombreConseillersCoselec = getCoselec(
@@ -165,7 +165,7 @@ const getDetailDossierReconventionnement =
             return item;
           }),
         );
-        structure[0].conseillersRenouveller = structure[0].conseillers.filter(
+        structure[0].conseillersRenouveller = structure[0]?.conseillers?.filter(
           (conseiller) =>
             conseiller.reconventionnement === 'RECONVENTIONNEMENT_EN_COURS',
         );
