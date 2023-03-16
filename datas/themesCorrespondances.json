@@ -59,6 +59,10 @@
     "correspondance": "Santé"
   },
   {
+    "nom": "espace-sante",
+    "correspondance": "Mon espace sant&eacute;"
+  },
+  {
     "nom": "budget",
     "correspondance": "Budget"
   },
