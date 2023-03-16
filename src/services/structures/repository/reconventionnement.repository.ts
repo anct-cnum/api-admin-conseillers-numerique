@@ -261,18 +261,22 @@ const filterDateDemandeHistorique = (
   };
 };
 
-const totalParConvention = async (app: Application, req: IRequest) => {
+const totalParConvention = async (
+  app: Application,
+  req: IRequest,
+  statut: string,
+) => {
   const reconventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
+      'conventionnement.statut': `RECONVENTIONNEMENT_${statut}`,
     });
   const conventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': 'CONVENTIONNEMENT_EN_COURS',
+      'conventionnement.statut': `CONVENTIONNEMENT_${statut}`,
     });
   const total = conventionnement + reconventionnement;
 

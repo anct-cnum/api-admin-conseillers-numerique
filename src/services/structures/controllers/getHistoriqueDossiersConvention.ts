@@ -116,7 +116,7 @@ const getHistoriqueDossiersConvention =
         dateFin,
       );
       items.total = totalStructures[0]?.count_structures ?? 0;
-      const totalConvention = await totalParConvention(app, req);
+      const totalConvention = await totalParConvention(app, req, 'VALIDÉ');
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,
