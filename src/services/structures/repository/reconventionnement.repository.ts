@@ -3,7 +3,10 @@ import { gql } from 'graphql-request';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import TypeDossierReconventionnement from '../../../ts/enum';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -142,11 +145,7 @@ const getTypeDossierDemarcheSimplifiee = (formJuridique: string) =>
 const getUrlDossierReconventionnement = (
   idPG: number,
   type: string,
-  demarcheSimplifiee: {
-    url_association_reconventionnement: string;
-    url_entreprise_reconventionnement: string;
-    url_structure_publique_reconventionnement: string;
-  },
+  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
   switch (type) {
     case TypeDossierReconventionnement.Association:
@@ -163,11 +162,7 @@ const getUrlDossierReconventionnement = (
 const getUrlDossierConventionnement = (
   idPG: number,
   type: string,
-  demarcheSimplifiee: {
-    url_association_conventionnement: string;
-    url_entreprise_conventionnement: string;
-    url_structure_publique_conventionnement: string;
-  },
+  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
   switch (type) {
     case TypeDossierReconventionnement.Association:

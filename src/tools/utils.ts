@@ -12,6 +12,7 @@ import channels from '../channels';
 import authentication from '../authentication';
 import mongoose from '../mongoose';
 import createMailer from '../mailer';
+import { IConfigurationDemarcheSimplifiee } from '../ts/interfaces/global.interfaces';
 
 const config = configuration();
 const f = feathers();
@@ -66,7 +67,9 @@ const execute = async (name: string, job: any) => {
 
   const mailer = createMailer(app);
 
-  const demarcheSimplifiee = app.get('demarche_simplifiee');
+  const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+    'demarche_simplifiee',
+  );
 
   const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
     headers: {
