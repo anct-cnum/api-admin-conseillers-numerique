@@ -16,6 +16,8 @@ const getExportHistoriqueDossiersConventionCsv =
     const { type } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     const pageValidation = validExportHistoriqueConvention.validate({
       type,
       dateDebut,

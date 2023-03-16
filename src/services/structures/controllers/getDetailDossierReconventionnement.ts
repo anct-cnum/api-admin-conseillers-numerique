@@ -101,6 +101,10 @@ const getDetailDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     try {
+      if (!ObjectId.isValid(idStructure)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const checkAccessStructures = await checkAccessReadRequestStructures(
         app,
         req,

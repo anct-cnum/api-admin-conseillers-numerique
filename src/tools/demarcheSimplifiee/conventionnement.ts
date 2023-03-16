@@ -177,6 +177,13 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           .Model.updateOne(
             {
               idPG: dossier.idPG,
+              statut: 'VALIDATION_COSELEC',
+              'conventionnement.statut': {
+                $nin: [
+                  'CONVENTIONNEMENT_VALIDÉ',
+                  'RECONVENTIONNEMENT_EN_COURS',
+                ],
+              },
               $or: [
                 {
                   'conventionnement.dossierConventionnement.dateDernierModification':
