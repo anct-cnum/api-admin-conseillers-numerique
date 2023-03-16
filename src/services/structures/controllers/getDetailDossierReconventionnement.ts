@@ -40,18 +40,6 @@ const getDetailStructureWithConseillers =
                   },
                   {
                     $and: [
-                      {
-                        $expr: { $eq: ['$$idStructure', '$structureId'] },
-                      },
-                      {
-                        $expr: {
-                          $eq: ['RUPTURE', '$statut'],
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    $and: [
                       { ruptures: { $exists: true } },
                       {
                         $expr: {
