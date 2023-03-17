@@ -125,7 +125,7 @@ const getDetailDossierReconventionnement =
       );
       if (typeDossierDs === null) {
         res.status(500).json({
-          message: 'Erreur lors de la récupération du numéro de la démarche',
+          message: 'Erreur lors de la récupération du type de la structure',
         });
         return;
       }
@@ -143,9 +143,6 @@ const getDetailDossierReconventionnement =
           structure[0]?.conseillers?.map((conseiller) => conseiller._id),
         );
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].conventionnement.dossierReconventionnement.numero}`;
-        structure[0].nombreConseillersCoselec = getCoselec(
-          structure[0],
-        ).nombreConseillersCoselec;
         structure[0].conseillers = await Promise.all(
           structure[0].conseillers.map(async (conseiller) => {
             const item = { ...conseiller };
@@ -164,6 +161,9 @@ const getDetailDossierReconventionnement =
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_conventionnement}/dossiers/${structure[0].conventionnement.dossierConventionnement.numero}`;
       }
+      structure[0].nombreConseillersCoselec = getCoselec(
+        structure[0],
+      )?.nombreConseillersCoselec;
 
       res.status(200).json(structure[0]);
       return;

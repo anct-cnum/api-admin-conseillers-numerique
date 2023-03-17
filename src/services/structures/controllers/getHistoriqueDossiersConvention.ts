@@ -10,6 +10,7 @@ import {
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { getCoselec } from '../../../utils';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -49,6 +50,7 @@ const getStructures =
           nom: 1,
           idPG: 1,
           nombreConseillersSouhaites: 1,
+          coselec: 1,
           statut: 1,
           conventionnement: 1,
         },
@@ -80,7 +82,7 @@ const getHistoriqueDossiersConvention =
       }
       const items: {
         total: number;
-        data: object;
+        data: IStructures[];
         totalParConvention: {
           reconventionnement: number;
           conventionnement: number;
@@ -105,7 +107,7 @@ const getHistoriqueDossiersConvention =
       };
 
       const checkAccess = await checkAccessReadRequestStructures(app, req);
-      const structures: IStructures = await getStructures(app, checkAccess)(
+      const structures = await getStructures(app, checkAccess)(
         page,
         options.paginate.default,
         type,
@@ -123,7 +125,14 @@ const getHistoriqueDossiersConvention =
         ...items.totalParConvention,
         ...totalConvention,
       };
-      items.data = structures;
+      items.data = structures.map((structure) => {
+        const item = { ...structure };
+        if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
+          item.nombreConseillersCoselec =
+            getCoselec(structure)?.nombreConseillersCoselec;
+        }
+        return item;
+      });
       items.limit = options.paginate.default;
       items.skip = page;
 
