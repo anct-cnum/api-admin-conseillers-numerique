@@ -82,19 +82,19 @@ export default class Structures extends Service {
       getStructuresMisesEnRelationsStats(app),
     );
     app.get(
-      '/reconventionnements/',
+      '/conventions/',
       authenticateMode(app),
       createAbilities(app),
       getDossiersConvention(app, options),
     );
     app.get(
-      '/historique/reconventionnements/',
+      '/historique/conventions/',
       authenticateMode(app),
       createAbilities(app),
       getHistoriqueDossiersConvention(app, options),
     );
     app.get(
-      '/reconventionnement/:id',
+      '/convention/:id',
       authenticateMode(app),
       createAbilities(app),
       getDetailDossierConvention(app),
