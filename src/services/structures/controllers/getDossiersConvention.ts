@@ -50,7 +50,7 @@ const getStructures =
       { $limit: Number(limit) },
     ]);
 
-const getDossiersReconventionnement =
+const getDossiersConvention =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const { page, type } = req.query;
     try {
@@ -113,4 +113,4 @@ const getDossiersReconventionnement =
     }
   };
 
-export default getDossiersReconventionnement;
+export default getDossiersConvention;

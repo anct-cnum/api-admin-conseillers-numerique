@@ -129,7 +129,7 @@ const getHistoriqueDossiersConvention =
         const item = { ...structure };
         if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
           item.nombreConseillersCoselec =
-            getCoselec(structure)?.nombreConseillersCoselec;
+            getCoselec(structure)?.nombreConseillersCoselec ?? 0;
         }
         return item;
       });

@@ -10,8 +10,8 @@ import {
   updateSiretStructure,
   updateStructure,
   verifySiretStructure,
-  getDossiersReconventionnement,
-  getDetailDossierReconventionnement,
+  getDossiersConvention,
+  getDetailDossierConvention,
   getHistoriqueDossiersConvention,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
@@ -85,7 +85,7 @@ export default class Structures extends Service {
       '/reconventionnements/',
       authenticateMode(app),
       createAbilities(app),
-      getDossiersReconventionnement(app, options),
+      getDossiersConvention(app, options),
     );
     app.get(
       '/historique/reconventionnements/',
@@ -97,7 +97,7 @@ export default class Structures extends Service {
       '/reconventionnement/:id',
       authenticateMode(app),
       createAbilities(app),
-      getDetailDossierReconventionnement(app),
+      getDetailDossierConvention(app),
     );
   }
 }

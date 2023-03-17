@@ -97,7 +97,7 @@ const miseEnRelationConseillerStructure =
       },
     ]);
 
-const getDetailDossierReconventionnement =
+const getDetailDossierConvention =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     try {
@@ -161,9 +161,8 @@ const getDetailDossierReconventionnement =
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_conventionnement}/dossiers/${structure[0].conventionnement.dossierConventionnement.numero}`;
       }
-      structure[0].nombreConseillersCoselec = getCoselec(
-        structure[0],
-      )?.nombreConseillersCoselec;
+      structure[0].nombreConseillersCoselec =
+        getCoselec(structure[0])?.nombreConseillersCoselec ?? 0;
 
       res.status(200).json(structure[0]);
       return;
@@ -177,4 +176,4 @@ const getDetailDossierReconventionnement =
     }
   };
 
-export default getDetailDossierReconventionnement;
+export default getDetailDossierConvention;
