@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
+// eslint-disable-next-line import/no-unresolved
 import { GraphQLClient } from 'graphql-request';
 import {
   IReconventionnementDS,
