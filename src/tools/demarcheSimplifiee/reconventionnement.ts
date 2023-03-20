@@ -103,12 +103,10 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           ?.integerNumber,
         10,
       );
-      item.nbPostesAttribuees = Math.abs(
-        parseInt(
-          champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyMw==')
-            ?.integerNumber,
-          10,
-        ),
+      item.nbPostesAttribuees = parseInt(
+        champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyMw==')
+          ?.integerNumber,
+        10,
       );
       if (item.nbPostesAttribuees > 1) {
         item.dateFinProchainContrat = champs.find(
@@ -144,12 +142,10 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           ?.integerNumber,
         10,
       );
-      item.nbPostesAttribuees = Math.abs(
-        parseInt(
-          champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1Mg==')
-            ?.integerNumber,
-          10,
-        ),
+      item.nbPostesAttribuees = parseInt(
+        champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1Mg==')
+          ?.integerNumber,
+        10,
       );
       if (item.nbPostesAttribuees > 1) {
         item.dateFinProchainContrat = champs.find(
@@ -185,12 +181,10 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           ?.integerNumber,
         10,
       );
-      item.nbPostesAttribuees = Math.abs(
-        parseInt(
-          champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg3MzQ4Mw==')
-            ?.integerNumber,
-          10,
-        ),
+      item.nbPostesAttribuees = parseInt(
+        champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg3MzQ4Mw==')
+          ?.integerNumber,
+        10,
       );
       if (item.nbPostesAttribuees > 1) {
         item.dateFinProchainContrat = champs.find(
