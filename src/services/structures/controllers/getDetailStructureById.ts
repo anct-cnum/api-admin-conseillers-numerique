@@ -131,7 +131,7 @@ const getDetailStructureById =
           idPG: conseiller?.conseillerObj?.idPG,
           nom: conseiller?.conseillerObj?.nom,
           prenom: conseiller?.conseillerObj?.prenom,
-          id: conseiller?.conseillerObj?._id,
+          _id: conseiller?.conseillerObj?._id,
           statut: conseiller?.statut,
         };
       });

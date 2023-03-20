@@ -32,6 +32,12 @@ const checkAccessReadRequestStructures = async (
 
 const filterNomStructure = (nom: string) => {
   const formatNom = nom?.trim();
+  if (/^[0-9]{14}$/.test(formatNom)) {
+    return { siret: { $eq: nom } };
+  }
+  if (/^[a-zA-Z0-9-._]+@[a-zA-Z0-9-._]{2,}[.][a-zA-Z]{2,3}$/i.test(formatNom)) {
+    return { 'contact.email': { $eq: nom } };
+  }
   if (/^\d+$/.test(formatNom)) {
     return { idPG: { $eq: parseInt(nom, 10) } };
   }
