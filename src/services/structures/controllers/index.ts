@@ -8,6 +8,7 @@ import updateEmailStructure from './updateEmailStructure';
 import preSelectionnerCandidat from './preSelectionnerCandidat';
 import getDossiersReconventionnement from './getDossiersReconventionnement';
 import getDetailDossierReconventionnement from './getDetailDossierReconventionnement';
+import updateDossierReconventionnement from './updateDossierReconventionnement';
 
 export {
   getStructures,
@@ -20,4 +21,5 @@ export {
   preSelectionnerCandidat,
   getDossiersReconventionnement,
   getDetailDossierReconventionnement,
+  updateDossierReconventionnement,
 };

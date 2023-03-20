@@ -89,6 +89,8 @@ export interface IMisesEnRelation {
   resendMailCnfsRupture: boolean | undefined;
 
   dossierIncompletRupture: boolean | undefined;
+
+  reconventionnement: string;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -308,6 +310,8 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  dossierDemarcheSimplifiee: object;
+  conventionnement: object;
 }
 
 interface IEtablissement {

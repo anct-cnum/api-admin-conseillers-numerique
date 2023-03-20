@@ -29,6 +29,8 @@ export default function (app: Application): Model<any> {
       conseillerObj: { type: Object },
 
       structureObj: { type: Object },
+
+      reconventionnement: { type: String },
     },
     {
       strict: false,

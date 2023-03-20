@@ -12,6 +12,7 @@ import {
   verifySiretStructure,
   getDossiersReconventionnement,
   getDetailDossierReconventionnement,
+  updateDossierReconventionnement,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -91,6 +92,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getDetailDossierReconventionnement(app),
+    );
+    app.patch(
+      '/reconventionnement',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDossierReconventionnement(app),
     );
   }
 }
