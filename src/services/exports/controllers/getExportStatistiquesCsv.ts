@@ -15,15 +15,13 @@ import { validStatCsv } from '../../../schemas/stats.schemas';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let {
-      idType,
+    let { idType, nom, conseillerIds } = req.query;
+    const {
       codePostal,
       ville,
-      nom,
-      prenom,
       codeRegion,
+      prenom,
       numeroDepartement,
-      conseillerIds,
       structureIds,
     } = req.query;
     const { type } = req.query;
@@ -31,16 +29,6 @@ const getExportStatistiquesCsv =
     dateDebut.setUTCHours(0, 0, 0, 0);
     const dateFin = new Date(String(req.query.dateFin));
     dateFin.setUTCHours(23, 59, 59, 59);
-    idType = idType === 'undefined' ? '' : idType;
-    codePostal = codePostal === 'undefined' ? '' : codePostal;
-    ville = ville === 'undefined' ? '' : ville;
-    nom = nom === 'undefined' ? '' : nom;
-    prenom = prenom === 'undefined' ? '' : prenom;
-    codeRegion = codeRegion === 'undefined' ? '' : codeRegion;
-    numeroDepartement =
-      numeroDepartement === 'undefined' ? '' : numeroDepartement;
-    conseillerIds = conseillerIds === 'undefined' ? [] : conseillerIds;
-    structureIds = structureIds === 'undefined' ? [] : structureIds;
 
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
@@ -90,10 +78,10 @@ const getExportStatistiquesCsv =
             },
             'conseiller.$id': { $in: conseillerIds },
           };
-          if (codePostal !== '' && codePostal !== 'null') {
+          if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville !== '' && ville !== 'null') {
+          if (ville) {
             query['cra.nomCommune'] = ville;
           }
           statistiques = await getStatsGlobales(
@@ -118,10 +106,10 @@ const getExportStatistiquesCsv =
             },
             'conseiller.$id': { $eq: idConseiller },
           };
-          if (codePostal !== '' && codePostal !== 'null') {
+          if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville !== '' && ville !== 'null') {
+          if (ville) {
             query['cra.nomCommune'] = ville;
           }
           statistiques = await getStatsGlobales(

@@ -23,8 +23,12 @@ const getStatsNationalesGrandReseau =
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
       const { codePostal, ville, codeRegion, numeroDepartement } = req.query;
-      const structureIds = JSON.parse(req.query.structureIds);
-      const conseillerIds = JSON.parse(req.query.conseillerIds);
+      const structureIds = req.query.conseillerIds
+        ? JSON.parse(req.query.structureIds)
+        : [];
+      const conseillerIds = req.query.conseillerIds
+        ? JSON.parse(req.query.conseillerIds)
+        : [];
       if (!exportStats) {
         const statsValidation = validStatGrandReseau.validate({
           dateDebut,
@@ -50,12 +54,7 @@ const getStatsNationalesGrandReseau =
         },
       };
       // Si la requête contient un code région, on l'ajoute à la requête
-      if (
-        codeRegion !== '' &&
-        codeRegion !== undefined &&
-        codeRegion !== 'undefined' &&
-        codeRegion !== 'tous'
-      ) {
+      if (codeRegion && codeRegion !== 'tous') {
         const regionInfos = codesRegions.find(
           (region: ICodeRegion) => codeRegion === region.code,
         );
@@ -80,12 +79,7 @@ const getStatsNationalesGrandReseau =
         }
       }
       // Si la requête contient un numéro de département, on l'ajoute à la requête
-      if (
-        numeroDepartement !== '' &&
-        numeroDepartement !== undefined &&
-        numeroDepartement !== 'undefined' &&
-        numeroDepartement !== 'tous'
-      ) {
+      if (numeroDepartement && numeroDepartement !== 'tous') {
         // Si le numéro de département est la Corse du Sud 2A, on ajoute les codes postaux de la Corse du Sud
         if (numeroDepartement === '2A') {
           query['cra.codePostal'] = { $regex: `^200.*|^201.*` };
@@ -111,12 +105,7 @@ const getStatsNationalesGrandReseau =
         };
       }
       // Si la requête contient une ville, on l'ajoute à la requête avec le code postal associé
-      if (
-        ville !== '' &&
-        ville !== undefined &&
-        ville !== 'undefined' &&
-        codePostal !== 'tous'
-      ) {
+      if (ville && ville !== 'tous' && codePostal && codePostal !== 'tous') {
         query['cra.codePostal'] = codePostal;
         query['cra.nomCommune'] = ville;
       }
