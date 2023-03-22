@@ -11,6 +11,7 @@ import {
 } from '../../cras/cras.repository';
 import service from '../../../helpers/services';
 import { getStatsNationalesGrandReseau } from '../../stats/controllers';
+import { validStatCsv } from '../../../schemas/stats.schemas';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -45,6 +46,23 @@ const getExportStatistiquesCsv =
     let idConseiller: ObjectId;
     let query: Object;
     let statistiques = {};
+    const statsValidation = validStatCsv.validate({
+      dateDebut,
+      dateFin,
+      codePostal,
+      ville,
+      codeRegion,
+      numeroDepartement,
+      nom,
+      prenom,
+      idType,
+      type,
+    });
+
+    if (statsValidation.error) {
+      res.status(400).json({ message: statsValidation.error.message });
+      return;
+    }
 
     try {
       switch (type) {

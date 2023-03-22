@@ -6,17 +6,28 @@ import { action } from '../../../helpers/accessControl/accessList';
 
 import getStatsGlobales from './getStatsGlobales';
 import { getConseillersIdsByStructure } from '../../cras/cras.repository';
+import { validStatStructure } from '../../../schemas/stats.schemas';
 
 const getStatsStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idStructure = new ObjectId(String(req.query?.idStructure));
+      const idStructure = String(req.query?.idStructure);
       const dateDebut = new Date(String(req.query.dateDebut));
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
-      const conseillerIds = await getConseillersIdsByStructure(
+      const statsValidation = validStatStructure.validate({
+        dateDebut,
+        dateFin,
         idStructure,
+      });
+
+      if (statsValidation.error) {
+        res.status(400).json({ message: statsValidation.error.message });
+        return;
+      }
+      const conseillerIds = await getConseillersIdsByStructure(
+        new ObjectId(idStructure),
         app,
       );
       const query = {

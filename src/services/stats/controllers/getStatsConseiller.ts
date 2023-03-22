@@ -4,22 +4,32 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from './getStatsGlobales';
+import { validStatConseiller } from '../../../schemas/stats.schemas';
 
 const getStatsConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idConseiller = new ObjectId(String(req.query?.idConseiller));
+      const idConseiller = String(req.query?.idConseiller);
       const dateDebut = new Date(String(req.query.dateDebut));
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
+      const statsValidation = validStatConseiller.validate({
+        dateDebut,
+        dateFin,
+        idConseiller,
+      });
 
+      if (statsValidation.error) {
+        res.status(400).json({ message: statsValidation.error.message });
+        return;
+      }
       const query = {
         'cra.dateAccompagnement': {
           $gte: dateDebut,
           $lte: dateFin,
         },
-        'conseiller.$id': { $eq: idConseiller },
+        'conseiller.$id': { $eq: new ObjectId(idConseiller) },
       };
 
       if (req.query?.codePostal !== '' && req.query?.codePostal !== 'null') {
