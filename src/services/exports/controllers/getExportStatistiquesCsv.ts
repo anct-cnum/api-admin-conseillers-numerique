@@ -14,7 +14,17 @@ import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let { idType, codePostal, ville, nom, prenom } = req.query;
+    let {
+      idType,
+      codePostal,
+      ville,
+      nom,
+      prenom,
+      codeRegion,
+      numeroDepartement,
+      conseillerIds,
+      structureIds,
+    } = req.query;
     const { type } = req.query;
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -25,9 +35,14 @@ const getExportStatistiquesCsv =
     ville = ville === 'undefined' ? '' : ville;
     nom = nom === 'undefined' ? '' : nom;
     prenom = prenom === 'undefined' ? '' : prenom;
+    codeRegion = codeRegion === 'undefined' ? '' : codeRegion;
+    numeroDepartement =
+      numeroDepartement === 'undefined' ? '' : numeroDepartement;
+    conseillerIds = conseillerIds === 'undefined' ? [] : conseillerIds;
+    structureIds = structureIds === 'undefined' ? [] : structureIds;
+
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
-    let conseillerIds: ObjectId[];
     let query: Object;
     let statistiques = {};
 
@@ -123,6 +138,15 @@ const getExportStatistiquesCsv =
           );
           break;
         case 'grandReseau':
+          req.query = {
+            dateDebut,
+            dateFin,
+            structureIds,
+            conseillerIds,
+            codeRegion,
+            numeroDepartement,
+            ville,
+          };
           statistiques = await getStatsNationalesGrandReseau(app, true)(
             req,
             res,

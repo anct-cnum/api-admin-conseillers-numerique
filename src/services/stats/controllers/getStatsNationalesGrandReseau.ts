@@ -37,6 +37,7 @@ const getStatsNationalesGrandReseau =
       // Si la requête contient un code région, on l'ajoute à la requête
       if (
         codeRegion !== '' &&
+        codeRegion !== undefined &&
         codeRegion !== 'undefined' &&
         codeRegion !== 'tous'
       ) {
@@ -66,6 +67,7 @@ const getStatsNationalesGrandReseau =
       // Si la requête contient un numéro de département, on l'ajoute à la requête
       if (
         numeroDepartement !== '' &&
+        numeroDepartement !== undefined &&
         numeroDepartement !== 'undefined' &&
         numeroDepartement !== 'tous'
       ) {
@@ -94,7 +96,12 @@ const getStatsNationalesGrandReseau =
         };
       }
       // Si la requête contient une ville, on l'ajoute à la requête avec le code postal associé
-      if (ville !== '' && ville !== 'undefined' && codePostal !== 'tous') {
+      if (
+        ville !== '' &&
+        ville !== undefined &&
+        ville !== 'undefined' &&
+        codePostal !== 'tous'
+      ) {
         query['cra.codePostal'] = codePostal;
         query['cra.nomCommune'] = ville;
       }
