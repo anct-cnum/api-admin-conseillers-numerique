@@ -54,7 +54,7 @@ const getStatsNationalesGrandReseau =
         },
       };
       // Si la requête contient un code région, on l'ajoute à la requête
-      if (codeRegion && codeRegion !== 'tous') {
+      if (codeRegion) {
         const regionInfos = codesRegions.find(
           (region: ICodeRegion) => codeRegion === region.code,
         );
@@ -79,7 +79,7 @@ const getStatsNationalesGrandReseau =
         }
       }
       // Si la requête contient un numéro de département, on l'ajoute à la requête
-      if (numeroDepartement && numeroDepartement !== 'tous') {
+      if (numeroDepartement) {
         // Si le numéro de département est la Corse du Sud 2A, on ajoute les codes postaux de la Corse du Sud
         if (numeroDepartement === '2A') {
           query['cra.codePostal'] = { $regex: `^200.*|^201.*` };
@@ -105,7 +105,7 @@ const getStatsNationalesGrandReseau =
         };
       }
       // Si la requête contient une ville, on l'ajoute à la requête avec le code postal associé
-      if (ville && ville !== 'tous' && codePostal && codePostal !== 'tous') {
+      if (ville && codePostal) {
         query['cra.codePostal'] = codePostal;
         query['cra.nomCommune'] = ville;
       }
