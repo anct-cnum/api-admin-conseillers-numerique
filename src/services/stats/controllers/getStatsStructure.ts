@@ -40,11 +40,11 @@ const getStatsStructure =
         },
         'conseiller.$id': { $in: conseillerIds },
       };
-      if (req.query?.codePostal !== '' && req.query?.codePostal !== 'null') {
-        query['cra.codePostal'] = req.query?.codePostal;
+      if (codePostal) {
+        query['cra.codePostal'] = codePostal;
       }
-      if (req.query?.ville !== '' && req.query?.ville !== 'null') {
-        query['cra.nomCommune'] = req.query?.ville;
+      if (ville) {
+        query['cra.nomCommune'] = ville;
       }
 
       const donneesStats = await getStatsGlobales(
