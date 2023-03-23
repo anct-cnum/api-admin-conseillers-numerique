@@ -73,12 +73,6 @@ const validStatCsv = Joi.object({
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
-  conseillerIds: Joi.array()
-    .items(Joi.string())
-    .error(new Error('Le tableau des conseillers est invalide')),
-  structureIds: Joi.array()
-    .items(Joi.string())
-    .error(new Error('Le tableau des structures est invalide')),
   codePostal: Joi.string().error(
     new Error('Le filtre code postal est invalide'),
   ),
