@@ -59,7 +59,7 @@ const validStatGrandReseau = Joi.object({
   ),
   ville: Joi.string().error(new Error('Le filtre ville est invalide')),
   codeRegion: Joi.string().error(
-    new Error('Le filtre code region est invalide'),
+    new Error('Le filtre code région est invalide'),
   ),
   numeroDepartement: Joi.string().error(
     new Error('Le filtre numéro de département est invalide'),
@@ -78,7 +78,7 @@ const validStatCsv = Joi.object({
   ),
   ville: Joi.string().error(new Error('Le filtre ville est invalide')),
   codeRegion: Joi.string().error(
-    new Error('Le filtre code region est invalide'),
+    new Error('Le filtre code région est invalide'),
   ),
   numeroDepartement: Joi.string().error(
     new Error('Le filtre numéro de département est invalide'),
