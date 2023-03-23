@@ -23,7 +23,7 @@ const getStatsNationalesGrandReseau =
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
       const { codePostal, ville, codeRegion, numeroDepartement } = req.query;
-      const structureIds = req.query.conseillerIds
+      const structureIds = req.query.structureIds
         ? JSON.parse(req.query.structureIds)
         : [];
       const conseillerIds = req.query.conseillerIds

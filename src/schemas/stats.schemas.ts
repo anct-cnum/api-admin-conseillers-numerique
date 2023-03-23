@@ -17,9 +17,12 @@ const validStatConseiller = Joi.object({
     .required()
     .error(new Error('La date de fin est invalide')),
   idConseiller: Joi.string()
-    .hex()
-    .length(24)
+    .regex(/^[0-9a-fA-F]{24}$/)
     .error(new Error("L'id du conseiller est invalide")),
+  codePostal: Joi.string().error(
+    new Error('Le filtre code postal est invalide'),
+  ),
+  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
 });
 
 const validStatStructure = Joi.object({
@@ -32,6 +35,10 @@ const validStatStructure = Joi.object({
   idStructure: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .error(new Error("L'id de la structure est invalide")),
+  codePostal: Joi.string().error(
+    new Error('Le filtre code postal est invalide'),
+  ),
+  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
 });
 
 const validStatGrandReseau = Joi.object({
@@ -47,18 +54,16 @@ const validStatGrandReseau = Joi.object({
   structureIds: Joi.array()
     .items(Joi.string())
     .error(new Error('Le tableau des structures est invalide')),
-  codePostal: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre code postal est invalide')),
-  ville: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre ville est invalide')),
-  codeRegion: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre code region est invalide')),
-  numeroDepartement: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre numéro de département est invalide')),
+  codePostal: Joi.string().error(
+    new Error('Le filtre code postal est invalide'),
+  ),
+  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
+  codeRegion: Joi.string().error(
+    new Error('Le filtre code region est invalide'),
+  ),
+  numeroDepartement: Joi.string().error(
+    new Error('Le filtre numéro de département est invalide'),
+  ),
 });
 
 const validStatCsv = Joi.object({
@@ -74,26 +79,20 @@ const validStatCsv = Joi.object({
   structureIds: Joi.array()
     .items(Joi.string())
     .error(new Error('Le tableau des structures est invalide')),
-  codePostal: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre code postal est invalide')),
-  ville: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre ville est invalide')),
-  codeRegion: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre code region est invalide')),
-  numeroDepartement: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre numéro de département est invalide')),
-  nom: Joi.string().allow('').error(new Error('Le filtre nom est invalide')),
-  prenom: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre prénom est invalide')),
-  idType: Joi.string()
-    .allow('')
-    .error(new Error('Le filtre id type est invalide')),
-  type: Joi.string().allow('').error(new Error('Le filtre type est invalide')),
+  codePostal: Joi.string().error(
+    new Error('Le filtre code postal est invalide'),
+  ),
+  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
+  codeRegion: Joi.string().error(
+    new Error('Le filtre code region est invalide'),
+  ),
+  numeroDepartement: Joi.string().error(
+    new Error('Le filtre numéro de département est invalide'),
+  ),
+  nom: Joi.string().error(new Error('Le filtre nom est invalide')),
+  prenom: Joi.string().error(new Error('Le filtre prénom est invalide')),
+  idType: Joi.string().error(new Error('Le filtre id type est invalide')),
+  type: Joi.string().error(new Error('Le filtre type est invalide')),
 });
 
 export {

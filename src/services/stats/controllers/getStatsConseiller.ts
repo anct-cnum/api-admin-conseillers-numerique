@@ -14,10 +14,13 @@ const getStatsConseiller =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
+      const { codePostal, ville } = req.query;
       const statsValidation = validStatConseiller.validate({
         dateDebut,
         dateFin,
         idConseiller,
+        codePostal,
+        ville,
       });
 
       if (statsValidation.error) {
@@ -32,11 +35,11 @@ const getStatsConseiller =
         'conseiller.$id': { $eq: new ObjectId(idConseiller) },
       };
 
-      if (req.query?.codePostal !== '' && req.query?.codePostal !== 'null') {
-        query['cra.codePostal'] = req.query?.codePostal;
+      if (codePostal) {
+        query['cra.codePostal'] = codePostal;
       }
-      if (req.query?.ville !== '' && req.query?.ville !== 'null') {
-        query['cra.nomCommune'] = req.query?.ville;
+      if (ville) {
+        query['cra.nomCommune'] = ville;
       }
 
       const donneesStats = await getStatsGlobales(

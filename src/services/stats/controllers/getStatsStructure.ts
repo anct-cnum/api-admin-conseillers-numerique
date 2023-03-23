@@ -16,10 +16,13 @@ const getStatsStructure =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
+      const { codePostal, ville } = req.query;
       const statsValidation = validStatStructure.validate({
         dateDebut,
         dateFin,
         idStructure,
+        codePostal,
+        ville,
       });
 
       if (statsValidation.error) {
