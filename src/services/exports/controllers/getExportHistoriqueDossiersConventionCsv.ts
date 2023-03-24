@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvHistoriqueDossiersConvention } from '../exports.repository';
-import { validExportHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
+import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
 import { checkAccessReadRequestStructures } from '../../structures/repository/structures.repository';
 import {
   filterDateDemandeHistorique,
@@ -14,11 +14,11 @@ import { getCoselec } from '../../../utils';
 const getExportHistoriqueDossiersConventionCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { type } = req.query;
-    const dateDebut: Date = new Date(req.query.dateDebut as string);
-    const dateFin: Date = new Date(req.query.dateFin as string);
+    const dateDebut: Date = new Date(req.query.dateDebut);
+    const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
-    const pageValidation = validExportHistoriqueConvention.validate({
+    const pageValidation = validHistoriqueConvention.validate({
       type,
       dateDebut,
       dateFin,

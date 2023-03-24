@@ -65,8 +65,8 @@ const getStructures =
 const getHistoriqueDossiersConvention =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const { page, type } = req.query;
-    const dateDebut: Date = new Date(req.query.dateDebut as string);
-    const dateFin: Date = new Date(req.query.dateFin as string);
+    const dateDebut: Date = new Date(req.query.dateDebut);
+    const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
     try {

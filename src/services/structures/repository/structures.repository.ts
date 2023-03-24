@@ -30,20 +30,22 @@ const checkAccessReadRequestStructures = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const filterNomStructure = (nom: string) => {
-  const formatNom = nom?.trim();
-  if (/^[0-9]{14}$/.test(formatNom)) {
-    return { siret: { $eq: nom } };
+const filterSearchBar = (input: string) => {
+  const inputSearchBar = input?.trim();
+  if (/^[0-9]{14}$/.test(inputSearchBar)) {
+    return { siret: { $eq: inputSearchBar } };
   }
-  if (/^[a-zA-Z0-9-._]+@[a-zA-Z0-9-._]{2,}[.][a-zA-Z]{2,3}$/i.test(formatNom)) {
-    return { 'contact.email': { $eq: nom } };
+  if (
+    /^[a-zA-Z0-9-._]+@[a-zA-Z0-9-._]{2,}[.][a-zA-Z]{2,3}$/i.test(inputSearchBar)
+  ) {
+    return { 'contact.email': { $eq: inputSearchBar } };
   }
-  if (/^\d+$/.test(formatNom)) {
-    return { idPG: { $eq: parseInt(nom, 10) } };
+  if (/^\d+$/.test(inputSearchBar)) {
+    return { idPG: { $eq: parseInt(inputSearchBar, 10) } };
   }
-  if (formatNom) {
+  if (inputSearchBar) {
     return {
-      nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' },
+      nom: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' },
     };
   }
   return {};
@@ -106,7 +108,7 @@ const getNameStructure =
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
-  filterNomStructure,
+  filterSearchBar,
   filterType,
   filterRegion,
   filterStatut,

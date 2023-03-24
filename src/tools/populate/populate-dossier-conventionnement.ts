@@ -40,9 +40,6 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
         .Model.updateOne(
           {
             idPG: match.idPG,
-            'conventionnement.dossierConventionnement': {
-              $exists: false,
-            },
             statut: 'VALIDATION_COSELEC',
           },
           {

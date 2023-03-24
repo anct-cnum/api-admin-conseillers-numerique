@@ -749,8 +749,8 @@ const generateCsvHistoriqueDossiersConvention = async (
         fileHeaders.join(csvCellSeparator),
         ...structures.map((structure) =>
           [
-            structure._id,
-            structure.nom,
+            structure?._id,
+            structure?.nom,
             formatDate(structure?.conventionnement?.dateDeCreation),
             formatDate(structure?.conventionnement?.dateFinProchainContrat),
             structure?.conventionnement?.nbPostesAttribuees ?? 'Non renseigné',

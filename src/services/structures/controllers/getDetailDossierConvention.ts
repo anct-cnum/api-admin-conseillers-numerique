@@ -75,7 +75,7 @@ const getDetailStructureWithConseillers =
 
 const miseEnRelationConseillerStructure =
   (app: Application, checkAccessMiseEnRelation) =>
-  async (idStructure: string, idConseiller: string[]) =>
+  async (idStructure: string, idConseiller: ObjectId[]) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
@@ -131,7 +131,7 @@ const getDetailDossierConvention =
       }
 
       if (
-        structure[0]?.conventionnement?.statut.match(/\bRECONVENTIONNEMENT\B/)
+        structure[0]?.conventionnement?.statut?.match(/\bRECONVENTIONNEMENT\B/)
       ) {
         const checkAccessMiseEnRelation =
           await checkAccessReadRequestMisesEnRelation(app, req);
@@ -144,8 +144,8 @@ const getDetailDossierConvention =
         );
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].conventionnement.dossierReconventionnement.numero}`;
         structure[0].conseillers = await Promise.all(
-          structure[0].conseillers.map(async (conseiller) => {
-            const item = { ...conseiller };
+          structure[0].conseillers?.map(async (conseiller) => {
+            const item = conseiller;
             item.idPG = item.conseillerObj?.idPG;
             item.nom = item.conseillerObj?.nom;
             item.prenom = item.conseillerObj?.prenom;
