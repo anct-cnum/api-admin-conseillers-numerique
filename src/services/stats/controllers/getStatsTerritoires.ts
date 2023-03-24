@@ -120,7 +120,7 @@ const getStatsTerritoires =
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
-    const emailValidation = validTerritoires.validate({
+    const statsValidation = validTerritoires.validate({
       territoire,
       page,
       nomOrdre,
@@ -129,8 +129,8 @@ const getStatsTerritoires =
       dateFin,
     });
 
-    if (emailValidation.error) {
-      res.statusMessage = emailValidation.error.message;
+    if (statsValidation.error) {
+      res.statusMessage = statsValidation.error.message;
       res.status(400).end();
       return;
     }

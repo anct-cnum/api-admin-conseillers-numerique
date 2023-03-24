@@ -4,6 +4,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 
 import getStatsGlobales from './getStatsGlobales';
+import { validStatNationales } from '../../../schemas/stats.schemas';
 
 const getStatsNationales =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -12,6 +13,15 @@ const getStatsNationales =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(String(req.query.dateFin));
       dateFin.setUTCHours(23, 59, 59, 59);
+      const statsValidation = validStatNationales.validate({
+        dateDebut,
+        dateFin,
+      });
+
+      if (statsValidation.error) {
+        res.status(400).json({ message: statsValidation.error.message });
+        return;
+      }
       const query = {
         'cra.dateAccompagnement': {
           $gte: dateDebut,

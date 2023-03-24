@@ -11,25 +11,46 @@ import {
 } from '../../cras/cras.repository';
 import service from '../../../helpers/services';
 import { getStatsNationalesGrandReseau } from '../../stats/controllers';
+import { validStatCsv } from '../../../schemas/stats.schemas';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let { idType, codePostal, ville, nom, prenom } = req.query;
+    let { idType, nom, conseillerIds } = req.query;
+    const {
+      codePostal,
+      ville,
+      codeRegion,
+      prenom,
+      numeroDepartement,
+      structureIds,
+    } = req.query;
     const { type } = req.query;
     const dateDebut = new Date(String(req.query.dateDebut));
     dateDebut.setUTCHours(0, 0, 0, 0);
     const dateFin = new Date(String(req.query.dateFin));
     dateFin.setUTCHours(23, 59, 59, 59);
-    idType = idType === 'undefined' ? '' : idType;
-    codePostal = codePostal === 'undefined' ? '' : codePostal;
-    ville = ville === 'undefined' ? '' : ville;
-    nom = nom === 'undefined' ? '' : nom;
-    prenom = prenom === 'undefined' ? '' : prenom;
+
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
-    let conseillerIds: ObjectId[];
     let query: Object;
     let statistiques = {};
+    const statsValidation = validStatCsv.validate({
+      dateDebut,
+      dateFin,
+      codePostal,
+      ville,
+      codeRegion,
+      numeroDepartement,
+      nom,
+      prenom,
+      idType,
+      type,
+    });
+
+    if (statsValidation.error) {
+      res.status(400).json({ message: statsValidation.error.message });
+      return;
+    }
 
     try {
       switch (type) {
@@ -57,10 +78,10 @@ const getExportStatistiquesCsv =
             },
             'conseiller.$id': { $in: conseillerIds },
           };
-          if (codePostal !== '' && codePostal !== 'null') {
+          if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville !== '' && ville !== 'null') {
+          if (ville) {
             query['cra.nomCommune'] = ville;
           }
           statistiques = await getStatsGlobales(
@@ -85,10 +106,10 @@ const getExportStatistiquesCsv =
             },
             'conseiller.$id': { $eq: idConseiller },
           };
-          if (codePostal !== '' && codePostal !== 'null') {
+          if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville !== '' && ville !== 'null') {
+          if (ville) {
             query['cra.nomCommune'] = ville;
           }
           statistiques = await getStatsGlobales(
@@ -123,6 +144,15 @@ const getExportStatistiquesCsv =
           );
           break;
         case 'grandReseau':
+          req.query = {
+            dateDebut,
+            dateFin,
+            structureIds,
+            conseillerIds,
+            codeRegion,
+            numeroDepartement,
+            ville,
+          };
           statistiques = await getStatsNationalesGrandReseau(app, true)(
             req,
             res,
