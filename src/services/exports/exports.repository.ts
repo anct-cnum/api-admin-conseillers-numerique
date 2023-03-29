@@ -41,6 +41,13 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
+const formatDateWithoutGetTime = (date: Date) => {
+  if (date !== undefined && date !== null) {
+    return dayjs.utc(date).format('DD/MM/YYYY');
+  }
+  return 'non renseignée';
+};
+
 const conseillerByMisesEnRelation = async (
   idConseiller: ObjectId,
   app: Application,
@@ -510,7 +517,7 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDate(dateDebut)}-${formatDate(dateFin)}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
       general,
       statsThemes,
       statsLieux,
