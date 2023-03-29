@@ -12,6 +12,7 @@ import {
 import service from '../../../helpers/services';
 import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 import { validStatCsv } from '../../../schemas/stats.schemas';
+import { formatDate } from '../../../utils';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -25,10 +26,8 @@ const getExportStatistiquesCsv =
       structureIds,
     } = req.query;
     const { type } = req.query;
-    const dateDebut = new Date(String(req.query.dateDebut));
-    dateDebut.setUTCHours(0, 0, 0, 0);
-    const dateFin = new Date(String(req.query.dateFin));
-    dateFin.setUTCHours(23, 59, 59, 59);
+    const dateDebut = new Date(req.query.dateDebut);
+    const dateFin = new Date(req.query.dateFin);
 
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
@@ -51,14 +50,18 @@ const getExportStatistiquesCsv =
       res.status(400).json({ message: statsValidation.error.message });
       return;
     }
-
+    const dateDebutFormat = formatDate(dateDebut);
+    dateDebutFormat.setUTCHours(0, 0, 0, 0);
+    const dateFinFormat = formatDate(dateFin);
+    dateFinFormat.setUTCHours(23, 59, 59, 59);
+    console.log(dateDebutFormat, dateFinFormat);
     try {
       switch (type) {
         case 'nationales':
           query = {
             'cra.dateAccompagnement': {
-              $gte: dateDebut,
-              $lte: dateFin,
+              $gte: dateDebutFormat,
+              $lte: dateFinFormat,
             },
           };
           statistiques = await getStatsGlobales(
@@ -73,8 +76,8 @@ const getExportStatistiquesCsv =
           conseillerIds = await getConseillersIdsByStructure(idStructure, app);
           query = {
             'cra.dateAccompagnement': {
-              $gte: dateDebut,
-              $lte: dateFin,
+              $gte: dateDebutFormat,
+              $lte: dateFinFormat,
             },
             'conseiller.$id': { $in: conseillerIds },
           };
@@ -101,8 +104,8 @@ const getExportStatistiquesCsv =
           idConseiller = new ObjectId(String(idType));
           query = {
             'cra.dateAccompagnement': {
-              $gte: dateDebut,
-              $lte: dateFin,
+              $gte: dateDebutFormat,
+              $lte: dateFinFormat,
             },
             'conseiller.$id': { $eq: idConseiller },
           };
@@ -123,7 +126,7 @@ const getExportStatistiquesCsv =
         case 'codeDepartement':
         case 'codeRegion':
           conseillerIds = await getConseillersIdsByTerritoire(
-            dateFin,
+            dateFinFormat,
             type,
             idType,
             app,
@@ -131,8 +134,8 @@ const getExportStatistiquesCsv =
 
           query = {
             'cra.dateAccompagnement': {
-              $gte: dateDebut,
-              $lte: dateFin,
+              $gte: dateDebutFormat,
+              $lte: dateFinFormat,
             },
             'conseiller.$id': { $in: conseillerIds },
           };
@@ -145,8 +148,8 @@ const getExportStatistiquesCsv =
           break;
         case 'grandReseau':
           req.query = {
-            dateDebut,
-            dateFin,
+            dateDebutFormat,
+            dateFinFormat,
             structureIds,
             conseillerIds,
             codeRegion,
@@ -164,8 +167,8 @@ const getExportStatistiquesCsv =
 
       generateCsvStatistiques(
         statistiques,
-        dateDebut,
-        dateFin,
+        dateDebutFormat,
+        dateFinFormat,
         type,
         idType,
         codePostal,
