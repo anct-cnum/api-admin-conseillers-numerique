@@ -70,7 +70,6 @@ const getDetailStructureById =
             coselec: 1,
             contact: 1,
             conseillers: '$conseillers',
-            dossierDemarcheSimplifiee: 1,
             conventionnement: 1,
           },
         },

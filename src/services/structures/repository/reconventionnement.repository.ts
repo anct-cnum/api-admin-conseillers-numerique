@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { gql } from 'graphql-request';
 
 const queryGetDemarcheReconventionnement = (limitDossier: number) => gql`

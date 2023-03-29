@@ -5,7 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 
-const getMisesEnRelationStructure =
+const getMisesEnRelationARenouveller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
 
@@ -14,6 +14,11 @@ const getMisesEnRelationStructure =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
+      const query = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .getQuery();
+
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
@@ -29,17 +34,49 @@ const getMisesEnRelationStructure =
         .Model.aggregate([
           {
             $match: {
+              $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: {
-                $in: ['finalisee', 'finalisee_rupture', 'nouvelle_rupture'],
+                $in: ['finalisee', 'finalisee_rupture'],
               },
             },
           },
           {
+            $sort: {
+              dateRecrutement: 1,
+            },
+          },
+          {
+            $unwind: {
+              path: '$conseillerObj',
+            },
+          },
+          {
             $project: {
-              conseillerObj: 1,
+              conseillerObj: '$conseillerObj',
               statut: 1,
               reconventionnement: 1,
+              dateRecrutement: 1,
+              _id: 1,
+            },
+          },
+          {
+            $group: {
+              _id: '$conseillerObj',
+              dateRecrutement: { $last: '$dateRecrutement' },
+              statut: { $last: '$statut' },
+              reconventionnement: { $last: '$reconventionnement' },
+              miseEnRelationId: { $last: '$_id' },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              conseiller: '$_id',
+              dateRecrutement: 1,
+              statut: 1,
+              reconventionnement: 1,
+              miseEnRelationId: 1,
             },
           },
         ]);
@@ -54,4 +91,4 @@ const getMisesEnRelationStructure =
     }
   };
 
-export default getMisesEnRelationStructure;
+export default getMisesEnRelationARenouveller;

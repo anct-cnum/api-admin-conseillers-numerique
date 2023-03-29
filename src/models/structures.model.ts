@@ -70,16 +70,6 @@ export default function (app: Application): Model<any> {
       coselecAt: { type: Date },
 
       reseau: { type: String },
-
-      dossierDemarcheSimplifiee: { type: Object },
-
-      conventionnement: {
-        statut: String,
-        derniereModification: Date,
-        dossierReconventionnement: {
-          nbPostesAttribues: Number,
-        },
-      },
     },
     { strict: false },
   );

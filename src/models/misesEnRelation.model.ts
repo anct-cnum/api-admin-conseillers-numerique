@@ -30,7 +30,7 @@ export default function (app: Application): Model<any> {
 
       structureObj: { type: Object },
 
-      reconventionnement: { type: String },
+      reconventionnement: { type: Boolean },
     },
     {
       strict: false,

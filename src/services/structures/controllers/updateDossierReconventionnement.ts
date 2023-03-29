@@ -35,72 +35,67 @@ const updateDossierReconventionnement =
       }
       // On modifie le statut de la structure en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
       if (statut === 'ENREGISTRÉ' || statut === 'RECONVENTIONNEMENT_EN_COURS') {
-        await app.service(service.structures).Model.findOneAndUpdate(
-          { _id: new ObjectId(structureId) },
-          {
-            $set: {
-              'conventionnement.statut': statut,
-              'conventionnement.derniereModification': new Date(),
-              'conventionnement.dossierReconventionnement.nbPostesAttribues':
-                nombreDePostes,
+        await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            { _id: new ObjectId(structureId) },
+            {
+              $set: {
+                'conventionnement.statut': statut,
+                'conventionnement.derniereModification': new Date(),
+                'conventionnement.dossierReconventionnement.nbPostesAttribues':
+                  nombreDePostes,
+              },
             },
-          },
-        );
+          );
       } else if (statut === 'NON_INTERESSE') {
-        await app.service(service.structures).Model.findOneAndUpdate(
-          { _id: new ObjectId(structureId) },
-          {
-            $set: {
-              'conventionnement.statut': statut,
-              'conventionnement.motif': motif,
-              'conventionnement.derniereModification': new Date(),
+        await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            { _id: new ObjectId(structureId) },
+            {
+              $set: {
+                'conventionnement.statut': statut,
+                'conventionnement.motif': motif,
+                'conventionnement.derniereModification': new Date(),
+              },
             },
-          },
-        );
+          );
       }
 
       misesEnRelationObjectIds = conseillers?.map(
         (conseiller) => new ObjectId(conseiller.miseEnRelationId),
       );
 
-      await app.service(service.misesEnRelation).Model.updateMany(
-        {
-          $and: [
-            { _id: { $in: misesEnRelationObjectIds } },
-            { 'structure.$id': new ObjectId(structureId) },
-          ],
-        },
-        { $set: { reconventionnement: statut } },
-        { multi: true },
-      );
-      await app.service(service.misesEnRelation).Model.updateMany(
-        {
-          $and: [
-            { _id: { $nin: misesEnRelationObjectIds } },
-            { 'structure.$id': new ObjectId(structureId) },
-          ],
-        },
-        { $unset: { reconventionnement: '' } },
-        { multi: true },
-      );
+      // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            $and: [{ _id: { $in: misesEnRelationObjectIds } }],
+          },
+          { $set: { reconventionnement: true } },
+          { multi: true },
+        );
 
-      await app.service(service.misesEnRelation).Model.aggregate([
-        {
-          $match: {
-            'structure.$id': new ObjectId(structureId),
-            statut: {
-              $in: ['recrutee', 'finalisee_rupture', 'nouvelle_rupture'],
-            },
+      // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            $and: [
+              { _id: { $nin: misesEnRelationObjectIds } },
+              { 'structure.$id': new ObjectId(structureId) },
+            ],
           },
-        },
-        {
-          $project: {
-            conseillerObj: 1,
-            statut: 1,
-            reconventionnement: 1,
-          },
-        },
-      ]);
+          { $unset: { reconventionnement: '' } },
+          { multi: true },
+        );
+
       res.status(200).json({
         message:
           'La structure ainsi que les conseillers associés ont bien été mis à jour.',
