@@ -14,7 +14,7 @@ import {
 import {
   formatAdresseStructure,
   formatQpv,
-} from '../structures/structures.repository';
+} from '../structures/repository/structures.repository';
 import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
 
 dayjs.extend(utc);
@@ -517,7 +517,7 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut).toLocaleString()}-${formatDateWithoutGetTime(dateFin).toLocaleString()}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
       general,
       statsThemes,
       statsLieux,
