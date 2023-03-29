@@ -54,7 +54,6 @@ const getExportStatistiquesCsv =
     dateDebutFormat.setUTCHours(0, 0, 0, 0);
     const dateFinFormat = formatDate(dateFin);
     dateFinFormat.setUTCHours(23, 59, 59, 59);
-    console.log(dateDebutFormat, dateFinFormat);
     try {
       switch (type) {
         case 'nationales':
