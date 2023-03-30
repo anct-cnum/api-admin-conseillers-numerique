@@ -8,18 +8,18 @@ import getStatsGlobales from './getStatsGlobales';
 
 const getStatsTerritoireCra =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const dateFin: Date = new Date(req.query.dateFin as string);
-    const dateDebut: Date = new Date(req.query.dateDebut as string);
+    const dateFin: Date = new Date(req.query.dateFin);
+    const dateDebut: Date = new Date(req.query.dateDebut);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
     const conseillerIds = JSON.parse(req.query?.conseillerIds as string);
-    const emailValidation = validTerritoireCra.validate({
+    const statsValidation = validTerritoireCra.validate({
       conseillerIds,
       dateDebut,
       dateFin,
     });
-    if (emailValidation.error) {
-      res.statusMessage = emailValidation.error.message;
+    if (statsValidation.error) {
+      res.statusMessage = statsValidation.error.message;
       res.status(400).end();
       return;
     }

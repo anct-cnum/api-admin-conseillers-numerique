@@ -60,17 +60,16 @@ const getRegion =
 const getStatsTerritoire =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { typeTerritoire, idTerritoire } = req.query;
-    const dateFin: Date = new Date(req.query.dateFin as string);
+    const dateFin: Date = new Date(req.query.dateFin);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
-    const emailValidation = validTerritoireDetails.validate({
+    const statsValidation = validTerritoireDetails.validate({
       typeTerritoire,
       idTerritoire,
       dateFin,
     });
 
-    if (emailValidation.error) {
-      res.statusMessage = emailValidation.error.message;
-      res.status(400).end();
+    if (statsValidation.error) {
+      res.status(400).json({ message: statsValidation.error.message });
       return;
     }
     try {

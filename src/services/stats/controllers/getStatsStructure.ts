@@ -6,17 +6,31 @@ import { action } from '../../../helpers/accessControl/accessList';
 
 import getStatsGlobales from './getStatsGlobales';
 import { getConseillersIdsByStructure } from '../../cras/cras.repository';
+import { validStatStructure } from '../../../schemas/stats.schemas';
 
 const getStatsStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idStructure = new ObjectId(String(req.query?.idStructure));
-      const dateDebut = new Date(String(req.query.dateDebut));
+      const idStructure = String(req.query?.idStructure);
+      const dateDebut = new Date(req.query.dateDebut);
       dateDebut.setUTCHours(0, 0, 0, 0);
-      const dateFin = new Date(String(req.query.dateFin));
+      const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const conseillerIds = await getConseillersIdsByStructure(
+      const { codePostal, ville } = req.query;
+      const statsValidation = validStatStructure.validate({
+        dateDebut,
+        dateFin,
         idStructure,
+        codePostal,
+        ville,
+      });
+
+      if (statsValidation.error) {
+        res.status(400).json({ message: statsValidation.error.message });
+        return;
+      }
+      const conseillerIds = await getConseillersIdsByStructure(
+        new ObjectId(idStructure),
         app,
       );
       const query = {
@@ -26,11 +40,11 @@ const getStatsStructure =
         },
         'conseiller.$id': { $in: conseillerIds },
       };
-      if (req.query?.codePostal !== '' && req.query?.codePostal !== 'null') {
-        query['cra.codePostal'] = req.query?.codePostal;
+      if (codePostal) {
+        query['cra.codePostal'] = codePostal;
       }
-      if (req.query?.ville !== '' && req.query?.ville !== 'null') {
-        query['cra.nomCommune'] = req.query?.ville;
+      if (ville) {
+        query['cra.nomCommune'] = ville;
       }
 
       const donneesStats = await getStatsGlobales(
