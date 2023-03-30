@@ -75,12 +75,12 @@ const getDetailStructureWithConseillers =
 
 const miseEnRelationConseillerStructure =
   (app: Application, checkAccessMiseEnRelation) =>
-  async (idStructure: string, idConseiller: ObjectId[]) =>
+  async (idStructure: string, idsConseiller: ObjectId[]) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
           'structure.$id': new ObjectId(idStructure),
-          'conseiller.$id': { $in: idConseiller },
+          'conseiller.$id': { $in: idsConseiller },
           $and: [checkAccessMiseEnRelation],
         },
       },
@@ -142,7 +142,7 @@ const getDetailDossierConvention =
           idStructure,
           structure[0]?.conseillers?.map((conseiller) => conseiller._id),
         );
-        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_reconventionnement}/dossiers/${structure[0].conventionnement.dossierReconventionnement.numero}`;
+        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}`;
         structure[0].conseillers = await Promise.all(
           structure[0].conseillers?.map(async (conseiller) => {
             const item = conseiller;
@@ -159,7 +159,7 @@ const getDetailDossierConvention =
             conseiller.reconventionnement === 'RECONVENTIONNEMENT_EN_COURS',
         );
       } else {
-        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs.numero_demarche_conventionnement}/dossiers/${structure[0].conventionnement.dossierConventionnement.numero}`;
+        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
       }
       structure[0].nombreConseillersCoselec =
         getCoselec(structure[0])?.nombreConseillersCoselec ?? 0;
