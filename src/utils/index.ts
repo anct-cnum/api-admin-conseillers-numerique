@@ -67,10 +67,24 @@ const envoiEmailInvit = (app, req, mailer, user) => {
   return message.send(user).catch((errSmtp: Error) => errSmtp);
 };
 
+const formatDate = (date: Date) => {
+  const dateTodayTimezoneParis = new Date(
+    new Date().toLocaleString('en', { timeZone: 'Europe/Paris' }),
+  );
+  const dateTodayTimezoneUTC = new Date(
+    new Date().toLocaleString('en', { timeZone: 'UTC' }),
+  );
+  const offsetTimezone =
+    dateTodayTimezoneParis.getTime() - dateTodayTimezoneUTC.getTime();
+
+  return new Date(date.getTime() + offsetTimezone);
+};
+
 export {
   getCoselecPositif,
   getLastCoselec,
   getCoselec,
   deleteUser,
   envoiEmailInvit,
+  formatDate,
 };
