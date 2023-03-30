@@ -8,7 +8,7 @@ import {
   checkAccessReadRequestStructures,
   filterComs,
   filterDepartement,
-  filterNomStructure,
+  filterSearchBar,
   filterRegion,
   filterStatut,
   filterType,
@@ -65,7 +65,7 @@ const getExportListeStructuresCsv =
             ...filterRegion(region),
             ...filterDepartement(departement),
             ...filterComs(coms),
-            ...filterNomStructure(searchByNom),
+            ...filterSearchBar(searchByNom),
           },
         },
         {
