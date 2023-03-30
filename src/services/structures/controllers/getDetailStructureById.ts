@@ -40,11 +40,6 @@ const getDetailStructureById =
             from: 'misesEnRelation',
             let: {
               idStructure: '$_id',
-              statutMisesEnrelation: [
-                'nouvelle_rupture',
-                'finalisee',
-                'recrutee',
-              ],
             },
             as: 'misesEnRelation',
             pipeline: [
