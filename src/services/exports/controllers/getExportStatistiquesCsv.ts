@@ -12,7 +12,7 @@ import {
 import service from '../../../helpers/services';
 import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 import { validStatCsv } from '../../../schemas/stats.schemas';
-import { formatDate } from '../../../utils';
+import { formatDateGMT } from '../../../utils';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -50,9 +50,9 @@ const getExportStatistiquesCsv =
       res.status(400).json({ message: statsValidation.error.message });
       return;
     }
-    const dateDebutFormat = formatDate(dateDebut);
+    const dateDebutFormat = formatDateGMT(dateDebut);
     dateDebutFormat.setUTCHours(0, 0, 0, 0);
-    const dateFinFormat = formatDate(dateFin);
+    const dateFinFormat = formatDateGMT(dateFin);
     dateFinFormat.setUTCHours(23, 59, 59, 59);
     try {
       switch (type) {
@@ -147,8 +147,8 @@ const getExportStatistiquesCsv =
           break;
         case 'grandReseau':
           req.query = {
-            dateDebutFormat,
-            dateFinFormat,
+            dateDebut: dateDebutFormat,
+            dateFin: dateFinFormat,
             structureIds,
             conseillerIds,
             codeRegion,

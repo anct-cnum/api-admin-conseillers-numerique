@@ -67,7 +67,7 @@ const envoiEmailInvit = (app, req, mailer, user) => {
   return message.send(user).catch((errSmtp: Error) => errSmtp);
 };
 
-const formatDate = (date: Date) => {
+const formatDateGMT = (date: Date) => {
   const dateTodayTimezoneParis = new Date(
     new Date().toLocaleString('en', { timeZone: 'Europe/Paris' }),
   );
@@ -86,5 +86,5 @@ export {
   getCoselec,
   deleteUser,
   envoiEmailInvit,
-  formatDate,
+  formatDateGMT,
 };
