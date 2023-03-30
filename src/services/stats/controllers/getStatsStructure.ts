@@ -12,9 +12,9 @@ const getStatsStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
       const idStructure = String(req.query?.idStructure);
-      const dateDebut = new Date(String(req.query.dateDebut));
+      const dateDebut = new Date(req.query.dateDebut);
       dateDebut.setUTCHours(0, 0, 0, 0);
-      const dateFin = new Date(String(req.query.dateFin));
+      const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
       const { codePostal, ville } = req.query;
       const statsValidation = validStatStructure.validate({

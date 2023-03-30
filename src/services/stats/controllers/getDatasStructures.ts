@@ -16,8 +16,8 @@ import {
 const getDatasStructures =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     try {
-      const dateDebut = new Date(String(req.query.dateDebut));
-      const dateFin = new Date(String(req.query.dateFin));
+      const dateDebut = new Date(req.query.dateDebut);
+      const dateFin = new Date(req.query.dateFin);
       const page = Number(req.query.page);
 
       const items = {
