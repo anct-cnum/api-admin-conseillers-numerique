@@ -3,7 +3,7 @@ import utc from 'dayjs/plugin/utc';
 import { Response } from 'express';
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { getCoselec } from '../../utils';
+import { formatDateGMT, getCoselec } from '../../utils';
 import service from '../../helpers/services';
 import {
   IMisesEnRelation,
@@ -36,7 +36,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 
 const formatDate = (date: Date) => {
   if (date !== undefined && date !== null) {
-    return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+    return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
 };

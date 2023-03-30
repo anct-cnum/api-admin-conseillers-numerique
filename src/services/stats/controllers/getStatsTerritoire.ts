@@ -60,7 +60,7 @@ const getRegion =
 const getStatsTerritoire =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { typeTerritoire, idTerritoire } = req.query;
-    const dateFin: Date = new Date(req.query.dateFin as string);
+    const dateFin: Date = new Date(req.query.dateFin);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
     const statsValidation = validTerritoireDetails.validate({
       typeTerritoire,
