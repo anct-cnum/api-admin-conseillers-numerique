@@ -13,6 +13,7 @@ import {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
+  updateDossierReconventionnement,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
