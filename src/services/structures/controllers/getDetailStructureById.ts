@@ -37,20 +37,40 @@ const getDetailStructureById =
         },
         {
           $lookup: {
-            from: 'conseillers',
-            let: { idStructure: '$_id' },
-            as: 'conseillers',
+            from: 'misesEnRelation',
+            let: {
+              idStructure: '$_id',
+            },
+            as: 'misesEnRelation',
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: ['$$idStructure', '$structureId'] },
+                  $and: [
+                    {
+                      $expr: {
+                        $eq: ['$$idStructure', '$structureObj._id'],
+                      },
+                    },
+                    {
+                      $expr: {
+                        $or: [
+                          { $eq: ['finalisee', '$statut'] },
+                          { $eq: ['nouvelle_rupture', '$statut'] },
+                          { $eq: ['recrutee', '$statut'] },
+                        ],
+                      },
+                    },
+                  ],
                 },
               },
               {
                 $project: {
-                  nom: 1,
-                  prenom: 1,
-                  idPG: 1,
+                  _id: 0,
+                  statut: 1,
+                  'conseillerObj.idPG': 1,
+                  'conseillerObj.nom': 1,
+                  'conseillerObj._id': 1,
+                  'conseillerObj.prenom': 1,
                 },
               },
             ],
@@ -69,8 +89,7 @@ const getDetailStructureById =
             createdAt: 1,
             coselec: 1,
             contact: 1,
-            conseillers: '$conseillers',
-            conventionnement: 1,
+            conseillers: '$misesEnRelation',
           },
         },
       ]);
@@ -102,6 +121,24 @@ const getDetailStructureById =
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
+      structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
+        return {
+          idPG: conseiller?.conseillerObj?.idPG,
+          nom: conseiller?.conseillerObj?.nom,
+          prenom: conseiller?.conseillerObj?.prenom,
+          _id: conseiller?.conseillerObj?._id,
+          statut: conseiller?.statut,
+        };
+      });
+      structure[0].conseillersValider = structure[0].conseillers?.filter(
+        (conseiller) => conseiller.statut === 'recrutee',
+      );
+      structure[0].conseillersRecruter = structure[0].conseillers?.filter(
+        (conseiller) =>
+          conseiller.statut === 'finalisee' ||
+          conseiller.statut === 'nouvelle_rupture',
+      );
+      delete structure[0].conseillers;
 
       if (structure.length === 0) {
         res.status(404).json({ message: 'Structure non trouvée' });

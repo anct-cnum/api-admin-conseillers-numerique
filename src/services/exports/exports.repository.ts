@@ -3,7 +3,7 @@ import utc from 'dayjs/plugin/utc';
 import { Response } from 'express';
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { getCoselec } from '../../utils';
+import { formatDateGMT, getCoselec } from '../../utils';
 import service from '../../helpers/services';
 import {
   IMisesEnRelation,
@@ -36,7 +36,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 
 const formatDate = (date: Date) => {
   if (date !== undefined && date !== null) {
-    return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+    return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
 };
@@ -517,7 +517,7 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut).toLocaleString()}-${formatDateWithoutGetTime(dateFin).toLocaleString()}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
       general,
       statsThemes,
       statsLieux,
@@ -730,6 +730,44 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
   }
 };
 
+const generateCsvHistoriqueDossiersConvention = async (
+  structures: any[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Date de la demande',
+      'Date de fin du prochain contrat',
+      'Nombre de postes',
+      'Type de la demande',
+    ];
+
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...structures.map((structure) =>
+          [
+            structure?._id,
+            structure?.nom,
+            formatDate(structure?.conventionnement?.dateDeCreation),
+            formatDate(structure?.conventionnement?.dateFinProchainContrat),
+            structure?.conventionnement?.nbPostesAttribuees ?? 'Non renseigné',
+            structure?.conventionnement?.statut,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -742,4 +780,5 @@ export {
   generateCsvConseillers,
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
+  generateCsvHistoriqueDossiersConvention,
 };
