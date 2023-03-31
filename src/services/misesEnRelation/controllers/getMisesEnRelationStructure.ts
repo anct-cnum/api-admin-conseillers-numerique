@@ -8,6 +8,10 @@ import { action } from '../../../helpers/accessControl/accessList';
 const getMisesEnRelationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const query = await app
+      .service(service.structures)
+      .Model.accessibleBy(req.ability, action.read)
+      .getQuery();
 
     try {
       if (!ObjectId.isValid(idStructure)) {
@@ -29,6 +33,7 @@ const getMisesEnRelationStructure =
         .Model.aggregate([
           {
             $match: {
+              $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: {
                 $in: ['finalisee', 'finalisee_rupture', 'nouvelle_rupture'],

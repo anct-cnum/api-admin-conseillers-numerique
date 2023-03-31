@@ -29,7 +29,7 @@ export default class MisesEnRelation extends Service {
       getMisesEnRelationStructure(app),
     );
     app.get(
-      '/misesEnRelationARenouveller-structure/:id',
+      '/misesEnRelation-renouvellement-structure/:id',
       authenticateMode(app),
       createAbilities(app),
       getMisesEnRelationARenouveller(app),

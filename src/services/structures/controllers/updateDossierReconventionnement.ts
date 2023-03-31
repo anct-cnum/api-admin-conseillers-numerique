@@ -13,6 +13,11 @@ const updateDossierReconventionnement =
     let statut: string;
     let misesEnRelationObjectIds: [string];
 
+    if (!ObjectId.isValid(structureId)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
+
     switch (action.trim()) {
       case 'enregistrer':
         statut = 'ENREGISTRÉ';
@@ -29,10 +34,6 @@ const updateDossierReconventionnement =
     }
 
     try {
-      if (!ObjectId.isValid(structureId)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
-      }
       // On modifie le statut de la structure en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
       if (statut === 'ENREGISTRÉ' || statut === 'RECONVENTIONNEMENT_EN_COURS') {
         await app
@@ -75,10 +76,12 @@ const updateDossierReconventionnement =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            $and: [{ _id: { $in: misesEnRelationObjectIds } }],
+            $and: [
+              { _id: { $in: misesEnRelationObjectIds } },
+              { statut: { $in: ['finalisee', 'finalisee_rupture'] } },
+            ],
           },
           { $set: { reconventionnement: true } },
-          { multi: true },
         );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
@@ -90,10 +93,10 @@ const updateDossierReconventionnement =
             $and: [
               { _id: { $nin: misesEnRelationObjectIds } },
               { 'structure.$id': new ObjectId(structureId) },
+              { statut: { $in: ['finalisee', 'finalisee_rupture'] } },
             ],
           },
           { $unset: { reconventionnement: '' } },
-          { multi: true },
         );
 
       res.status(200).json({
