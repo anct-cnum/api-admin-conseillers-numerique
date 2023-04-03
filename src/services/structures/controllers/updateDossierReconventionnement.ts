@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
+import { updateReconventionnement } from '../../../schemas/reconventionnement.schemas';
 
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -12,6 +13,18 @@ const updateDossierReconventionnement =
     } = req;
     let statut: string;
     let misesEnRelationObjectIds: [string];
+
+    const updateValidation = updateReconventionnement.validate({
+      action,
+      structureId,
+      nombreDePostes,
+      motif,
+      conseillers,
+    });
+
+    if (updateValidation.error) {
+      return res.status(400).json({ message: updateValidation.error.message });
+    }
 
     if (!ObjectId.isValid(structureId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -39,31 +52,25 @@ const updateDossierReconventionnement =
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            { _id: new ObjectId(structureId) },
-            {
-              $set: {
-                'conventionnement.statut': statut,
-                'conventionnement.derniereModification': new Date(),
-                'conventionnement.dossierReconventionnement.nbPostesAttribues':
-                  nombreDePostes,
-              },
+          .findOneAndUpdate({
+            $set: {
+              'conventionnement.statut': statut,
+              'conventionnement.derniereModification': new Date(),
+              'conventionnement.dossierReconventionnement.nbPostesAttribues':
+                nombreDePostes,
             },
-          );
+          });
       } else if (statut === 'NON_INTERESSE') {
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            { _id: new ObjectId(structureId) },
-            {
-              $set: {
-                'conventionnement.statut': statut,
-                'conventionnement.motif': motif,
-                'conventionnement.derniereModification': new Date(),
-              },
+          .findOneAndUpdate({
+            $set: {
+              'conventionnement.statut': statut,
+              'conventionnement.motif': motif,
+              'conventionnement.derniereModification': new Date(),
             },
-          );
+          });
       }
 
       misesEnRelationObjectIds = conseillers?.map(
@@ -78,7 +85,7 @@ const updateDossierReconventionnement =
           {
             $and: [
               { _id: { $in: misesEnRelationObjectIds } },
-              { statut: { $in: ['finalisee', 'finalisee_rupture'] } },
+              { statut: { $in: ['finalisee'] } },
             ],
           },
           { $set: { reconventionnement: true } },
@@ -93,7 +100,7 @@ const updateDossierReconventionnement =
             $and: [
               { _id: { $nin: misesEnRelationObjectIds } },
               { 'structure.$id': new ObjectId(structureId) },
-              { statut: { $in: ['finalisee', 'finalisee_rupture'] } },
+              { statut: { $in: ['finalisee'] } },
             ],
           },
           { $unset: { reconventionnement: '' } },

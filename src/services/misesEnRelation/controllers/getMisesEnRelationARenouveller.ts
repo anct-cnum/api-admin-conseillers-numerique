@@ -37,7 +37,7 @@ const getMisesEnRelationARenouveller =
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: {
-                $in: ['finalisee', 'finalisee_rupture'],
+                $in: ['finalisee'],
               },
             },
           },
