@@ -9,7 +9,7 @@ const getMisesEnRelationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const query = await app
-      .service(service.structures)
+      .service(service.misesEnRelation)
       .Model.accessibleBy(req.ability, action.read)
       .getQuery();
 
@@ -36,7 +36,7 @@ const getMisesEnRelationStructure =
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: {
-                $in: ['finalisee', 'finalisee_rupture', 'nouvelle_rupture'],
+                $in: ['finalisee', 'nouvelle_rupture'],
               },
             },
           },
