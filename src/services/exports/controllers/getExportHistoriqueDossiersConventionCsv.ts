@@ -71,8 +71,6 @@ const getExportHistoriqueDossiersConventionCsv =
             item.conventionnement.dossierReconventionnement.nbPostesAttribuees;
           item.conventionnement.dateDeCreation =
             item.conventionnement.dossierReconventionnement.dateDeCreation;
-          item.conventionnement.dateFinProchainContrat =
-            item.conventionnement.dossierReconventionnement.dateFinProchainContrat;
           item.conventionnement.statut = 'Reconventionnement';
 
           return item;

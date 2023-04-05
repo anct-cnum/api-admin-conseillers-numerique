@@ -739,7 +739,6 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Id de la structure',
       'Nom de la structure',
       'Date de la demande',
-      'Date de fin du prochain contrat',
       'Nombre de postes',
       'Type de la demande',
     ];
@@ -752,7 +751,6 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure?._id,
             structure?.nom,
             formatDate(structure?.conventionnement?.dateDeCreation),
-            formatDate(structure?.conventionnement?.dateFinProchainContrat),
             structure?.conventionnement?.nbPostesAttribuees ?? 'Non renseigné',
             structure?.conventionnement?.statut,
           ].join(csvCellSeparator),
