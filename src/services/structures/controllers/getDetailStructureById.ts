@@ -90,6 +90,7 @@ const getDetailStructureById =
             coselec: 1,
             contact: 1,
             conseillers: '$misesEnRelation',
+            conventionnement: 1,
           },
         },
       ]);
