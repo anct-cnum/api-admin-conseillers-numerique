@@ -31,12 +31,25 @@ const formatStatutMisesEnRelation = (
 };
 
 const filterNomConseiller = (nom: string) => {
-  const formatNom = nom?.trim();
-  if (/^\d+$/.test(formatNom)) {
-    return { idPG: { $eq: parseInt(formatNom, 10) } };
-  }
-  if (formatNom) {
-    return { nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' } };
+  const inputSearchBar = nom?.trim();
+  if (inputSearchBar) {
+    return {
+      $or: [
+        {
+          nomPrenomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          prenomNomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+      ],
+    };
   }
   return {};
 };

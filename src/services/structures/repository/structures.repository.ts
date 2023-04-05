@@ -32,20 +32,19 @@ const checkAccessReadRequestStructures = async (
 
 const filterSearchBar = (input: string) => {
   const inputSearchBar = input?.trim();
-  if (/^[0-9]{14}$/.test(inputSearchBar)) {
-    return { siret: { $eq: inputSearchBar } };
-  }
-  if (
-    /^[a-zA-Z0-9-._]+@[a-zA-Z0-9-._]{2,}[.][a-zA-Z]{2,3}$/i.test(inputSearchBar)
-  ) {
-    return { 'contact.email': { $eq: inputSearchBar } };
-  }
-  if (/^\d+$/.test(inputSearchBar)) {
-    return { idPG: { $eq: parseInt(inputSearchBar, 10) } };
-  }
   if (inputSearchBar) {
     return {
-      nom: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' },
+      $or: [
+        { nom: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+        { siret: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+        {
+          'contact.email': {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+      ],
     };
   }
   return {};
