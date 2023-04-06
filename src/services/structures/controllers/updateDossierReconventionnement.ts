@@ -14,8 +14,6 @@ const updateDossierReconventionnement =
     let statut: string;
     let misesEnRelationObjectIds: [string];
 
-    const intNombreDePostes = Number(nombreDePostes);
-
     const updateValidation = updateReconventionnement.validate({
       action,
       structureId,
@@ -60,7 +58,7 @@ const updateDossierReconventionnement =
               'conventionnement.statut': statut,
               'conventionnement.derniereModification': new Date(),
               'conventionnement.dossierReconventionnement.nbPostesAttribues':
-                intNombreDePostes,
+                Number(nombreDePostes),
             },
           });
       } else if (statut === 'NON_INTERESSE') {
