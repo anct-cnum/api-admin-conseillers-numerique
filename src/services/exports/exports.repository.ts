@@ -41,6 +41,18 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
+const formatMinutes = (minutes: number) => {
+  if (minutes > 0) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h${remainingMinutes}min`;
+  }
+  return '0';
+};
+
 const formatDateWithoutGetTime = (date: Date) => {
   if (date !== undefined && date !== null) {
     return dayjs.utc(date).format('DD/MM/YYYY');
@@ -432,6 +444,16 @@ const generateCsvStatistiques = async (
       ),
       '',
     ];
+    const statsTempsAccompagnement = [
+      '\nTemps en accompagnement',
+      ...['Total', 'Individuelles', 'Collectives', 'Ponctuelles'].map(
+        (tempsAccompagnement, index) =>
+          `\n${tempsAccompagnement};${formatMinutes(
+            statistiques?.statsTempsAccompagnement[index].valeur,
+          )}`,
+      ),
+      '',
+    ];
     const statsDurees = [
       '\nDurée des accompagnements',
       ...[
@@ -521,6 +543,7 @@ const generateCsvStatistiques = async (
       general,
       statsThemes,
       statsLieux,
+      statsTempsAccompagnement,
       statsDurees,
       statsAges,
       statsUsagers,

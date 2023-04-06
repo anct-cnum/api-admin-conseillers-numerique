@@ -666,6 +666,79 @@ const getPersonnesAccompagnees = async (statsActivites) => {
   return nbTotalParticipant + nbAccompagnementPerso + nbDemandePonctuel;
 };
 
+const getStatsTempsAccompagnement = async (query, ability, read, app) => {
+  const queryAccess = await app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+  const tempsAccompagnement = [
+    { nom: 'total', valeur: 0 },
+    { nom: 'individuel', valeur: 0 },
+    { nom: 'ponctuel', valeur: 0 },
+    { nom: 'collectif', valeur: 0 },
+  ];
+  const ttempsAccompagnement: Array<{ nom: string; valeur: number }> = await app
+    .service(service.cras)
+    .Model.aggregate([
+      { $unwind: '$cra.duree' },
+      {
+        $match: {
+          ...query,
+          $and: [queryAccess],
+          'cra.duree': { $ne: ['0-30', '30-60', '60', '90'] },
+        },
+      },
+      { $group: { _id: '$cra.activite', count: { $sum: '$cra.duree' } } },
+      { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
+    ]);
+
+  if (ttempsAccompagnement?.length === 0) {
+    return tempsAccompagnement;
+  }
+  // Gestion des categories '0-30' / '30-60' / '60' / '90'
+  ttempsAccompagnement.forEach(async (activite) => {
+    const dureesString: Array<{ nom: string; valeur: number }> = await app
+      .service(service.cras)
+      .Model.aggregate([
+        { $unwind: '$cra.duree' },
+        {
+          $match: {
+            ...query,
+            $and: [queryAccess],
+            'cra.activite': activite.nom,
+            'cra.duree': { $ne: ['0-30', '30-60', '60', '90'] },
+          },
+        },
+        { $group: { _id: '$cra.duree', count: { $sum: 1 } } },
+        { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
+      ]);
+    // Ajout des heures par activité
+    if (dureesString?.length > 0) {
+      dureesString.forEach((duree: { valeur: number; nom: string }) => {
+        let valeurString = 0;
+        if (duree.nom === '0-30') {
+          valeurString = 30 * duree.valeur;
+        }
+        if (duree.nom === '30-60' || duree.nom === '60') {
+          valeurString = 60 * duree.valeur;
+        }
+        if (duree.nom === '90') {
+          valeurString = 90 * duree.valeur;
+        }
+        tempsAccompagnement.find(
+          (tempAccompagnement: { nom: string; valeur: number }) =>
+            tempAccompagnement.nom === activite.nom,
+        ).valeur += valeurString;
+        tempsAccompagnement.find(
+          (accompagnement) => accompagnement.nom === 'total',
+        ).valeur += valeurString;
+      });
+    }
+  });
+
+  return tempsAccompagnement;
+};
+
 export {
   getNombreCra,
   getPersonnesRecurrentes,
@@ -686,4 +759,5 @@ export {
   getCodesPostauxGrandReseau,
   getStructures,
   getConseillers,
+  getStatsTempsAccompagnement,
 };
