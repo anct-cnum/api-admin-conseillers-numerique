@@ -155,8 +155,7 @@ const getDetailDossierConvention =
           }),
         );
         structure[0].conseillersRenouveller = structure[0]?.conseillers?.filter(
-          (conseiller) =>
-            conseiller.reconventionnement === 'RECONVENTIONNEMENT_EN_COURS',
+          (conseiller) => conseiller.reconventionnement === true,
         );
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
