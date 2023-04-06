@@ -61,7 +61,7 @@ const updateDossierReconventionnement =
                 Number(nombreDePostes),
             },
           });
-      } else if (statut === 'NON_INTERESSE') {
+      } else if (statut === 'NON_INTERESSÉ') {
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
