@@ -89,6 +89,8 @@ export interface IMisesEnRelation {
   resendMailCnfsRupture: boolean | undefined;
 
   dossierIncompletRupture: boolean | undefined;
+
+  reconventionnement: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;

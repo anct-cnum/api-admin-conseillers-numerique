@@ -13,6 +13,7 @@ import {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
+  updateDossierReconventionnement,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -98,6 +99,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getDetailDossierConvention(app),
+    );
+    app.patch(
+      '/reconventionnement',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDossierReconventionnement(app),
     );
   }
 }
