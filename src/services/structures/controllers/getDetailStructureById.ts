@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestStructures,
+  getUrlDemarcheSimplifiee,
   formatAdresseStructure,
   formatQpv,
   formatType,
@@ -91,6 +92,7 @@ const getDetailStructureById =
             contact: 1,
             conseillers: '$misesEnRelation',
             conventionnement: 1,
+            dossierDemarcheSimplifiee: 1,
           },
         },
       ]);
@@ -114,6 +116,7 @@ const getDetailStructureById =
         },
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
+      const urlDemarcheSimplifiee = getUrlDemarcheSimplifiee(structure[0]);
       const coselec = getCoselec(structure[0]);
       structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
       structure[0].craCount = craCount;
@@ -122,6 +125,7 @@ const getDetailStructureById =
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
+      structure[0].urlDemarcheSimplifiee = urlDemarcheSimplifiee;
       structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
         return {
           idPG: conseiller?.conseillerObj?.idPG,
