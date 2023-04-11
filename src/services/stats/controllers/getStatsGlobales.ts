@@ -146,6 +146,12 @@ const getStatsGlobales = async (
       donneesStats.statsLieux,
       donneesStats.nbAccompagnement,
     );
+    donneesStats.statsTempsAccompagnement = await conversionPourcentage(
+      donneesStats.statsTempsAccompagnement,
+      donneesStats.statsTempsAccompagnement.find(
+        (temps) => temps.nom === 'total',
+      ).valeur,
+    );
     donneesStats.statsAges = await conversionPourcentage(
       donneesStats.statsAges,
       totalParticipants,

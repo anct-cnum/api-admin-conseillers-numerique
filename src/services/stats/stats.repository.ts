@@ -672,10 +672,10 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
     .Model.accessibleBy(ability, read)
     .getQuery();
   const tempsAccompagnement = [
-    { nom: 'total', valeur: 0 },
-    { nom: 'individuel', valeur: 0 },
-    { nom: 'ponctuel', valeur: 0 },
-    { nom: 'collectif', valeur: 0 },
+    { nom: 'total', valeur: 0, valeurFormat: 0 },
+    { nom: 'individuel', valeur: 0, valeurFormat: 0 },
+    { nom: 'ponctuel', valeur: 0, valeurFormat: 0 },
+    { nom: 'collectif', valeur: 0, valeurFormat: 0 },
   ];
   const ttempsAccompagnement: Array<{ nom: string; valeur: number }> = await app
     .service(service.cras)
@@ -725,13 +725,28 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
         if (duree.nom === '90') {
           valeurString = 90 * duree.valeur;
         }
-        tempsAccompagnement.find(
-          (tempAccompagnement: { nom: string; valeur: number }) =>
-            tempAccompagnement.nom === activite.nom,
-        ).valeur += valeurString;
-        tempsAccompagnement.find(
-          (accompagnement) => accompagnement.nom === 'total',
-        ).valeur += valeurString;
+        tempsAccompagnement.map(
+          (tempAccompagnement: {
+            nom: string;
+            valeur: number;
+            valeurFormat: number;
+          }) => {
+            const item = tempAccompagnement;
+            if (tempAccompagnement.nom === activite.nom) {
+              item.valeur += valeurString;
+              item.valeurFormat += valeurString;
+            }
+            return item;
+          },
+        );
+        tempsAccompagnement.map((accompagnement) => {
+          const item = accompagnement;
+          if (accompagnement.nom === 'total') {
+            item.valeur += valeurString;
+            item.valeurFormat += valeurString;
+          }
+          return item;
+        });
       });
     }
   });
