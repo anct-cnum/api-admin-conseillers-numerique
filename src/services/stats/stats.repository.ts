@@ -5,6 +5,12 @@ import { ICodesPostauxQuery } from '../../ts/interfaces/global.interfaces';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
+interface TempsAccompagnement {
+  nom: string;
+  valeur: number;
+  minutes: number;
+}
+
 const sortByValueThenName = (a, b) => {
   if (a.valeur > b.valeur) {
     return -1;
@@ -671,15 +677,14 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
     .service(service.cras)
     .Model.accessibleBy(ability, read)
     .getQuery();
-  const tempsAccompagnement = [
-    { nom: 'total', valeur: 0, valeurFormat: 0 },
-    { nom: 'individuel', valeur: 0, valeurFormat: 0 },
-    { nom: 'ponctuel', valeur: 0, valeurFormat: 0 },
-    { nom: 'collectif', valeur: 0, valeurFormat: 0 },
+  const tempsAccompagnement: TempsAccompagnement[] = [
+    { nom: 'total', valeur: 0, minutes: 0 },
+    { nom: 'individuel', valeur: 0, minutes: 0 },
+    { nom: 'ponctuel', valeur: 0, minutes: 0 },
+    { nom: 'collectif', valeur: 0, minutes: 0 },
   ];
-  const ttempsAccompagnement: Array<{ nom: string; valeur: number }> = await app
-    .service(service.cras)
-    .Model.aggregate([
+  const dureeTotalParActiviter: Array<{ nom: string; valeur: number }> =
+    await app.service(service.cras).Model.aggregate([
       { $unwind: '$cra.duree' },
       {
         $match: {
@@ -692,64 +697,93 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
       { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
     ]);
 
-  if (ttempsAccompagnement?.length === 0) {
+  if (dureeTotalParActiviter?.length === 0) {
     return tempsAccompagnement;
   }
   // Gestion des categories '0-30' / '30-60' / '60' / '90'
-  ttempsAccompagnement.forEach(async (activite) => {
-    const dureesString: Array<{ nom: string; valeur: number }> = await app
-      .service(service.cras)
-      .Model.aggregate([
-        { $unwind: '$cra.duree' },
-        {
-          $match: {
-            ...query,
-            $and: [queryAccess],
-            'cra.activite': activite.nom,
-            'cra.duree': { $ne: ['0-30', '30-60', '60', '90'] },
-          },
-        },
-        { $group: { _id: '$cra.duree', count: { $sum: 1 } } },
-        { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
-      ]);
-    // Ajout des heures par activité
-    if (dureesString?.length > 0) {
-      dureesString.forEach((duree: { valeur: number; nom: string }) => {
-        let valeurString = 0;
-        if (duree.nom === '0-30') {
-          valeurString = 30 * duree.valeur;
-        }
-        if (duree.nom === '30-60' || duree.nom === '60') {
-          valeurString = 60 * duree.valeur;
-        }
-        if (duree.nom === '90') {
-          valeurString = 90 * duree.valeur;
-        }
-        tempsAccompagnement.map(
-          (tempAccompagnement: {
-            nom: string;
-            valeur: number;
-            valeurFormat: number;
-          }) => {
-            const item = tempAccompagnement;
-            if (tempAccompagnement.nom === activite.nom) {
-              item.valeur += valeurString;
-              item.valeurFormat += valeurString;
+  const promises = [];
+  dureeTotalParActiviter.forEach((dureeActiviter) => {
+    promises.push(
+      new Promise<void>((resolve) => {
+        app
+          .service(service.cras)
+          .Model.aggregate([
+            { $unwind: '$cra.duree' },
+            {
+              $match: {
+                ...query,
+                $and: [queryAccess],
+                'cra.activite': dureeActiviter.nom,
+                'cra.duree': { $in: ['0-30', '30-60', '60', '90'] },
+              },
+            },
+            {
+              $group: {
+                _id: '$cra.duree',
+                count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                nom: '$_id',
+                valeur: '$count',
+              },
+            },
+          ])
+          .then((dureeTypeString) => {
+            if (dureeTypeString?.length > 0) {
+              dureeTypeString.forEach((duree) => {
+                let valeurString = 0;
+                if (duree.nom === '0-30') {
+                  valeurString = 30 * duree.valeur;
+                }
+                if (duree.nom === '30-60' || duree.nom === '60') {
+                  valeurString = 60 * duree.valeur;
+                }
+                if (duree.nom === '90') {
+                  valeurString = 90 * duree.valeur;
+                }
+                tempsAccompagnement.map((accompagnement) => {
+                  const item = accompagnement;
+                  if (accompagnement.nom === dureeActiviter.nom) {
+                    item.valeur += valeurString;
+                    item.minutes += valeurString;
+                  }
+                  return item;
+                });
+                tempsAccompagnement.map((accompagnement) => {
+                  const item = accompagnement;
+                  if (accompagnement.nom === 'total') {
+                    item.valeur += valeurString;
+                    item.minutes += valeurString;
+                  }
+                  return item;
+                });
+              });
             }
-            return item;
-          },
-        );
-        tempsAccompagnement.map((accompagnement) => {
-          const item = accompagnement;
-          if (accompagnement.nom === 'total') {
-            item.valeur += valeurString;
-            item.valeurFormat += valeurString;
-          }
-          return item;
-        });
-      });
-    }
+            resolve();
+          });
+      }),
+    );
+    tempsAccompagnement.map((tempAccompagnement: TempsAccompagnement) => {
+      const item = tempAccompagnement;
+      if (tempAccompagnement.nom === dureeActiviter.nom) {
+        item.valeur += dureeActiviter.valeur;
+        item.minutes += dureeActiviter.valeur;
+      }
+      return item;
+    });
+    tempsAccompagnement.map((accompagnement: TempsAccompagnement) => {
+      const item = accompagnement;
+      if (accompagnement.nom === 'total') {
+        item.valeur += dureeActiviter.valeur;
+        item.minutes += dureeActiviter.valeur;
+      }
+      return item;
+    });
   });
+  await Promise.all(promises);
 
   return tempsAccompagnement;
 };
