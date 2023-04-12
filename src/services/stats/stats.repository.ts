@@ -653,9 +653,9 @@ const getStatsEvolutions = async (query, ability, read, app) => {
 
 const conversionPourcentage = async (datas, total) => {
   return datas.map((data) => {
-    // eslint-disable-next-line
-    data.valeur = total > 0 ? Math.round((data.valeur / total) * 100) : 0;
-    return data;
+    const item = data;
+    item.valeur = total > 0 ? Math.round((data.valeur / total) * 100) : 0;
+    return item;
   });
 };
 
