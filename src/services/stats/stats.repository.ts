@@ -735,29 +735,29 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
             if (dureeTypeString?.length > 0) {
               dureeTypeString.forEach(
                 (duree: { nom: string; valeur: number }) => {
-                  let valeurString = 0;
+                  let dureeByActiviter = 0;
                   if (duree.nom === '0-30') {
-                    valeurString = 30 * duree.valeur;
+                    dureeByActiviter = 30 * duree.valeur;
                   }
                   if (duree.nom === '30-60' || duree.nom === '60') {
-                    valeurString = 60 * duree.valeur;
+                    dureeByActiviter = 60 * duree.valeur;
                   }
                   if (duree.nom === '90') {
-                    valeurString = 90 * duree.valeur;
+                    dureeByActiviter = 90 * duree.valeur;
                   }
                   tempsAccompagnement.map((accompagnement) => {
                     const item = accompagnement;
                     if (accompagnement.nom === dureeActiviter.nom) {
-                      item.valeur += valeurString;
-                      item.minutes += valeurString;
+                      item.valeur += dureeByActiviter;
+                      item.minutes += dureeByActiviter;
                     }
                     return item;
                   });
                   tempsAccompagnement.map((accompagnement) => {
                     const item = accompagnement;
                     if (accompagnement.nom === 'total') {
-                      item.valeur += valeurString;
-                      item.minutes += valeurString;
+                      item.valeur += dureeByActiviter;
+                      item.minutes += dureeByActiviter;
                     }
                     return item;
                   });
