@@ -41,11 +41,15 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
-const formatMinutes = (minutes: number) => {
+const formatMinutes = (minutes: number, type) => {
   if (minutes > 0) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    if (remainingMinutes === 0) {
+    if (
+      remainingMinutes === 0 ||
+      type !== 'conseiller' ||
+      type !== 'structure'
+    ) {
       return `${hours}h`;
     }
     return `${hours}h${remainingMinutes}min`;
@@ -449,7 +453,8 @@ const generateCsvStatistiques = async (
       ...['Total', 'Individuelles', 'Collectives', 'Ponctuelles'].map(
         (tempsAccompagnement, index) =>
           `\n${tempsAccompagnement};${formatMinutes(
-            statistiques?.statsTempsAccompagnement[index].valeur,
+            statistiques?.statsTempsAccompagnement[index].minutes,
+            type,
           )}`,
       ),
       '',
