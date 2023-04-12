@@ -731,36 +731,38 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
               },
             },
           ])
-          .then((dureeTypeString) => {
+          .then((dureeTypeString: Array<{ nom: string; valeur: number }>) => {
             if (dureeTypeString?.length > 0) {
-              dureeTypeString.forEach((duree) => {
-                let valeurString = 0;
-                if (duree.nom === '0-30') {
-                  valeurString = 30 * duree.valeur;
-                }
-                if (duree.nom === '30-60' || duree.nom === '60') {
-                  valeurString = 60 * duree.valeur;
-                }
-                if (duree.nom === '90') {
-                  valeurString = 90 * duree.valeur;
-                }
-                tempsAccompagnement.map((accompagnement) => {
-                  const item = accompagnement;
-                  if (accompagnement.nom === dureeActiviter.nom) {
-                    item.valeur += valeurString;
-                    item.minutes += valeurString;
+              dureeTypeString.forEach(
+                (duree: { nom: string; valeur: number }) => {
+                  let valeurString = 0;
+                  if (duree.nom === '0-30') {
+                    valeurString = 30 * duree.valeur;
                   }
-                  return item;
-                });
-                tempsAccompagnement.map((accompagnement) => {
-                  const item = accompagnement;
-                  if (accompagnement.nom === 'total') {
-                    item.valeur += valeurString;
-                    item.minutes += valeurString;
+                  if (duree.nom === '30-60' || duree.nom === '60') {
+                    valeurString = 60 * duree.valeur;
                   }
-                  return item;
-                });
-              });
+                  if (duree.nom === '90') {
+                    valeurString = 90 * duree.valeur;
+                  }
+                  tempsAccompagnement.map((accompagnement) => {
+                    const item = accompagnement;
+                    if (accompagnement.nom === dureeActiviter.nom) {
+                      item.valeur += valeurString;
+                      item.minutes += valeurString;
+                    }
+                    return item;
+                  });
+                  tempsAccompagnement.map((accompagnement) => {
+                    const item = accompagnement;
+                    if (accompagnement.nom === 'total') {
+                      item.valeur += valeurString;
+                      item.minutes += valeurString;
+                    }
+                    return item;
+                  });
+                },
+              );
             }
             resolve();
           });
