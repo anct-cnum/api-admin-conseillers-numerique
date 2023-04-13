@@ -56,7 +56,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           { $set: {
             dateDebutDeContrat: dateDebutObject,
             dateFinDeContrat: dateFinObject,
-            typeContrat: contrat['CT dans BDD'],
+            typeDeContrat: contrat['CT dans BDD'],
             dureeEffectiveContrat: contrat['Durée effective \n(mois)'],
             numeroDSContrat: contrat['N°DS'],
           } },
