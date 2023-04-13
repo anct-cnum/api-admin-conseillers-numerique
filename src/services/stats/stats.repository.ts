@@ -690,7 +690,7 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
         $match: {
           ...query,
           $and: [queryAccess],
-          'cra.duree': { $ne: ['0-30', '30-60', '60', '90'] },
+          'cra.duree': { $nin: ['0-30', '30-60', '60', '90'] },
         },
       },
       { $group: { _id: '$cra.activite', count: { $sum: '$cra.duree' } } },
