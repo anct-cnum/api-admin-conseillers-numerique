@@ -93,6 +93,9 @@ const miseEnRelationConseillerStructure =
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,
           reconventionnement: 1,
+          dateFinDeContrat: 1,
+          dateDebutDeContrat: 1,
+          typeDeContrat: 1,
         },
       },
     ]);
