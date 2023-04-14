@@ -8,7 +8,7 @@ const labelsCorrespondance = require('../../../datas/themesCorrespondances.json'
 interface TempsAccompagnement {
   nom: string;
   valeur: number;
-  minutes: number;
+  temps: string;
 }
 
 const sortByValueThenName = (a, b) => {
@@ -672,16 +672,28 @@ const getPersonnesAccompagnees = async (statsActivites) => {
   return nbTotalParticipant + nbAccompagnementPerso + nbDemandePonctuel;
 };
 
+const formatMinutes = (minutes: number) => {
+  if (minutes > 0) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h${remainingMinutes}min`;
+  }
+  return '0h';
+};
+
 const getStatsTempsAccompagnement = async (query, ability, read, app) => {
   const queryAccess = await app
     .service(service.cras)
     .Model.accessibleBy(ability, read)
     .getQuery();
   const tempsAccompagnement: TempsAccompagnement[] = [
-    { nom: 'total', valeur: 0, minutes: 0 },
-    { nom: 'individuel', valeur: 0, minutes: 0 },
-    { nom: 'ponctuel', valeur: 0, minutes: 0 },
-    { nom: 'collectif', valeur: 0, minutes: 0 },
+    { nom: 'total', valeur: 0, temps: '0h' },
+    { nom: 'collectif', valeur: 0, temps: '0h' },
+    { nom: 'individuel', valeur: 0, temps: '0h' },
+    { nom: 'ponctuel', valeur: 0, temps: '0h' },
   ];
   const dureeTotalParActiviter: Array<{ nom: string; valeur: number }> =
     await app.service(service.cras).Model.aggregate([
@@ -690,89 +702,38 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
         $match: {
           ...query,
           $and: [queryAccess],
-          'cra.duree': { $nin: ['0-30', '30-60', '60', '90'] },
         },
       },
-      { $group: { _id: '$cra.activite', count: { $sum: '$cra.duree' } } },
+      {
+        $group: {
+          _id: '$cra.activite',
+          count: {
+            $sum: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ['$cra.duree', '0-30'] }, then: 30 },
+                  { case: { $eq: ['$cra.duree', '30-60'] }, then: 60 },
+                  { case: { $eq: ['$cra.duree', '60'] }, then: 60 },
+                  { case: { $eq: ['$cra.duree', '90'] }, then: 90 },
+                ],
+                default: '$cra.duree',
+              },
+            },
+          },
+        },
+      },
       { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
     ]);
 
   if (dureeTotalParActiviter?.length === 0) {
     return tempsAccompagnement;
   }
-  // Gestion des categories '0-30' / '30-60' / '60' / '90'
-  const promises = [];
-  dureeTotalParActiviter.forEach((dureeActiviter) => {
-    promises.push(
-      new Promise<void>((resolve) => {
-        app
-          .service(service.cras)
-          .Model.aggregate([
-            { $unwind: '$cra.duree' },
-            {
-              $match: {
-                ...query,
-                $and: [queryAccess],
-                'cra.activite': dureeActiviter.nom,
-                'cra.duree': { $in: ['0-30', '30-60', '60', '90'] },
-              },
-            },
-            {
-              $group: {
-                _id: '$cra.duree',
-                count: { $sum: 1 },
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                nom: '$_id',
-                valeur: '$count',
-              },
-            },
-          ])
-          .then((dureeTypeString: Array<{ nom: string; valeur: number }>) => {
-            if (dureeTypeString?.length > 0) {
-              dureeTypeString.forEach(
-                (duree: { nom: string; valeur: number }) => {
-                  let dureeByActiviter = 0;
-                  if (duree.nom === '0-30') {
-                    dureeByActiviter = 30 * duree.valeur;
-                  }
-                  if (duree.nom === '30-60' || duree.nom === '60') {
-                    dureeByActiviter = 60 * duree.valeur;
-                  }
-                  if (duree.nom === '90') {
-                    dureeByActiviter = 90 * duree.valeur;
-                  }
-                  tempsAccompagnement.map((accompagnement) => {
-                    const item = accompagnement;
-                    if (accompagnement.nom === dureeActiviter.nom) {
-                      item.valeur += dureeByActiviter;
-                      item.minutes += dureeByActiviter;
-                    }
-                    return item;
-                  });
-                  tempsAccompagnement.map((accompagnement) => {
-                    const item = accompagnement;
-                    if (accompagnement.nom === 'total') {
-                      item.valeur += dureeByActiviter;
-                      item.minutes += dureeByActiviter;
-                    }
-                    return item;
-                  });
-                },
-              );
-            }
-            resolve();
-          });
-      }),
-    );
+  dureeTotalParActiviter.forEach((dureeActiviter, index: number) => {
     tempsAccompagnement.map((tempAccompagnement: TempsAccompagnement) => {
       const item = tempAccompagnement;
       if (tempAccompagnement.nom === dureeActiviter.nom) {
         item.valeur += dureeActiviter.valeur;
-        item.minutes += dureeActiviter.valeur;
+        item.temps = formatMinutes(item.valeur);
       }
       return item;
     });
@@ -780,12 +741,13 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
       const item = accompagnement;
       if (accompagnement.nom === 'total') {
         item.valeur += dureeActiviter.valeur;
-        item.minutes += dureeActiviter.valeur;
+        if (index === dureeTotalParActiviter.length - 1) {
+          item.temps = formatMinutes(item.valeur);
+        }
       }
       return item;
     });
   });
-  await Promise.all(promises);
 
   return tempsAccompagnement;
 };
