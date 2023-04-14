@@ -6,7 +6,10 @@
 import { GraphQLClient } from 'graphql-request';
 import execute from '../utils';
 import service from '../../helpers/services';
-import TypeDossierReconventionnement from '../../ts/enum';
+import {
+  TypeDossierReconventionnement,
+  StatutConventionnement,
+} from '../../ts/enum';
 import { queryGetDemarcheReconventionnement } from '../../services/structures/repository/reconventionnement.repository';
 import { IDossierDS } from '../../ts/interfaces/global.interfaces';
 
@@ -180,8 +183,8 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               statut: 'VALIDATION_COSELEC',
               'conventionnement.statut': {
                 $nin: [
-                  'CONVENTIONNEMENT_VALIDÉ',
-                  'RECONVENTIONNEMENT_EN_COURS',
+                  StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
+                  StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
                 ],
               },
               $or: [
@@ -200,7 +203,8 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               ],
             },
             {
-              'conventionnement.statut': 'CONVENTIONNEMENT_EN_COURS',
+              'conventionnement.statut':
+                StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
               'conventionnement.dossierConventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),

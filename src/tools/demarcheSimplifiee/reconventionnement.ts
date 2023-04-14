@@ -6,7 +6,10 @@
 import { GraphQLClient } from 'graphql-request';
 import execute from '../utils';
 import service from '../../helpers/services';
-import TypeDossierReconventionnement from '../../ts/enum';
+import {
+  TypeDossierReconventionnement,
+  StatutConventionnement,
+} from '../../ts/enum';
 import { queryGetDemarcheReconventionnement } from '../../services/structures/repository/reconventionnement.repository';
 import { IDossierDS } from '../../ts/interfaces/global.interfaces';
 
@@ -239,7 +242,8 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               ],
             },
             {
-              'conventionnement.statut': 'RECONVENTIONNEMENT_EN_COURS',
+              'conventionnement.statut':
+                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
               'conventionnement.dossierReconventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),
