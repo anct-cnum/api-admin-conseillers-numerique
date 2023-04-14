@@ -37,7 +37,7 @@ const validationReconventionnement =
         return;
       }
       res.status(200).json({
-        statutReconventionnement:
+        statutReconventionnementUpdated:
           StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
       });
     } catch (error) {

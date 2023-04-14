@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { gql } from 'graphql-request';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import TypeDossierReconventionnement from '../../../ts/enum';
+import { TypeDossierReconventionnement } from '../../../ts/enum';
 import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
