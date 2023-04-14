@@ -41,15 +41,11 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
-const formatMinutes = (minutes: number, type) => {
+const formatMinutes = (minutes: number) => {
   if (minutes > 0) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    if (
-      remainingMinutes === 0 ||
-      type !== 'conseiller' ||
-      type !== 'structure'
-    ) {
+    if (remainingMinutes === 0) {
       return `${hours}h`;
     }
     return `${hours}h${remainingMinutes}min`;
@@ -454,7 +450,6 @@ const generateCsvStatistiques = async (
         (tempsAccompagnement, index) =>
           `\n${tempsAccompagnement};${formatMinutes(
             statistiques?.statsTempsAccompagnement[index].minutes,
-            type,
           )}`,
       ),
       '',
