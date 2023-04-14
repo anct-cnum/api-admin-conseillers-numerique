@@ -2,7 +2,6 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { getTypeDossierDemarcheSimplifiee } from './reconventionnement.repository';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -105,25 +104,8 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const getUrlDemarcheSimplifiee = (structure) => {
-  const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-    structure?.insee?.entreprise?.forme_juridique,
-  );
-  if (structure?.conventionnement?.statut?.match(/\bRECONVENTIONNEMENT\B/)) {
-    const reconventionnement = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}`;
-    const conventionnement = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}`;
-    return {
-      reconventionnement,
-      conventionnement,
-    };
-  }
-  const conventionnement = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}`;
-  return { conventionnement };
-};
-
 export {
   checkAccessReadRequestStructures,
-  getUrlDemarcheSimplifiee,
   filterDepartement,
   filterSearchBar,
   filterType,
