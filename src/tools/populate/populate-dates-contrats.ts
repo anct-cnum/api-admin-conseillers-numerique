@@ -12,16 +12,16 @@ program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
-  const contrats = await CSVToJSON({ delimiter: 'auto', trim: true }).fromFile(filePath); // CSV en entrée
+  const contrats = await CSVToJSON({ delimiter: 'auto', trim: true }).fromFile(
+    filePath,
+  ); // CSV en entrée
 
   return contrats;
 };
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const matchContrat = (idStructure: number, idConseiller: number) => app
-    .service(service.misesEnRelation)
-    .Model
-    .findOne({
+  const matchContrat = (idStructure: number, idConseiller: number) =>
+    app.service(service.misesEnRelation).Model.findOne({
       'structureObj.idPG': idStructure,
       'conseillerObj.idPG': idConseiller,
       statut: { $in: ['finalisee', 'nouvelle_rupture', 'finalisee_rupture'] },
@@ -38,31 +38,49 @@ execute(__filename, async ({ app, logger, exit }) => {
   contrats.forEach(async (contrat) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve, reject) => {
-      const match = await matchContrat(parseInt(contrat['ID SA'], 10), parseInt(contrat['ID CNFS'], 10));
+      const match = await matchContrat(
+        parseInt(contrat['ID SA'], 10),
+        parseInt(contrat['ID CNFS'], 10),
+      );
 
       if (match === null) {
-        inconnues++;
-        logger.warn(`Contrat inexistant pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`);
+        inconnues += 1;
+        logger.warn(
+          `Contrat inexistant pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+        );
         reject();
       } else {
-        trouvees++;
-        const [jourDebut, moisDebut, anneeDebut] = contrat['Date de début de CT\nJJ/MM/AAAA'].split("/");
-        const dateDebutObject = new Date(anneeDebut, moisDebut - 1, jourDebut, 0, 0, 0);
-        const [jourFin, moisFin, anneeFin] = contrat['Date de fin de CT\nJJ/MM/AAAA'].split("/");
+        trouvees += 1;
+        const [jourDebut, moisDebut, anneeDebut] =
+          contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
+        const dateDebutObject = new Date(
+          anneeDebut,
+          moisDebut - 1,
+          jourDebut,
+          0,
+          0,
+          0,
+        );
+        const [jourFin, moisFin, anneeFin] =
+          contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
         const dateFinObject = new Date(anneeFin, moisFin - 1, jourFin, 0, 0, 0);
 
-        const c = await app.service(service.misesEnRelation).Model.findOneAndUpdate(
+        await app.service(service.misesEnRelation).Model.findOneAndUpdate(
           { _id: match._id },
-          { $set: {
-            dateDebutDeContrat: dateDebutObject,
-            dateFinDeContrat: dateFinObject,
-            typeDeContrat: contrat['CT dans BDD'],
-            dureeEffectiveContrat: contrat['Durée effective \n(mois)'],
-            numeroDSContrat: contrat['N°DS'],
-          } },
+          {
+            $set: {
+              dateDebutDeContrat: dateDebutObject,
+              dateFinDeContrat: dateFinObject,
+              typeDeContrat: contrat['CT dans BDD'],
+              dureeEffectiveContrat: contrat['Durée effective \n(mois)'],
+              numeroDSContrat: contrat['N°DS'],
+            },
+          },
           { returnOriginal: false },
         );
-        logger.info(`Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`);
+        logger.info(
+          `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+        );
         logger.info(match._id);
         resolve(p);
       }
