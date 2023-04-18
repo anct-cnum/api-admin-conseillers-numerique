@@ -732,7 +732,7 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
     tempsAccompagnement.map((tempAccompagnement: TempsAccompagnement) => {
       const item = tempAccompagnement;
       if (tempAccompagnement.nom === dureeActiviter.nom) {
-        item.valeur += dureeActiviter.valeur;
+        item.valeur = dureeActiviter.valeur;
         item.temps = formatMinutes(item.valeur);
       }
       return item;
