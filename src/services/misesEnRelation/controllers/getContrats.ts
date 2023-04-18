@@ -35,7 +35,6 @@ const getMisesEnRelations =
       {
         $project: {
           _id: 1,
-          dateRecrutement: 1,
           emetteurRupture: 1,
           emetteurRenouvellement: 1,
           'structureObj.nom': 1,
