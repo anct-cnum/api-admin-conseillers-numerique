@@ -651,13 +651,12 @@ const getStatsEvolutions = async (query, ability, read, app) => {
   return statsEvolutions;
 };
 
-const conversionPourcentage = async (datas, total) => {
-  return datas.map((data) => {
-    const item = data;
-    item.valeur = total > 0 ? Math.round((data.valeur / total) * 100) : 0;
-    return item;
-  });
-};
+const conversionPourcentage = (datas, total) =>
+  datas.map((obj) =>
+    Object.assign(obj, {
+      valeur: total > 0 ? Math.round((obj.valeur / total) * 100) : 0,
+    }),
+  );
 
 const getPersonnesAccompagnees = async (statsActivites) => {
   const nbTotalParticipant =
