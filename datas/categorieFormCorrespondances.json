@@ -1,7 +1,8 @@
 [
   {
     "type": "entreprise",
-    "numero_demarche": 69686,
+    "numero_demarche_reconventionnement": 69686,
+    "numero_demarche_conventionnement": 38614,
     "categorie": [
       "Autre SARL coopérative",
       "SA d'économie mixte à conseil d'administration",
@@ -25,7 +26,8 @@
   },
   {
     "type": "association",
-    "numero_demarche": 69687,
+    "numero_demarche_reconventionnement": 69687,
+    "numero_demarche_conventionnement": 43266,
     "categorie": [
       "Association déclarée",
       "Association de droit local (Bas-Rhin, Haut-Rhin et Moselle)",
@@ -37,7 +39,8 @@
   },
   {
     "type": "structure_publique",
-    "numero_demarche": 69665,
+    "numero_demarche_reconventionnement": 69665,
+    "numero_demarche_conventionnement": 38389,
     "categorie": [
       "Commune et commune nouvelle",
       "Syndicat mixte ouvert",

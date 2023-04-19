@@ -57,7 +57,11 @@ app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(favicon(path.join(__dirname, 'favicon.ico')));
+if (process.env.NODE_ENV === 'production') {
+  app.use(favicon(path.join(__dirname, 'favicon.ico')));
+} else {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
 // Set up Plugins and providers
 app.configure(express.rest());

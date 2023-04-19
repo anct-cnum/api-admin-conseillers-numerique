@@ -30,14 +30,21 @@ const checkAccessReadRequestStructures = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const filterNomStructure = (nom: string) => {
-  const formatNom = nom?.trim();
-  if (/^\d+$/.test(formatNom)) {
-    return { idPG: { $eq: parseInt(nom, 10) } };
-  }
-  if (formatNom) {
+const filterSearchBar = (input: string) => {
+  const inputSearchBar = input?.trim();
+  if (inputSearchBar) {
     return {
-      nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' },
+      $or: [
+        { nom: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+        { siret: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+        {
+          'contact.email': {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+      ],
     };
   }
   return {};
@@ -100,7 +107,7 @@ const getNameStructure =
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
-  filterNomStructure,
+  filterSearchBar,
   filterType,
   filterRegion,
   filterStatut,

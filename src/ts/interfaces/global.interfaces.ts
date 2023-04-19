@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { IUser, IStructures } from './db.interfaces';
+import { IUser } from './db.interfaces';
 
 export interface IRequest extends Request {
   ability: any;
@@ -64,22 +64,22 @@ export interface ICodesPostauxQuery {
 }
 
 export interface IDossierDS {
-  _id: string;
-  idPG: number;
-  dateDeCreation: Date;
-  dateFinProchainContrat: Date;
-  nbPostesAttribuees: number;
-  nomStructure: string;
-  type: string;
-}
-
-export interface IReconventionnementDS {
-  idDossier?: string;
-  numeroDossier?: number;
+  _id?: string;
+  idPG?: number;
   dateDeCreation?: Date;
   dateFinProchainContrat?: Date;
+  dateDerniereModification?: Date;
   nbPostesAttribuees?: number;
   statut?: string;
-  structure?: IStructures;
-  url?: string;
+}
+
+export interface IConfigurationDemarcheSimplifiee {
+  url_association_reconventionnement: string;
+  url_entreprise_reconventionnement: string;
+  url_structure_publique_reconventionnement: string;
+  url_association_conventionnement: string;
+  url_entreprise_conventionnement: string;
+  url_structure_publique_conventionnement: string;
+  token_api: string;
+  endpoint: string;
 }
