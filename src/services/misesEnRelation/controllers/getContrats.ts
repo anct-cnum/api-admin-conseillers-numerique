@@ -35,7 +35,7 @@ const getMisesEnRelations =
       {
         $project: {
           emetteurRupture: 1,
-          emetteurRenouvellement: 1,
+          emetteurRenouvellement: 1, // à définir
           'structureObj.nom': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,
@@ -105,7 +105,7 @@ const getContrats =
           )?.count ?? 0,
         renouvellementDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'renouvellement',
+            (totalParStatut) => totalParStatut.statut === 'renouvellement', // statut à définir pour le renouvellement de contrat
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
