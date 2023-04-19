@@ -70,16 +70,7 @@ const filterStatutContrat = (statut: string) => {
   }
   return {
     statut: {
-      $nin: [
-        'finalisee_rupture',
-        'interesee',
-        'nonInteressee',
-        'non_disponible',
-        'nouvelle',
-        'finalisee',
-        'finalisee_non_disponible',
-        'interessee',
-      ],
+      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
     },
   };
 };
@@ -90,16 +81,7 @@ const totalContrat = async (app: Application, checkAccess) => {
       $match: {
         $and: [checkAccess],
         statut: {
-          $nin: [
-            'finalisee_rupture',
-            'interesee',
-            'nonInteressee',
-            'non_disponible',
-            'nouvelle',
-            'finalisee',
-            'finalisee_non_disponible',
-            'interessee',
-          ],
+          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
         },
       },
     },

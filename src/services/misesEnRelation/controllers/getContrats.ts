@@ -10,11 +10,11 @@ import {
 import validContrat from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
-  (app: Application, checkAccess) => async (typeContrat: string) =>
+  (app: Application, checkAccess) => async (statut: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterStatutContrat(typeContrat),
+          ...filterStatutContrat(statut),
           $and: [checkAccess],
         },
       },
@@ -24,17 +24,16 @@ const getTotalMisesEnRelations =
 
 const getMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (skip: string, limit: number, typeContrat: string) =>
+  async (skip: string, limit: number, statut: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
           $and: [checkAccess],
-          ...filterStatutContrat(typeContrat),
+          ...filterStatutContrat(statut),
         },
       },
       {
         $project: {
-          _id: 1,
           emetteurRupture: 1,
           emetteurRenouvellement: 1,
           'structureObj.nom': 1,
@@ -54,9 +53,9 @@ const getMisesEnRelations =
 
 const getContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, type } = req.query;
+    const { page, statut } = req.query;
     try {
-      const pageValidation = validContrat.validate({ page, type });
+      const pageValidation = validContrat.validate({ page, statut });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
         return;
@@ -86,16 +85,16 @@ const getContrats =
       };
 
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
-      const structures = await getMisesEnRelations(app, checkAccess)(
+      const contrats = await getMisesEnRelations(app, checkAccess)(
         page,
         options.paginate.default,
-        type,
+        statut,
       );
-      const totalStructures = await getTotalMisesEnRelations(
+      const totalContrats = await getTotalMisesEnRelations(
         app,
         checkAccess,
-      )(type);
-      items.total = totalStructures[0]?.count_contrats ?? 0;
+      )(statut);
+      items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalContrat(app, checkAccess);
       items.totalParContrat = {
         ...items.totalParContrat,
@@ -113,7 +112,7 @@ const getContrats =
             (totalParStatut) => totalParStatut.statut === 'nouvelle_rupture',
           )?.count ?? 0,
       };
-      items.data = structures;
+      items.data = contrats;
       items.limit = options.paginate.default;
       items.skip = page;
       res.status(200).json(items);
