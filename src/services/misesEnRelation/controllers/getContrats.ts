@@ -55,9 +55,9 @@ const getContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const { page, statut } = req.query;
     try {
-      const pageValidation = validContrat.validate({ page, statut });
-      if (pageValidation.error) {
-        res.status(400).json({ message: pageValidation.error.message });
+      const contratValidation = validContrat.validate({ page, statut });
+      if (contratValidation.error) {
+        res.status(400).json({ message: contratValidation.error.message });
         return;
       }
       const items: {
