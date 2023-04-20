@@ -7,7 +7,7 @@ import {
   filterStatutContrat,
   totalContrat,
 } from '../misesEnRelation.repository';
-import { validContrat } from '../../../schemas/contrat.schemas';
+import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
@@ -25,11 +25,27 @@ const getTotalMisesEnRelations =
 
 const getMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (skip: string, limit: number, statut: string, statutOld: string[]) =>
+  async (
+    skip: string,
+    limit: number,
+    statut: string,
+    dateDebut: Date,
+    dateFin: Date,
+    statutOld: string[],
+  ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
           $and: [checkAccess],
+          $or: [
+            { 'emetteurRupture.date': { $gte: dateDebut, $lte: dateFin } },
+            {
+              'emetteurRenouvellement.date': { $gte: dateDebut, $lte: dateFin },
+            },
+            {
+              dateRecrutement: { $gte: dateDebut, $lte: dateFin },
+            },
+          ],
           ...filterStatutContrat(statut, statutOld),
         },
       },
@@ -42,6 +58,9 @@ const getMisesEnRelations =
           'conseillerObj.prenom': 1,
           'structureObj.idPG': 1,
           'conseillerObj.idPG': 1,
+          typeDeContrat: 1,
+          dateDebutDeContrat: 1,
+          dateFinDeContrat: 1,
           statut: 1,
         },
       },
@@ -52,13 +71,24 @@ const getMisesEnRelations =
       { $limit: Number(limit) },
     ]);
 
-const getContrats =
+const getHistoriqueContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const { page, statut } = req.query;
+    const dateDebut: Date = new Date(req.query.dateDebut);
+    const dateFin: Date = new Date(req.query.dateFin);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     try {
-      const contratValidation = validContrat.validate({ page, statut });
-      if (contratValidation.error) {
-        res.status(400).json({ message: contratValidation.error.message });
+      const contratHistoriqueValidation = validHistoriqueContrat.validate({
+        page,
+        statut,
+        dateDebut,
+        dateFin,
+      });
+      if (contratHistoriqueValidation.error) {
+        res
+          .status(400)
+          .json({ message: contratHistoriqueValidation.error.message });
         return;
       }
       const items: {
@@ -84,12 +114,14 @@ const getContrats =
         limit: 0,
         skip: 0,
       };
-      const statutOld = ['recrutee', 'nouvelle_rupture', 'renouvellement'];
+      const statutOld = ['finalisee', 'finalisee_rupture', 'renouvelee'];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const contrats = await getMisesEnRelations(app, checkAccess)(
         page,
         options.paginate.default,
         statut,
+        dateDebut,
+        dateFin,
         statutOld,
       );
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
@@ -103,15 +135,15 @@ const getContrats =
         total: totalConvention.total,
         recrutement:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'recrutee',
+            (totalParStatut) => totalParStatut.statut === 'finalisee',
           )?.count ?? 0,
         renouvellementDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'renouvellement', // statut à définir pour le renouvellement de contrat
+            (totalParStatut) => totalParStatut.statut === 'renouvelee', // statut à définir pour le renouvellement de contrat
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'nouvelle_rupture',
+            (totalParStatut) => totalParStatut.statut === 'finalisee_rupture',
           )?.count ?? 0,
       };
       items.data = contrats;
@@ -128,4 +160,4 @@ const getContrats =
     }
   };
 
-export default getContrats;
+export default getHistoriqueContrats;
