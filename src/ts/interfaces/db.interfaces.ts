@@ -231,6 +231,8 @@ export interface IConseillers {
 
     competence3: boolean;
   };
+
+  inactivite: boolean;
 }
 
 export interface IStructures {
@@ -301,6 +303,8 @@ export interface IStructures {
     email: string;
 
     telephone: string;
+
+    inactivite: boolean;
   };
   insee: {
     etablissement: IEtablissement;
