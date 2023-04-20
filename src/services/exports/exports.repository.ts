@@ -420,7 +420,7 @@ const generateCsvStatistiques = async (
           `\n${
             labelsCorrespondance.find((label) => label.nom === theme.nom)
               ?.correspondance ?? theme.nom
-          };${theme.valeur}`,
+          };${theme.valeur};${theme.pourcent}%`,
       ) ?? []),
       '',
     ];
