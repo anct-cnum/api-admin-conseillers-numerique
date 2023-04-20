@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { action } from '../../../helpers/accessControl/accessList';
+import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { updateEmail } from '../../../schemas/structures.schemas';
 import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
@@ -82,7 +82,10 @@ const updateEmailStructure =
           { returnOriginal: false },
         );
 
-      if (structureUpdated.contact?.inactivite === true) {
+      if (
+        structureUpdated.contact?.inactivite === true &&
+        structureUpdated.statut === 'VALIDATION_COSELEC'
+      ) {
         let errorSmtpMail: Error | null = null;
         await app
           .service(service.structures)
@@ -102,25 +105,26 @@ const updateEmailStructure =
 
         const connect = app.get('mongodb');
         const database = connect.substr(connect.lastIndexOf('/') + 1);
-        const user: IUser = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.create)
-          .create({
-            name: email,
-            roles: ['structure'],
-            entity: new DBRef(
-              'structures',
-              new ObjectId(idStructure),
-              database,
-            ),
-            password: uuidv4(),
-            token: uuidv4(),
-            tokenCreatedAt: new Date(),
-            passwordCreated: false,
-            migrationDashboard: true,
-            mailSentDate: null,
-            resend: false,
+
+        const canCreate = req.ability.can(action.create, ressource.users);
+        if (!canCreate) {
+          res.status(403).json({
+            message: `Accès refusé, vous n'êtes pas autorisé à créer un nouvel utilisateur`,
           });
+          return;
+        }
+        const user: IUser = await app.service(service.users).create({
+          name: email,
+          roles: ['structure'],
+          entity: new DBRef('structures', new ObjectId(idStructure), database),
+          password: uuidv4(),
+          token: uuidv4(),
+          tokenCreatedAt: new Date(),
+          passwordCreated: false,
+          migrationDashboard: true,
+          mailSentDate: null,
+          resend: false,
+        });
         await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
@@ -128,12 +132,12 @@ const updateEmailStructure =
             { 'structure.$id': new ObjectId(idStructure) },
             {
               $set: {
-                userCreated: true,
+                'structureObj.userCreated': true,
                 'structureObj.contact.email': email,
               },
               $unset: {
-                'contact.inactivite': '',
-                userCreationError: '',
+                'structureObj.contact.inactivite': '',
+                'structureObj.userCreationError': '',
               },
             },
           );
