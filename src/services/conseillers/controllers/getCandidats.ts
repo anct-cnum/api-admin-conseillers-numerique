@@ -47,6 +47,17 @@ const getCandidatsAvecFiltre =
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
+      {
         $match: {
           statut: { $ne: 'RECRUTE' },
           $and: [checkAccess],
