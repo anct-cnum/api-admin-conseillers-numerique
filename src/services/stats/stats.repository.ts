@@ -5,6 +5,18 @@ import { ICodesPostauxQuery } from '../../ts/interfaces/global.interfaces';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
+interface TempsAccompagnement {
+  nom: string;
+  valeur: number;
+  temps: string;
+}
+
+interface ThemesAccompagnement {
+  nom: string;
+  valeur: number;
+  percent: number;
+}
+
 const sortByValueThenName = (a, b) => {
   if (a.valeur > b.valeur) {
     return -1;
@@ -251,26 +263,26 @@ const getStatsTauxAccompagnements = async (
     : 0;
 
 const getStatsThemes = async (query, ability, read, app) => {
-  let statsThemes = [
-    { nom: 'equipement informatique', valeur: 0 },
-    { nom: 'internet', valeur: 0 },
-    { nom: 'courriel', valeur: 0 },
-    { nom: 'smartphone', valeur: 0 },
-    { nom: 'contenus numeriques', valeur: 0 },
-    { nom: 'vocabulaire', valeur: 0 },
-    { nom: 'traitement texte', valeur: 0 },
-    { nom: 'echanger', valeur: 0 },
-    { nom: 'trouver emploi', valeur: 0 },
-    { nom: 'accompagner enfant', valeur: 0 },
-    { nom: 'tpe/pme', valeur: 0 },
-    { nom: 'demarche en ligne', valeur: 0 },
-    { nom: 'securite', valeur: 0 },
-    { nom: 'fraude et harcelement', valeur: 0 },
-    { nom: 'sante', valeur: 0 },
-    { nom: 'espace-sante', valeur: 0 },
-    { nom: 'budget', valeur: 0 },
-    { nom: 'scolaire', valeur: 0 },
-    { nom: 'diagnostic', valeur: 0 },
+  let statsThemes: ThemesAccompagnement[] = [
+    { nom: 'equipement informatique', valeur: 0, percent: 0 },
+    { nom: 'internet', valeur: 0, percent: 0 },
+    { nom: 'courriel', valeur: 0, percent: 0 },
+    { nom: 'smartphone', valeur: 0, percent: 0 },
+    { nom: 'contenus numeriques', valeur: 0, percent: 0 },
+    { nom: 'vocabulaire', valeur: 0, percent: 0 },
+    { nom: 'traitement texte', valeur: 0, percent: 0 },
+    { nom: 'echanger', valeur: 0, percent: 0 },
+    { nom: 'trouver emploi', valeur: 0, percent: 0 },
+    { nom: 'accompagner enfant', valeur: 0, percent: 0 },
+    { nom: 'tpe/pme', valeur: 0, percent: 0 },
+    { nom: 'demarche en ligne', valeur: 0, percent: 0 },
+    { nom: 'securite', valeur: 0, percent: 0 },
+    { nom: 'fraude et harcelement', valeur: 0, percent: 0 },
+    { nom: 'sante', valeur: 0, percent: 0 },
+    { nom: 'espace-sante', valeur: 0, percent: 0 },
+    { nom: 'budget', valeur: 0, percent: 0 },
+    { nom: 'scolaire', valeur: 0, percent: 0 },
+    { nom: 'diagnostic', valeur: 0, percent: 0 },
   ];
 
   const queryAccess = await app
@@ -301,6 +313,7 @@ const getStatsThemes = async (query, ability, read, app) => {
     { $group: { _id: 'espace-sante', count: { $sum: 1 } } },
     { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
   ]);
+
   if (themes?.length > 0) {
     statsThemes = statsThemes.map(
       (theme1) => themes.find((theme2) => theme1.nom === theme2.nom) || theme1,
@@ -310,6 +323,17 @@ const getStatsThemes = async (query, ability, read, app) => {
     }
   }
 
+  const totalThemes = statsThemes.reduce(
+    (previousValue, currentValue) => previousValue + currentValue.valeur,
+    0,
+  );
+  if (totalThemes > 0) {
+    statsThemes.forEach((theme: ThemesAccompagnement, i: number) => {
+      statsThemes[i].percent = Number(
+        ((theme.valeur * 100) / totalThemes).toFixed(1),
+      );
+    });
+  }
   return statsThemes.sort(sortByValueThenName);
 };
 
@@ -645,13 +669,12 @@ const getStatsEvolutions = async (query, ability, read, app) => {
   return statsEvolutions;
 };
 
-const conversionPourcentage = async (datas, total) => {
-  return datas.map((data) => {
-    // eslint-disable-next-line
-    data.valeur = total > 0 ? Math.round((data.valeur / total) * 100) : 0;
-    return data;
-  });
-};
+const conversionPourcentage = (datas, total) =>
+  datas.map((obj) =>
+    Object.assign(obj, {
+      valeur: total > 0 ? Math.round((obj.valeur / total) * 100) : 0,
+    }),
+  );
 
 const getPersonnesAccompagnees = async (statsActivites) => {
   const nbTotalParticipant =
@@ -664,6 +687,86 @@ const getPersonnesAccompagnees = async (statsActivites) => {
     statsActivites?.find((activite) => activite._id === 'ponctuel')?.count ?? 0;
 
   return nbTotalParticipant + nbAccompagnementPerso + nbDemandePonctuel;
+};
+
+const formatMinutes = (minutes: number) => {
+  if (minutes > 0) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h${remainingMinutes}min`;
+  }
+  return '0h';
+};
+
+const getStatsTempsAccompagnement = async (query, ability, read, app) => {
+  const queryAccess = await app
+    .service(service.cras)
+    .Model.accessibleBy(ability, read)
+    .getQuery();
+  const tempsAccompagnement: TempsAccompagnement[] = [
+    { nom: 'total', valeur: 0, temps: '0h' },
+    { nom: 'collectif', valeur: 0, temps: '0h' },
+    { nom: 'individuel', valeur: 0, temps: '0h' },
+    { nom: 'ponctuel', valeur: 0, temps: '0h' },
+  ];
+  const dureeTotalParActiviter: Array<{ nom: string; valeur: number }> =
+    await app.service(service.cras).Model.aggregate([
+      { $unwind: '$cra.duree' },
+      {
+        $match: {
+          ...query,
+          $and: [queryAccess],
+        },
+      },
+      {
+        $group: {
+          _id: '$cra.activite',
+          count: {
+            $sum: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ['$cra.duree', '0-30'] }, then: 30 },
+                  { case: { $eq: ['$cra.duree', '30-60'] }, then: 60 },
+                  { case: { $eq: ['$cra.duree', '60'] }, then: 60 },
+                  { case: { $eq: ['$cra.duree', '90'] }, then: 90 },
+                ],
+                default: '$cra.duree',
+              },
+            },
+          },
+        },
+      },
+      { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
+    ]);
+
+  if (dureeTotalParActiviter?.length === 0) {
+    return tempsAccompagnement;
+  }
+  dureeTotalParActiviter.forEach((dureeActiviter, index: number) => {
+    tempsAccompagnement.map((tempAccompagnement: TempsAccompagnement) => {
+      const item = tempAccompagnement;
+      if (tempAccompagnement.nom === dureeActiviter.nom) {
+        item.valeur = dureeActiviter.valeur;
+        item.temps = formatMinutes(item.valeur);
+      }
+      return item;
+    });
+    tempsAccompagnement.map((accompagnement: TempsAccompagnement) => {
+      const item = accompagnement;
+      if (accompagnement.nom === 'total') {
+        item.valeur += dureeActiviter.valeur;
+        if (index === dureeTotalParActiviter.length - 1) {
+          item.temps = formatMinutes(item.valeur);
+        }
+      }
+      return item;
+    });
+  });
+
+  return tempsAccompagnement;
 };
 
 export {
@@ -686,4 +789,5 @@ export {
   getCodesPostauxGrandReseau,
   getStructures,
   getConseillers,
+  getStatsTempsAccompagnement,
 };
