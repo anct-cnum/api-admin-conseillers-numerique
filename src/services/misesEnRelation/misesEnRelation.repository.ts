@@ -64,13 +64,16 @@ const filterStatut = (statut: string) => {
   return { statut: { $ne: 'non_disponible' } };
 };
 
-const filterStatutContrat = (statut: string, statutOld: string[]) => {
+const filterStatutContrat = (
+  statut: string,
+  statutPossibleContrat: string[],
+) => {
   if (statut !== 'toutes') {
     return { statut: { $eq: statut } };
   }
   return {
     statut: {
-      $in: statutOld,
+      $in: statutPossibleContrat,
     },
   };
 };
@@ -78,14 +81,14 @@ const filterStatutContrat = (statut: string, statutOld: string[]) => {
 const totalContrat = async (
   app: Application,
   checkAccess,
-  statutOld: string[],
+  statutPossibleContrat: string[],
 ) => {
   const contrat = await app.service(service.misesEnRelation).Model.aggregate([
     {
       $match: {
         $and: [checkAccess],
         statut: {
-          $in: statutOld,
+          $in: statutPossibleContrat,
         },
       },
     },

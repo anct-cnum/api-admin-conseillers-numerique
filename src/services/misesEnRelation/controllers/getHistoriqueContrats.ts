@@ -11,11 +11,11 @@ import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (statut: string, statutOld: string[]) =>
+  async (statut: string, statutHistoriqueContrat: string[]) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterStatutContrat(statut, statutOld),
+          ...filterStatutContrat(statut, statutHistoriqueContrat),
           $and: [checkAccess],
         },
       },
@@ -31,7 +31,7 @@ const getMisesEnRelations =
     statut: string,
     dateDebut: Date,
     dateFin: Date,
-    statutOld: string[],
+    statutHistoriqueContrat: string[],
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -46,7 +46,7 @@ const getMisesEnRelations =
               dateRecrutement: { $gte: dateDebut, $lte: dateFin },
             },
           ],
-          ...filterStatutContrat(statut, statutOld),
+          ...filterStatutContrat(statut, statutHistoriqueContrat),
         },
       },
       {
@@ -114,7 +114,11 @@ const getHistoriqueContrats =
         limit: 0,
         skip: 0,
       };
-      const statutOld = ['finalisee', 'finalisee_rupture', 'renouvelee'];
+      const statutHistoriqueContrat = [
+        'finalisee',
+        'finalisee_rupture',
+        'renouvelee',
+      ];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const contrats = await getMisesEnRelations(app, checkAccess)(
         page,
@@ -122,14 +126,18 @@ const getHistoriqueContrats =
         statut,
         dateDebut,
         dateFin,
-        statutOld,
+        statutHistoriqueContrat,
       );
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
         statut,
-        statutOld,
+        statutHistoriqueContrat,
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
-      const totalConvention = await totalContrat(app, checkAccess, statutOld);
+      const totalConvention = await totalContrat(
+        app,
+        checkAccess,
+        statutHistoriqueContrat,
+      );
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,

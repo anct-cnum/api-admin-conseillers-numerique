@@ -30,7 +30,11 @@ const getExportHistoriqueContratsCsv =
           .json({ message: contratHistoriqueExportValidation.error.message });
         return;
       }
-      const statutOld = ['finalisee', 'finalisee_rupture', 'renouvelee'];
+      const statutHistoriqueContrat = [
+        'finalisee',
+        'finalisee_rupture',
+        'renouvelee',
+      ];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const contrats = await app
         .service(service.misesEnRelation)
@@ -50,7 +54,7 @@ const getExportHistoriqueContratsCsv =
                   dateRecrutement: { $gte: dateDebut, $lte: dateFin },
                 },
               ],
-              ...filterStatutContrat(statut, statutOld),
+              ...filterStatutContrat(statut, statutHistoriqueContrat),
             },
           },
           {
