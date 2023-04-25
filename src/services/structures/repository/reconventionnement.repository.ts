@@ -193,26 +193,7 @@ const filterStatut = (typeConvention: string) => {
   };
 };
 
-const filterStatutHistorique = (typeConvention: string) => {
-  if (typeConvention === 'reconventionnement') {
-    return {
-      'conventionnement.statut': 'RECONVENTIONNEMENT_VALIDÉ',
-    };
-  }
-  if (typeConvention === 'conventionnement') {
-    return {
-      'conventionnement.statut': 'CONVENTIONNEMENT_VALIDÉ',
-    };
-  }
-
-  return {
-    'conventionnement.statut': {
-      $in: ['RECONVENTIONNEMENT_VALIDÉ', 'CONVENTIONNEMENT_VALIDÉ'],
-    },
-  };
-};
-
-const filterDateDemandeHistorique = (
+const filterDateDemandeAndStatutHistorique = (
   typeConvention: string,
   dateDebut: Date,
   dateFin: Date,
@@ -289,7 +270,6 @@ export {
   getUrlDossierReconventionnement,
   getUrlDossierConventionnement,
   filterStatut,
-  filterStatutHistorique,
-  filterDateDemandeHistorique,
+  filterDateDemandeAndStatutHistorique,
   totalParConvention,
 };
