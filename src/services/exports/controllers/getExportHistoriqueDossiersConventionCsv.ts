@@ -5,10 +5,7 @@ import service from '../../../helpers/services';
 import { generateCsvHistoriqueDossiersConvention } from '../exports.repository';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
 import { checkAccessReadRequestStructures } from '../../structures/repository/structures.repository';
-import {
-  filterDateDemandeHistorique,
-  filterStatutHistorique,
-} from '../../structures/repository/reconventionnement.repository';
+import { filterDateDemandeAndStatutHistorique } from '../../structures/repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
 
 const getExportHistoriqueDossiersConventionCsv =
@@ -38,8 +35,7 @@ const getExportHistoriqueDossiersConventionCsv =
           {
             $match: {
               $and: [checkAccessStructure],
-              ...filterStatutHistorique(type),
-              ...filterDateDemandeHistorique(type, dateDebut, dateFin),
+              ...filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
             },
           },
           {

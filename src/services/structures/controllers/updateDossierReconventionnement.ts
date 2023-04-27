@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { updateReconventionnement } from '../../../schemas/reconventionnement.schemas';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -34,13 +35,13 @@ const updateDossierReconventionnement =
 
     switch (action.trim()) {
       case 'enregistrer':
-        statut = 'ENREGISTRÉ';
+        statut = StatutConventionnement.ENREGISTRÉ;
         break;
       case 'envoyer':
-        statut = 'RECONVENTIONNEMENT_EN_COURS';
+        statut = StatutConventionnement.RECONVENTIONNEMENT_EN_COURS;
         break;
       case 'annuler':
-        statut = 'NON_INTERESSÉ';
+        statut = StatutConventionnement.NON_INTERESSÉ;
         break;
       default:
         res.status(400).json({ message: 'Action non valide' });
@@ -49,7 +50,10 @@ const updateDossierReconventionnement =
 
     try {
       // On modifie le statut de la structure en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
-      if (statut === 'ENREGISTRÉ' || statut === 'RECONVENTIONNEMENT_EN_COURS') {
+      if (
+        statut === StatutConventionnement.ENREGISTRÉ ||
+        statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+      ) {
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
@@ -61,7 +65,7 @@ const updateDossierReconventionnement =
                 Number(nombreDePostes),
             },
           });
-      } else if (statut === 'NON_INTERESSÉ') {
+      } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)

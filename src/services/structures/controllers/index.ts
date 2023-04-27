@@ -10,6 +10,7 @@ import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
+import validationReconventionnement from './validationReconventionnement';
 
 export {
   getStructures,
@@ -24,4 +25,5 @@ export {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
+  validationReconventionnement,
 };
