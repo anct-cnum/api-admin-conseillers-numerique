@@ -10,6 +10,7 @@ import { checkAccessReadRequestStructures } from '../repository/structures.repos
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { getCoselec } from '../../../utils';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -132,7 +133,10 @@ const getHistoriqueDossiersConvention =
       };
       items.data = structures.map((structure) => {
         const item = { ...structure };
-        if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
+        if (
+          item.conventionnement.statut ===
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+        ) {
           item.nombreConseillersCoselec =
             getCoselec(structure)?.nombreConseillersCoselec ?? 0;
         }
