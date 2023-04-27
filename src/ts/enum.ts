@@ -3,6 +3,7 @@ enum TypeDossierReconventionnement {
   Association = 'association',
   Entreprise = 'entreprise',
 }
+
 enum StatutConventionnement {
   ENREGISTRÉ = 'ENREGISTRÉ',
   NON_INTERESSÉ = 'NON_INTERESSÉ',
