@@ -43,7 +43,7 @@ const getMisesEnRelationARenouveller =
           },
           {
             $sort: {
-              dateRecrutement: 1,
+              dateFinDeContrat: 1,
             },
           },
           {
@@ -56,14 +56,17 @@ const getMisesEnRelationARenouveller =
               conseillerObj: '$conseillerObj',
               statut: 1,
               reconventionnement: 1,
-              dateRecrutement: 1,
-              _id: 1,
+              typeDeContrat: 1,
+              dateDebutDeContrat: 1,
+              dateFinDeContrat: 1,
             },
           },
           {
             $group: {
               _id: '$conseillerObj',
-              dateRecrutement: { $last: '$dateRecrutement' },
+              dateFinDeContrat: { $last: '$dateFinDeContrat' },
+              typeDeContrat: { $last: '$typeDeContrat' },
+              dateDebutDeContrat: { $last: '$dateDebutDeContrat' },
               statut: { $last: '$statut' },
               reconventionnement: { $last: '$reconventionnement' },
               miseEnRelationId: { $last: '$_id' },
@@ -73,7 +76,9 @@ const getMisesEnRelationARenouveller =
             $project: {
               _id: 0,
               conseiller: '$_id',
-              dateRecrutement: 1,
+              typeDeContrat: 1,
+              dateDebutDeContrat: 1,
+              dateFinDeContrat: 1,
               statut: 1,
               reconventionnement: 1,
               miseEnRelationId: 1,
