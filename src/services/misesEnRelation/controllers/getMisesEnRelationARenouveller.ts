@@ -36,9 +36,7 @@ const getMisesEnRelationARenouveller =
             $match: {
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
-              statut: {
-                $in: ['finalisee'],
-              },
+              statut: 'finalisee',
             },
           },
           {
@@ -47,41 +45,13 @@ const getMisesEnRelationARenouveller =
             },
           },
           {
-            $unwind: {
-              path: '$conseillerObj',
-            },
-          },
-          {
             $project: {
-              conseillerObj: '$conseillerObj',
-              statut: 1,
-              reconventionnement: 1,
-              typeDeContrat: 1,
-              dateDebutDeContrat: 1,
-              dateFinDeContrat: 1,
-            },
-          },
-          {
-            $group: {
-              _id: '$conseillerObj',
-              dateFinDeContrat: { $last: '$dateFinDeContrat' },
-              typeDeContrat: { $last: '$typeDeContrat' },
-              dateDebutDeContrat: { $last: '$dateDebutDeContrat' },
-              statut: { $last: '$statut' },
-              reconventionnement: { $last: '$reconventionnement' },
-              miseEnRelationId: { $last: '$_id' },
-            },
-          },
-          {
-            $project: {
-              _id: 0,
-              conseiller: '$_id',
+              conseiller: '$conseillerObj',
               typeDeContrat: 1,
               dateDebutDeContrat: 1,
               dateFinDeContrat: 1,
               statut: 1,
               reconventionnement: 1,
-              miseEnRelationId: 1,
             },
           },
         ]);
