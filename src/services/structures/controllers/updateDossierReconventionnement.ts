@@ -10,7 +10,7 @@ const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
       query: { action, structureId, nombreDePostes, motif },
-      body: { conseillers },
+      body: { misesEnRelations },
     } = req;
     let statut: string;
     let misesEnRelationObjectIds: [string];
@@ -20,7 +20,7 @@ const updateDossierReconventionnement =
       structureId,
       nombreDePostes,
       motif,
-      conseillers,
+      misesEnRelations,
     });
 
     if (updateValidation.error) {
@@ -54,16 +54,23 @@ const updateDossierReconventionnement =
         statut === StatutConventionnement.ENREGISTRÉ ||
         statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
       ) {
+        const objectConventionnement = {
+          ...{
+            'conventionnement.statut': statut,
+            'conventionnement.derniereModification': new Date(),
+            'conventionnement.dossierReconventionnement.nbPostesAttribuees':
+              Number(nombreDePostes),
+          },
+          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS && {
+            'conventionnement.dossierReconventionnement.dateDeCreation':
+              new Date(),
+          }),
+        };
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate({
-            $set: {
-              'conventionnement.statut': statut,
-              'conventionnement.derniereModification': new Date(),
-              'conventionnement.dossierReconventionnement.nbPostesAttribuees':
-                Number(nombreDePostes),
-            },
+            $set: objectConventionnement,
           });
       } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
         await app
@@ -78,8 +85,8 @@ const updateDossierReconventionnement =
           });
       }
 
-      misesEnRelationObjectIds = conseillers?.map(
-        (conseiller) => new ObjectId(conseiller.miseEnRelationId),
+      misesEnRelationObjectIds = misesEnRelations?.map(
+        (miseEnRelation) => new ObjectId(miseEnRelation._id),
       );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)

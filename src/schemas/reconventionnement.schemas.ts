@@ -32,9 +32,9 @@ const updateReconventionnement = Joi.object({
     new Error('Le nombre de postes est invalide'),
   ),
   motif: Joi.string().allow(null, '').error(new Error('Le motif est invalide')),
-  conseillers: Joi.array()
+  misesEnRelations: Joi.array()
     .items(Joi.object())
-    .error(new Error('Les conseillers sont invalides')),
+    .error(new Error('Les mises en relations sont invalides')),
 });
 
 export {
