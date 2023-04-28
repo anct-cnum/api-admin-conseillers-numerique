@@ -61,7 +61,7 @@ const updateDossierReconventionnement =
             $set: {
               'conventionnement.statut': statut,
               'conventionnement.derniereModification': new Date(),
-              'conventionnement.dossierReconventionnement.nbPostesAttribues':
+              'conventionnement.dossierReconventionnement.nbPostesAttribuees':
                 Number(nombreDePostes),
             },
           });
