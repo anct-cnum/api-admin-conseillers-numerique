@@ -60,7 +60,7 @@
   },
   {
     "nom": "espace-sante",
-    "correspondance": "Mon espace sant&eacute;"
+    "correspondance": "Mon espace santé"
   },
   {
     "nom": "budget",
@@ -68,7 +68,7 @@
   },
   {
     "nom": "diagnostic",
-    "correspondance": "Diagnostic num&eacute;rique"
+    "correspondance": "Diagnostic numérique"
   },
   {
     "nom": "scolaire",
