@@ -176,52 +176,48 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       // eslint-disable-next-line no-async-promise-executor
       const p = new Promise<void>(async (resolve) => {
         try {
-          if (dossier?.idPG) {
-            const structureUpdated = await app
-              .service(service.structures)
-              .Model.updateOne(
-                {
-                  idPG: dossier?.idPG,
-                  statut: 'VALIDATION_COSELEC',
-                  'conventionnement.statut': {
-                    $nin: [
-                      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-                      StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-                    ],
-                  },
-                  $or: [
-                    {
-                      'conventionnement.dossierConventionnement.dateDernierModification':
-                        {
-                          $gt: new Date(dossier.dateDerniereModification),
-                        },
-                    },
-                    {
-                      'conventionnement.dossierConventionnement.dateDernierModification':
-                        {
-                          $exists: false,
-                        },
-                    },
+          const structureUpdated = await app
+            .service(service.structures)
+            .Model.updateOne(
+              {
+                idPG: dossier.idPG,
+                statut: 'VALIDATION_COSELEC',
+                'conventionnement.statut': {
+                  $nin: [
+                    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
+                    StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
                   ],
                 },
-                {
-                  'conventionnement.statut':
-                    StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-                  'conventionnement.dossierConventionnement': {
-                    numero: dossier._id,
-                    dateDeCreation: new Date(dossier.dateDeCreation),
-                    statut: dossier.statut,
-                    dateDernierModification: new Date(
-                      dossier.dateDerniereModification,
-                    ),
+                $or: [
+                  {
+                    'conventionnement.dossierConventionnement.dateDernierModification':
+                      {
+                        $gt: new Date(dossier.dateDerniereModification),
+                      },
                   },
+                  {
+                    'conventionnement.dossierConventionnement.dateDernierModification':
+                      {
+                        $exists: false,
+                      },
+                  },
+                ],
+              },
+              {
+                'conventionnement.statut':
+                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+                'conventionnement.dossierConventionnement': {
+                  numero: dossier._id,
+                  dateDeCreation: new Date(dossier.dateDeCreation),
+                  statut: dossier.statut,
+                  dateDernierModification: new Date(
+                    dossier.dateDerniereModification,
+                  ),
                 },
-              );
-            if (structureUpdated.modifiedCount === 1) {
-              logger.info(
-                `Structure [${dossier.idPG}] mise à jour avec succès`,
-              );
-            }
+              },
+            );
+          if (structureUpdated.modifiedCount === 1) {
+            logger.info(`Structure [${dossier.idPG}] mise à jour avec succès`);
           }
           resolve(p);
         } catch (e) {
