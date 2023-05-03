@@ -226,6 +226,12 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
             {
               idPG: dossier.idPG,
               statut: 'VALIDATION_COSELEC',
+              'conventionnement.statut': {
+                $nin: [
+                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+                  StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+                ],
+              },
               $or: [
                 {
                   'conventionnement.dossierReconventionnement.dateDernierModification':
