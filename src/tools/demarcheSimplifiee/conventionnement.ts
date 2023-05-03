@@ -179,7 +179,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           .service(service.structures)
           .Model.updateOne(
             {
-              idPG: dossier.idPG,
+              idPG: dossier?.idPG,
               statut: 'VALIDATION_COSELEC',
               'conventionnement.statut': {
                 $nin: [
