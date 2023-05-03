@@ -693,10 +693,11 @@ const formatMinutes = (minutes: number) => {
   if (minutes > 0) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
+    const formatStringHours = hours.toLocaleString().replace(/,/g, ' ');
     if (remainingMinutes === 0) {
-      return `${hours}h`;
+      return `${formatStringHours}h`;
     }
-    return `${hours}h${remainingMinutes}min`;
+    return `${formatStringHours}h ${remainingMinutes}min`;
   }
   return '0h';
 };
