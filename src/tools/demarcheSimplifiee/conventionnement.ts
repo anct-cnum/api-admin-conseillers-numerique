@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/demarcheSimplifiee/reconventionnement.ts
+// Lancement de ce script : ts-node src/tools/demarcheSimplifiee/conventionnement.ts
 
 import { GraphQLClient } from 'graphql-request';
 import execute from '../utils';
@@ -172,58 +172,68 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
   }
 
   dossiers.forEach(async (dossier: IDossierDS) => {
-    // eslint-disable-next-line no-async-promise-executor
-    const p = new Promise<void>(async (resolve) => {
-      try {
-        const structureUpdated = await app
-          .service(service.structures)
-          .Model.updateOne(
-            {
-              idPG: dossier?.idPG,
-              statut: 'VALIDATION_COSELEC',
-              'conventionnement.statut': {
-                $nin: [
-                  StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-                  StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-                ],
-              },
-              $or: [
+    if (dossier?.idPG) {
+      // eslint-disable-next-line no-async-promise-executor
+      const p = new Promise<void>(async (resolve) => {
+        try {
+          if (dossier?.idPG) {
+            const structureUpdated = await app
+              .service(service.structures)
+              .Model.updateOne(
                 {
-                  'conventionnement.dossierConventionnement.dateDernierModification':
+                  idPG: dossier?.idPG,
+                  statut: 'VALIDATION_COSELEC',
+                  'conventionnement.statut': {
+                    $nin: [
+                      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
+                      StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
+                    ],
+                  },
+                  $or: [
                     {
-                      $gt: new Date(dossier.dateDerniereModification),
+                      'conventionnement.dossierConventionnement.dateDernierModification':
+                        {
+                          $gt: new Date(dossier.dateDerniereModification),
+                        },
                     },
+                    {
+                      'conventionnement.dossierConventionnement.dateDernierModification':
+                        {
+                          $exists: false,
+                        },
+                    },
+                  ],
                 },
                 {
-                  'conventionnement.dossierConventionnement.dateDernierModification':
-                    {
-                      $exists: false,
-                    },
+                  'conventionnement.statut':
+                    StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+                  'conventionnement.dossierConventionnement': {
+                    numero: dossier._id,
+                    dateDeCreation: new Date(dossier.dateDeCreation),
+                    statut: dossier.statut,
+                    dateDernierModification: new Date(
+                      dossier.dateDerniereModification,
+                    ),
+                  },
                 },
-              ],
-            },
-            {
-              'conventionnement.statut':
-                StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-              'conventionnement.dossierConventionnement': {
-                numero: dossier._id,
-                dateDeCreation: new Date(dossier.dateDeCreation),
-                statut: dossier.statut,
-                dateDernierModification: new Date(
-                  dossier.dateDerniereModification,
-                ),
-              },
-            },
-          );
-        if (structureUpdated.modifiedCount === 1) {
-          logger.info(`Structure [${dossier.idPG}] mise à jour avec succès`);
+              );
+            if (structureUpdated.modifiedCount === 1) {
+              logger.info(
+                `Structure [${dossier.idPG}] mise à jour avec succès`,
+              );
+            }
+          }
+          resolve(p);
+        } catch (e) {
+          logger.error(e);
         }
-        resolve(p);
-      } catch (e) {
-        logger.error(e);
-      }
-    });
-    promises.push(p);
+      });
+      promises.push(p);
+    } else {
+      logger.info(
+        `Structure avec le dossier [${dossier._id}] non mise à jour car idPG non renseigné`,
+      );
+    }
   });
   await Promise.allSettled(promises);
   exit(0, 'Migration terminée');
