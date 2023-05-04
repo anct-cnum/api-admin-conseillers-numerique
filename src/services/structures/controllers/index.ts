@@ -10,6 +10,8 @@ import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
+import createContrat from './createContrat';
+import updateContrat from './updateContrat';
 
 export {
   getStructures,
@@ -24,4 +26,6 @@ export {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
+  createContrat,
+  updateContrat,
 };

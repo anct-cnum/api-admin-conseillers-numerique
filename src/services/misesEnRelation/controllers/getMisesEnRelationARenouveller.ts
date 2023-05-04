@@ -57,6 +57,7 @@ const getMisesEnRelationARenouveller =
               statut: 1,
               reconventionnement: 1,
               dateRecrutement: 1,
+              typeDeContrat: 1,
               _id: 1,
             },
           },
@@ -65,6 +66,7 @@ const getMisesEnRelationARenouveller =
               _id: '$conseillerObj',
               dateRecrutement: { $last: '$dateRecrutement' },
               statut: { $last: '$statut' },
+              typeDeContrat: { $last: '$typeDeContrat' },
               reconventionnement: { $last: '$reconventionnement' },
               miseEnRelationId: { $last: '$_id' },
             },
@@ -77,6 +79,7 @@ const getMisesEnRelationARenouveller =
               statut: 1,
               reconventionnement: 1,
               miseEnRelationId: 1,
+              typeDeContrat: 1,
             },
           },
         ]);
