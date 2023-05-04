@@ -56,8 +56,8 @@ const getMisesEnRelationStructure =
           },
           {
             $match: {
-              miseEnRelationReconventionnement: { $eq: null }
-            }
+              miseEnRelationReconventionnement: { $eq: null },
+            },
           },
           {
             $project: {
