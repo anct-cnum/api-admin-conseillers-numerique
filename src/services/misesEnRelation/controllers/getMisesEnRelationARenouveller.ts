@@ -36,28 +36,23 @@ const getMisesEnRelationARenouveller =
             $match: {
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
-              statut: {
-                $in: ['finalisee'],
-              },
+              statut: 'finalisee',
             },
           },
           {
             $sort: {
-              dateRecrutement: 1,
-            },
-          },
-          {
-            $unwind: {
-              path: '$conseillerObj',
+              dateFinDeContrat: 1,
             },
           },
           {
             $project: {
-              conseillerObj: '$conseillerObj',
+              conseiller: '$conseillerObj',
+              typeDeContrat: 1,
+              dateDebutDeContrat: 1,
+              dateFinDeContrat: 1,
               statut: 1,
               reconventionnement: 1,
               dateRecrutement: 1,
-              typeDeContrat: 1,
               _id: 1,
             },
           },

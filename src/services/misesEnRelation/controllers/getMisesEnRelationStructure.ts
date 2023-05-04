@@ -56,7 +56,17 @@ const getMisesEnRelationStructure =
           },
           {
             $match: {
-              miseEnRelationReconventionnement: { $eq: null },
+              miseEnRelationReconventionnement: { $eq: null }
+            }
+          },
+          {
+            $project: {
+              conseillerObj: 1,
+              statut: 1,
+              reconventionnement: 1,
+              dateDebutDeContrat: 1,
+              dateFinDeContrat: 1,
+              typeDeContrat: 1,
             },
           },
         ]);

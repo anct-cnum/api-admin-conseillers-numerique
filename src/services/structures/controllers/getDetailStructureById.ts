@@ -108,7 +108,6 @@ const getDetailStructureById =
             contact: 1,
             conseillers: '$misesEnRelation',
             conventionnement: 1,
-            dossierDemarcheSimplifiee: 1,
           },
         },
       ]);

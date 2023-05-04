@@ -12,6 +12,7 @@ import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
 import createContrat from './createContrat';
 import updateContrat from './updateContrat';
+import validationReconventionnement from './validationReconventionnement';
 
 export {
   getStructures,
@@ -28,4 +29,5 @@ export {
   getHistoriqueDossiersConvention,
   createContrat,
   updateContrat,
+  validationReconventionnement,
 };
