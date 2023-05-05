@@ -137,6 +137,12 @@ const getConseillerById =
         return;
       }
       if (idMiseEnRelation !== undefined) {
+        if (!ObjectId.isValid(idMiseEnRelation)) {
+          res
+            .status(400)
+            .json({ message: 'Id de la mise en relation incorrect' });
+          return;
+        }
         conseiller[0].contrat = conseiller[0].misesEnRelation.find(
           (miseEnRelation) => String(miseEnRelation._id) === idMiseEnRelation,
         );

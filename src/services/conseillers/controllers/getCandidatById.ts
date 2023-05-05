@@ -35,6 +35,12 @@ const getCandidatById =
       const conseillerFormat = conseiller.toObject();
       conseillerFormat.possedeCompteCandidat = possedeCompteCandidat > 0;
       if (idMiseEnRelation !== undefined) {
+        if (!ObjectId.isValid(idMiseEnRelation)) {
+          res
+            .status(400)
+            .json({ message: 'Id de la mise en relation incorrect' });
+          return;
+        }
         const misesEnRelation = await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.read)
