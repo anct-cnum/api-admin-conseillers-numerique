@@ -2,11 +2,11 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
 import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
 import { action } from '../../../helpers/accessControl/accessList';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -159,7 +159,14 @@ const getConseillerById =
           });
           return;
         }
-        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+        if (
+          structure?.conventionnement?.statut ===
+          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+        ) {
+          conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+        } else {
+          conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
+        }
       }
       res.status(200).json(conseiller[0]);
       return;
