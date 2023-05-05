@@ -7,6 +7,7 @@ import getMiseEnRelation from './controllers/getMiseEnRelation';
 import getMisesEnRelationStructure from './controllers/getMisesEnRelationStructure';
 import getMisesEnRelationARenouveller from './controllers/getMisesEnRelationARenouveller';
 import getContrats from './controllers/getContrats';
+import validationRenouvellementContrat from './controllers/validationRenouvellementContrat';
 
 export default class MisesEnRelation extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -16,6 +17,12 @@ export default class MisesEnRelation extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateMiseEnRelation(app),
+    );
+    app.patch(
+      '/contrat/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      validationRenouvellementContrat(app),
     );
     app.get(
       '/misesEnRelation/:id',

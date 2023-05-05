@@ -53,7 +53,7 @@ export default class Conseillers extends Service {
       deleteCandidatById(app),
     );
     app.get(
-      '/conseiller/:id',
+      '/conseiller/:id/:idMiseEnRelation?',
       authenticateMode(app),
       createAbilities(app),
       getConseillerById(app),

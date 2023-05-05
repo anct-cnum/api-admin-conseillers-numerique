@@ -5,17 +5,20 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
+import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
+    const { idMiseEnRelation } = req.params;
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
       const checkAccess = await checkAccessReadRequestConseillers(app, req);
-      const conseiller: IConseillers[] = await app
+      const conseiller = await app
         .service(service.conseillers)
         .Model.aggregate([
           {
@@ -51,6 +54,7 @@ const getConseillerById =
                             { $eq: ['finalisee', '$statut'] },
                             { $eq: ['nouvelle_rupture', '$statut'] },
                             { $eq: ['finalisee_rupture', '$statut'] },
+                            { $eq: ['renouvellement_initié', '$statut'] },
                           ],
                         },
                       },
@@ -68,6 +72,8 @@ const getConseillerById =
                     motifRupture: 1,
                     dossierIncompletRupture: 1,
                     emetteurRupture: 1,
+                    emetteurRenouvellement: 1,
+                    salaire: 1,
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
                     'structureObj._id': 1,
@@ -129,6 +135,31 @@ const getConseillerById =
       if (conseiller.length === 0) {
         res.status(404).json({ message: 'Conseiller non trouvé' });
         return;
+      }
+      if (idMiseEnRelation !== undefined) {
+        conseiller[0].contrat = conseiller[0].misesEnRelation.find(
+          (miseEnRelation) => String(miseEnRelation._id) === idMiseEnRelation,
+        );
+        if (!conseiller[0]?.contrat) {
+          res.status(404).json({ message: 'Mise en relation non trouvée' });
+          return;
+        }
+        const structure = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({
+            _id: new ObjectId(conseiller[0].contrat?.structureObj?._id),
+          });
+        const typeDossierDs = getTypeDossierDemarcheSimplifiee(
+          structure?.insee?.entreprise?.forme_juridique,
+        );
+        if (typeDossierDs === null) {
+          res.status(500).json({
+            message: 'Erreur lors de la récupération du type de la structure',
+          });
+          return;
+        }
+        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
       }
       res.status(200).json(conseiller[0]);
       return;

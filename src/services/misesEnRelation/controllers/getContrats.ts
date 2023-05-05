@@ -41,6 +41,7 @@ const getMisesEnRelations =
           'conseillerObj.prenom': 1,
           'structureObj.idPG': 1,
           'conseillerObj.idPG': 1,
+          'conseillerObj._id': 1,
           statut: 1,
         },
       },
@@ -105,7 +106,8 @@ const getContrats =
           )?.count ?? 0,
         renouvellementDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'renouvellement', // statut à définir pour le renouvellement de contrat
+            (totalParStatut) =>
+              totalParStatut.statut === 'renouvellement_initié',
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
