@@ -4,18 +4,17 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
-  filterStatutContrat,
-  totalContrat,
+  filterStatutContratHistorique,
+  totalHistoriqueContrat,
 } from '../misesEnRelation.repository';
 import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
-  (app: Application, checkAccess) =>
-  async (statut: string, statutHistoriqueContrat: string[]) =>
+  (app: Application, checkAccess) => async (statut: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterStatutContrat(statut, statutHistoriqueContrat),
+          ...filterStatutContratHistorique(statut),
           $and: [checkAccess],
         },
       },
@@ -31,7 +30,6 @@ const getMisesEnRelations =
     statut: string,
     dateDebut: Date,
     dateFin: Date,
-    statutHistoriqueContrat: string[],
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -46,7 +44,7 @@ const getMisesEnRelations =
               dateRecrutement: { $gte: dateDebut, $lte: dateFin },
             },
           ],
-          ...filterStatutContrat(statut, statutHistoriqueContrat),
+          ...filterStatutContratHistorique(statut),
         },
       },
       {
@@ -61,6 +59,7 @@ const getMisesEnRelations =
           typeDeContrat: 1,
           dateDebutDeContrat: 1,
           dateFinDeContrat: 1,
+          miseEnRelationConventionnement: 1,
           statut: 1,
         },
       },
@@ -114,11 +113,6 @@ const getHistoriqueContrats =
         limit: 0,
         skip: 0,
       };
-      const statutHistoriqueContrat = [
-        'finalisee',
-        'finalisee_rupture',
-        'renouvelee',
-      ];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const contrats = await getMisesEnRelations(app, checkAccess)(
         page,
@@ -126,18 +120,23 @@ const getHistoriqueContrats =
         statut,
         dateDebut,
         dateFin,
-        statutHistoriqueContrat,
       );
-      const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
-        statut,
-        statutHistoriqueContrat,
-      );
-      items.total = totalContrats[0]?.count_contrats ?? 0;
-      const totalConvention = await totalContrat(
+      contrats.map((contrat) => {
+        const item = contrat;
+        if (
+          contrat.statut === 'finalisee' &&
+          contrat.miseEnRelationConventionnement
+        ) {
+          item.statut = 'renouvelee';
+        }
+        return item;
+      });
+      const totalContrats = await getTotalMisesEnRelations(
         app,
         checkAccess,
-        statutHistoriqueContrat,
-      );
+      )(statut);
+      items.total = totalContrats[0]?.count_contrats ?? 0;
+      const totalConvention = await totalHistoriqueContrat(app, checkAccess);
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,

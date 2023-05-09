@@ -6,7 +6,7 @@ import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 import { generateCsvHistoriqueContrats } from '../exports.repository';
 import {
   checkAccessReadRequestMisesEnRelation,
-  filterStatutContrat,
+  filterStatutContratHistorique,
 } from '../../misesEnRelation/misesEnRelation.repository';
 
 const getExportHistoriqueContratsCsv =
@@ -30,11 +30,6 @@ const getExportHistoriqueContratsCsv =
           .json({ message: contratHistoriqueExportValidation.error.message });
         return;
       }
-      const statutHistoriqueContrat = [
-        'finalisee',
-        'finalisee_rupture',
-        'renouvelee',
-      ];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const contrats = await app
         .service(service.misesEnRelation)
@@ -54,7 +49,7 @@ const getExportHistoriqueContratsCsv =
                   dateRecrutement: { $gte: dateDebut, $lte: dateFin },
                 },
               ],
-              ...filterStatutContrat(statut, statutHistoriqueContrat),
+              ...filterStatutContratHistorique(statut),
             },
           },
           {
@@ -62,6 +57,7 @@ const getExportHistoriqueContratsCsv =
               _id: 0,
               emetteurRupture: 1,
               emetteurRenouvellement: 1, // à définir
+              miseEnRelationConventionnement: 1,
               'structureObj.nom': 1,
               'conseillerObj.nom': 1,
               'conseillerObj.prenom': 1,
@@ -76,7 +72,10 @@ const getExportHistoriqueContratsCsv =
         ]);
       contrats.map((contrat) => {
         const item = contrat;
-        if (contrat.statut === 'finalisee') {
+        if (
+          contrat.statut === 'finalisee' &&
+          !contrat.miseEnRelationConventionnement
+        ) {
           item.statut = 'Recrutement';
           item.dateDeLaDemande = null;
         }
@@ -84,7 +83,10 @@ const getExportHistoriqueContratsCsv =
           item.statut = 'Rupture de contrat';
           item.dateDeLaDemande = contrat?.emetteurRupture?.date;
         }
-        if (contrat.statut === 'renouvelee') {
+        if (
+          contrat.statut === 'finalisee' &&
+          contrat.miseEnRelationConventionnement
+        ) {
           item.statut = 'Renouvellement';
           item.dateDeLaDemande = contrat?.emetteurRenouvellement?.date;
         }

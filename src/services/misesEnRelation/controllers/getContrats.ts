@@ -10,12 +10,11 @@ import {
 import { validContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
-  (app: Application, checkAccess) =>
-  async (statut: string, statutOld: string[]) =>
+  (app: Application, checkAccess) => async (statut: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterStatutContrat(statut, statutOld),
+          ...filterStatutContrat(statut),
           $and: [checkAccess],
         },
       },
@@ -25,12 +24,12 @@ const getTotalMisesEnRelations =
 
 const getMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (skip: string, limit: number, statut: string, statutOld: string[]) =>
+  async (skip: string, limit: number, statut: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
           $and: [checkAccess],
-          ...filterStatutContrat(statut, statutOld),
+          ...filterStatutContrat(statut),
         },
       },
       {
@@ -84,20 +83,18 @@ const getContrats =
         limit: 0,
         skip: 0,
       };
-      const statutOld = ['recrutee', 'nouvelle_rupture', 'renouvellement'];
       const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const contrats = await getMisesEnRelations(app, checkAccess)(
         page,
         options.paginate.default,
         statut,
-        statutOld,
       );
-      const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
-        statut,
-        statutOld,
-      );
+      const totalContrats = await getTotalMisesEnRelations(
+        app,
+        checkAccess,
+      )(statut);
       items.total = totalContrats[0]?.count_contrats ?? 0;
-      const totalConvention = await totalContrat(app, checkAccess, statutOld);
+      const totalConvention = await totalContrat(app, checkAccess);
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,

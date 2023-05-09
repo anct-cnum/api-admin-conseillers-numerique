@@ -64,31 +64,85 @@ const filterStatut = (statut: string) => {
   return { statut: { $ne: 'non_disponible' } };
 };
 
-const filterStatutContrat = (
-  statut: string,
-  statutPossibleContrat: string[],
-) => {
+const filterStatutContrat = (statut: string) => {
   if (statut !== 'toutes') {
     return { statut: { $eq: statut } };
   }
   return {
     statut: {
-      $in: statutPossibleContrat,
+      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
     },
   };
 };
 
-const totalContrat = async (
-  app: Application,
-  checkAccess,
-  statutPossibleContrat: string[],
-) => {
+const filterStatutContratHistorique = (statut: string) => {
+  if (statut !== 'toutes' && statut !== 'renouvelee') {
+    return { statut: { $eq: statut } };
+  }
+  if (statut === 'renouvelee') {
+    return {
+      statut: 'finalisee',
+      miseEnRelationConventionnement: { $exists: true },
+    };
+  }
+  return {
+    statut: {
+      $in: ['finalisee', 'finalisee_rupture'],
+    },
+  };
+};
+
+const totalHistoriqueContrat = async (app: Application, checkAccess) => {
   const contrat = await app.service(service.misesEnRelation).Model.aggregate([
     {
       $match: {
         $and: [checkAccess],
         statut: {
-          $in: statutPossibleContrat,
+          $in: ['finalisee_rupture', 'finalisee'],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          statut: '$statut',
+          miseEnRelationConventionnement: '$miseEnRelationConventionnement',
+        },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        statut: '$_id.statut',
+        miseEnRelationConventionnement: '$_id.miseEnRelationConventionnement',
+        count: 1,
+      },
+    },
+  ]);
+  contrat.map((contratFormat) => {
+    const item = contratFormat;
+    if (contratFormat.miseEnRelationConventionnement) {
+      item.statut = 'renouvelee';
+      delete item.miseEnRelationConventionnement;
+    }
+    return item;
+  });
+  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
+
+  return {
+    contrat,
+    total,
+  };
+};
+
+const totalContrat = async (app: Application, checkAccess) => {
+  const contrat = await app.service(service.misesEnRelation).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+        statut: {
+          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
         },
       },
     },
@@ -122,5 +176,7 @@ export {
   filterCv,
   filterStatut,
   filterStatutContrat,
+  filterStatutContratHistorique,
+  totalHistoriqueContrat,
   totalContrat,
 };
