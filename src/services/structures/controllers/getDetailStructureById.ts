@@ -111,6 +111,10 @@ const getDetailStructureById =
           },
         },
       ]);
+      if (structure.length === 0) {
+        res.status(404).json({ message: 'Structure non trouvée' });
+        return;
+      }
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByArrayConseillerId(
