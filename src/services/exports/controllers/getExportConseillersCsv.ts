@@ -12,6 +12,7 @@ import {
   filterIsRuptureConseiller,
   filterIsRuptureMisesEnRelation,
   checkAccessReadRequestConseillers,
+  filterDepartement,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
@@ -25,6 +26,7 @@ const getConseillersRecruter =
     isCoordinateur: string,
     searchByConseiller: string,
     region: string,
+    departement: string,
     rupture: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
@@ -33,6 +35,7 @@ const getConseillersRecruter =
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
+          ...filterDepartement(departement),
           ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           $and: [checkAccess],
         },
@@ -81,6 +84,8 @@ const getMisesEnRelationRecruter =
           dateRecrutement: 1,
           statut: 1,
           dossierIncompletRupture: 1,
+          dateDebutDeContrat: 1,
+          dateFinDeContrat: 1,
           'structureObj.idPG': 1,
           'structureObj._id': 1,
           'structureObj.nom': 1,
@@ -106,6 +111,7 @@ const getExportConseillersCsv =
       searchByConseiller,
       searchByStructure,
       region,
+      departement,
       piecesManquantes,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
@@ -120,6 +126,7 @@ const getExportConseillersCsv =
       searchByConseiller,
       searchByStructure,
       region,
+      departement,
       piecesManquantes,
     });
 
@@ -146,6 +153,7 @@ const getExportConseillersCsv =
         coordinateur as string,
         searchByConseiller as string,
         region as string,
+        departement as string,
         rupture as string,
       );
       const conseillerRecruter = conseillers.filter(
