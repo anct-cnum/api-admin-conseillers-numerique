@@ -21,7 +21,6 @@ const validStructures = Joi.object({
   type: Joi.string().error(new Error('Le filtre type est invalide')),
   statut: Joi.string().error(new Error('Le filtre statut est invalide')),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
-  coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 
 const validExportStructures = Joi.object({
@@ -44,7 +43,6 @@ const validExportStructures = Joi.object({
   type: Joi.string().error(new Error('Le filtre type est invalide')),
   statut: Joi.string().error(new Error('Le filtre statut est invalide')),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
-  coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 
 const updateEmail = Joi.string()

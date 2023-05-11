@@ -119,8 +119,6 @@ const filterDepartement = (departement: string) => {
   return {};
 };
 
-const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
-
 const filtrePiecesManquantes = (piecesManquantes: boolean) =>
   piecesManquantes
     ? { dossierIncompletRupture: true }
@@ -216,7 +214,6 @@ export {
   filterIsRuptureConseiller,
   filterRegion,
   filterDepartement,
-  filterComs,
   filterCv,
   filterDiplome,
   filterPix,
