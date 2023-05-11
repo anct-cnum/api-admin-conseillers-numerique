@@ -109,8 +109,15 @@ const filterCv = (cv: string) => {
   return {};
 };
 
-const filterDepartement = (departement: string) =>
-  departement ? { codeDepartement: departement } : {};
+const filterDepartement = (departement: string) => {
+  if (departement === '978') {
+    return { codeCom: departement };
+  }
+  if (departement) {
+    return { codeDepartement: departement };
+  }
+  return {};
+};
 
 const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
 
