@@ -3,14 +3,14 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
 import {
-  filterDateDemandeHistorique,
-  filterStatutHistorique,
+  filterDateDemandeAndStatutHistorique,
   totalParConvention,
 } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { getCoselec } from '../../../utils';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -18,8 +18,11 @@ const getTotalStructures =
     app.service(service.structures).Model.aggregate([
       {
         $match: {
-          ...filterStatutHistorique(typeConvention),
-          ...filterDateDemandeHistorique(typeConvention, dateDebut, dateFin),
+          ...filterDateDemandeAndStatutHistorique(
+            typeConvention,
+            dateDebut,
+            dateFin,
+          ),
           $and: [checkAccess],
         },
       },
@@ -40,8 +43,11 @@ const getStructures =
       {
         $match: {
           $and: [checkAccess],
-          ...filterStatutHistorique(typeConvention),
-          ...filterDateDemandeHistorique(typeConvention, dateDebut, dateFin),
+          ...filterDateDemandeAndStatutHistorique(
+            typeConvention,
+            dateDebut,
+            dateFin,
+          ),
         },
       },
       {
@@ -127,7 +133,10 @@ const getHistoriqueDossiersConvention =
       };
       items.data = structures.map((structure) => {
         const item = { ...structure };
-        if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
+        if (
+          item.conventionnement.statut ===
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+        ) {
           item.nombreConseillersCoselec =
             getCoselec(structure)?.nombreConseillersCoselec ?? 0;
         }

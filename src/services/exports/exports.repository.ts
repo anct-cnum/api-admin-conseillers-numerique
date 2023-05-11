@@ -420,7 +420,7 @@ const generateCsvStatistiques = async (
           `\n${
             labelsCorrespondance.find((label) => label.nom === theme.nom)
               ?.correspondance ?? theme.nom
-          };${theme.valeur}`,
+          };${theme.valeur};${theme.percent}%`,
       ) ?? []),
       '',
     ];
@@ -429,6 +429,14 @@ const generateCsvStatistiques = async (
       ...['À domicile', 'À distance', 'Lieu de rattachement', 'Autre'].map(
         (statLieux, index) =>
           `\n${statLieux};${statistiques?.statsLieux[index].valeur}`,
+      ),
+      '',
+    ];
+    const statsTempsAccompagnement = [
+      '\nTemps en accompagnement',
+      ...['Total', 'Collectifs', 'Individuels', 'Ponctuels'].map(
+        (tempsAccompagnement, index) =>
+          `\n${tempsAccompagnement};${statistiques?.statsTempsAccompagnement[index].temps}`,
       ),
       '',
     ];
@@ -519,8 +527,9 @@ const generateCsvStatistiques = async (
       // eslint-disable-next-line prettier/prettier
       `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
       general,
-      statsThemes,
+      statsThemes.map((stat) => stat.trim()).join('\n'),
       statsLieux,
+      statsTempsAccompagnement.map((stat) => stat.trim()).join('\n'),
       statsDurees,
       statsAges,
       statsUsagers,

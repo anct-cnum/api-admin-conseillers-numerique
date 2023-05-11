@@ -4,4 +4,13 @@ enum TypeDossierReconventionnement {
   Entreprise = 'entreprise',
 }
 
-export default TypeDossierReconventionnement;
+enum StatutConventionnement {
+  ENREGISTRÉ = 'ENREGISTRÉ',
+  NON_INTERESSÉ = 'NON_INTERESSÉ',
+  CONVENTIONNEMENT_EN_COURS = 'CONVENTIONNEMENT_EN_COURS',
+  CONVENTIONNEMENT_VALIDÉ = 'CONVENTIONNEMENT_VALIDÉ',
+  RECONVENTIONNEMENT_EN_COURS = 'RECONVENTIONNEMENT_EN_COURS',
+  RECONVENTIONNEMENT_VALIDÉ = 'RECONVENTIONNEMENT_VALIDÉ',
+}
+
+export { TypeDossierReconventionnement, StatutConventionnement };

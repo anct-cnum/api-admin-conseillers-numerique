@@ -14,14 +14,31 @@ import {
   getNombreAccompagnementsByArrayConseillerId,
   getNombreCrasByArrayConseillerId,
 } from '../../cras/cras.repository';
+import {
+  getUrlDossierConventionnement,
+  getUrlDossierReconventionnement,
+  getTypeDossierDemarcheSimplifiee,
+} from '../repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const demarcheSimplifiee = app.get('demarche_simplifiee');
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      const findStructure: IStructures = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: new ObjectId(idStructure) });
+
+      if (!findStructure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
       const checkAccessStructure = await checkAccessReadRequestStructures(
@@ -94,6 +111,10 @@ const getDetailStructureById =
           },
         },
       ]);
+      if (structure.length === 0) {
+        res.status(404).json({ message: 'Structure non trouvée' });
+        return;
+      }
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByArrayConseillerId(
@@ -114,6 +135,9 @@ const getDetailStructureById =
         },
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
+      const typeStructure = getTypeDossierDemarcheSimplifiee(
+        structure[0]?.insee?.entreprise?.forme_juridique,
+      );
       const coselec = getCoselec(structure[0]);
       structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
       structure[0].craCount = craCount;
@@ -122,6 +146,17 @@ const getDetailStructureById =
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
+      structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
+        structure[0].idPG,
+        typeStructure.type,
+        demarcheSimplifiee,
+      );
+      structure[0].urlDossierReconventionnement =
+        getUrlDossierReconventionnement(
+          structure[0].idPG,
+          typeStructure.type,
+          demarcheSimplifiee,
+        );
       structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
         return {
           idPG: conseiller?.conseillerObj?.idPG,

@@ -64,6 +64,49 @@ const filterStatut = (statut: string) => {
   return { statut: { $ne: 'non_disponible' } };
 };
 
+const filterStatutContrat = (statut: string) => {
+  if (statut !== 'toutes') {
+    return { statut: { $eq: statut } };
+  }
+  return {
+    statut: {
+      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
+    },
+  };
+};
+
+const totalContrat = async (app: Application, checkAccess) => {
+  const contrat = await app.service(service.misesEnRelation).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+        statut: {
+          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: '$statut',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        statut: '$_id',
+        count: 1,
+      },
+    },
+  ]);
+  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
+
+  return {
+    contrat,
+    total,
+  };
+};
+
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
@@ -71,4 +114,6 @@ export {
   filterDiplome,
   filterCv,
   filterStatut,
+  filterStatutContrat,
+  totalContrat,
 };

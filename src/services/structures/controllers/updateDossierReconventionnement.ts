@@ -4,12 +4,13 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { updateReconventionnement } from '../../../schemas/reconventionnement.schemas';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
       query: { action, structureId, nombreDePostes, motif },
-      body: { conseillers },
+      body: { misesEnRelations },
     } = req;
     let statut: string;
     let misesEnRelationObjectIds: [string];
@@ -19,7 +20,7 @@ const updateDossierReconventionnement =
       structureId,
       nombreDePostes,
       motif,
-      conseillers,
+      misesEnRelations,
     });
 
     if (updateValidation.error) {
@@ -34,13 +35,13 @@ const updateDossierReconventionnement =
 
     switch (action.trim()) {
       case 'enregistrer':
-        statut = 'ENREGISTRÉ';
+        statut = StatutConventionnement.ENREGISTRÉ;
         break;
       case 'envoyer':
-        statut = 'RECONVENTIONNEMENT_EN_COURS';
+        statut = StatutConventionnement.RECONVENTIONNEMENT_EN_COURS;
         break;
       case 'annuler':
-        statut = 'NON_INTERESSÉ';
+        statut = StatutConventionnement.NON_INTERESSÉ;
         break;
       default:
         res.status(400).json({ message: 'Action non valide' });
@@ -49,19 +50,29 @@ const updateDossierReconventionnement =
 
     try {
       // On modifie le statut de la structure en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
-      if (statut === 'ENREGISTRÉ' || statut === 'RECONVENTIONNEMENT_EN_COURS') {
+      if (
+        statut === StatutConventionnement.ENREGISTRÉ ||
+        statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+      ) {
+        const objectConventionnement = {
+          ...{
+            'conventionnement.statut': statut,
+            'conventionnement.derniereModification': new Date(),
+            'conventionnement.dossierReconventionnement.nbPostesAttribuees':
+              Number(nombreDePostes),
+          },
+          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS && {
+            'conventionnement.dossierReconventionnement.dateDeCreation':
+              new Date(),
+          }),
+        };
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate({
-            $set: {
-              'conventionnement.statut': statut,
-              'conventionnement.derniereModification': new Date(),
-              'conventionnement.dossierReconventionnement.nbPostesAttribues':
-                Number(nombreDePostes),
-            },
+            $set: objectConventionnement,
           });
-      } else if (statut === 'NON_INTERESSÉ') {
+      } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
@@ -74,8 +85,8 @@ const updateDossierReconventionnement =
           });
       }
 
-      misesEnRelationObjectIds = conseillers?.map(
-        (conseiller) => new ObjectId(conseiller.miseEnRelationId),
+      misesEnRelationObjectIds = misesEnRelations?.map(
+        (miseEnRelation) => new ObjectId(miseEnRelation._id),
       );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)

@@ -32,6 +32,17 @@ const getTotalCandidatsStructure =
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
+      {
         $match: {
           _id: { $nin: conseillerIds },
           ...filterPix(pix),
@@ -57,6 +68,17 @@ const getCandidatsStructureAvecFiltre =
     limit: number,
   ) =>
     app.service(service.conseillers).Model.aggregate([
+      {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
           _id: { $nin: conseillerIds },
