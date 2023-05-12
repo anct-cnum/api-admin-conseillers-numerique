@@ -67,6 +67,10 @@ const getMisesEnRelationStructure =
               dateDebutDeContrat: 1,
               dateFinDeContrat: 1,
               typeDeContrat: 1,
+              salaire: 1,
+              originalMiseEnRelation: 1,
+              miseEnRelationConventionnement: 1,
+              miseEnRelationReconventionnement: 1,
             },
           },
         ]);

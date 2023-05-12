@@ -86,7 +86,7 @@ const updateDossierReconventionnement =
       }
 
       misesEnRelationObjectIds = misesEnRelations?.map(
-        (miseEnRelation) => new ObjectId(miseEnRelation._id),
+        (miseEnRelation) => new ObjectId(miseEnRelation.miseEnRelationId),
       );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)

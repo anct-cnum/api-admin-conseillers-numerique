@@ -34,6 +34,7 @@ const updateContrat =
       res.status(200).json({ message: 'Contrat mis à jour' });
     } catch (error) {
       res.status(500).json({ message: error.message });
+      throw new Error(error);
     }
   };
 
