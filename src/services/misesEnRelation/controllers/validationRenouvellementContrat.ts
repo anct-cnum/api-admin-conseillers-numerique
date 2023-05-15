@@ -14,7 +14,10 @@ const validationRenouvellementContrat =
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idMiseEnRelation) });
-      if (miseEnRelationVerif.statut !== 'renouvellement_initié') {
+      if (
+        miseEnRelationVerif.statut !== 'renouvellement_initié' &&
+        !miseEnRelationVerif?.miseEnRelationConventionnement
+      ) {
         res.status(400).json({
           message: 'Le renouvellement est impossible pour ce contrat',
         });
@@ -34,26 +37,27 @@ const validationRenouvellementContrat =
           },
           { returnOriginal: false, rawResult: true },
         );
-      if (
-        miseEnRelationUpdated.lastErrorObject.n === 1 &&
-        miseEnRelationVerif?.miseEnRelationConventionnement
-      ) {
-        await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            {
-              _id: new ObjectId(
-                miseEnRelationVerif.miseEnRelationConventionnement,
-              ),
-            },
-            {
-              $set: {
-                statut: 'terminée',
-              },
-            },
-          );
+      if (miseEnRelationUpdated.lastErrorObject.n === 0) {
+        res.status(404).json({
+          message: "La mise en relation n'a pas été mise à jour",
+        });
+        return;
       }
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: new ObjectId(
+              miseEnRelationVerif.miseEnRelationConventionnement,
+            ),
+          },
+          {
+            $set: {
+              statut: 'terminée',
+            },
+          },
+        );
       res
         .status(200)
         .json({ miseEnRelationUpdated: miseEnRelationUpdated.value });

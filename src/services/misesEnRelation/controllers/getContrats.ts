@@ -7,7 +7,7 @@ import {
   filterStatutContrat,
   totalContrat,
 } from '../misesEnRelation.repository';
-import validContrat from '../../../schemas/contrat.schemas';
+import { validContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) => async (statut: string) =>

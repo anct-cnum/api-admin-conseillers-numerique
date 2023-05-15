@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
+import { validCreationContrat } from '../../../schemas/contrat.schemas';
 
 const createContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -23,6 +24,16 @@ const createContrat =
     }
 
     try {
+      const creationContrat = validCreationContrat.validate({
+        typeDeContrat,
+        dateDebutDeContrat,
+        dateFinDeContrat,
+        salaire,
+      });
+      if (creationContrat.error) {
+        res.status(400).json({ message: creationContrat.error.message });
+        return;
+      }
       const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)

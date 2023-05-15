@@ -4,11 +4,12 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
+import { validCreationContrat } from '../../../schemas/contrat.schemas';
 
 const updateContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
-      body: { typeDeContrat, dateDebut, dateFin, salaire },
+      body: { typeDeContrat, dateDebutDeContrat, dateFinDeContrat, salaire },
     } = req;
     const { id } = req.params;
 
@@ -17,21 +18,34 @@ const updateContrat =
       return;
     }
     try {
-      await app
+      const editContrat = validCreationContrat.validate({
+        typeDeContrat,
+        dateDebutDeContrat,
+        dateFinDeContrat,
+        salaire,
+      });
+      if (editContrat.error) {
+        res.status(400).json({ message: editContrat.error.message });
+        return;
+      }
+      const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           { _id: id },
           {
             $set: {
               typeDeContrat,
-              dateDebut,
-              dateFin,
-              salaire,
+              dateDebutDeContrat: new Date(dateDebutDeContrat),
+              dateFinDeContrat: new Date(dateFinDeContrat),
+              salaire: Number(salaire),
             },
           },
+          {
+            new: true,
+          },
         );
-      res.status(200).json({ message: 'Contrat mis à jour' });
+      res.status(200).json(miseEnRelation);
     } catch (error) {
       res.status(500).json({ message: error.message });
       throw new Error(error);
