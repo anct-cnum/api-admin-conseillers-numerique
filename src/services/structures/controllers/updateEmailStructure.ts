@@ -34,18 +34,11 @@ const updateEmailStructure =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      const emailExists: IUser = await app
-        .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ name: email });
-      if (emailExists !== null) {
-        res.status(409).json({ message: `l'email ${email} est déjà utilisé` });
-        return;
-      }
+
+      // Pas d'access control pour vérifier dans les autres structures
       const emailExistStructure: number = await app
         .service(service.structures)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({ 'contact.email': email });
+        .Model.countDocuments({ 'contact.email': email });
       if (emailExistStructure !== 0) {
         res.status(409).json({
           message:
@@ -53,6 +46,27 @@ const updateEmailStructure =
         });
         return;
       }
+
+      let impactUser = true;
+      // Pas d'access control pour vérifier dans tous les users
+      const emailExists: IUser = await app
+        .service(service.users)
+        .Model.findOne({ name: email });
+      if (
+        emailExists !== null &&
+        emailExists?.entity?.oid?.toString() !== idStructure
+      ) {
+        res.status(409).json({ message: `l'email ${email} est déjà utilisé` });
+        return;
+      }
+
+      if (
+        emailExists !== null &&
+        emailExists?.entity?.oid?.toString() === idStructure
+      ) {
+        impactUser = false;
+      }
+
       await pool.query(
         `
       UPDATE djapp_hostorganization
@@ -103,28 +117,6 @@ const updateEmailStructure =
             },
           );
 
-        const connect = app.get('mongodb');
-        const database = connect.substr(connect.lastIndexOf('/') + 1);
-
-        const canCreate = req.ability.can(action.create, ressource.users);
-        if (!canCreate) {
-          res.status(403).json({
-            message: `Accès refusé, vous n'êtes pas autorisé à créer un nouvel utilisateur`,
-          });
-          return;
-        }
-        const user: IUser = await app.service(service.users).create({
-          name: email,
-          roles: ['structure'],
-          entity: new DBRef('structures', new ObjectId(idStructure), database),
-          password: uuidv4(),
-          token: uuidv4(),
-          tokenCreatedAt: new Date(),
-          passwordCreated: false,
-          migrationDashboard: true,
-          mailSentDate: null,
-          resend: false,
-        });
         await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
@@ -141,26 +133,45 @@ const updateEmailStructure =
               },
             },
           );
-        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
-        if (errorSmtpMail instanceof Error) {
-          res.status(503).json({
-            message:
-              "Une erreur est survenue lors de l'envoi du mail d'invitation",
+
+        if (impactUser === true) {
+          const connect = app.get('mongodb');
+          const database = connect.substr(connect.lastIndexOf('/') + 1);
+
+          const canCreate = req.ability.can(action.create, ressource.users);
+          if (!canCreate) {
+            res.status(403).json({
+              message: `Accès refusé, vous n'êtes pas autorisé à créer un nouvel utilisateur`,
+            });
+            return;
+          }
+          const user: IUser = await app.service(service.users).create({
+            name: email,
+            roles: ['structure'],
+            entity: new DBRef(
+              'structures',
+              new ObjectId(idStructure),
+              database,
+            ),
+            password: uuidv4(),
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            passwordCreated: false,
+            migrationDashboard: true,
+            mailSentDate: null,
+            resend: false,
           });
-          return;
+
+          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          if (errorSmtpMail instanceof Error) {
+            res.status(503).json({
+              message:
+                "Une erreur est survenue lors de l'envoi du mail d'invitation",
+            });
+            return;
+          }
         }
       } else {
-        await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            {
-              name: structure.contact.email,
-              'entity.$id': new ObjectId(idStructure),
-              roles: { $in: ['structure'] },
-            },
-            { $set: { name: email } },
-          );
         await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
@@ -168,6 +179,20 @@ const updateEmailStructure =
             { 'structure.$id': new ObjectId(idStructure) },
             { $set: { 'structureObj.contact.email': email } },
           );
+
+        if (impactUser === true) {
+          await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              {
+                name: structure.contact.email,
+                'entity.$id': new ObjectId(idStructure),
+                roles: { $in: ['structure'] },
+              },
+              { $set: { name: email } },
+            );
+        }
       }
       res.send({ emailUpdated: structureUpdated.contact.email });
     } catch (error) {
