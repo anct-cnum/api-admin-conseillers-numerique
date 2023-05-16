@@ -35,7 +35,7 @@ const getMisesEnRelations =
       {
         $project: {
           emetteurRupture: 1,
-          emetteurRenouvellement: 1, // à définir
+          emetteurRenouvellement: 1,
           'structureObj.nom': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,

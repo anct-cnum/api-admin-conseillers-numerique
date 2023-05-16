@@ -46,9 +46,9 @@ const createContrat =
         ...miseEnRelation.toObject(),
         _id: new ObjectId(),
         typeDeContrat,
-        dateDebutDeContrat,
-        dateFinDeContrat,
-        salaire,
+        dateDebutDeContrat: new Date(dateDebutDeContrat),
+        dateFinDeContrat: new Date(dateFinDeContrat),
+        salaire: Number(salaire),
         emetteurRenouvellement: {
           date: new Date(),
           email: req.user?.name,

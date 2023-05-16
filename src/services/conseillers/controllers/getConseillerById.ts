@@ -175,7 +175,6 @@ const getConseillerById =
         }
       }
       res.status(200).json(conseiller[0]);
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
