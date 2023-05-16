@@ -41,17 +41,11 @@ const getCandidatById =
             .json({ message: 'Id de la mise en relation incorrect' });
           return;
         }
-        const misesEnRelation = await app
+        conseillerFormat.miseEnRelation = await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.read)
-          .find({
-            'conseiller.$id': conseiller._id,
-            statut: { $in: ['finalisee', 'recrutee'] },
-          });
-        conseillerFormat.miseEnRelation = misesEnRelation.filter(
-          (miseEnRelation) => String(miseEnRelation._id) === idMiseEnRelation,
-        );
-        if (!conseillerFormat?.miseEnRelation) {
+          .findOne({ _id: new ObjectId(idMiseEnRelation) });
+        if (!conseillerFormat.miseEnRelation) {
           res.status(404).json({ message: 'Mise en relation non trouvée' });
           return;
         }
@@ -59,7 +53,7 @@ const getCandidatById =
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
           .findOne({
-            _id: conseillerFormat.miseEnRelation[0]?.structureObj?._id,
+            _id: conseillerFormat.miseEnRelation?.structureObj?._id,
           });
         const typeDossierDs = getTypeDossierDemarcheSimplifiee(
           structure?.insee?.entreprise?.forme_juridique,
@@ -78,7 +72,6 @@ const getCandidatById =
         } else {
           conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
         }
-        conseillerFormat.contrat = conseillerFormat.miseEnRelation;
       } else {
         conseillerFormat.miseEnRelation = await app
           .service(service.misesEnRelation)
