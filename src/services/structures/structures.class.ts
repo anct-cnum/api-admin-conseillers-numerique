@@ -8,7 +8,7 @@ import {
   preSelectionnerCandidat,
   updateEmailStructure,
   updateSiretStructure,
-  updateStructure,
+  updateContactStructure,
   verifySiretStructure,
   getDossiersConvention,
   getDetailDossierConvention,
@@ -42,10 +42,10 @@ export default class Structures extends Service {
       getDetailStructureById(app),
     );
     app.patch(
-      '/structure/:id',
+      '/structure/contact/:id',
       authenticateMode(app),
       createAbilities(app),
-      updateStructure(app),
+      updateContactStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',

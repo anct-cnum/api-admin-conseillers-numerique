@@ -52,4 +52,15 @@ const updateEmail = Joi.string()
   .required()
   .error(new Error("Le format de l'email est invalide"));
 
-export { validStructures, validExportStructures, updateEmail };
+const updateContact = Joi.object({
+  nom: Joi.string().required().error(new Error('Le nom est invalide')),
+  prenom: Joi.string().required().error(new Error('Le prénom est invalide')),
+  telephone: Joi.string()
+    .required()
+    .error(new Error('Le téléphone est invalide')),
+  fonction: Joi.string()
+    .required()
+    .error(new Error('La fonction est invalide')),
+});
+
+export { validStructures, validExportStructures, updateEmail, updateContact };
