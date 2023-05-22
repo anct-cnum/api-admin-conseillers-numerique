@@ -8,7 +8,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 const updateContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
-      body: { typeDeContrat, dateDebut, dateFin, salaire },
+      body: { typeDeContrat, dateDebutDeContrat, dateFinDeContrat, salaire },
     } = req;
     const { id } = req.params;
 
@@ -25,8 +25,8 @@ const updateContrat =
           {
             $set: {
               typeDeContrat,
-              dateDebut,
-              dateFin,
+              dateDebutDeContrat,
+              dateFinDeContrat,
               salaire,
             },
           },

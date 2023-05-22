@@ -38,6 +38,7 @@ const createContrat =
         dateDebutDeContrat,
         dateFinDeContrat,
         salaire,
+        banniereValidationRenouvellement: false,
         emetteurRenouvellement: {
           date: new Date(),
           email: req.user?.name,
