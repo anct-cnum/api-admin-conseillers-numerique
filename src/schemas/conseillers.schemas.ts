@@ -23,6 +23,9 @@ const validConseillers = Joi.object({
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
   region: Joi.string().error(new Error('Le filtre region est invalide')),
+  departement: Joi.string().error(
+    new Error('Le filtre département est invalide'),
+  ),
   piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
   ),
@@ -50,6 +53,9 @@ const validExportConseillers = Joi.object({
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
   region: Joi.string().error(new Error('Le filtre region est invalide')),
+  departement: Joi.string().error(
+    new Error('Le filtre département est invalide'),
+  ),
   piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
   ),
@@ -64,7 +70,6 @@ const validCandidats = Joi.object({
     new Error('Le filtre département est invalide'),
   ),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
-  coms: Joi.string().error(new Error('Le filtre coms est invalide')),
 });
 
 const validCandidatsStructure = Joi.object({

@@ -11,7 +11,6 @@ import {
   filterType,
   filterSearchBar,
   checkAccessReadRequestStructures,
-  filterComs,
   filterSortColonne,
 } from '../repository/structures.repository';
 
@@ -24,7 +23,6 @@ const getTotalStructures =
     statut: string,
     region: string,
     departement: string,
-    coms: string,
     searchByName: string,
   ) =>
     app.service(service.structures).Model.aggregate([
@@ -37,7 +35,6 @@ const getTotalStructures =
           ...filterStatut(statut),
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterComs(coms),
           ...filterSearchBar(searchByName),
         },
       },
@@ -54,7 +51,6 @@ const getStructuresAvecFiltre =
     statut: string,
     region: string,
     departement: string,
-    coms: string,
     searchByName: string,
     sortColonne: object,
     skip: string,
@@ -70,7 +66,6 @@ const getStructuresAvecFiltre =
           ...filterStatut(statut),
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterComs(coms),
           ...filterSearchBar(searchByName),
         },
       },
@@ -103,7 +98,6 @@ const getStructures =
       searchByNom,
       departement,
       region,
-      coms,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -118,7 +112,6 @@ const getStructures =
       searchByNom,
       departement,
       region,
-      coms,
     });
 
     if (emailValidation.error) {
@@ -146,7 +139,6 @@ const getStructures =
         statut as string,
         region as string,
         departement as string,
-        coms as string,
         searchByNom as string,
         sortColonne,
         skip as string,
@@ -160,7 +152,6 @@ const getStructures =
           statut as string,
           region as string,
           departement as string,
-          coms as string,
           searchByNom as string,
         );
         items.data = structures;
