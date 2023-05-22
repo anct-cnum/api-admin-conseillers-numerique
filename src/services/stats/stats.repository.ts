@@ -565,31 +565,40 @@ const getStatsReorientations = async (query, ability, read, app) => {
     .getQuery();
 
   const statsReorientations = await app.service(service.cras).Model.aggregate([
-    { $unwind: '$cra.accompagnement' },
+    { $unwind: '$cra.organismes' },
     {
       $match: {
         ...query,
         $and: [queryAccess],
-        'cra.organisme': { $ne: null },
+        'cra.organismes': { $ne: null },
       },
     },
     {
       $group: {
-        _id: '$cra.organisme',
-        redirection: { $sum: '$cra.accompagnement.redirection' },
+        _id: '$cra.organismes',
       },
     },
-    { $project: { _id: 0, nom: '$_id', valeur: '$redirection' } },
+    { $project: { _id: 0, organismes: '$_id' } },
   ]);
 
-  const totalReorientations = statsReorientations.reduce(
-    (previousValue, currentValue) => previousValue + currentValue.valeur,
-    0,
-  );
+  let reorientations = [];
+  let totalReorientations = 0;
+  statsReorientations.forEach(statsReorientation => {
+    if (reorientations.filter(reorientation => reorientation.nom === String(Object.keys(statsReorientation.organismes)[0]))?.length > 0) {
+      reorientations.filter(reorientation => reorientation.nom === Object.keys(statsReorientation.organismes)[0])[0].valeur +=
+        statsReorientation.organismes[Object.keys(statsReorientation.organismes)[0]];
+    } else {
+      reorientations.push({
+        nom: String(Object.keys(statsReorientation.organismes)[0]),
+        valeur: statsReorientation.organismes[Object.keys(statsReorientation.organismes)[0]]
+      });
+    }
+    totalReorientations += statsReorientation.organismes[Object.keys(statsReorientation.organismes)[0]];
+  });
 
   // Conversion en % total
-  if (statsReorientations.length > 0) {
-    return statsReorientations.map((lieu) => {
+  if (reorientations.length > 0) {
+    return reorientations.map((lieu) => {
       // eslint-disable-next-line
       lieu.valeur =
         totalReorientations > 0
@@ -599,7 +608,7 @@ const getStatsReorientations = async (query, ability, read, app) => {
     });
   }
 
-  return statsReorientations;
+  return reorientations;
 };
 
 const getStatsEvolutions = async (query, ability, read, app) => {
