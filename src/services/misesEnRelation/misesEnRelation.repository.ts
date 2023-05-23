@@ -46,6 +46,26 @@ const filterDiplome = (diplome: string) => {
   return {};
 };
 
+const filterCCP1 = (ccp1: string) => {
+  if (ccp1 === 'true') {
+    return {
+      $or: [
+        { 'conseillerObj.statut': { $eq: 'RUPTURE' } },
+        { 'conseillerObj.statut': { $eq: 'RECRUTE' } }
+      ]
+    };
+  }
+  if (ccp1 === 'false') {
+    return {
+      $nor: [
+        { 'conseillerObj.statut': { $eq: 'RUPTURE' } },
+        { 'conseillerObj.statut': { $eq: 'RECRUTE' } }
+      ]
+    };
+  }
+  return {}
+};
+
 const filterCv = (cv: string) => {
   if (cv === 'true') {
     return { 'conseillerObj.cv': { $exists: true } };
@@ -112,6 +132,7 @@ export {
   filterNomConseiller,
   filterPix,
   filterDiplome,
+  filterCCP1,
   filterCv,
   filterStatut,
   filterStatutContrat,
