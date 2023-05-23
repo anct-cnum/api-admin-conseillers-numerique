@@ -573,12 +573,7 @@ const getStatsReorientations = async (query, ability, read, app) => {
         'cra.organismes': { $ne: null },
       },
     },
-    {
-      $group: {
-        _id: '$cra.organismes',
-      },
-    },
-    { $project: { _id: 0, organismes: '$_id' } },
+    { $project: { _id: 0, organismes: '$cra.organismes' } },
   ]);
 
   const reorientations = [];
