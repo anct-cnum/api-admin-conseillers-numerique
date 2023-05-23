@@ -4,19 +4,45 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
+import { IConseillers } from '../../../ts/interfaces/db.interfaces';
+
+interface ICandidat extends IConseillers {
+  possedeCompteCandidat: boolean;
+  miseEnRelation: object;
+}
+
+interface ICandidatMongoose extends IConseillers {
+  toObject: () => ICandidat;
+}
 
 const getCandidatById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
+    let conseiller: ICandidatMongoose | null = null;
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const conseiller = await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: new ObjectId(idConseiller) });
+      if (req.query.role === 'structure') {
+        const findStructure = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne();
+
+        if (!findStructure) {
+          res.status(404).json({ message: "La structure n'existe pas" });
+          return;
+        }
+        conseiller = await app
+          .service(service.conseillers)
+          .Model.findOne({ _id: new ObjectId(idConseiller) });
+      } else {
+        conseiller = await app
+          .service(service.conseillers)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({ _id: new ObjectId(idConseiller) });
+      }
 
       if (!conseiller) {
         res.status(404).json({ message: 'Conseiller non trouvé' });

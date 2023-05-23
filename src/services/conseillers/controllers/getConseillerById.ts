@@ -2,26 +2,43 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { IConseillers } from '../../../ts/interfaces/db.interfaces';
+import {
+  IConseillers,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
+    let checkAccess: {};
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const checkAccess = await checkAccessReadRequestConseillers(app, req);
+      if (req.query.role === 'structure') {
+        const findStructure: IStructures = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne();
+
+        if (!findStructure) {
+          res.status(404).json({ message: "La structure n'existe pas" });
+          return;
+        }
+      } else {
+        checkAccess = await checkAccessReadRequestConseillers(app, req);
+      }
       const conseiller: IConseillers[] = await app
         .service(service.conseillers)
         .Model.aggregate([
           {
             $match: {
               _id: new ObjectId(idConseiller),
-              $and: [checkAccess],
+              ...checkAccess,
             },
           },
           {
