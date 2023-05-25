@@ -17,6 +17,7 @@ import {
   createContrat,
   updateContrat,
   validationReconventionnement,
+  closeBanner,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -126,6 +127,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateContrat(app),
+    );
+    app.patch(
+      '/reconventionnement/banniere/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBanner(app),
     );
   }
 }

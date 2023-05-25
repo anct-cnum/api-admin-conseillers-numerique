@@ -22,6 +22,7 @@ const updateContrat =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           { _id: id },
+          { statut: 'finalisee' },
           {
             $set: {
               typeDeContrat,
