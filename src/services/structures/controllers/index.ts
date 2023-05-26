@@ -1,5 +1,5 @@
 import getStructures from './getStructures';
-import updateStructure from './updateStructure';
+import updateContactStructure from './updateContactStructure';
 import getDetailStructureById from './getDetailStructureById';
 import getStructureById from './getStructureById';
 import verifySiretStructure from './verifySiretStructure';
@@ -16,7 +16,7 @@ import validationReconventionnement from './validationReconventionnement';
 
 export {
   getStructures,
-  updateStructure,
+  updateContactStructure,
   getDetailStructureById,
   getStructureById,
   verifySiretStructure,

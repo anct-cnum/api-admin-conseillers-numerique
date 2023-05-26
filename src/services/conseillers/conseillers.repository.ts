@@ -109,10 +109,15 @@ const filterCv = (cv: string) => {
   return {};
 };
 
-const filterDepartement = (departement: string) =>
-  departement ? { codeDepartement: departement } : {};
-
-const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
+const filterDepartement = (departement: string) => {
+  if (departement === '978') {
+    return { codeCom: departement };
+  }
+  if (departement) {
+    return { codeDepartement: departement };
+  }
+  return {};
+};
 
 const filtrePiecesManquantes = (piecesManquantes: boolean) =>
   piecesManquantes
@@ -209,7 +214,6 @@ export {
   filterIsRuptureConseiller,
   filterRegion,
   filterDepartement,
-  filterComs,
   filterCv,
   filterDiplome,
   filterPix,
