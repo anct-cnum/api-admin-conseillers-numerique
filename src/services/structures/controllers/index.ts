@@ -13,6 +13,7 @@ import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
 import createContrat from './createContrat';
 import updateContrat from './updateContrat';
 import validationReconventionnement from './validationReconventionnement';
+import closeBanner from './closeBanner';
 
 export {
   getStructures,
@@ -30,4 +31,5 @@ export {
   createContrat,
   updateContrat,
   validationReconventionnement,
+  closeBanner,
 };

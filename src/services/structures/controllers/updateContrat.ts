@@ -33,6 +33,7 @@ const updateContrat =
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           { _id: id },
+          { statut: 'finalisee' },
           {
             $set: {
               typeDeContrat,
