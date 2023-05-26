@@ -4,17 +4,17 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
-  filterStatutContrat,
-  totalContrat,
+  filterStatutContratHistorique,
+  totalHistoriqueContrat,
 } from '../misesEnRelation.repository';
-import { validContrat } from '../../../schemas/contrat.schemas';
+import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) => async (statut: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterStatutContrat(statut),
+          ...filterStatutContratHistorique(statut),
           $and: [checkAccess],
         },
       },
@@ -24,12 +24,27 @@ const getTotalMisesEnRelations =
 
 const getMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (skip: string, limit: number, statut: string) =>
+  async (
+    skip: string,
+    limit: number,
+    statut: string,
+    dateDebut: Date,
+    dateFin: Date,
+  ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
           $and: [checkAccess],
-          ...filterStatutContrat(statut),
+          $or: [
+            { 'emetteurRupture.date': { $gte: dateDebut, $lte: dateFin } },
+            {
+              'emetteurRenouvellement.date': { $gte: dateDebut, $lte: dateFin },
+            },
+            {
+              dateRecrutement: { $gte: dateDebut, $lte: dateFin },
+            },
+          ],
+          ...filterStatutContratHistorique(statut),
         },
       },
       {
@@ -41,6 +56,10 @@ const getMisesEnRelations =
           'conseillerObj.prenom': 1,
           'structureObj.idPG': 1,
           'conseillerObj.idPG': 1,
+          typeDeContrat: 1,
+          dateDebutDeContrat: 1,
+          dateFinDeContrat: 1,
+          miseEnRelationConventionnement: 1,
           statut: 1,
         },
       },
@@ -51,13 +70,24 @@ const getMisesEnRelations =
       { $limit: Number(limit) },
     ]);
 
-const getContrats =
+const getHistoriqueContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const { page, statut } = req.query;
+    const dateDebut: Date = new Date(req.query.dateDebut);
+    const dateFin: Date = new Date(req.query.dateFin);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     try {
-      const contratValidation = validContrat.validate({ page, statut });
-      if (contratValidation.error) {
-        res.status(400).json({ message: contratValidation.error.message });
+      const contratHistoriqueValidation = validHistoriqueContrat.validate({
+        page,
+        statut,
+        dateDebut,
+        dateFin,
+      });
+      if (contratHistoriqueValidation.error) {
+        res
+          .status(400)
+          .json({ message: contratHistoriqueValidation.error.message });
         return;
       }
       const items: {
@@ -88,27 +118,39 @@ const getContrats =
         page,
         options.paginate.default,
         statut,
+        dateDebut,
+        dateFin,
       );
+      contrats.map((contrat) => {
+        const item = contrat;
+        if (
+          contrat.statut === 'finalisee' &&
+          contrat.miseEnRelationConventionnement
+        ) {
+          item.statut = 'renouvelee';
+        }
+        return item;
+      });
       const totalContrats = await getTotalMisesEnRelations(
         app,
         checkAccess,
       )(statut);
       items.total = totalContrats[0]?.count_contrats ?? 0;
-      const totalConvention = await totalContrat(app, checkAccess);
+      const totalConvention = await totalHistoriqueContrat(app, checkAccess);
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,
         recrutement:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'recrutee',
+            (totalParStatut) => totalParStatut.statut === 'finalisee',
           )?.count ?? 0,
         renouvellementDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'renouvellement', // statut à définir pour le renouvellement de contrat
+            (totalParStatut) => totalParStatut.statut === 'renouvelee', // statut à définir pour le renouvellement de contrat
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'nouvelle_rupture',
+            (totalParStatut) => totalParStatut.statut === 'finalisee_rupture',
           )?.count ?? 0,
       };
       items.data = contrats;
@@ -125,4 +167,4 @@ const getContrats =
     }
   };
 
-export default getContrats;
+export default getHistoriqueContrats;
