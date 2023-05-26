@@ -37,21 +37,32 @@ const getMisesEnRelationARenouveller =
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: 'finalisee',
+              miseEnRelationConventionnement: { $exists: false },
             },
           },
           {
-            $sort: {
-              dateFinDeContrat: 1,
+            $group: {
+              _id: '$conseillerObj',
+              dateRecrutement: { $first: '$dateRecrutement' },
+              statut: { $first: '$statut' },
+              typeDeContrat: { $first: '$typeDeContrat' },
+              reconventionnement: { $first: '$reconventionnement' },
+              miseEnRelationId: { $first: '$_id' },
+              dateDebutDeContrat: { $first: '$dateDebut' },
+              dateFinDeContrat: { $first: '$dateFin' },
             },
           },
           {
             $project: {
-              conseiller: '$conseillerObj',
-              typeDeContrat: 1,
-              dateDebutDeContrat: 1,
-              dateFinDeContrat: 1,
+              _id: 0,
+              conseiller: '$_id',
+              dateRecrutement: 1,
               statut: 1,
               reconventionnement: 1,
+              miseEnRelationId: 1,
+              typeDeContrat: 1,
+              dateDebutDeContrat: 1,
+              DateFinDeContrat: 1,
             },
           },
         ]);
