@@ -10,14 +10,16 @@ const closeBanner =
     const filter = { _id: req.params.id };
 
     try {
-      if (type === 'renouvellement') {
-        await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(filter, {
-            $set: { banniereValidationRenouvellement: false },
-          });
+      if (type !== 'renouvellement') {
+        res.status(400).json({ message: 'Type incorrect' });
+        return;
       }
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(filter, {
+          $set: { banniereValidationRenouvellement: false },
+        });
 
       res.status(200).json({ message: 'Bannière fermée' });
     } catch (error) {

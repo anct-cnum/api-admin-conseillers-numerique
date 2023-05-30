@@ -69,14 +69,14 @@ const updateDossierReconventionnement =
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate({
+          .updateOne({
             $set: objectConventionnement,
           });
       } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate({
+          .updateOne({
             $set: {
               'conventionnement.statut': statut,
               'conventionnement.motif': motif,
