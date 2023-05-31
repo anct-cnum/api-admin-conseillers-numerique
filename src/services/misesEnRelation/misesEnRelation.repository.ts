@@ -49,18 +49,12 @@ const filterDiplome = (diplome: string) => {
 const filterCCP1 = (ccp1: string) => {
   if (ccp1 === 'true') {
     return {
-      $or: [
-        { 'conseillerObj.statut': { $eq: 'RUPTURE' } },
-        { 'conseillerObj.statut': { $eq: 'RECRUTE' } }
-      ]
+      'conseillerObj.statut': { $in: ['RECRUTE', 'RUPTURE'] }
     };
   }
   if (ccp1 === 'false') {
     return {
-      $nor: [
-        { 'conseillerObj.statut': { $eq: 'RUPTURE' } },
-        { 'conseillerObj.statut': { $eq: 'RECRUTE' } }
-      ]
+      'conseillerObj.statut': { $nin: ['RECRUTE', 'RUPTURE'] }
     };
   }
   return {}
