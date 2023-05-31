@@ -12,12 +12,15 @@ const getUsers = (app: Application) => async (req: IRequest, res: Response) => {
       .service(service.users)
       .Model.accessibleBy(req.ability, action.read)
       .find({ _id: { $ne: new ObjectId(req.user?._id) } })
-      .select({ name: 1, passwordCreated: 1, sub: 1 })
+      .select({ name: 1, passwordCreated: 1, sub: 1, roles: 1 })
       .lean();
     const hiddenSubUsers = users?.map((user) => {
+      const item = user;
       if (user?.sub) {
-        return { ...user, sub: 'xxxxxxxx' };
+        item.sub = 'xxxxxxxx';
       }
+      item.roles = user.roles.filter((role) => role !== 'structure_coop');
+
       return user;
     });
     res.status(200).json(hiddenSubUsers);
