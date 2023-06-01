@@ -106,7 +106,7 @@ const getContrats =
         renouvellementDeContrat:
           totalConvention.contrat.find(
             (totalParStatut) =>
-              totalParStatut.statut === 'renouvellement_initié',
+              totalParStatut.statut === 'renouvellement_initiee',
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(

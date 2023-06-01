@@ -36,7 +36,11 @@ const getMisesEnRelationStructure =
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: {
-                $in: ['finalisee', 'nouvelle_rupture', 'renouvellement_initié'],
+                $in: [
+                  'finalisee',
+                  'nouvelle_rupture',
+                  'renouvellement_initiee',
+                ],
               },
             },
           },

@@ -46,7 +46,7 @@ const updateContrat =
         .findOneAndUpdate(
           {
             _id: id,
-            statut: 'renouvellement_initié',
+            statut: 'renouvellement_initiee',
           },
           contratUpdated,
           {

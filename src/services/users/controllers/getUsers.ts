@@ -21,7 +21,7 @@ const getUsers = (app: Application) => async (req: IRequest, res: Response) => {
       }
       item.roles = user.roles.filter((role) => role !== 'structure_coop');
 
-      return user;
+      return item;
     });
     res.status(200).json(hiddenSubUsers);
   } catch (error) {

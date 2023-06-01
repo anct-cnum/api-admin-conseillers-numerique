@@ -12,6 +12,8 @@ import getCandidats from './controllers/getCandidats';
 import deleteCandidatById from './controllers/deleteCandidatById';
 import candidatRelanceInvitation from './controllers/candidatRelanceInvitation';
 import getCandidatsStructure from './controllers/getCandidatsStructure';
+import getConseillerContratById from './controllers/getConseillerContratById';
+import getCandidatContratById from './controllers/getCandidatContratById';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -35,10 +37,16 @@ export default class Conseillers extends Service {
       getCandidatsStructure(app, options),
     );
     app.get(
-      '/candidat/:id/:idMiseEnRelation?',
+      '/candidat/:id',
       authenticateMode(app),
       createAbilities(app),
       getCandidatById(app),
+    );
+    app.get(
+      '/candidat/contrat/:idConseiller/:idMiseEnRelation',
+      authenticateMode(app),
+      createAbilities(app),
+      getCandidatContratById(app),
     );
     app.post(
       '/candidat/relance-invitation/:id',
@@ -53,10 +61,16 @@ export default class Conseillers extends Service {
       deleteCandidatById(app),
     );
     app.get(
-      '/conseiller/:id/:idMiseEnRelation?',
+      '/conseiller/:id',
       authenticateMode(app),
       createAbilities(app),
       getConseillerById(app),
+    );
+    app.get(
+      '/conseiller/contrat/:idConseiller/:idMiseEnRelation',
+      authenticateMode(app),
+      createAbilities(app),
+      getConseillerContratById(app),
     );
     app.patch(
       '/conseiller/rupture/validation/:id',

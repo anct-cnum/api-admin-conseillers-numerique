@@ -4,13 +4,10 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
-import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
-import { StatutConventionnement } from '../../../ts/enum';
 
 const getCandidatById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    const { idMiseEnRelation } = req.params;
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -34,53 +31,13 @@ const getCandidatById =
         });
       const conseillerFormat = conseiller.toObject();
       conseillerFormat.possedeCompteCandidat = possedeCompteCandidat > 0;
-      if (idMiseEnRelation !== undefined) {
-        if (!ObjectId.isValid(idMiseEnRelation)) {
-          res
-            .status(400)
-            .json({ message: 'Id de la mise en relation incorrect' });
-          return;
-        }
-        conseillerFormat.miseEnRelation = await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.read)
-          .findOne({ _id: new ObjectId(idMiseEnRelation) });
-        if (!conseillerFormat.miseEnRelation) {
-          res.status(404).json({ message: 'Mise en relation non trouvée' });
-          return;
-        }
-        const structure = await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.read)
-          .findOne({
-            _id: conseillerFormat.miseEnRelation?.structureObj?._id,
-          });
-        const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-          structure?.insee?.entreprise?.forme_juridique,
-        );
-        if (typeDossierDs === null) {
-          res.status(500).json({
-            message: 'Erreur lors de la récupération du type de la structure',
-          });
-          return;
-        }
-        if (
-          structure?.conventionnement?.statut ===
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-        ) {
-          conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
-        } else {
-          conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
-        }
-      } else {
-        conseillerFormat.miseEnRelation = await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.read)
-          .find({
-            'conseiller.$id': conseiller._id,
-            statut: 'recrutee',
-          });
-      }
+      conseillerFormat.miseEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          'conseiller.$id': conseiller._id,
+          statut: 'recrutee',
+        });
 
       res.status(200).json(conseillerFormat);
     } catch (error) {

@@ -15,10 +15,10 @@ const validationRenouvellementContrat =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idMiseEnRelation) });
       if (
-        miseEnRelationVerif.statut !== 'renouvellement_initié' &&
+        miseEnRelationVerif?.statut !== 'renouvellement_initiee' &&
         !miseEnRelationVerif?.miseEnRelationConventionnement
       ) {
-        res.status(400).json({
+        res.status(404).json({
           message: 'Le renouvellement est impossible pour ce contrat',
         });
         return;
@@ -54,7 +54,7 @@ const validationRenouvellementContrat =
           },
           {
             $set: {
-              statut: 'terminée',
+              statut: 'terminee',
             },
           },
         );

@@ -54,7 +54,7 @@ const createContrat =
           email: req.user?.name,
         },
         miseEnRelationConventionnement: miseEnRelation._id,
-        statut: 'renouvellement_initié',
+        statut: 'renouvellement_initiee',
       };
       const canCreate = req.ability.can(
         action.create,
