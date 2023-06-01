@@ -47,7 +47,6 @@ const createContrat =
         _id: new ObjectId(),
         typeDeContrat,
         dateDebutDeContrat: new Date(dateDebutDeContrat),
-        dateFinDeContrat: new Date(dateFinDeContrat),
         salaire: Number(salaire),
         banniereValidationRenouvellement: false,
         emetteurRenouvellement: {
@@ -66,6 +65,9 @@ const createContrat =
           message: `Accès refusé, vous n'êtes pas autorisé à créer un contrat`,
         });
         return;
+      }
+      if (typeDeContrat !== 'CDI') {
+        duplicateMiseEnRelation.dateFinDeContrat = new Date(dateFinDeContrat);
       }
       const newMiseEnRelation = await app
         .service(service.misesEnRelation)

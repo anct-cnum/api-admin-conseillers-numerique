@@ -28,25 +28,39 @@ const updateContrat =
         res.status(400).json({ message: editContrat.error.message });
         return;
       }
+      const contratUpdated: any = {
+        $set: {
+          typeDeContrat,
+          dateDebutDeContrat: new Date(dateDebutDeContrat),
+          salaire: Number(salaire),
+        },
+      };
+      if (dateFinDeContrat !== null) {
+        contratUpdated.$set.dateFinDeContrat = new Date(dateFinDeContrat);
+      } else {
+        contratUpdated.$unset = { dateFinDeContrat: '' };
+      }
       const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
-          { _id: id },
-          { statut: 'finalisee' },
           {
-            $set: {
-              typeDeContrat,
-              dateDebutDeContrat: new Date(dateDebutDeContrat),
-              dateFinDeContrat: new Date(dateFinDeContrat),
-              salaire: Number(salaire),
-            },
+            _id: id,
+            statut: 'renouvellement_initié',
           },
+          contratUpdated,
           {
             new: true,
+            rawResult: true,
           },
         );
-      res.status(200).json(miseEnRelation);
+      if (miseEnRelation.lastErrorObject.n === 0) {
+        res.status(404).json({
+          message: "Le contrat n'a pas été mise à jour",
+        });
+        return;
+      }
+      res.status(200).json(miseEnRelation.value);
     } catch (error) {
       res.status(500).json({ message: error.message });
       throw new Error(error);
