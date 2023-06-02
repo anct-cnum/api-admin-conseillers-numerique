@@ -8,6 +8,7 @@ import service from '../../../helpers/services';
 import {
   filterCv,
   filterDiplome,
+  filterCCP1,
   filterPix,
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
@@ -63,6 +64,7 @@ const getMisesEnRelation =
     cv: string,
     pix: string,
     diplome: string,
+    ccp1: string,
     filter: string,
     searchByNom: string,
     sortColonne: object,
@@ -76,6 +78,7 @@ const getMisesEnRelation =
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
+          ...filterCCP1(ccp1),
           ...filterNomConseiller(searchByNom),
           ...filterStatut(filter),
           $and: [checkAccess],
@@ -93,6 +96,7 @@ const getMisesEnRelation =
           'conseillerObj.createdAt': 1,
           'conseillerObj.codePostal': 1,
           'conseillerObj.pix': 1,
+          'conseillerObj.statut': 1,
           'conseillerObj._id': 1,
         },
       },
@@ -117,7 +121,7 @@ const getStructuresMisesEnRelations =
       }
 
       // User Filters
-      const { pix, diplome, cv, skip, search, filter, nomOrdre, ordre } =
+      const { pix, diplome, ccp1, cv, skip, search, filter, nomOrdre, ordre } =
         req.query;
       const emailValidation = validMiseEnRelation.validate({
         skip,
@@ -155,6 +159,7 @@ const getStructuresMisesEnRelations =
         cv as string,
         pix,
         diplome as string,
+        ccp1 as string,
         filter,
         search,
         sortColonne,

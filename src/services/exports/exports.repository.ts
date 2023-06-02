@@ -779,6 +779,48 @@ const generateCsvHistoriqueDossiersConvention = async (
   }
 };
 
+const generateCsvHistoriqueContrats = async (
+  contrats: any[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom du candidat',
+      'Date de la demande',
+      'Type de la demande',
+      'Type de contrat',
+      'Début de contrat',
+      'Fin de contrat',
+    ];
+
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...contrats.map((contrat) =>
+          [
+            contrat?.structureObj?.idPG,
+            contrat?.structureObj?.nom,
+            `${contrat?.conseillerObj?.prenom} ${contrat?.conseillerObj?.nom}`,
+            formatDate(contrat?.dateDeLaDemande),
+            contrat?.statut ?? 'Non renseigné',
+            contrat?.typeDeContrat ?? 'Non renseigné',
+            formatDate(contrat?.dateDebutDeContrat),
+            formatDate(contrat?.dateFinDeContrat),
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -792,4 +834,5 @@ export {
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,
+  generateCsvHistoriqueContrats,
 };
