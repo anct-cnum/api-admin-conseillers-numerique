@@ -98,6 +98,20 @@ const filterDiplome = (diplome: string) => {
   return {};
 };
 
+const filterCCP1 = (ccp1: string) => {
+  if (ccp1 === 'true') {
+    return {
+      statut: { $in: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  if (ccp1 === 'false') {
+    return {
+      statut: { $nin: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  return {};
+};
+
 const filterCv = (cv: string) => {
   if (cv === 'true') {
     return { cv: { $exists: true } };
@@ -217,4 +231,5 @@ export {
   filterCv,
   filterDiplome,
   filterPix,
+  filterCCP1,
 };

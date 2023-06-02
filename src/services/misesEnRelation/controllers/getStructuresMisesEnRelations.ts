@@ -127,6 +127,7 @@ const getStructuresMisesEnRelations =
         skip,
         diplome,
         cv,
+        ccp1,
         pix,
         search,
         filter,
