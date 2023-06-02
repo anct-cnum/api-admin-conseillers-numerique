@@ -38,7 +38,7 @@ const getConseillerById =
           {
             $match: {
               _id: new ObjectId(idConseiller),
-              ...checkAccess,
+              $and: [checkAccess],
             },
           },
           {
