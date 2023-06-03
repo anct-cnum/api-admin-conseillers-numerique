@@ -13,12 +13,16 @@ import { action } from '../../../helpers/accessControl/accessList';
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    let checkAccess: {};
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
+      const paramsRequest: any = {
+        $match: {
+          _id: new ObjectId(idConseiller),
+        },
+      };
       if (req.query.role === 'structure') {
         const findStructure: IStructures = await app
           .service(service.structures)
@@ -30,17 +34,19 @@ const getConseillerById =
           return;
         }
       } else {
-        checkAccess = await checkAccessReadRequestConseillers(app, req);
+        const checkAccessConseillers = await checkAccessReadRequestConseillers(
+          app,
+          req,
+        );
+        paramsRequest.$match = {
+          $and: [checkAccessConseillers],
+          ...paramsRequest.$match,
+        };
       }
       const conseiller: IConseillers[] = await app
         .service(service.conseillers)
         .Model.aggregate([
-          {
-            $match: {
-              _id: new ObjectId(idConseiller),
-              $and: [checkAccess],
-            },
-          },
+          paramsRequest,
           {
             $lookup: {
               from: 'misesEnRelation',
