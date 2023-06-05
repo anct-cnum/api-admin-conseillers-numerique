@@ -8,18 +8,18 @@ const verifySiretStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { siret } = req.params;
     try {
-      const urlSiret = `https://entreprise.api.gouv.fr/v2/etablissements/${siret}`;
-      const params = {
-        token: app.get('api_entreprise'),
-        context: 'cnum',
-        recipient: 'cnum',
-        object: 'checkSiret',
-      };
-      const result = await axios.get(urlSiret, { params });
-      if (result.data?.errors?.length > 0) {
-        return res.status(400).json({ message: result.data.errors[0] });
-      }
-      return res.send({ nomStructure: result.data.etablissement.adresse.l1 });
+      const urlSiret = `https://entreprise.api.gouv.fr/v3/insee/sirene/etablissements/${siret}?context=cnum&object=checkSiret&recipient=13002603200016`;
+      const bearer = 'Bearer ';
+      const result = await axios.get(urlSiret, {
+        headers: {
+          Authorization: bearer + app.get('api_entreprise'),
+        },
+      });
+
+      const nomStructure =
+        result?.data?.data?.unite_legale?.personne_morale_attributs
+          ?.raison_sociale;
+      return res.send({ nomStructure });
     } catch (error) {
       if (error.name === 'AxiosError') {
         return res.status(error?.response?.status).json({
@@ -29,7 +29,11 @@ const verifySiretStructure =
       if (error.name === 'ForbiddenError') {
         return res.status(403).json({ message: 'Accès refusé' });
       }
+      if (error.status !== 200) {
+        return res.status(400).json({ message: error.response.data.errors[0] });
+      }
       res.status(500).json({ message: error.message });
+
       throw new Error(error);
     }
   };
