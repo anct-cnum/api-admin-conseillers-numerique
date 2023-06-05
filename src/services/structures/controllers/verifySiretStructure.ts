@@ -16,9 +16,6 @@ const verifySiretStructure =
         },
       });
 
-      if (result.status !== 200) {
-        return res.status(400).json({ message: result.data.errors[0] });
-      }
       const nomStructure =
         result?.data?.data?.unite_legale?.personne_morale_attributs
           ?.raison_sociale;
@@ -32,7 +29,11 @@ const verifySiretStructure =
       if (error.name === 'ForbiddenError') {
         return res.status(403).json({ message: 'Accès refusé' });
       }
+      if (error.status !== 200) {
+        return res.status(400).json({ message: error.response.data.errors[0] });
+      }
       res.status(500).json({ message: error.message });
+
       throw new Error(error);
     }
   };
