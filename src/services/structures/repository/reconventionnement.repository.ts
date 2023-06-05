@@ -192,14 +192,38 @@ const filterStatut = (typeConvention: string) => {
         StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
     };
   }
+  if (typeConvention === 'avenantAjoutPoste') {
+    return {
+      'demandesCoselec.statut': 'en_cours',
+      'demandesCoselec.type': 'ajout',
+    };
+  }
+  if (typeConvention === 'avenantRenduPoste') {
+    return {
+      'demandesCoselec.statut': 'en_cours',
+      'demandesCoselec.type': 'rendu',
+    };
+  }
 
   return {
-    'conventionnement.statut': {
-      $in: [
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-        StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-      ],
-    },
+    $or: [
+      {
+        'conventionnement.statut': {
+          $in: [
+            StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
+            StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+          ],
+        },
+      },
+      {
+        'demandesCoselec.statut': 'en_cours',
+        'demandesCoselec.type': 'ajout',
+      },
+      {
+        'demandesCoselec.statut': 'en_cours',
+        'demandesCoselec.type': 'rendu',
+      },
+    ],
   };
 };
 
@@ -267,11 +291,31 @@ const totalParConvention = async (
     .countDocuments({
       'conventionnement.statut': `CONVENTIONNEMENT_${statut}`,
     });
-  const total = conventionnement + reconventionnement;
+  const avenantAjoutPoste = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'demandesCoselec.statut': 'en_cours',
+      'demandesCoselec.type': 'ajout',
+    });
+  const avenantRenduPoste = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'demandesCoselec.statut': 'en_cours',
+      'demandesCoselec.type': 'rendu',
+    });
+  const total =
+    conventionnement +
+    reconventionnement +
+    avenantAjoutPoste +
+    avenantRenduPoste;
 
   return {
     conventionnement,
     reconventionnement,
+    avenantAjoutPoste,
+    avenantRenduPoste,
     total,
   };
 };

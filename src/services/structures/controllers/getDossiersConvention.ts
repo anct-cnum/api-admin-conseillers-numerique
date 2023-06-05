@@ -41,6 +41,7 @@ const getStructures =
           nombreConseillersSouhaites: 1,
           statut: 1,
           conventionnement: 1,
+          demandesCoselec: 1,
         },
       },
       { $sort: { idPG: 1 } },

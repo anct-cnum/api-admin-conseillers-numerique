@@ -66,6 +66,7 @@ const getDetailStructureWithConseillers =
           coselec: 1,
           contact: 1,
           conventionnement: 1,
+          demandesCoselec: 1,
           nombreConseillersSouhaites: 1,
           'insee.entreprise.forme_juridique': 1,
           conseillers: '$conseillers',
