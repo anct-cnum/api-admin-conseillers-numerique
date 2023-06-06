@@ -24,6 +24,7 @@ const countMisesEnRelation =
     cv: string,
     pix: string,
     diplome: string,
+    ccp1: string,
     filter: string,
     searchByNom: string,
   ) =>
@@ -34,6 +35,7 @@ const countMisesEnRelation =
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
+          ...filterCCP1(ccp1),
           ...filterNomConseiller(searchByNom),
           ...filterStatut(filter),
           $and: [checkAccess],
@@ -171,7 +173,15 @@ const getStructuresMisesEnRelations =
         const totalMiseEnRelation = await countMisesEnRelation(
           app,
           checkAccess,
-        )(structure._id, cv as string, pix, diplome as string, filter, search);
+        )(
+          structure._id,
+          cv as string,
+          pix,
+          diplome as string,
+          ccp1 as string,
+          filter,
+          search,
+        );
         items.data = misesEnRelation;
         items.total = totalMiseEnRelation[0]?.countMiseEnRelation;
         items.limit = options.paginate.default;
