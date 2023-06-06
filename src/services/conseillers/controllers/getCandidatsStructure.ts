@@ -47,6 +47,7 @@ const getTotalCandidatsStructure =
       {
         $match: {
           _id: { $nin: conseillerIds },
+          disponible: true,
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
