@@ -181,9 +181,9 @@ const filterIsRuptureConseiller = (
       return {
         statut: { $eq: 'RECRUTE' },
         $or: [
-          { datePrisePoste: { $gt: dateDebut, $lt: dateFin } },
+          { datePrisePoste: { $gte: dateDebut, $lte: dateFin } },
           { datePrisePoste: null },
-        ]
+        ],
       };
     case 'finalisee_rupture':
       return { statut: { $eq: 'RUPTURE' } };
@@ -191,9 +191,9 @@ const filterIsRuptureConseiller = (
       return {
         statut: { $eq: 'RECRUTE' },
         $or: [
-          { datePrisePoste: { $gt: dateDebut, $lt: dateFin } },
+          { datePrisePoste: { $gte: dateDebut, $lte: dateFin } },
           { datePrisePoste: null },
-        ]
+        ],
       };
     default:
       return {
@@ -202,13 +202,11 @@ const filterIsRuptureConseiller = (
           {
             $and: [
               { statut: { $eq: 'RECRUTE' } },
-              { datePrisePoste: { $gt: dateDebut, $lt: dateFin } },
-            ],
-          },
-          {
-            $and: [
-              { statut: { $eq: 'RECRUTE' } },
-              { datePrisePoste: null },
+              { $or: [
+                  { datePrisePoste: { $gte: dateDebut, $lte: dateFin } },
+                  { datePrisePoste: null },
+                ],
+              },
             ],
           },
         ],
