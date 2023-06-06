@@ -207,6 +207,7 @@ const generateCsvConseillersWithoutCRA = async (
       'Siret de la structure',
       'Nom de la structure',
       'Code postal de la structure',
+      'Coordonnées de la structure',
     ];
     res.write(
       [
@@ -235,6 +236,12 @@ const generateCsvConseillersWithoutCRA = async (
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
             statCnfsWithoutCRA.structure.codePostal,
+            statCnfsWithoutCRA.structure?.contact?.telephone?.length >= 10
+              ? statCnfsWithoutCRA.structure?.contact?.telephone.replace(
+                  /[- ]/g,
+                  '',
+                )
+              : 'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
