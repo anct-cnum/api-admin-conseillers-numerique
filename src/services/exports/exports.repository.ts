@@ -163,7 +163,7 @@ const generateCsvCandidatByStructure = async (
 
 const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
   res.write(
-    'Nom;Prénom;Email @conseiller-numerique.fr;Nom de la Structure;Email de la structure;Coordonnées de la structure;Adresse de la structure;Code région de la structure\n',
+    'Nom;Prénom;Email @conseiller-numerique.fr;Nom de la Structure;Email de la structure;Adresse de la structure;Code région de la structure\n',
   );
   try {
     for (const exportHub of exportsHub) {
@@ -172,9 +172,9 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
           exportHub.conseiller?.mattermost?.id
             ? exportHub.conseiller?.emailCN?.address
             : 'compte COOP non créé'
-        };${exportHub.nom};${exportHub.contact?.email};
-        ${exportHub.contact?.telephone};
-        ${formatAdresseStructure(exportHub.insee)};${exportHub.codeRegion};\n`,
+        };${exportHub.nom};${exportHub.contact?.email};${formatAdresseStructure(
+          exportHub.insee,
+        )};${exportHub.codeRegion};\n`,
       );
     }
     res.end();
