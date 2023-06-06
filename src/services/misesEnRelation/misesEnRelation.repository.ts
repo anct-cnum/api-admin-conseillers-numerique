@@ -75,7 +75,9 @@ const filterStatut = (statut: string) => {
   if (statut !== 'toutes') {
     return { statut: { $eq: statut } };
   }
-  return { statut: { $ne: 'non_disponible' } };
+  return {
+    statut: { $nin: ['non_disponible', 'renouvellement_initiee', 'terminee'] },
+  };
 };
 
 const filterStatutContrat = (statut: string) => {
