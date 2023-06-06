@@ -47,7 +47,7 @@ const createContrat =
         _id: new ObjectId(),
         typeDeContrat,
         dateDebutDeContrat: new Date(dateDebutDeContrat),
-        salaire: Number(salaire),
+        salaire: Number(salaire.replace(',', '.')),
         banniereValidationRenouvellement: false,
         emetteurRenouvellement: {
           date: new Date(),
