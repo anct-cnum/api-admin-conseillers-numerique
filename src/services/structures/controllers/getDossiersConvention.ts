@@ -94,7 +94,7 @@ const getDossiersConvention =
       );
       const totalStructures = await getTotalStructures(app, checkAccess)(type);
       items.total = totalStructures[0]?.count_structures ?? 0;
-      const totalConvention = await totalParConvention(app, req, 'EN_COURS');
+      const totalConvention = await totalParConvention(app, req);
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,

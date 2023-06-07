@@ -12,6 +12,8 @@ import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
 import validationReconventionnement from './validationReconventionnement';
 import closeBanner from './closeBanner';
+import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
+import validationAvenantRenduPoste from './validationAvenantRenduPoste';
 
 export {
   getStructures,
@@ -28,4 +30,6 @@ export {
   getHistoriqueDossiersConvention,
   validationReconventionnement,
   closeBanner,
+  updateAvenantAjoutPoste,
+  validationAvenantRenduPoste,
 };

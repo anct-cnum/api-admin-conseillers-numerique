@@ -251,6 +251,34 @@ const filterDateDemandeAndStatutHistorique = (
       },
     };
   }
+  if (typeConvention === 'avenantAjoutPoste') {
+    return {
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $ne: 'en_cours' },
+          type: { $eq: 'ajout' },
+          date: {
+            $gte: dateDebut,
+            $lte: dateFin,
+          },
+        },
+      },
+    };
+  }
+  if (typeConvention === 'avenantRenduPoste') {
+    return {
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $ne: 'en_cours' },
+          type: { $eq: 'rendu' },
+          date: {
+            $gte: dateDebut,
+            $lte: dateFin,
+          },
+        },
+      },
+    };
+  }
 
   return {
     $or: [
@@ -270,40 +298,134 @@ const filterDateDemandeAndStatutHistorique = (
           $lte: dateFin,
         },
       },
+      {
+        demandesCoselec: {
+          $elemMatch: {
+            statut: { $ne: 'en_cours' },
+            type: { $eq: 'ajout' },
+            date: {
+              $gte: dateDebut,
+              $lte: dateFin,
+            },
+          },
+        },
+      },
+      {
+        demandesCoselec: {
+          $elemMatch: {
+            statut: { $ne: 'en_cours' },
+            type: { $eq: 'rendu' },
+            date: {
+              $gte: dateDebut,
+              $lte: dateFin,
+            },
+          },
+        },
+      },
     ],
   };
 };
 
-const totalParConvention = async (
-  app: Application,
-  req: IRequest,
-  statut: string,
-) => {
+const totalParConvention = async (app: Application, req: IRequest) => {
   const reconventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': `RECONVENTIONNEMENT_${statut}`,
+      'conventionnement.statut':
+        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
     });
   const conventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': `CONVENTIONNEMENT_${statut}`,
+      'conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
     });
   const avenantAjoutPoste = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'demandesCoselec.statut': 'en_cours',
+      'demandesCoselec.statut': { $eq: 'en_cours' },
       'demandesCoselec.type': 'ajout',
     });
   const avenantRenduPoste = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'demandesCoselec.statut': 'en_cours',
+      'demandesCoselec.statut': { $eq: 'en_cours' },
       'demandesCoselec.type': 'rendu',
+    });
+  const total =
+    conventionnement +
+    reconventionnement +
+    avenantAjoutPoste +
+    avenantRenduPoste;
+
+  return {
+    conventionnement,
+    reconventionnement,
+    avenantAjoutPoste,
+    avenantRenduPoste,
+    total,
+  };
+};
+
+const totalParHistoriqueConvention = async (
+  app: Application,
+  req: IRequest,
+  dateDebut: Date,
+  dateFin: Date,
+) => {
+  const reconventionnement = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'conventionnement.statut':
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+      'conventionnement.dossierReconventionnement.dateDeValidation': {
+        $gte: dateDebut,
+        $lte: dateFin,
+      },
+    });
+  const conventionnement = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'conventionnement.statut': StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
+      'conventionnement.dossierConventionnement.dateDeValidation': {
+        $gte: dateDebut,
+        $lte: dateFin,
+      },
+    });
+  const avenantAjoutPoste = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $ne: 'en_cours' },
+          type: { $eq: 'ajout' },
+          date: {
+            $gte: dateDebut,
+            $lte: dateFin,
+          },
+        },
+      },
+    });
+  const avenantRenduPoste = await app
+    .service(service.structures)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $ne: 'en_cours' },
+          type: { $eq: 'rendu' },
+          date: {
+            $gte: dateDebut,
+            $lte: dateFin,
+          },
+        },
+      },
     });
   const total =
     conventionnement +
@@ -329,4 +451,5 @@ export {
   filterStatut,
   filterDateDemandeAndStatutHistorique,
   totalParConvention,
+  totalParHistoriqueConvention,
 };

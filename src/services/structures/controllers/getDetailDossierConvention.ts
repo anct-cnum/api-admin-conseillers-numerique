@@ -65,6 +65,7 @@ const getDetailStructureWithConseillers =
           nom: 1,
           coselec: 1,
           contact: 1,
+          statut: 1,
           conventionnement: 1,
           demandesCoselec: 1,
           nombreConseillersSouhaites: 1,
