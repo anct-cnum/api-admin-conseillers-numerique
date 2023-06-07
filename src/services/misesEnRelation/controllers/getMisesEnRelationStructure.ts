@@ -40,6 +40,7 @@ const getMisesEnRelationStructure =
                   'finalisee',
                   'nouvelle_rupture',
                   'renouvellement_initiee',
+                  'recrutee',
                 ],
               },
             },

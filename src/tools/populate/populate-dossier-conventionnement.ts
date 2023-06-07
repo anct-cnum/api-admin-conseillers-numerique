@@ -8,6 +8,7 @@ import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { queryGetDossierReconventionnement } from '../../services/structures/repository/reconventionnement.repository';
+import { StatutConventionnement } from '../../ts/enum';
 
 program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
@@ -44,9 +45,10 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           },
           {
             'conventionnement.statut':
-              match.conventionnement.statut === 'RECONVENTIONNEMENT_EN_COURS'
-                ? 'RECONVENTIONNEMENT_EN_COURS'
-                : 'CONVENTIONNEMENT_VALIDÉ',
+              match.conventionnement.statut ===
+              StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+                ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+                : StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
             'conventionnement.dossierConventionnement': {
               statut: dossier.dossier.state,
               numero: dossier.dossier.number,
