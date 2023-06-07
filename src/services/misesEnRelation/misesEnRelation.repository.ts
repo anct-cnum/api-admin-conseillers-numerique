@@ -46,6 +46,20 @@ const filterDiplome = (diplome: string) => {
   return {};
 };
 
+const filterCCP1 = (ccp1: string) => {
+  if (ccp1 === 'true') {
+    return {
+      'conseillerObj.statut': { $in: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  if (ccp1 === 'false') {
+    return {
+      'conseillerObj.statut': { $nin: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  return {};
+};
+
 const filterCv = (cv: string) => {
   if (cv === 'true') {
     return { 'conseillerObj.cv': { $exists: true } };
@@ -61,7 +75,16 @@ const filterStatut = (statut: string) => {
   if (statut !== 'toutes') {
     return { statut: { $eq: statut } };
   }
-  return { statut: { $ne: 'non_disponible' } };
+  return {
+    statut: {
+      $nin: [
+        'finalisee_non_disponible',
+        'non_disponible',
+        'renouvellement_initiee',
+        'terminee',
+      ],
+    },
+  };
 };
 
 const filterStatutContrat = (statut: string) => {
@@ -173,6 +196,7 @@ export {
   filterNomConseiller,
   filterPix,
   filterDiplome,
+  filterCCP1,
   filterCv,
   filterStatut,
   filterStatutContrat,

@@ -83,6 +83,7 @@ const validCandidatsStructure = Joi.object({
   ),
   pix: Joi.string().error(new Error('Le filtre pix est invalide')),
   cv: Joi.string().error(new Error('Le filtre cv est invalide')),
+  ccp1: Joi.string().error(new Error('Le filtre CCP1 est invalide')),
   diplome: Joi.string().error(new Error('Le filtre diplôme est invalide')),
 });
 
