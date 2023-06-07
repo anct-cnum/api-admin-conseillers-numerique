@@ -202,7 +202,8 @@ const filterIsRuptureConseiller = (
           {
             $and: [
               { statut: { $eq: 'RECRUTE' } },
-              { $or: [
+              {
+                $or: [
                   { datePrisePoste: { $gte: dateDebut, $lte: dateFin } },
                   { datePrisePoste: null },
                 ],
