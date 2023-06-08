@@ -17,6 +17,7 @@ import {
   createContrat,
   updateContrat,
   validationReconventionnement,
+  demandeCoselec,
   closeBanner,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
@@ -133,6 +134,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       closeBanner(app),
+    );
+    app.patch(
+      '/demande-coselec',
+      authenticateMode(app),
+      createAbilities(app),
+      demandeCoselec(app),
     );
   }
 }

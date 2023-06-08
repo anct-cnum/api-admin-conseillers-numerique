@@ -52,4 +52,18 @@ const updateEmail = Joi.string()
   .required()
   .error(new Error("Le format de l'email est invalide"));
 
-export { validStructures, validExportStructures, updateEmail };
+const validDemandeCoselec = Joi.object({
+  type: Joi.string().required().error(new Error('Le type est invalide')),
+  nombreDePostes: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes est invalide')),
+  motif: Joi.string().required().error(new Error('Le motif est invalide')),
+  autreMotif: Joi.string().allow('').error(new Error('Le motif est invalide')),
+});
+
+export {
+  validStructures,
+  validExportStructures,
+  updateEmail,
+  validDemandeCoselec,
+};

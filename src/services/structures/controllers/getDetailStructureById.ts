@@ -108,6 +108,8 @@ const getDetailStructureById =
             contact: 1,
             conseillers: '$misesEnRelation',
             conventionnement: 1,
+            demandesCoselec: 1,
+            lastDemandeCoselec: { $arrayElemAt: ['$demandesCoselec', -1] },
           },
         },
       ]);

@@ -14,6 +14,7 @@ import createContrat from './createContrat';
 import updateContrat from './updateContrat';
 import validationReconventionnement from './validationReconventionnement';
 import closeBanner from './closeBanner';
+import demandeCoselec from './demandeCoselec';
 
 export {
   getStructures,
@@ -32,4 +33,5 @@ export {
   updateContrat,
   validationReconventionnement,
   closeBanner,
+  demandeCoselec,
 };

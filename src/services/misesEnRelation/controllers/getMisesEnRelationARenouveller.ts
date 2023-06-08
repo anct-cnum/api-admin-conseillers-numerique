@@ -48,8 +48,8 @@ const getMisesEnRelationARenouveller =
               typeDeContrat: { $first: '$typeDeContrat' },
               reconventionnement: { $first: '$reconventionnement' },
               miseEnRelationId: { $first: '$_id' },
-              dateDebutDeContrat: { $first: '$dateDebut' },
-              dateFinDeContrat: { $first: '$dateFin' },
+              dateDebutDeContrat: { $first: '$dateDebutDeContrat' },
+              dateFinDeContrat: { $first: '$dateFinDeContrat' },
             },
           },
           {
@@ -62,7 +62,7 @@ const getMisesEnRelationARenouveller =
               miseEnRelationId: 1,
               typeDeContrat: 1,
               dateDebutDeContrat: 1,
-              DateFinDeContrat: 1,
+              dateFinDeContrat: 1,
             },
           },
         ]);
