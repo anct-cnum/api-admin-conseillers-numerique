@@ -98,6 +98,20 @@ const filterDiplome = (diplome: string) => {
   return {};
 };
 
+const filterCCP1 = (ccp1: string) => {
+  if (ccp1 === 'true') {
+    return {
+      statut: { $in: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  if (ccp1 === 'false') {
+    return {
+      statut: { $nin: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  return {};
+};
+
 const filterCv = (cv: string) => {
   if (cv === 'true') {
     return { cv: { $exists: true } };
@@ -109,10 +123,15 @@ const filterCv = (cv: string) => {
   return {};
 };
 
-const filterDepartement = (departement: string) =>
-  departement ? { codeDepartement: departement } : {};
-
-const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
+const filterDepartement = (departement: string) => {
+  if (departement === '978') {
+    return { codeCom: departement };
+  }
+  if (departement) {
+    return { codeDepartement: departement };
+  }
+  return {};
+};
 
 const filtrePiecesManquantes = (piecesManquantes: boolean) =>
   piecesManquantes
@@ -209,8 +228,8 @@ export {
   filterIsRuptureConseiller,
   filterRegion,
   filterDepartement,
-  filterComs,
   filterCv,
   filterDiplome,
   filterPix,
+  filterCCP1,
 };

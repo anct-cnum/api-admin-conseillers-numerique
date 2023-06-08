@@ -92,6 +92,7 @@ const miseEnRelationConseillerStructure =
           'conseillerObj.idPG': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,
+          'conseillerObj._id': 1,
           reconventionnement: 1,
           dateFinDeContrat: 1,
           dateDebutDeContrat: 1,
@@ -152,6 +153,7 @@ const getDetailDossierConvention =
             item.idPG = item.conseillerObj?.idPG;
             item.nom = item.conseillerObj?.nom;
             item.prenom = item.conseillerObj?.prenom;
+            item._id = item.conseillerObj?._id;
             item.statutMiseEnrelation = item.statut;
 
             return item;

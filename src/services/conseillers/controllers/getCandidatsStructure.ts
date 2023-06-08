@@ -13,6 +13,7 @@ import {
   filterPix,
   filterCv,
   filterDiplome,
+  filterCCP1,
 } from '../conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
@@ -28,15 +29,29 @@ const getTotalCandidatsStructure =
     pix: string,
     diplome: string,
     cv: string,
+    ccp1: string,
     searchByName: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
+      {
         $match: {
           _id: { $nin: conseillerIds },
+          disponible: true,
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
+          ...filterCCP1(ccp1),
           ...filterNomConseiller(searchByName),
         },
       },
@@ -51,6 +66,7 @@ const getCandidatsStructureAvecFiltre =
     pix: string,
     diplome: string,
     cv: string,
+    ccp1: string,
     searchByName: string,
     sortColonne: object,
     skip: string,
@@ -58,11 +74,24 @@ const getCandidatsStructureAvecFiltre =
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
+      {
         $match: {
           _id: { $nin: conseillerIds },
+          disponible: true,
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
+          ...filterCCP1(ccp1),
           ...filterNomConseiller(searchByName),
         },
       },
@@ -103,11 +132,12 @@ const getCandidatsStructure =
       res.status(404).json({ message: "La structure n'existe pas" });
       return;
     }
-    const { pix, diplome, cv, skip, search, nomOrdre, ordre } = req.query;
+    const { pix, diplome, ccp1, cv, skip, search, nomOrdre, ordre } = req.query;
     const candidatValidation = validCandidatsStructure.validate({
       skip,
       pix,
       diplome,
+      ccp1,
       cv,
       search,
       nomOrdre,
@@ -145,6 +175,7 @@ const getCandidatsStructure =
           pix as string,
           diplome as string,
           cv as string,
+          ccp1 as string,
           search as string,
           sortColonne,
           skip as string,
@@ -171,6 +202,7 @@ const getCandidatsStructure =
           pix as string,
           diplome as string,
           cv as string,
+          ccp1 as string,
           search as string,
         );
         items.data = candidats;

@@ -1,5 +1,5 @@
 import getStructures from './getStructures';
-import updateStructure from './updateStructure';
+import updateContactStructure from './updateContactStructure';
 import getDetailStructureById from './getDetailStructureById';
 import getStructureById from './getStructureById';
 import verifySiretStructure from './verifySiretStructure';
@@ -10,15 +10,13 @@ import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
-import createContrat from './createContrat';
-import updateContrat from './updateContrat';
 import validationReconventionnement from './validationReconventionnement';
 import closeBanner from './closeBanner';
 import demandeCoselec from './demandeCoselec';
 
 export {
   getStructures,
-  updateStructure,
+  updateContactStructure,
   getDetailStructureById,
   getStructureById,
   verifySiretStructure,
@@ -29,8 +27,6 @@ export {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
-  createContrat,
-  updateContrat,
   validationReconventionnement,
   closeBanner,
   demandeCoselec,

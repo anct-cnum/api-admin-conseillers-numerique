@@ -22,6 +22,7 @@ import {
 import { getCoselec } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -113,6 +114,10 @@ const getDetailStructureById =
           },
         },
       ]);
+      if (structure.length === 0) {
+        res.status(404).json({ message: 'Structure non trouvée' });
+        return;
+      }
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByArrayConseillerId(
@@ -155,6 +160,12 @@ const getDetailStructureById =
           typeStructure.type,
           demarcheSimplifiee,
         );
+      if (
+        structure[0]?.conventionnement?.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        structure[0].urlDossierReconventionnementMessagerie = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+      }
       structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
         return {
           idPG: conseiller?.conseillerObj?.idPG,

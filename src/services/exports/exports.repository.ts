@@ -48,6 +48,9 @@ const formatDateWithoutGetTime = (date: Date) => {
   return 'non renseignée';
 };
 
+const checkIfCcp1 = (statut) =>
+  statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
+
 const conseillerByMisesEnRelation = async (
   idConseiller: ObjectId,
   app: Application,
@@ -124,7 +127,9 @@ const generateCsvCandidatByStructure = async (
   app: Application,
 ) => {
   const promises = [];
-  res.write('Nom;Prénom;Email;Code postal;Expérience;Test PIX;CV\n');
+  res.write(
+    'Nom;Prénom;Email;Code postal;Formation CCP1;Expérience;Test PIX;CV\n',
+  );
   try {
     for (const miseEnrelation of misesEnRelations) {
       promises.push(
@@ -134,9 +139,11 @@ const generateCsvCandidatByStructure = async (
               res.write(
                 `${conseiller.nom};${conseiller.prenom};${conseiller.email};${
                   conseiller.codePostal
-                };${conseiller.aUneExperienceMedNum ? 'oui' : 'non'};${
-                  conseiller.pix === undefined ? 'non' : 'oui'
-                };${conseiller.cv === undefined ? 'non' : 'oui'}\n`,
+                };${checkIfCcp1(conseiller.statut)};${
+                  conseiller.aUneExperienceMedNum ? 'oui' : 'non'
+                };${conseiller.pix === undefined ? 'non' : 'oui'};${
+                  conseiller.cv === undefined ? 'non' : 'oui'
+                }\n`,
               );
               resolve();
             },
@@ -200,6 +207,7 @@ const generateCsvConseillersWithoutCRA = async (
       'Siret de la structure',
       'Nom de la structure',
       'Code postal de la structure',
+      'Coordonnées de la structure',
     ];
     res.write(
       [
@@ -228,6 +236,12 @@ const generateCsvConseillersWithoutCRA = async (
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
             statCnfsWithoutCRA.structure.codePostal,
+            statCnfsWithoutCRA.structure?.contact?.telephone?.length >= 10
+              ? statCnfsWithoutCRA.structure?.contact?.telephone.replace(
+                  /[- ]/g,
+                  '',
+                )
+              : 'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -602,6 +616,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Email personnelle',
       'Statut',
       'Date de recrutement',
+      'Date de début de contrat',
+      'date de fin de contrat',
       "Date d'entrée en formation",
       'Date de sortie de formation',
       'Disponibilité',
@@ -629,6 +645,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               miseEnRelation?.dossierIncompletRupture,
             ),
             formatDate(miseEnRelation?.dateRecrutement),
+            formatDate(miseEnRelation?.dateDebutDeContrat),
+            formatDate(miseEnRelation?.dateFinDeContrat),
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
@@ -775,6 +793,48 @@ const generateCsvHistoriqueDossiersConvention = async (
   }
 };
 
+const generateCsvHistoriqueContrats = async (
+  contrats: any[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom du candidat',
+      'Date de la demande',
+      'Type de la demande',
+      'Type de contrat',
+      'Début de contrat',
+      'Fin de contrat',
+    ];
+
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...contrats.map((contrat) =>
+          [
+            contrat?.structureObj?.idPG,
+            contrat?.structureObj?.nom,
+            `${contrat?.conseillerObj?.prenom} ${contrat?.conseillerObj?.nom}`,
+            formatDate(contrat?.dateDeLaDemande),
+            contrat?.statut ?? 'Non renseigné',
+            contrat?.typeDeContrat ?? 'Non renseigné',
+            formatDate(contrat?.dateDebutDeContrat),
+            formatDate(contrat?.dateFinDeContrat),
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
 export {
   generateCsvCandidat,
   generateCsvCandidatByStructure,
@@ -788,4 +848,5 @@ export {
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,
+  generateCsvHistoriqueContrats,
 };

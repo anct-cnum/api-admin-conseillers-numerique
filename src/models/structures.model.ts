@@ -71,6 +71,8 @@ export default function (app: Application): Model<any> {
 
       reseau: { type: String },
 
+      contact: { type: Object },
+
       conventionnement: {
         statut: { type: String },
         dossierReconventionnement: { type: Object },

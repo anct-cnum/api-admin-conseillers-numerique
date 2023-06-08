@@ -22,12 +22,21 @@ const closeBanner =
         .getQuery();
 
       if (type === 'renouvellement') {
-        await app
+        const miseEnRelation = await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(filter, {
-            $set: { banniereValidationRenouvellement: false },
+          .updateOne(
+            { ...filter, statut: 'finalisee' },
+            {
+              $set: { banniereValidationRenouvellement: false },
+            },
+          );
+        if (miseEnRelation.modifiedCount === 0) {
+          res.status(404).json({
+            message: "La mise en relation n'a pas été mise à jour",
           });
+          return;
+        }
       } else {
         const getStructure = await app
           .service(service.structures)

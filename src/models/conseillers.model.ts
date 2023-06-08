@@ -139,6 +139,8 @@ export default function (app: Application): Model<any> {
       estCoordinateur: { type: Boolean },
 
       groupeCRAHistorique: [Object],
+
+      inactivite: { type: Boolean },
     },
 
     { strict: false },

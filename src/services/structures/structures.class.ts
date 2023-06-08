@@ -8,14 +8,12 @@ import {
   preSelectionnerCandidat,
   updateEmailStructure,
   updateSiretStructure,
-  updateStructure,
+  updateContactStructure,
   verifySiretStructure,
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
-  createContrat,
-  updateContrat,
   validationReconventionnement,
   demandeCoselec,
   closeBanner,
@@ -46,10 +44,10 @@ export default class Structures extends Service {
       getDetailStructureById(app),
     );
     app.patch(
-      '/structure/:id',
+      '/structure/contact/:id',
       authenticateMode(app),
       createAbilities(app),
-      updateStructure(app),
+      updateContactStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',
@@ -116,18 +114,6 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateDossierReconventionnement(app),
-    );
-    app.post(
-      '/reconventionnement/contrat',
-      authenticateMode(app),
-      createAbilities(app),
-      createContrat(app),
-    );
-    app.patch(
-      '/reconventionnement/contrat/:id',
-      authenticateMode(app),
-      createAbilities(app),
-      updateContrat(app),
     );
     app.patch(
       '/reconventionnement/banniere/:id',
