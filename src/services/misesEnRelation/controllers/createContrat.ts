@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
+import { validCreationContrat } from '../../../schemas/contrat.schemas';
 
 const createContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -23,6 +24,16 @@ const createContrat =
     }
 
     try {
+      const creationContrat = validCreationContrat.validate({
+        typeDeContrat,
+        dateDebutDeContrat,
+        dateFinDeContrat,
+        salaire,
+      });
+      if (creationContrat.error) {
+        res.status(400).json({ message: creationContrat.error.message });
+        return;
+      }
       const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -35,16 +46,15 @@ const createContrat =
         ...miseEnRelation.toObject(),
         _id: new ObjectId(),
         typeDeContrat,
-        dateDebutDeContrat,
-        dateFinDeContrat,
-        salaire,
+        dateDebutDeContrat: new Date(dateDebutDeContrat),
+        salaire: Number(salaire.replace(',', '.')),
         banniereValidationRenouvellement: false,
         emetteurRenouvellement: {
           date: new Date(),
           email: req.user?.name,
         },
         miseEnRelationConventionnement: miseEnRelation._id,
-        statut: 'renouvellement_initié',
+        statut: 'renouvellement_initiee',
       };
       const canCreate = req.ability.can(
         action.create,
@@ -55,6 +65,9 @@ const createContrat =
           message: `Accès refusé, vous n'êtes pas autorisé à créer un contrat`,
         });
         return;
+      }
+      if (typeDeContrat !== 'CDI') {
+        duplicateMiseEnRelation.dateFinDeContrat = new Date(dateFinDeContrat);
       }
       const newMiseEnRelation = await app
         .service(service.misesEnRelation)

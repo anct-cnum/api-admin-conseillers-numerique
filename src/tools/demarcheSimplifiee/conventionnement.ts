@@ -210,7 +210,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                   numero: dossier._id,
                   dateDeCreation: new Date(dossier.dateDeCreation),
                   statut: dossier.statut,
-                  dateDernierModification: new Date(
+                  dateDerniereModification: new Date(
                     dossier.dateDerniereModification,
                   ),
                 },

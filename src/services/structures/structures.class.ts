@@ -14,8 +14,6 @@ import {
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
-  createContrat,
-  updateContrat,
   validationReconventionnement,
   closeBanner,
 } from './controllers';
@@ -115,18 +113,6 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateDossierReconventionnement(app),
-    );
-    app.post(
-      '/reconventionnement/contrat',
-      authenticateMode(app),
-      createAbilities(app),
-      createContrat(app),
-    );
-    app.patch(
-      '/reconventionnement/contrat/:id',
-      authenticateMode(app),
-      createAbilities(app),
-      updateContrat(app),
     );
     app.patch(
       '/reconventionnement/banniere/:id',

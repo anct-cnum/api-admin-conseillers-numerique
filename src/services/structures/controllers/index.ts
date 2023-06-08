@@ -10,8 +10,6 @@ import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
-import createContrat from './createContrat';
-import updateContrat from './updateContrat';
 import validationReconventionnement from './validationReconventionnement';
 import closeBanner from './closeBanner';
 
@@ -28,8 +26,6 @@ export {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
-  createContrat,
-  updateContrat,
   validationReconventionnement,
   closeBanner,
 };

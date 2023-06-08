@@ -56,6 +56,7 @@ const getMisesEnRelations =
           'conseillerObj.prenom': 1,
           'structureObj.idPG': 1,
           'conseillerObj.idPG': 1,
+          'conseillerObj._id': 1,
           typeDeContrat: 1,
           dateDebutDeContrat: 1,
           dateFinDeContrat: 1,

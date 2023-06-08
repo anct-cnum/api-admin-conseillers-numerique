@@ -8,7 +8,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 const dossierIncompletRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    const { dateFinDeContrat } = req.body;
+    const { dateFinDeContrat, dossierIncomplet } = req.body;
     if (!dateFinDeContrat) {
       res.status(400).json({
         message: 'Aucune date de fin de contrat renseignée',
@@ -23,23 +23,26 @@ const dossierIncompletRuptureConseiller =
       return;
     }
     try {
-      await app
+      const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             'conseiller.$id': new ObjectId(idConseiller),
             statut: 'nouvelle_rupture',
           },
           {
             $set: {
-              dossierIncompletRupture: true,
+              dossierIncompletRupture: dossierIncomplet,
               dateRupture: new Date(dateFinDeContrat),
             },
           },
+          {
+            new: true,
+          },
         );
 
-      res.status(200).json({ dossierIncompletRupture: true });
+      res.status(200).json(miseEnRelationUpdated);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
