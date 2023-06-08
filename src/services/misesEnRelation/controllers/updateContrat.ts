@@ -32,7 +32,7 @@ const updateContrat =
         $set: {
           typeDeContrat,
           dateDebutDeContrat: new Date(dateDebutDeContrat),
-          salaire: Number(salaire),
+          salaire: Number(salaire.replace(',', '.')),
         },
       };
       if (dateFinDeContrat !== null) {

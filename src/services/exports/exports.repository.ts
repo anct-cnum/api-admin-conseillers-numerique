@@ -48,6 +48,9 @@ const formatDateWithoutGetTime = (date: Date) => {
   return 'non renseignée';
 };
 
+const checkIfCcp1 = (statut) =>
+  statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
+
 const conseillerByMisesEnRelation = async (
   idConseiller: ObjectId,
   app: Application,
@@ -124,7 +127,9 @@ const generateCsvCandidatByStructure = async (
   app: Application,
 ) => {
   const promises = [];
-  res.write('Nom;Prénom;Email;Code postal;Expérience;Test PIX;CV\n');
+  res.write(
+    'Nom;Prénom;Email;Code postal;Formation CCP1;Expérience;Test PIX;CV\n',
+  );
   try {
     for (const miseEnrelation of misesEnRelations) {
       promises.push(
@@ -134,9 +139,11 @@ const generateCsvCandidatByStructure = async (
               res.write(
                 `${conseiller.nom};${conseiller.prenom};${conseiller.email};${
                   conseiller.codePostal
-                };${conseiller.aUneExperienceMedNum ? 'oui' : 'non'};${
-                  conseiller.pix === undefined ? 'non' : 'oui'
-                };${conseiller.cv === undefined ? 'non' : 'oui'}\n`,
+                };${checkIfCcp1(conseiller.statut)};${
+                  conseiller.aUneExperienceMedNum ? 'oui' : 'non'
+                };${conseiller.pix === undefined ? 'non' : 'oui'};${
+                  conseiller.cv === undefined ? 'non' : 'oui'
+                }\n`,
               );
               resolve();
             },
@@ -200,6 +207,7 @@ const generateCsvConseillersWithoutCRA = async (
       'Siret de la structure',
       'Nom de la structure',
       'Code postal de la structure',
+      'Coordonnées de la structure',
     ];
     res.write(
       [
@@ -228,6 +236,12 @@ const generateCsvConseillersWithoutCRA = async (
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
             statCnfsWithoutCRA.structure.codePostal,
+            statCnfsWithoutCRA.structure?.contact?.telephone?.length >= 10
+              ? statCnfsWithoutCRA.structure?.contact?.telephone.replace(
+                  /[- ]/g,
+                  '',
+                )
+              : 'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

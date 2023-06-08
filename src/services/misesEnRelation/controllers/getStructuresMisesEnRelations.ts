@@ -8,6 +8,7 @@ import service from '../../../helpers/services';
 import {
   filterCv,
   filterDiplome,
+  filterCCP1,
   filterPix,
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
@@ -23,6 +24,7 @@ const countMisesEnRelation =
     cv: string,
     pix: string,
     diplome: string,
+    ccp1: string,
     filter: string,
     searchByNom: string,
   ) =>
@@ -33,6 +35,7 @@ const countMisesEnRelation =
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
+          ...filterCCP1(ccp1),
           ...filterNomConseiller(searchByNom),
           ...filterStatut(filter),
           $and: [checkAccess],
@@ -63,6 +66,7 @@ const getMisesEnRelation =
     cv: string,
     pix: string,
     diplome: string,
+    ccp1: string,
     filter: string,
     searchByNom: string,
     sortColonne: object,
@@ -76,6 +80,7 @@ const getMisesEnRelation =
           ...filterPix(pix),
           ...filterCv(cv),
           ...filterDiplome(diplome),
+          ...filterCCP1(ccp1),
           ...filterNomConseiller(searchByNom),
           ...filterStatut(filter),
           $and: [checkAccess],
@@ -93,6 +98,7 @@ const getMisesEnRelation =
           'conseillerObj.createdAt': 1,
           'conseillerObj.codePostal': 1,
           'conseillerObj.pix': 1,
+          'conseillerObj.statut': 1,
           'conseillerObj._id': 1,
         },
       },
@@ -117,12 +123,13 @@ const getStructuresMisesEnRelations =
       }
 
       // User Filters
-      const { pix, diplome, cv, skip, search, filter, nomOrdre, ordre } =
+      const { pix, diplome, ccp1, cv, skip, search, filter, nomOrdre, ordre } =
         req.query;
       const emailValidation = validMiseEnRelation.validate({
         skip,
         diplome,
         cv,
+        ccp1,
         pix,
         search,
         filter,
@@ -155,6 +162,7 @@ const getStructuresMisesEnRelations =
         cv as string,
         pix,
         diplome as string,
+        ccp1 as string,
         filter,
         search,
         sortColonne,
@@ -165,7 +173,15 @@ const getStructuresMisesEnRelations =
         const totalMiseEnRelation = await countMisesEnRelation(
           app,
           checkAccess,
-        )(structure._id, cv as string, pix, diplome as string, filter, search);
+        )(
+          structure._id,
+          cv as string,
+          pix,
+          diplome as string,
+          ccp1 as string,
+          filter,
+          search,
+        );
         items.data = misesEnRelation;
         items.total = totalMiseEnRelation[0]?.countMiseEnRelation;
         items.limit = options.paginate.default;
