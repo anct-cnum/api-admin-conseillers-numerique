@@ -72,9 +72,9 @@ const avenantAjoutPoste = Joi.object({
 });
 
 const avenantRenduPoste = Joi.object({
-  nbDePosteAccorder: Joi.number()
+  nbDePosteRendu: Joi.number()
     .required()
-    .error(new Error('Le nombre de postes accordés est invalide')),
+    .error(new Error('Le nombre de postes rendus est invalide')),
   nbDePosteCoselec: Joi.number()
     .required()
     .error(new Error('Le nombre de postes coselec est invalide')),

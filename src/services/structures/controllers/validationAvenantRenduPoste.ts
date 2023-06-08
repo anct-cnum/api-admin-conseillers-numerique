@@ -9,9 +9,9 @@ import { avenantRenduPoste } from '../../../schemas/structures.schemas';
 const validationAvenantRenduPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { nbDePosteAccorder, nbDePosteCoselec } = req.body;
+    const { nbDePosteRendu, nbDePosteCoselec } = req.body;
     const avenantAJoutPosteValidation = avenantRenduPoste.validate({
-      nbDePosteAccorder,
+      nbDePosteRendu,
       nbDePosteCoselec,
     });
 
@@ -32,19 +32,22 @@ const validationAvenantRenduPoste =
         .updateOne(
           {
             _id: idStructure,
-            'demandesCoselec.statut': 'en_cours',
-            'demandesCoselec.type': 'rendu',
+            demandesCoselec: {
+              $elemMatch: {
+                statut: { $eq: 'en_cours' },
+                type: { $eq: 'rendu' },
+              },
+            },
             statut: 'VALIDATION_COSELEC',
           },
           {
             $set: {
               'demandesCoselec.$.statut': 'validee',
-              'demandesCoselec.$.nombreDePostes': nbDePosteAccorder,
             },
             $push: {
               coselec: {
                 nombreConseillersCoselec:
-                  Number(nbDePosteCoselec) - Number(nbDePosteAccorder),
+                  Number(nbDePosteCoselec) - Number(nbDePosteRendu),
                 avisCoselec: 'POSITIF',
                 insertedAt: new Date(),
               },

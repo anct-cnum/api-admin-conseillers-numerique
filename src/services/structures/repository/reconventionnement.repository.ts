@@ -194,14 +194,22 @@ const filterStatut = (typeConvention: string) => {
   }
   if (typeConvention === 'avenantAjoutPoste') {
     return {
-      'demandesCoselec.statut': 'en_cours',
-      'demandesCoselec.type': 'ajout',
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $eq: 'en_cours' },
+          type: { $eq: 'ajout' },
+        },
+      },
     };
   }
   if (typeConvention === 'avenantRenduPoste') {
     return {
-      'demandesCoselec.statut': 'en_cours',
-      'demandesCoselec.type': 'rendu',
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $eq: 'en_cours' },
+          type: { $eq: 'rendu' },
+        },
+      },
     };
   }
 
@@ -216,12 +224,20 @@ const filterStatut = (typeConvention: string) => {
         },
       },
       {
-        'demandesCoselec.statut': 'en_cours',
-        'demandesCoselec.type': 'ajout',
+        demandesCoselec: {
+          $elemMatch: {
+            statut: { $eq: 'en_cours' },
+            type: { $eq: 'ajout' },
+          },
+        },
       },
       {
-        'demandesCoselec.statut': 'en_cours',
-        'demandesCoselec.type': 'rendu',
+        demandesCoselec: {
+          $elemMatch: {
+            statut: { $eq: 'en_cours' },
+            type: { $eq: 'rendu' },
+          },
+        },
       },
     ],
   };
@@ -345,15 +361,23 @@ const totalParConvention = async (app: Application, req: IRequest) => {
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'demandesCoselec.statut': { $eq: 'en_cours' },
-      'demandesCoselec.type': 'ajout',
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $eq: 'en_cours' },
+          type: { $eq: 'ajout' },
+        },
+      },
     });
   const avenantRenduPoste = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'demandesCoselec.statut': { $eq: 'en_cours' },
-      'demandesCoselec.type': 'rendu',
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $eq: 'en_cours' },
+          type: { $eq: 'rendu' },
+        },
+      },
     });
   const total =
     conventionnement +
