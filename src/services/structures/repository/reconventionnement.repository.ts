@@ -10,6 +10,7 @@ import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
 } from '../../../ts/interfaces/global.interfaces';
+import { checkAccessReadRequestStructures } from './structures.repository';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -357,39 +358,69 @@ const totalParConvention = async (app: Application, req: IRequest) => {
       'conventionnement.statut':
         StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
     });
+  const checkAccess = await checkAccessReadRequestStructures(app, req);
+
   const avenantAjoutPoste = await app
     .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      demandesCoselec: {
-        $elemMatch: {
-          statut: { $eq: 'en_cours' },
-          type: { $eq: 'ajout' },
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
         },
       },
-    });
+      { $unwind: '$demandesCoselec' },
+      {
+        $match: {
+          'demandesCoselec.statut': { $eq: 'en_cours' },
+          'demandesCoselec.type': { $eq: 'ajout' },
+        },
+      },
+      {
+        $group: {
+          _id: 0,
+          count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0, count_avenant_ajout_poste: '$count' } },
+    ]);
   const avenantRenduPoste = await app
     .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      demandesCoselec: {
-        $elemMatch: {
-          statut: { $eq: 'en_cours' },
-          type: { $eq: 'rendu' },
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
         },
       },
-    });
+      { $unwind: '$demandesCoselec' },
+      {
+        $match: {
+          'demandesCoselec.statut': { $eq: 'en_cours' },
+          'demandesCoselec.type': { $eq: 'rendu' },
+        },
+      },
+      {
+        $group: {
+          _id: 0,
+          count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0, count_avenant_rendu_poste: '$count' } },
+    ]);
+  const totalAvenantAjoutPoste =
+    avenantAjoutPoste[0]?.count_avenant_ajout_poste ?? 0;
+  const totalAvenantRenduPoste =
+    avenantRenduPoste[0]?.count_avenant_rendu_poste ?? 0;
   const total =
     conventionnement +
     reconventionnement +
-    avenantAjoutPoste +
-    avenantRenduPoste;
+    totalAvenantAjoutPoste +
+    totalAvenantRenduPoste;
 
   return {
     conventionnement,
     reconventionnement,
-    avenantAjoutPoste,
-    avenantRenduPoste,
+    avenantAjoutPoste: totalAvenantAjoutPoste,
+    avenantRenduPoste: totalAvenantRenduPoste,
     total,
   };
 };
@@ -421,47 +452,77 @@ const totalParHistoriqueConvention = async (
         $lte: dateFin,
       },
     });
+  const checkAccess = await checkAccessReadRequestStructures(app, req);
   const avenantAjoutPoste = await app
     .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      demandesCoselec: {
-        $elemMatch: {
-          statut: { $ne: 'en_cours' },
-          type: { $eq: 'ajout' },
-          date: {
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
+        },
+      },
+      { $unwind: '$demandesCoselec' },
+      {
+        $match: {
+          'demandesCoselec.statut': { $ne: 'en_cours' },
+          'demandesCoselec.type': { $eq: 'ajout' },
+          'demandesCoselec.date': {
             $gte: dateDebut,
             $lte: dateFin,
           },
         },
       },
-    });
+      {
+        $group: {
+          _id: 0,
+          count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0, count_avenant_ajout_poste: '$count' } },
+    ]);
+
   const avenantRenduPoste = await app
     .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      demandesCoselec: {
-        $elemMatch: {
-          statut: { $ne: 'en_cours' },
-          type: { $eq: 'rendu' },
-          date: {
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
+        },
+      },
+      { $unwind: '$demandesCoselec' },
+      {
+        $match: {
+          'demandesCoselec.statut': { $ne: 'en_cours' },
+          'demandesCoselec.type': { $eq: 'rendu' },
+          'demandesCoselec.date': {
             $gte: dateDebut,
             $lte: dateFin,
           },
         },
       },
-    });
+      {
+        $group: {
+          _id: 0,
+          count: { $sum: 1 },
+        },
+      },
+      { $project: { _id: 0, count_avenant_rendu_poste: '$count' } },
+    ]);
+  const totalAvenantAjoutPoste =
+    avenantAjoutPoste[0]?.count_avenant_ajout_poste ?? 0;
+  const totalAvenantRenduPoste =
+    avenantRenduPoste[0]?.count_avenant_rendu_poste ?? 0;
   const total =
     conventionnement +
     reconventionnement +
-    avenantAjoutPoste +
-    avenantRenduPoste;
+    totalAvenantAjoutPoste +
+    totalAvenantRenduPoste;
 
   return {
     conventionnement,
     reconventionnement,
-    avenantAjoutPoste,
-    avenantRenduPoste,
+    avenantAjoutPoste: totalAvenantAjoutPoste,
+    avenantRenduPoste: totalAvenantRenduPoste,
     total,
   };
 };

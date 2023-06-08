@@ -140,7 +140,7 @@ const getHistoriqueDossiersConvention =
       items.data = structures.map((structure) => {
         const item = { ...structure };
         if (
-          item.conventionnement.statut ===
+          item?.conventionnement?.statut ===
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
         ) {
           item.nombreConseillersCoselec =
