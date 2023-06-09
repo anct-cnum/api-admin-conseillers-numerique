@@ -69,7 +69,10 @@ const getExportHistoriqueDossiersConventionCsv =
                 const item = { ...avenant };
                 item._id = structure._id;
                 item.nom = structure.nom;
-                item.nbPostesAttribuees = avenant.nombreDePostesAccorder;
+                item.nbPostesAttribuees =
+                  avenant.statut === 'validee'
+                    ? avenant.nombreDePostesAccorder
+                    : avenant.nombreDePostesSouhaites;
                 item.dateDeCreation = avenant.emetteurAvenant.date;
                 item.statut = 'Avenant · ajout de poste';
                 return item;
@@ -100,7 +103,7 @@ const getExportHistoriqueDossiersConventionCsv =
                 const item = { ...avenant };
                 item._id = structure._id;
                 item.nom = structure.nom;
-                item.nbPostesAttribuees = avenant.nombreDePostesAccorder;
+                item.nbPostesAttribuees = avenant.nombreDePostesSouhaites;
                 item.dateDeCreation = avenant.emetteurAvenant.date;
                 item.statut = 'Avenant · poste rendu';
                 return item;
