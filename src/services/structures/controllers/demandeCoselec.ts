@@ -19,7 +19,7 @@ const demandeCoselec =
       return;
     }
 
-    const statut = type === 'retrait' ? 'validée' : 'initiée';
+    const statut = type === 'retrait' ? 'validee' : 'initiee';
 
     const demandeCoselecValidation = validDemandeCoselec.validate({
       type,
