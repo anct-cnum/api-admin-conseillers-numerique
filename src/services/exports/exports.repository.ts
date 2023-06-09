@@ -777,9 +777,9 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure?._id,
             structure?.nom,
-            formatDate(structure?.conventionnement?.dateDeCreation),
-            structure?.conventionnement?.nbPostesAttribuees ?? 'Non renseigné',
-            structure?.conventionnement?.statut,
+            formatDate(structure?.dateDeCreation),
+            structure?.nbPostesAttribuees ?? 'Non renseigné',
+            structure?.statut,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

@@ -47,31 +47,99 @@ const getExportHistoriqueDossiersConventionCsv =
               statut: 1,
               conventionnement: 1,
               coselec: 1,
+              demandesCoselec: 1,
             },
           },
         ]);
-      const structuresFormat = await Promise.all(
-        structures.map(async (structure) => {
-          const item = { ...structure };
-          if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
-            const coselec = getCoselec(item);
-            item.conventionnement.nbPostesAttribuees =
-              coselec?.nombreConseillersCoselec ?? 0;
-            item.conventionnement.dateDeCreation =
-              item.conventionnement.dossierConventionnement.dateDeCreation;
-            item.conventionnement.statut = 'Conventionnement';
+      let structuresFormat = [];
+      if (type === 'avenantAjoutPoste' || type === 'toutes') {
+        const structureWithAvenant = structures.filter(
+          (structure) => structure?.demandesCoselec?.length > 0,
+        );
+        if (structureWithAvenant.length > 0) {
+          const avenantsAjoutPoste = await Promise.all(
+            structureWithAvenant.map(async (structure) => {
+              const avenants = structure.demandesCoselec.filter(
+                (demande) => demande.type === 'ajout',
+              );
+              if (avenants.length === 0) {
+                return [];
+              }
+              const avenantsFormat = avenants.map((avenant) => {
+                const item = { ...avenant };
+                item._id = structure._id;
+                item.nom = structure.nom;
+                item.nbPostesAttribuees = avenant.nombreDePostesAccorder;
+                item.dateDeCreation = avenant.emetteurAvenant.date;
+                item.statut = 'Avenant · ajout de poste';
+                return item;
+              });
+              return avenantsFormat;
+            }),
+          );
+          const avenantsAjoutPosteFlat = avenantsAjoutPoste.flat(1);
+          if (avenantsAjoutPosteFlat.length > 0) {
+            structuresFormat = structuresFormat.concat(avenantsAjoutPosteFlat);
+          }
+        }
+      }
+      if (type === 'avenantRenduPoste' || type === 'toutes') {
+        const structureWithAvenant = structures.filter(
+          (structure) => structure?.demandesCoselec?.length > 0,
+        );
+        if (structureWithAvenant.length > 0) {
+          const avenantsRenduPoste = await Promise.all(
+            structureWithAvenant.map(async (structure) => {
+              const avenants = structure.demandesCoselec.filter(
+                (demande) => demande.type === 'rendu',
+              );
+              if (avenants.length === 0) {
+                return [];
+              }
+              const avenantsFormat = avenants.map((avenant) => {
+                const item = { ...avenant };
+                item._id = structure._id;
+                item.nom = structure.nom;
+                item.nbPostesAttribuees = avenant.nombreDePostesAccorder;
+                item.dateDeCreation = avenant.emetteurAvenant.date;
+                item.statut = 'Avenant · poste rendu';
+                return item;
+              });
+              return avenantsFormat;
+            }),
+          );
+          const avenantsRenduPosteFlat = avenantsRenduPoste.flat(1);
+          if (avenantsRenduPosteFlat.length > 0) {
+            structuresFormat = structuresFormat.concat(avenantsRenduPosteFlat);
+          }
+        }
+      }
+      if (type === 'toutes' || type.includes('tionnement')) {
+        const conventionnement = await Promise.all(
+          structures.map(async (structure) => {
+            const item = { ...structure };
+            if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
+              const coselec = getCoselec(item);
+              item.nbPostesAttribuees = coselec?.nombreConseillersCoselec ?? 0;
+              item.dateDeCreation =
+                item.conventionnement.dossierConventionnement.dateDeCreation;
+              item.statut = 'Conventionnement';
+
+              return item;
+            }
+            item.nbPostesAttribuees =
+              item.conventionnement.dossierReconventionnement.nbPostesAttribuees;
+            item.dateDeCreation =
+              item.conventionnement.dossierReconventionnement.dateDeCreation;
+            item.statut = 'Reconventionnement';
 
             return item;
-          }
-          item.conventionnement.nbPostesAttribuees =
-            item.conventionnement.dossierReconventionnement.nbPostesAttribuees;
-          item.conventionnement.dateDeCreation =
-            item.conventionnement.dossierReconventionnement.dateDeCreation;
-          item.conventionnement.statut = 'Reconventionnement';
-
-          return item;
-        }),
-      );
+          }),
+        );
+        if (conventionnement.length > 0) {
+          structuresFormat = structuresFormat.concat(conventionnement);
+        }
+      }
       generateCsvHistoriqueDossiersConvention(structuresFormat, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
