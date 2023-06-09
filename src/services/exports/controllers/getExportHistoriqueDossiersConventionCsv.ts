@@ -15,6 +15,8 @@ const getExportHistoriqueDossiersConventionCsv =
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
+    let structuresFormat = [];
+
     const pageValidation = validHistoriqueConvention.validate({
       type,
       dateDebut,
@@ -51,7 +53,6 @@ const getExportHistoriqueDossiersConventionCsv =
             },
           },
         ]);
-      let structuresFormat = [];
       if (type === 'avenantAjoutPoste' || type === 'toutes') {
         const structureWithAvenant = structures.filter(
           (structure) => structure?.demandesCoselec?.length > 0,
