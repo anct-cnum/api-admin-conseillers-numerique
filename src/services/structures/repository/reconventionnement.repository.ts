@@ -274,7 +274,7 @@ const filterDateDemandeAndStatutHistorique = (
         $elemMatch: {
           statut: { $ne: 'en_cours' },
           type: { $eq: 'ajout' },
-          date: {
+          'emetteurAvenant.date': {
             $gte: dateDebut,
             $lte: dateFin,
           },
@@ -288,7 +288,7 @@ const filterDateDemandeAndStatutHistorique = (
         $elemMatch: {
           statut: { $ne: 'en_cours' },
           type: { $eq: 'rendu' },
-          date: {
+          'emetteurAvenant.date': {
             $gte: dateDebut,
             $lte: dateFin,
           },
@@ -320,7 +320,7 @@ const filterDateDemandeAndStatutHistorique = (
           $elemMatch: {
             statut: { $ne: 'en_cours' },
             type: { $eq: 'ajout' },
-            date: {
+            'emetteurAvenant.date': {
               $gte: dateDebut,
               $lte: dateFin,
             },
@@ -332,7 +332,7 @@ const filterDateDemandeAndStatutHistorique = (
           $elemMatch: {
             statut: { $ne: 'en_cours' },
             type: { $eq: 'rendu' },
-            date: {
+            'emetteurAvenant.date': {
               $gte: dateDebut,
               $lte: dateFin,
             },
@@ -466,7 +466,7 @@ const totalParHistoriqueConvention = async (
         $match: {
           'demandesCoselec.statut': { $ne: 'en_cours' },
           'demandesCoselec.type': { $eq: 'ajout' },
-          'demandesCoselec.date': {
+          'demandesCoselec.emetteurAvenant.date': {
             $gte: dateDebut,
             $lte: dateFin,
           },
@@ -494,7 +494,7 @@ const totalParHistoriqueConvention = async (
         $match: {
           'demandesCoselec.statut': { $ne: 'en_cours' },
           'demandesCoselec.type': { $eq: 'rendu' },
-          'demandesCoselec.date': {
+          'demandesCoselec.emetteurAvenant.date': {
             $gte: dateDebut,
             $lte: dateFin,
           },

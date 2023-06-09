@@ -74,7 +74,7 @@ const updateAvenantAjoutPoste =
           paramsUpdate,
         );
       if (structure.modifiedCount === 0) {
-        res.status(400).json({ message: "L'avenant n'a pas pu être validé" });
+        res.status(400).json({ message: "L'avenant n'a pas pu être modifié" });
         return;
       }
       res.status(200).json({

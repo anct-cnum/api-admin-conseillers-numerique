@@ -331,6 +331,20 @@ export interface IStructures {
       dateDernierModification: Date;
     };
   };
+  demandesCoselec: [
+    {
+      statut: string;
+      type: string;
+      nombreDePostesAccorder?: number;
+      nombreDePostesSouhaites: number;
+      motif: string;
+      emetteurAvenant: {
+        date: Date;
+        email: string;
+      };
+      banniereValidationAvenant: boolean;
+    },
+  ];
 }
 
 interface IEtablissement {
