@@ -38,6 +38,7 @@ const updateAvenantAjoutPoste =
         };
         paramsUpdate.$push = {
           coselec: {
+            type: 'avenant',
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',

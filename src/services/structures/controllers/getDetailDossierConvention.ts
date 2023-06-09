@@ -6,7 +6,7 @@ import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import { getTypeDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
-import { getCoselec } from '../../../utils';
+import { getCoselec, getCoselecConventionnement } from '../../../utils';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -174,6 +174,8 @@ const getDetailDossierConvention =
       }
       structure[0].nombreConseillersCoselec =
         getCoselec(structure[0])?.nombreConseillersCoselec ?? 0;
+      structure[0].nombreConseillersCoselecConventionnement =
+        getCoselecConventionnement(structure[0])?.nombreConseillersCoselec ?? 0;
       res.status(200).json(structure[0]);
       return;
     } catch (error) {
