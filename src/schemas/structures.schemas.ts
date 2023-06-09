@@ -55,8 +55,14 @@ const validDemandeCoselec = Joi.object({
   nombreDePostes: Joi.number()
     .required()
     .error(new Error('Le nombre de postes est invalide')),
-  motif: Joi.string().required().error(new Error('Le motif est invalide')),
-  autreMotif: Joi.string().allow('').error(new Error('Le motif est invalide')),
+  motif: Joi.string()
+    .allow('')
+    .required()
+    .error(new Error('Le motif est invalide')),
+  autreMotif: Joi.string()
+    .allow('')
+    .required()
+    .error(new Error('Le motif est invalide')),
 });
 
 const updateContact = Joi.object({

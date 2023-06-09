@@ -122,7 +122,7 @@ export default class Structures extends Service {
       closeBanner(app),
     );
     app.patch(
-      '/demande-coselec',
+      '/demande-coselec/:id',
       authenticateMode(app),
       createAbilities(app),
       demandeCoselec(app),

@@ -5,23 +5,19 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validDemandeCoselec } from '../../../schemas/structures.schemas';
+import getDetailStructureById from './getDetailStructureById';
 
 const demandeCoselec =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
       body: { type, nombreDePostes, motif, autreMotif },
-      query: { structureId },
+      params: { id },
     } = req;
 
-    if (!ObjectId.isValid(structureId)) {
+    if (!ObjectId.isValid(id)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
-
-    const query = await app
-      .service(service.structures)
-      .Model.accessibleBy(req.ability, action.update)
-      .getQuery();
 
     const statut = type === 'retrait' ? 'validée' : 'initiée';
 
@@ -39,11 +35,9 @@ const demandeCoselec =
 
     const objectDemandeCoselec = {
       id: new ObjectId(),
-      date: new Date(),
       nombreDePostesSouhaites: nombreDePostes,
-      motif,
-      autreMotif,
-      emetteur: req.user?.name,
+      motif: motif || autreMotif,
+      emetteurAvenant: { date: new Date(), email: req.user?.name },
       type,
       statut,
       banniereValidationAvenant: type === 'retrait',
@@ -54,21 +48,12 @@ const demandeCoselec =
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
-          { _id: structureId },
+          { _id: id },
           { $push: { demandesCoselec: objectDemandeCoselec } },
-          { new: true },
         );
 
-      const structure = await app.service(service.structures).Model.aggregate([
-        { $match: { $and: [query], _id: new ObjectId(structureId) } },
-        {
-          $addFields: {
-            lastDemandeCoselec: { $arrayElemAt: ['$demandesCoselec', -1] },
-          },
-        },
-      ]);
-
-      res.status(200).json(structure[0]);
+      const structure = await getDetailStructureById(app)(req, res);
+      res.status(200).json(structure);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
