@@ -337,7 +337,7 @@ export interface IStructures {
 interface IDemandesCoselec {
   statut: string;
   type: string;
-  nombreDePostesAccorder?: number;
+  nombreDePostesAccordes?: number;
   nombreDePostesSouhaites: number;
   motif: string;
   emetteurAvenant: {

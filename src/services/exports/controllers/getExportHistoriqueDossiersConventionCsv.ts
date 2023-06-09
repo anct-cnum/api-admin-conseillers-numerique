@@ -72,7 +72,7 @@ const getExportHistoriqueDossiersConventionCsv =
                 item.nom = structure.nom;
                 item.nbPostesAttribuees =
                   avenant.statut === 'validee'
-                    ? avenant.nombreDePostesAccorder
+                    ? avenant.nombreDePostesAccordes
                     : avenant.nombreDePostesSouhaites;
                 item.dateDeCreation = avenant.emetteurAvenant.date;
                 item.statut = 'Avenant · ajout de poste';

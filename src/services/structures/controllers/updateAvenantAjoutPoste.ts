@@ -34,7 +34,7 @@ const updateAvenantAjoutPoste =
       if (statut === 'POSITIF') {
         paramsUpdate.$set = {
           'demandesCoselec.$.statut': 'validee',
-          'demandesCoselec.$.nombreDePostesAccorder': Number(nbDePosteAccorder),
+          'demandesCoselec.$.nombreDePostesAccordes': Number(nbDePosteAccorder),
         };
         paramsUpdate.$push = {
           coselec: {
