@@ -95,7 +95,7 @@ const getMisesEnRelation =
           'conseillerObj.nom': 1,
           'conseillerObj.idPG': 1,
           'conseillerObj.email': 1,
-          'conseillerObj.createdAt': 1,
+          'conseillerObj.dateDisponibilite': 1,
           'conseillerObj.codePostal': 1,
           'conseillerObj.pix': 1,
           'conseillerObj.statut': 1,

@@ -102,7 +102,7 @@ const getCandidatsStructureAvecFiltre =
           nom: 1,
           prenom: 1,
           codePostal: 1,
-          createdAt: 1,
+          dateDisponibilite: 1,
           structureId: 1,
           statut: 1,
           email: 1,
