@@ -6,7 +6,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
 
-const validationAvenantRenduPoste =
+const updateAvenantRenduPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { nbDePosteRendu, nbDePosteCoselec } = req.body;
@@ -24,6 +24,20 @@ const validationAvenantRenduPoste =
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      const nbConseillers = await app
+        .service(service.conseillers)
+        .countDocuments({
+          statut: 'RECRUTE',
+          structureId: new ObjectId(idStructure),
+        });
+      const nbDePosteLibre = Number(nbDePosteCoselec) - Number(nbConseillers);
+      if (nbDePosteLibre < Number(nbDePosteRendu)) {
+        res.status(400).json({
+          message:
+            'Le nombre de poste rendu ne peut pas être supérieur ou égal aux nombre de conseillers en postes',
+        });
         return;
       }
       const structure = await app
@@ -71,4 +85,4 @@ const validationAvenantRenduPoste =
     }
   };
 
-export default validationAvenantRenduPoste;
+export default updateAvenantRenduPoste;
