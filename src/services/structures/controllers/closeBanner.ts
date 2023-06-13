@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import getDetailStructureById from './getDetailStructureById';
 
 const closeBanner =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -16,11 +17,6 @@ const closeBanner =
     }
 
     try {
-      const query = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.update)
-        .getQuery();
-
       if (type === 'renouvellement') {
         const miseEnRelation = await app
           .service(service.misesEnRelation)
@@ -41,39 +37,80 @@ const closeBanner =
         const getStructure = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
-          .findById(req.params.id);
+          .findOne();
 
-        if (!getStructure) {
+        if (getStructure === null) {
           res.status(404).json({ message: "La structure n'existe pas" });
           return;
         }
 
-        const latestIndex = getStructure?.demandesCoselec.length
-          ? getStructure.demandesCoselec.length - 1
-          : 0;
-
-        await app
+        const updateStructure = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
-          .findByIdAndUpdate(req.params.id, {
-            $set: {
-              [`demandesCoselec.${latestIndex}.banniereValidationAvenant`]:
-                false,
-            },
-          });
-
-        const structure = await app
-          .service(service.structures)
-          .Model.aggregate([
-            { $match: { $and: [query], _id: new ObjectId(req.params.id) } },
+          .updateOne(
             {
-              $addFields: {
-                lastDemandeCoselec: { $arrayElemAt: ['$demandesCoselec', -1] },
+              _id: req.params.id,
+            },
+            {
+              $set: {
+                [`demandesCoselec.$[elem].banniereValidationAvenant`]: false,
               },
             },
-          ]);
+            {
+              arrayFilters: [{ 'elem.statut': 'validee' }],
+            },
+          );
 
-        res.status(200).json(structure[0]);
+        if (updateStructure.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "La structure n'a pas été mise à jour" });
+          return;
+        }
+
+        const updateMiseEnRelation = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            { 'structureObj._id': new ObjectId(req.params.id) },
+            {
+              $set: {
+                'structureObj.demandesCoselec.$[elem].banniereValidationAvenant':
+                  false,
+              },
+            },
+            {
+              arrayFilters: [{ 'elem.statut': 'validee' }],
+            },
+          );
+
+        if (updateMiseEnRelation.modifiedCount === 0) {
+          await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              {
+                _id: req.params.id,
+              },
+              {
+                $set: {
+                  [`demandesCoselec.$[elem].banniereValidationAvenant`]: true,
+                },
+              },
+              {
+                arrayFilters: [{ 'elem.statut': 'validee' }],
+              },
+            );
+
+          res.status(404).json({
+            message:
+              "Les mises en relation liées à la structure n'ont pas été mise à jour",
+          });
+          return;
+        }
+
+        const structure = await getDetailStructureById(app)(req, res);
+        res.status(200).json(structure);
       }
     } catch (error) {
       if (error.name === 'ForbiddenError') {

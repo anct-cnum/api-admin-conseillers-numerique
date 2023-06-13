@@ -12,7 +12,7 @@ import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
 import validationReconventionnement from './validationReconventionnement';
 import closeBanner from './closeBanner';
-import demandeCoselec from './demandeCoselec';
+import createAvenant from './createAvenant';
 
 export {
   getStructures,
@@ -29,5 +29,5 @@ export {
   getHistoriqueDossiersConvention,
   validationReconventionnement,
   closeBanner,
-  demandeCoselec,
+  createAvenant,
 };

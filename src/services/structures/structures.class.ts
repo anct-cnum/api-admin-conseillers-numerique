@@ -15,7 +15,7 @@ import {
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
   validationReconventionnement,
-  demandeCoselec,
+  createAvenant,
   closeBanner,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
@@ -116,16 +116,16 @@ export default class Structures extends Service {
       updateDossierReconventionnement(app),
     );
     app.patch(
-      '/reconventionnement/banniere/:id',
+      '/banniere/:id',
       authenticateMode(app),
       createAbilities(app),
       closeBanner(app),
     );
     app.patch(
-      '/demande-coselec/:id',
+      '/avenant/creation/:id',
       authenticateMode(app),
       createAbilities(app),
-      demandeCoselec(app),
+      createAvenant(app),
     );
   }
 }

@@ -59,10 +59,6 @@ const validDemandeCoselec = Joi.object({
     .allow('')
     .required()
     .error(new Error('Le motif est invalide')),
-  autreMotif: Joi.string()
-    .allow('')
-    .required()
-    .error(new Error('Le motif est invalide')),
 });
 
 const updateContact = Joi.object({
