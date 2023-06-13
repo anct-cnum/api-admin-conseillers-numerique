@@ -5,19 +5,47 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
+import { StatutConventionnement } from '../../../ts/enum';
+
+interface IUpdateStructureAvenant {
+  $push?: {
+    coselec: {
+      nombreConseillersCoselec: number;
+      avisCoselec: string;
+      insertedAt: Date;
+      type?: string;
+    };
+  };
+  $set?: {
+    'demandesCoselec.$.statut': string;
+    'demandesCoselec.$.nombreDePostesAccordes'?: number;
+    'demandesCoselec.$.banniereValidationAvenant'?: boolean;
+  };
+}
+
+interface IUpdateMiseEnRelationAvenant {
+  $push?: {
+    'structureObj.coselec': {
+      nombreConseillersCoselec: number;
+      avisCoselec: string;
+      insertedAt: Date;
+      type?: string;
+    };
+  };
+  $set?: {
+    'structureObj.demandesCoselec.$.statut': string;
+    'structureObj.demandesCoselec.$.nombreDePostesAccordes'?: number;
+    'structureObj.demandesCoselec.$.banniereValidationAvenant'?: boolean;
+  };
+}
 
 const updateAvenantAjoutPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { statut, nbDePosteAccorder, nbDePosteCoselec } = req.body;
-    const paramsUpdateCollectionStructure = {
-      $set: {},
-      $push: {},
-    };
-    const paramsUpdateCollectionMiseEnRelation = {
-      $set: {},
-      $push: {},
-    };
+    const paramsUpdateCollectionStructure: IUpdateStructureAvenant = {};
+    const paramsUpdateCollectionMiseEnRelation: IUpdateMiseEnRelationAvenant =
+      {};
     const avenantAJoutPosteValidation = avenantAjoutPoste.validate({
       statut,
       nbDePosteAccorder,
@@ -35,6 +63,19 @@ const updateAvenantAjoutPoste =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
+      const conventionnement = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne(
+          {
+            _id: new ObjectId(idStructure),
+          },
+          { _id: 0, conventionnement: 1 },
+        );
+      if (!conventionnement) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
       if (statut === 'POSITIF') {
         paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'validee',
@@ -43,7 +84,6 @@ const updateAvenantAjoutPoste =
         };
         paramsUpdateCollectionStructure.$push = {
           coselec: {
-            type: 'avenant',
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',
@@ -58,13 +98,21 @@ const updateAvenantAjoutPoste =
         };
         paramsUpdateCollectionMiseEnRelation.$push = {
           'structureObj.coselec': {
-            type: 'avenant',
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',
             insertedAt: new Date(),
           },
         };
+        if (
+          conventionnement?.statut ===
+          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+        ) {
+          paramsUpdateCollectionStructure.$push.coselec.type = 'avenant';
+          paramsUpdateCollectionMiseEnRelation.$push[
+            'structureObj.coselec'
+          ].type = 'avenant';
+        }
       }
       if (statut === 'NÉGATIF') {
         paramsUpdateCollectionStructure.$set = {

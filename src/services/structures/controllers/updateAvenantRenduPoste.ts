@@ -5,6 +5,14 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
+import { StatutConventionnement } from '../../../ts/enum';
+
+const checkIfReconventionnement = (statut: string) => {
+  if (statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ) {
+    return { type: 'avenant' };
+  }
+  return {};
+};
 
 const updateAvenantRenduPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -24,6 +32,19 @@ const updateAvenantRenduPoste =
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      const conventionnement = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne(
+          {
+            _id: new ObjectId(idStructure),
+          },
+          { _id: 0, conventionnement: 1 },
+        );
+      if (!conventionnement) {
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
       const nbMiseEnRelationRecruter = await app
@@ -67,6 +88,7 @@ const updateAvenantRenduPoste =
                   Number(nbDePosteCoselec) - Number(nbDePosteRendu),
                 avisCoselec: 'POSITIF',
                 insertedAt: new Date(),
+                ...checkIfReconventionnement(conventionnement.statut),
               },
             },
           },
