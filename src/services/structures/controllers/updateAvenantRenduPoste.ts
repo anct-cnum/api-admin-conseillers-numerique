@@ -26,14 +26,15 @@ const updateAvenantRenduPoste =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const nbConseillers = await app
-        .service(service.conseillers)
+      const nbMiseEnRelationRecruter = await app
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
-          statut: 'RECRUTE',
-          structureId: new ObjectId(idStructure),
+          statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
+          'structure.$id': new ObjectId(idStructure),
         });
-      const nbDePosteLibre = Number(nbDePosteCoselec) - Number(nbConseillers);
+      const nbDePosteLibre =
+        Number(nbDePosteCoselec) - Number(nbMiseEnRelationRecruter);
       if (nbDePosteLibre < Number(nbDePosteRendu)) {
         res.status(400).json({
           message:
@@ -58,6 +59,7 @@ const updateAvenantRenduPoste =
           {
             $set: {
               'demandesCoselec.$.statut': 'validee',
+              'demandesCoselec.$.banniereValidationAvenant': true,
             },
             $push: {
               coselec: {
@@ -90,6 +92,7 @@ const updateAvenantRenduPoste =
           {
             $set: {
               'structureObj.demandesCoselec.$.statut': 'validee',
+              'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
             },
             $push: {
               'structureObj.coselec': {
