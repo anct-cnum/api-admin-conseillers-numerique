@@ -28,6 +28,7 @@ const updateAvenantRenduPoste =
       }
       const nbConseillers = await app
         .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
           statut: 'RECRUTE',
           structureId: new ObjectId(idStructure),
@@ -49,7 +50,7 @@ const updateAvenantRenduPoste =
             demandesCoselec: {
               $elemMatch: {
                 statut: { $eq: 'en_cours' },
-                type: { $eq: 'rendu' },
+                type: { $eq: 'retrait' },
               },
             },
             statut: 'VALIDATION_COSELEC',
@@ -81,7 +82,7 @@ const updateAvenantRenduPoste =
             'structureObj.demandesCoselec': {
               $elemMatch: {
                 statut: { $eq: 'en_cours' },
-                type: { $eq: 'rendu' },
+                type: { $eq: 'retrait' },
               },
             },
             'structureObj.statut': 'VALIDATION_COSELEC',

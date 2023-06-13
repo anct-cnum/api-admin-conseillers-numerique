@@ -208,7 +208,7 @@ const filterStatut = (typeConvention: string) => {
       demandesCoselec: {
         $elemMatch: {
           statut: { $eq: 'en_cours' },
-          type: { $eq: 'rendu' },
+          type: { $eq: 'retrait' },
         },
       },
     };
@@ -236,7 +236,7 @@ const filterStatut = (typeConvention: string) => {
         demandesCoselec: {
           $elemMatch: {
             statut: { $eq: 'en_cours' },
-            type: { $eq: 'rendu' },
+            type: { $eq: 'retrait' },
           },
         },
       },
@@ -287,7 +287,7 @@ const filterDateDemandeAndStatutHistorique = (
       demandesCoselec: {
         $elemMatch: {
           statut: { $ne: 'en_cours' },
-          type: { $eq: 'rendu' },
+          type: { $eq: 'retrait' },
           'emetteurAvenant.date': {
             $gte: dateDebut,
             $lte: dateFin,
@@ -331,7 +331,7 @@ const filterDateDemandeAndStatutHistorique = (
         demandesCoselec: {
           $elemMatch: {
             statut: { $ne: 'en_cours' },
-            type: { $eq: 'rendu' },
+            type: { $eq: 'retrait' },
             'emetteurAvenant.date': {
               $gte: dateDebut,
               $lte: dateFin,
@@ -395,7 +395,7 @@ const totalParConvention = async (app: Application, req: IRequest) => {
       {
         $match: {
           'demandesCoselec.statut': { $eq: 'en_cours' },
-          'demandesCoselec.type': { $eq: 'rendu' },
+          'demandesCoselec.type': { $eq: 'retrait' },
         },
       },
       {
@@ -493,7 +493,7 @@ const totalParHistoriqueConvention = async (
       {
         $match: {
           'demandesCoselec.statut': { $ne: 'en_cours' },
-          'demandesCoselec.type': { $eq: 'rendu' },
+          'demandesCoselec.type': { $eq: 'retrait' },
           'demandesCoselec.emetteurAvenant.date': {
             $gte: dateDebut,
             $lte: dateFin,

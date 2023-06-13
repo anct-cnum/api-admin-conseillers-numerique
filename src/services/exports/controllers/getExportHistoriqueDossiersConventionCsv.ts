@@ -95,7 +95,7 @@ const getExportHistoriqueDossiersConventionCsv =
           const avenantsRenduPoste = await Promise.all(
             structureWithAvenant.map(async (structure) => {
               const avenants = structure.demandesCoselec.filter(
-                (demande) => demande.type === 'rendu',
+                (demande) => demande.type === 'retrait',
               );
               if (avenants.length === 0) {
                 return [];

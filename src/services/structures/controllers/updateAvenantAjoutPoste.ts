@@ -39,6 +39,7 @@ const updateAvenantAjoutPoste =
         paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'validee',
           'demandesCoselec.$.nombreDePostesAccordes': Number(nbDePosteAccorder),
+          'demandesCoselec.$.banniereValidationAvenant': true,
         };
         paramsUpdateCollectionStructure.$push = {
           coselec: {
@@ -53,6 +54,7 @@ const updateAvenantAjoutPoste =
           'structureObj.demandesCoselec.$.statut': 'validee',
           'structureObj.demandesCoselec.$.nombreDePostesAccordes':
             Number(nbDePosteAccorder),
+          'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
         };
         paramsUpdateCollectionMiseEnRelation.$push = {
           'structureObj.coselec': {

@@ -167,7 +167,10 @@ const getDetailDossierConvention =
             conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
         );
         structure[0].conseillersRenouveller = structure[0]?.conseillers?.filter(
-          (conseiller) => conseiller.reconventionnement === true,
+          (conseiller) =>
+            conseiller.reconventionnement === true &&
+            conseiller.statutMiseEnrelation !== 'terminee' &&
+            conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
         );
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
