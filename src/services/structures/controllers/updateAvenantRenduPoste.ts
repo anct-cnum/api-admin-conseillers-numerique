@@ -45,7 +45,7 @@ const updateAvenantRenduPoste =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: idStructure,
+            _id: new ObjectId(idStructure),
             demandesCoselec: {
               $elemMatch: {
                 statut: { $eq: 'en_cours' },
@@ -72,6 +72,34 @@ const updateAvenantRenduPoste =
         res.status(400).json({ message: "L'avenant n'a pas pu être validé" });
         return;
       }
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': new ObjectId(idStructure),
+            'structureObj.demandesCoselec': {
+              $elemMatch: {
+                statut: { $eq: 'en_cours' },
+                type: { $eq: 'rendu' },
+              },
+            },
+            'structureObj.statut': 'VALIDATION_COSELEC',
+          },
+          {
+            $set: {
+              'structureObj.demandesCoselec.$.statut': 'validee',
+            },
+            $push: {
+              'structureObj.coselec': {
+                nombreConseillersCoselec:
+                  Number(nbDePosteCoselec) - Number(nbDePosteRendu),
+                avisCoselec: 'POSITIF',
+                insertedAt: new Date(),
+              },
+            },
+          },
+        );
       res.status(200).json({
         statutAvenantAjoutPosteUpdated: 'validee',
       });

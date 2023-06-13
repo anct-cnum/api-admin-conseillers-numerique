@@ -10,7 +10,11 @@ const updateAvenantAjoutPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { statut, nbDePosteAccorder, nbDePosteCoselec } = req.body;
-    const paramsUpdate = {
+    const paramsUpdateCollectionStructure = {
+      $set: {},
+      $push: {},
+    };
+    const paramsUpdateCollectionMiseEnRelation = {
       $set: {},
       $push: {},
     };
@@ -32,12 +36,26 @@ const updateAvenantAjoutPoste =
         return;
       }
       if (statut === 'POSITIF') {
-        paramsUpdate.$set = {
+        paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'validee',
           'demandesCoselec.$.nombreDePostesAccordes': Number(nbDePosteAccorder),
         };
-        paramsUpdate.$push = {
+        paramsUpdateCollectionStructure.$push = {
           coselec: {
+            type: 'avenant',
+            nombreConseillersCoselec:
+              Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
+            avisCoselec: 'POSITIF',
+            insertedAt: new Date(),
+          },
+        };
+        paramsUpdateCollectionMiseEnRelation.$set = {
+          'structureObj.demandesCoselec.$.statut': 'validee',
+          'structureObj.demandesCoselec.$.nombreDePostesAccordes':
+            Number(nbDePosteAccorder),
+        };
+        paramsUpdateCollectionMiseEnRelation.$push = {
+          'structureObj.coselec': {
             type: 'avenant',
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
@@ -47,11 +65,21 @@ const updateAvenantAjoutPoste =
         };
       }
       if (statut === 'NÉGATIF') {
-        paramsUpdate.$set = {
+        paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'refusee',
         };
-        paramsUpdate.$push = {
+        paramsUpdateCollectionMiseEnRelation.$set = {
+          'structureObj.demandesCoselec.$.statut': 'refusee',
+        };
+        paramsUpdateCollectionStructure.$push = {
           coselec: {
+            nombreConseillersCoselec: 0,
+            avisCoselec: 'NÉGATIF',
+            insertedAt: new Date(),
+          },
+        };
+        paramsUpdateCollectionMiseEnRelation.$push = {
+          'structureObj.coselec': {
             nombreConseillersCoselec: 0,
             avisCoselec: 'NÉGATIF',
             insertedAt: new Date(),
@@ -63,7 +91,7 @@ const updateAvenantAjoutPoste =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: idStructure,
+            _id: new ObjectId(idStructure),
             demandesCoselec: {
               $elemMatch: {
                 statut: { $eq: 'en_cours' },
@@ -72,12 +100,28 @@ const updateAvenantAjoutPoste =
             },
             statut: 'VALIDATION_COSELEC',
           },
-          paramsUpdate,
+          paramsUpdateCollectionStructure,
         );
       if (structure.modifiedCount === 0) {
         res.status(400).json({ message: "L'avenant n'a pas pu être modifié" });
         return;
       }
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': new ObjectId(idStructure),
+            'structureObj.demandesCoselec': {
+              $elemMatch: {
+                statut: { $eq: 'en_cours' },
+                type: { $eq: 'ajout' },
+              },
+            },
+            'structureObj.statut': 'VALIDATION_COSELEC',
+          },
+          paramsUpdateCollectionMiseEnRelation,
+        );
       res.status(200).json({
         statutAvenantAjoutPosteUpdated:
           statut === 'POSITIF' ? 'validee' : 'refusee',
