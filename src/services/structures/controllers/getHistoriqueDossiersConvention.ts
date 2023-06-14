@@ -4,7 +4,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
 import {
   filterDateDemandeAndStatutHistorique,
-  totalParConvention,
+  totalParHistoriqueConvention,
 } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import service from '../../../helpers/services';
@@ -56,6 +56,7 @@ const getStructures =
           nom: 1,
           idPG: 1,
           nombreConseillersSouhaites: 1,
+          demandesCoselec: 1,
           coselec: 1,
           statut: 1,
           conventionnement: 1,
@@ -126,7 +127,12 @@ const getHistoriqueDossiersConvention =
         dateFin,
       );
       items.total = totalStructures[0]?.count_structures ?? 0;
-      const totalConvention = await totalParConvention(app, req, 'VALIDÉ');
+      const totalConvention = await totalParHistoriqueConvention(
+        app,
+        req,
+        dateDebut,
+        dateFin,
+      );
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,
@@ -134,7 +140,7 @@ const getHistoriqueDossiersConvention =
       items.data = structures.map((structure) => {
         const item = { ...structure };
         if (
-          item.conventionnement.statut ===
+          item?.conventionnement?.statut ===
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
         ) {
           item.nombreConseillersCoselec =

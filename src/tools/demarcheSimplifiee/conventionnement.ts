@@ -186,6 +186,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                   $nin: [
                     StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
                     StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
+                    StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
                   ],
                 },
                 $or: [

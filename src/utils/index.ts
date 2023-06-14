@@ -15,7 +15,25 @@ const getCoselecPositif = (structure) => {
   let coselecsPositifs = null;
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
-      (c) => c.avisCoselec === 'POSITIF',
+      (c) => c.avisCoselec === 'POSITIF' && c.type === 'avenant',
+    );
+    if (coselecsPositifs.length === 0) {
+      coselecsPositifs = structure.coselec.filter(
+        (c) => c.avisCoselec === 'POSITIF' && c.type !== 'avenant',
+      );
+    }
+  }
+  // On prend le dernier
+  return coselecsPositifs !== null && coselecsPositifs.length > 0
+    ? coselecsPositifs.slice(-1).pop()
+    : null;
+};
+
+const getCoselecPositifConventionnement = (structure) => {
+  let coselecsPositifs = null;
+  if ('coselec' in structure && structure.coselec !== null) {
+    coselecsPositifs = structure.coselec.filter(
+      (c) => c.avisCoselec === 'POSITIF' && c.type !== 'avenant',
     );
   }
   // On prend le dernier
@@ -54,6 +72,13 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
+const getCoselecConventionnement = (structure) => {
+  if (structure.statut === 'VALIDATION_COSELEC') {
+    return getCoselecPositifConventionnement(structure);
+  }
+  return getLastCoselec(structure);
+};
+
 const deleteUser = async (app, req, email) => {
   await app
     .service(service.users)
@@ -82,6 +107,7 @@ const formatDateGMT = (date: Date) => {
 
 export {
   getCoselecPositif,
+  getCoselecConventionnement,
   getLastCoselec,
   getCoselec,
   deleteUser,

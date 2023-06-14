@@ -33,6 +33,7 @@ const validationRenouvellementContrat =
           {
             $set: {
               statut: 'finalisee',
+              banniereValidationRenouvellement: true,
             },
           },
           { returnOriginal: false, rawResult: true },
