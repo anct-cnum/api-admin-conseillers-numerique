@@ -10,29 +10,33 @@ const closeBanner =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { type } = req.query;
     const filter = { _id: req.params.id };
-
+    
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
-
+    
     try {
       if (type === 'renouvellement') {
         const miseEnRelation = await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            { ...filter, statut: 'finalisee' },
-            {
-              $set: { banniereValidationRenouvellement: false },
-            },
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          { ...filter, statut: 'finalisee' },
+          {
+            $set: { banniereValidationRenouvellement: false },
+          },
           );
-        if (miseEnRelation.modifiedCount === 0) {
-          res.status(404).json({
-            message: "La mise en relation n'a pas été mise à jour",
-          });
-          return;
-        }
+          if (miseEnRelation.modifiedCount === 0) {
+            res.status(404).json({
+              message: "La mise en relation n'a pas été mise à jour",
+            });
+            return;
+          }
+          
+        req.params.id = req?.user?.entity?.oid;
+        const structure = await getDetailStructureById(app)(req, res);
+        res.status(200).json(structure);
       } else {
         const getStructure = await app
           .service(service.structures)
@@ -90,7 +94,7 @@ const closeBanner =
             .Model.accessibleBy(req.ability, action.update)
             .updateOne(
               {
-                _id: req.params.id,
+                _id: new ObjectId(req.params.id),
               },
               {
                 $set: {

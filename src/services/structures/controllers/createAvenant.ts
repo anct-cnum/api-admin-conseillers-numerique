@@ -19,7 +19,7 @@ const createAvenant =
       return;
     }
 
-    const statut = type === 'retrait' ? 'validee' : 'en_cours';
+  
 
     const createAvenantValidation = validDemandeCoselec.validate({
       type,
@@ -40,8 +40,8 @@ const createAvenant =
       motif,
       emetteurAvenant: { date: new Date(), email: req.user?.name },
       type,
-      statut,
-      banniereValidationAvenant: type === 'retrait',
+      statut : 'en_cours',
+      banniereValidationAvenant: false,
     };
 
     try {
