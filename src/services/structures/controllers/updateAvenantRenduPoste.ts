@@ -59,7 +59,7 @@ const updateAvenantRenduPoste =
       if (nbDePosteLibre < Number(nbDePosteRendu)) {
         res.status(400).json({
           message:
-            'Le nombre de poste rendu ne peut pas être supérieur ou égal aux nombre de conseillers en postes',
+            'Le nombre de postes rendus ne peut pas être supérieur ou égal au nombre de conseillers en poste',
         });
         return;
       }

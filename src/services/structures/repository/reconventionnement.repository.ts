@@ -360,56 +360,29 @@ const totalParConvention = async (app: Application, req: IRequest) => {
     });
   const checkAccess = await checkAccessReadRequestStructures(app, req);
 
-  const avenantAjoutPoste = await app
-    .service(service.structures)
-    .Model.aggregate([
-      {
-        $match: {
-          $and: [checkAccess],
-        },
+  const countAvenant = await app.service(service.structures).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
       },
-      { $unwind: '$demandesCoselec' },
-      {
-        $match: {
-          'demandesCoselec.statut': { $eq: 'en_cours' },
-          'demandesCoselec.type': { $eq: 'ajout' },
-        },
+    },
+    { $unwind: '$demandesCoselec' },
+    {
+      $match: {
+        'demandesCoselec.statut': { $eq: 'en_cours' },
       },
-      {
-        $group: {
-          _id: 0,
-          count: { $sum: 1 },
-        },
+    },
+    {
+      $group: {
+        _id: '$demandesCoselec.type',
+        count: { $sum: 1 },
       },
-      { $project: { _id: 0, count_avenant_ajout_poste: '$count' } },
-    ]);
-  const avenantRenduPoste = await app
-    .service(service.structures)
-    .Model.aggregate([
-      {
-        $match: {
-          $and: [checkAccess],
-        },
-      },
-      { $unwind: '$demandesCoselec' },
-      {
-        $match: {
-          'demandesCoselec.statut': { $eq: 'en_cours' },
-          'demandesCoselec.type': { $eq: 'retrait' },
-        },
-      },
-      {
-        $group: {
-          _id: 0,
-          count: { $sum: 1 },
-        },
-      },
-      { $project: { _id: 0, count_avenant_rendu_poste: '$count' } },
-    ]);
+    },
+  ]);
   const totalAvenantAjoutPoste =
-    avenantAjoutPoste[0]?.count_avenant_ajout_poste ?? 0;
+    countAvenant.find((element) => element._id === 'ajout')?.count ?? 0;
   const totalAvenantRenduPoste =
-    avenantRenduPoste[0]?.count_avenant_rendu_poste ?? 0;
+    countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
     conventionnement +
     reconventionnement +
@@ -453,65 +426,34 @@ const totalParHistoriqueConvention = async (
       },
     });
   const checkAccess = await checkAccessReadRequestStructures(app, req);
-  const avenantAjoutPoste = await app
-    .service(service.structures)
-    .Model.aggregate([
-      {
-        $match: {
-          $and: [checkAccess],
+  const countAvenant = await app.service(service.structures).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+      },
+    },
+    { $unwind: '$demandesCoselec' },
+    {
+      $match: {
+        'demandesCoselec.statut': { $ne: 'en_cours' },
+        'demandesCoselec.emetteurAvenant.date': {
+          $gte: dateDebut,
+          $lte: dateFin,
         },
       },
-      { $unwind: '$demandesCoselec' },
-      {
-        $match: {
-          'demandesCoselec.statut': { $ne: 'en_cours' },
-          'demandesCoselec.type': { $eq: 'ajout' },
-          'demandesCoselec.emetteurAvenant.date': {
-            $gte: dateDebut,
-            $lte: dateFin,
-          },
-        },
+    },
+    {
+      $group: {
+        _id: '$demandesCoselec.type',
+        count: { $sum: 1 },
       },
-      {
-        $group: {
-          _id: 0,
-          count: { $sum: 1 },
-        },
-      },
-      { $project: { _id: 0, count_avenant_ajout_poste: '$count' } },
-    ]);
+    },
+  ]);
 
-  const avenantRenduPoste = await app
-    .service(service.structures)
-    .Model.aggregate([
-      {
-        $match: {
-          $and: [checkAccess],
-        },
-      },
-      { $unwind: '$demandesCoselec' },
-      {
-        $match: {
-          'demandesCoselec.statut': { $ne: 'en_cours' },
-          'demandesCoselec.type': { $eq: 'retrait' },
-          'demandesCoselec.emetteurAvenant.date': {
-            $gte: dateDebut,
-            $lte: dateFin,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: 0,
-          count: { $sum: 1 },
-        },
-      },
-      { $project: { _id: 0, count_avenant_rendu_poste: '$count' } },
-    ]);
   const totalAvenantAjoutPoste =
-    avenantAjoutPoste[0]?.count_avenant_ajout_poste ?? 0;
+    countAvenant.find((element) => element._id === 'ajout')?.count ?? 0;
   const totalAvenantRenduPoste =
-    avenantRenduPoste[0]?.count_avenant_rendu_poste ?? 0;
+    countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
     conventionnement +
     reconventionnement +

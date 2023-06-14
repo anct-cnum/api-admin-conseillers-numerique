@@ -7,6 +7,7 @@ import { validHistoriqueConvention } from '../../../schemas/reconventionnement.s
 import { checkAccessReadRequestStructures } from '../../structures/repository/structures.repository';
 import { filterDateDemandeAndStatutHistorique } from '../../structures/repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getExportHistoriqueDossiersConventionCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -122,7 +123,10 @@ const getExportHistoriqueDossiersConventionCsv =
         const conventionnement = await Promise.all(
           structures.map(async (structure) => {
             const item = { ...structure };
-            if (item.conventionnement.statut === 'CONVENTIONNEMENT_VALIDÉ') {
+            if (
+              item.conventionnement.statut ===
+              StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+            ) {
               const coselec = getCoselec(item);
               item.nbPostesAttribuees = coselec?.nombreConseillersCoselec ?? 0;
               item.dateDeCreation =
