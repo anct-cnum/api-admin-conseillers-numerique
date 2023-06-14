@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
-import { validDemandeCoselec } from '../../../schemas/structures.schemas';
+import { validCreationAvenant } from '../../../schemas/structures.schemas';
 import getDetailStructureById from './getDetailStructureById';
 
 const createAvenant =
@@ -19,7 +19,7 @@ const createAvenant =
       return;
     }
 
-    const createAvenantValidation = validDemandeCoselec.validate({
+    const createAvenantValidation = validCreationAvenant.validate({
       type,
       nombreDePostes,
       motif,
