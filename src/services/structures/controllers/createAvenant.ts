@@ -19,8 +19,6 @@ const createAvenant =
       return;
     }
 
-  
-
     const createAvenantValidation = validDemandeCoselec.validate({
       type,
       nombreDePostes,
@@ -40,7 +38,7 @@ const createAvenant =
       motif,
       emetteurAvenant: { date: new Date(), email: req.user?.name },
       type,
-      statut : 'en_cours',
+      statut: 'en_cours',
       banniereValidationAvenant: false,
     };
 
