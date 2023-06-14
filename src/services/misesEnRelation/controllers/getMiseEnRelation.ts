@@ -66,6 +66,7 @@ const getMiseEnRelation =
               codePostal: '$conseiller.codePostal',
               nomDiplomeMedNum: '$conseiller.nomDiplomeMedNum',
               aUneExperienceMedNum: '$conseiller.aUneExperienceMedNum',
+              statutCandidat: '$conseiller.statut',
               pix: '$conseiller.pix',
               cv: '$conseiller.cv',
               idConseiller: '$conseiller._id',
