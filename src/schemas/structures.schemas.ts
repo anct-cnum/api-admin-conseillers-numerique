@@ -50,17 +50,6 @@ const updateEmail = Joi.string()
   .required()
   .error(new Error("Le format de l'email est invalide"));
 
-const validDemandeCoselec = Joi.object({
-  type: Joi.string()
-    .valid('retrait', 'ajout')
-    .required()
-    .error(new Error('Le type est invalide')),
-  nombreDePostes: Joi.number()
-    .required()
-    .error(new Error('Le nombre de postes est invalide')),
-  motif: Joi.string().required().error(new Error('Le motif est invalide')),
-});
-
 const updateContact = Joi.object({
   nom: Joi.string().required().error(new Error('Le nom est invalide')),
   prenom: Joi.string().required().error(new Error('Le prénom est invalide')),
@@ -72,10 +61,42 @@ const updateContact = Joi.object({
     .error(new Error('La fonction est invalide')),
 });
 
+const validCreationAvenant = Joi.object({
+  type: Joi.string()
+    .valid('retrait', 'ajout')
+    .required()
+    .error(new Error('Le type est invalide')),
+  nombreDePostes: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes est invalide')),
+  motif: Joi.string().required().error(new Error('Le motif est invalide')),
+});
+
+const avenantAjoutPoste = Joi.object({
+  statut: Joi.string().required().error(new Error('Le statut est invalide')),
+  nbDePosteAccorder: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes accordés est invalide')),
+  nbDePosteCoselec: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes coselec est invalide')),
+});
+
+const avenantRenduPoste = Joi.object({
+  nbDePosteRendu: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes rendus est invalide')),
+  nbDePosteCoselec: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes coselec est invalide')),
+});
+
 export {
   validStructures,
   validExportStructures,
   updateEmail,
-  validDemandeCoselec,
+  validCreationAvenant,
   updateContact,
+  avenantAjoutPoste,
+  avenantRenduPoste,
 };

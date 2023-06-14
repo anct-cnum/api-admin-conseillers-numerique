@@ -13,6 +13,8 @@ import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
 import validationReconventionnement from './validationReconventionnement';
 import closeBanner from './closeBanner';
 import createAvenant from './createAvenant';
+import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
+import updateAvenantRenduPoste from './updateAvenantRenduPoste';
 
 export {
   getStructures,
@@ -30,4 +32,6 @@ export {
   validationReconventionnement,
   closeBanner,
   createAvenant,
+  updateAvenantAjoutPoste,
+  updateAvenantRenduPoste,
 };

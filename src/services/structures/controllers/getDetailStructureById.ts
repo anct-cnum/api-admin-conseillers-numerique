@@ -19,7 +19,7 @@ import {
   getUrlDossierReconventionnement,
   getTypeDossierDemarcheSimplifiee,
 } from '../repository/reconventionnement.repository';
-import { getCoselec } from '../../../utils';
+import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import { StatutConventionnement } from '../../../ts/enum';
@@ -142,7 +142,10 @@ const getDetailStructureById =
         structure[0]?.insee?.entreprise?.forme_juridique,
       );
       const coselec = getCoselec(structure[0]);
+      const coselecConventionnement = getCoselecConventionnement(structure[0]);
       structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
+      structure[0].posteValiderCoselecConventionnement =
+        coselecConventionnement?.nombreConseillersCoselec;
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);

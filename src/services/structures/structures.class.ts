@@ -17,6 +17,8 @@ import {
   validationReconventionnement,
   createAvenant,
   closeBanner,
+  updateAvenantAjoutPoste,
+  updateAvenantRenduPoste,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -126,6 +128,18 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       createAvenant(app),
+    );
+    app.patch(
+      '/avenant/ajout-poste/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateAvenantAjoutPoste(app),
+    );
+    app.patch(
+      '/avenant/rendu-poste/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateAvenantRenduPoste(app),
     );
   }
 }
