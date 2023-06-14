@@ -51,14 +51,14 @@ const updateEmail = Joi.string()
   .error(new Error("Le format de l'email est invalide"));
 
 const validDemandeCoselec = Joi.object({
-  type: Joi.string().required().error(new Error('Le type est invalide')),
+  type: Joi.string()
+    .valid('retrait', 'ajout')
+    .required()
+    .error(new Error('Le type est invalide')),
   nombreDePostes: Joi.number()
     .required()
     .error(new Error('Le nombre de postes est invalide')),
-  motif: Joi.string()
-    .allow('')
-    .required()
-    .error(new Error('Le motif est invalide')),
+  motif: Joi.string().required().error(new Error('Le motif est invalide')),
 });
 
 const updateContact = Joi.object({

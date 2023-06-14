@@ -37,7 +37,9 @@ const closeBanner =
         req.params.id = req?.user?.entity?.oid;
         const structure = await getDetailStructureById(app)(req, res);
         res.status(200).json(structure);
-      } else {
+      }
+      // s'il s'agit d'un avenant de contrat
+      else {
         const getStructure = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
@@ -72,7 +74,7 @@ const closeBanner =
           return;
         }
 
-        const updateMiseEnRelation = await app
+        await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateMany(
@@ -87,31 +89,6 @@ const closeBanner =
               arrayFilters: [{ 'elem.statut': 'validee' }],
             },
           );
-
-        if (updateMiseEnRelation.modifiedCount === 0) {
-          await app
-            .service(service.structures)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateOne(
-              {
-                _id: new ObjectId(req.params.id),
-              },
-              {
-                $set: {
-                  [`demandesCoselec.$[elem].banniereValidationAvenant`]: true,
-                },
-              },
-              {
-                arrayFilters: [{ 'elem.statut': 'validee' }],
-              },
-            );
-
-          res.status(404).json({
-            message:
-              "Les mises en relation liées à la structure n'ont pas été mise à jour",
-          });
-          return;
-        }
 
         const structure = await getDetailStructureById(app)(req, res);
         res.status(200).json(structure);

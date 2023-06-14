@@ -58,29 +58,13 @@ const createAvenant =
         return;
       }
 
-      const updateMiseEnRelation = await app
+      await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
-          { 'structureObj._id': new ObjectId(id) },
+          { 'structure.$id': new ObjectId(id) },
           { $push: { 'structureObj.demandesCoselec': demandeCoselec } },
         );
-
-      if (updateMiseEnRelation.modifiedCount === 0) {
-        await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            { _id: new ObjectId(id) },
-            { $pull: { demandesCoselec: demandeCoselec } },
-          );
-
-        res.status(404).json({
-          message:
-            "Les mises en relation liées à la structure n'ont pas été mise à jour",
-        });
-        return;
-      }
 
       const structure = await getDetailStructureById(app)(req, res);
       res.status(200).json(structure);
