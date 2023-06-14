@@ -61,6 +61,17 @@ const updateContact = Joi.object({
     .error(new Error('La fonction est invalide')),
 });
 
+const validCreationAvenant = Joi.object({
+  type: Joi.string()
+    .valid('retrait', 'ajout')
+    .required()
+    .error(new Error('Le type est invalide')),
+  nombreDePostes: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes est invalide')),
+  motif: Joi.string().required().error(new Error('Le motif est invalide')),
+});
+
 const avenantAjoutPoste = Joi.object({
   statut: Joi.string().required().error(new Error('Le statut est invalide')),
   nbDePosteAccorder: Joi.number()
@@ -84,6 +95,7 @@ export {
   validStructures,
   validExportStructures,
   updateEmail,
+  validCreationAvenant,
   updateContact,
   avenantAjoutPoste,
   avenantRenduPoste,

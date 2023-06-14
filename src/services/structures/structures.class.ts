@@ -15,6 +15,7 @@ import {
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
   validationReconventionnement,
+  createAvenant,
   closeBanner,
   updateAvenantAjoutPoste,
   updateAvenantRenduPoste,
@@ -117,10 +118,16 @@ export default class Structures extends Service {
       updateDossierReconventionnement(app),
     );
     app.patch(
-      '/reconventionnement/banniere/:id',
+      '/banniere/:id',
       authenticateMode(app),
       createAbilities(app),
       closeBanner(app),
+    );
+    app.patch(
+      '/avenant/creation/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      createAvenant(app),
     );
     app.patch(
       '/avenant/ajout-poste/:id',
