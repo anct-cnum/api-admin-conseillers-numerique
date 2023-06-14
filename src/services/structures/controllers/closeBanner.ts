@@ -25,7 +25,7 @@ const closeBanner =
         .updateOne(
           { ...filter, statut: 'finalisee' },
           {
-            $set: { banniereValidationRenouvellement: true },
+            $set: { banniereValidationRenouvellement: false },
           },
         );
       if (miseEnRelation.modifiedCount === 0) {
