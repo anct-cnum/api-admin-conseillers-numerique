@@ -63,7 +63,7 @@ const updateAvenantAjoutPoste =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const conventionnement = await app
+      const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne(
@@ -72,7 +72,7 @@ const updateAvenantAjoutPoste =
           },
           { _id: 0, conventionnement: 1 },
         );
-      if (!conventionnement) {
+      if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
@@ -105,7 +105,7 @@ const updateAvenantAjoutPoste =
           },
         };
         if (
-          conventionnement?.statut ===
+          structure?.conventionnement?.statut ===
           StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
         ) {
           paramsUpdateCollectionStructure.$push.coselec.type = 'avenant';
@@ -136,7 +136,7 @@ const updateAvenantAjoutPoste =
           },
         };
       }
-      const structure = await app
+      const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
@@ -152,7 +152,7 @@ const updateAvenantAjoutPoste =
           },
           paramsUpdateCollectionStructure,
         );
-      if (structure.modifiedCount === 0) {
+      if (structureUpdated.modifiedCount === 0) {
         res.status(400).json({ message: "L'avenant n'a pas pu être modifié" });
         return;
       }

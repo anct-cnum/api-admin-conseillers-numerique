@@ -7,12 +7,12 @@ import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
 import { StatutConventionnement } from '../../../ts/enum';
 
-const checkIfReconventionnement = (statut: string) => {
-  if (statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ) {
-    return { type: 'avenant' };
-  }
-  return {};
-};
+interface ICoselecObject {
+  nombreConseillersCoselec: number;
+  avisCoselec: string;
+  insertedAt: Date;
+  type?: string;
+}
 
 const updateAvenantRenduPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -34,7 +34,7 @@ const updateAvenantRenduPoste =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const conventionnement = await app
+      const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne(
@@ -43,7 +43,7 @@ const updateAvenantRenduPoste =
           },
           { _id: 0, conventionnement: 1 },
         );
-      if (!conventionnement) {
+      if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
@@ -63,7 +63,19 @@ const updateAvenantRenduPoste =
         });
         return;
       }
-      const structure = await app
+      const coselecObject: ICoselecObject = {
+        nombreConseillersCoselec:
+          Number(nbDePosteCoselec) - Number(nbDePosteRendu),
+        avisCoselec: 'POSITIF',
+        insertedAt: new Date(),
+      };
+      if (
+        structure?.conventionnement?.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        coselecObject.type = 'avenant';
+      }
+      const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
@@ -83,17 +95,11 @@ const updateAvenantRenduPoste =
               'demandesCoselec.$.banniereValidationAvenant': true,
             },
             $push: {
-              coselec: {
-                nombreConseillersCoselec:
-                  Number(nbDePosteCoselec) - Number(nbDePosteRendu),
-                avisCoselec: 'POSITIF',
-                insertedAt: new Date(),
-                ...checkIfReconventionnement(conventionnement.statut),
-              },
+              coselec: coselecObject,
             },
           },
         );
-      if (structure.modifiedCount === 0) {
+      if (structureUpdated.modifiedCount === 0) {
         res.status(400).json({ message: "L'avenant n'a pas pu être validé" });
         return;
       }
@@ -117,12 +123,7 @@ const updateAvenantRenduPoste =
               'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
             },
             $push: {
-              'structureObj.coselec': {
-                nombreConseillersCoselec:
-                  Number(nbDePosteCoselec) - Number(nbDePosteRendu),
-                avisCoselec: 'POSITIF',
-                insertedAt: new Date(),
-              },
+              'structureObj.coselec': coselecObject,
             },
           },
         );
