@@ -76,14 +76,14 @@ const filterType = (type: string) => {
 const filterStatut = (statut: string) => (statut ? { statut } : {});
 
 const formatAdresseStructure = (insee) => {
-  const adresse = `${insee?.etablissement?.adresse?.numero_voie ?? ''} ${
-    insee?.etablissement?.adresse?.type_voie ?? ''
-  } ${insee?.etablissement?.adresse?.nom_voie ?? ''} ${
-    insee?.etablissement?.adresse?.complement_adresse
-      ? `${insee.etablissement.adresse.complement_adresse} `
+  const adresse = `${insee?.adresse?.numero_voie ?? ''} ${
+    insee?.adresse?.type_voie ?? ''
+  } ${insee?.adresse?.libelle_voie ?? ''} ${
+    insee?.adresse?.complement_adresse
+      ? `${insee.adresse.complement_adresse} `
       : ' '
-  }${insee?.etablissement?.adresse?.code_postal ?? ''} ${
-    insee?.etablissement?.adresse?.localite ?? ''
+  }${insee?.adresse?.code_postal ?? ''} ${
+    insee?.adresse?.libelle_commune ?? ''
   }`;
 
   return adresse.replace(/["']/g, '');
