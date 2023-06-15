@@ -41,6 +41,7 @@ const getStructures =
           nombreConseillersSouhaites: 1,
           statut: 1,
           conventionnement: 1,
+          demandesCoselec: 1,
         },
       },
       { $sort: { idPG: 1 } },
@@ -93,7 +94,7 @@ const getDossiersConvention =
       );
       const totalStructures = await getTotalStructures(app, checkAccess)(type);
       items.total = totalStructures[0]?.count_structures ?? 0;
-      const totalConvention = await totalParConvention(app, req, 'EN_COURS');
+      const totalConvention = await totalParConvention(app, req);
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,

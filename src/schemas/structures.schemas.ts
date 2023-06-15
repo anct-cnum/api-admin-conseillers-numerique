@@ -61,4 +61,30 @@ const updateContact = Joi.object({
     .error(new Error('La fonction est invalide')),
 });
 
-export { validStructures, validExportStructures, updateEmail, updateContact };
+const avenantAjoutPoste = Joi.object({
+  statut: Joi.string().required().error(new Error('Le statut est invalide')),
+  nbDePosteAccorder: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes accordés est invalide')),
+  nbDePosteCoselec: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes coselec est invalide')),
+});
+
+const avenantRenduPoste = Joi.object({
+  nbDePosteRendu: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes rendus est invalide')),
+  nbDePosteCoselec: Joi.number()
+    .required()
+    .error(new Error('Le nombre de postes coselec est invalide')),
+});
+
+export {
+  validStructures,
+  validExportStructures,
+  updateEmail,
+  updateContact,
+  avenantAjoutPoste,
+  avenantRenduPoste,
+};
