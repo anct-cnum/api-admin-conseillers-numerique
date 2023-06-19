@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';

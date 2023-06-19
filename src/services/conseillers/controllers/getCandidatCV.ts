@@ -2,7 +2,6 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { NotFound, Forbidden } from '@feathersjs/errors';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
