@@ -11,6 +11,6 @@ type Roles =
   | 'coordinateur_coop';
 
 const mapReseau = GrandsReseaux.map((reseau: any) => reseau.valeur);
-type Reseau = typeof mapReseau[number];
+type Reseau = (typeof mapReseau)[number];
 
 export { Roles, Reseau };
