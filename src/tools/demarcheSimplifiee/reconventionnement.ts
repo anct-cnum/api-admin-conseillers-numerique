@@ -23,7 +23,7 @@ const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
   type: string,
   cursor: string,
-) =>
+): Promise<any> =>
   graphQLClient
     .request(queryGetDemarcheReconventionnement(), {
       demarcheNumber: getDemarcheNumber(type),
