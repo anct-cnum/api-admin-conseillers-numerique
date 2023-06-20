@@ -52,7 +52,6 @@
 		"@feathersjs/feathers": "^4.5.15",
 		"@feathersjs/socketio": "^4.5.15",
 		"@feathersjs/transport-commons": "^4.5.15",
-		"@hapi/joi": "^17.1.1",
 		"@sentry/node": "^7.55.2",
 		"@sentry/tracing": "^7.55.2",
 		"axios": "^1.4.0",

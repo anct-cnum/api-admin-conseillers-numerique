@@ -1,4 +1,4 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 
 const validConseillers = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
