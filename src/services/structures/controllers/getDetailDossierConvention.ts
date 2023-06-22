@@ -180,7 +180,6 @@ const getDetailDossierConvention =
       structure[0].nombreConseillersCoselecConventionnement =
         getCoselecConventionnement(structure[0])?.nombreConseillersCoselec ?? 0;
       res.status(200).json(structure[0]);
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

@@ -23,7 +23,7 @@ const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
   type: string,
   cursor: string,
-) =>
+): Promise<any> =>
   graphQLClient
     .request(queryGetDemarcheReconventionnement(), {
       demarcheNumber: getDemarcheNumber(type),
@@ -253,7 +253,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
             {
               'conventionnement.statut':
                 StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
-                structure.conventionnement.statut
+                structure?.conventionnement?.statut
                   ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
                   : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
               'conventionnement.dossierReconventionnement': {

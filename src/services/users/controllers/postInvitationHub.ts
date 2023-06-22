@@ -102,7 +102,6 @@ const postInvitationHub =
         return;
       }
       res.status(200).json(messageSuccess);
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
