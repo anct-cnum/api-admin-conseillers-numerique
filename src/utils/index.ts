@@ -15,11 +15,11 @@ const getCoselecPositif = (structure) => {
   let coselecsPositifs = null;
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
-      (c) => c.avisCoselec === 'POSITIF' && c.type === 'avenant',
+      (c) => c.avisCoselec === 'POSITIF' && c.phaseConventionnement === '2',
     );
     if (coselecsPositifs.length === 0) {
       coselecsPositifs = structure.coselec.filter(
-        (c) => c.avisCoselec === 'POSITIF' && c.type !== 'avenant',
+        (c) => c.avisCoselec === 'POSITIF' && c.phaseConventionnement !== '2',
       );
     }
   }
@@ -33,7 +33,7 @@ const getCoselecPositifConventionnement = (structure) => {
   let coselecsPositifs = null;
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
-      (c) => c.avisCoselec === 'POSITIF' && c.type !== 'avenant',
+      (c) => c.avisCoselec === 'POSITIF' && c.phaseConventionnement !== '2',
     );
   }
   // On prend le dernier

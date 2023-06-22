@@ -13,7 +13,7 @@ interface IUpdateStructureAvenant {
       nombreConseillersCoselec: number;
       avisCoselec: string;
       insertedAt: Date;
-      type?: string;
+      phaseConventionnement?: string;
     };
   };
   $set?: {
@@ -29,7 +29,7 @@ interface IUpdateMiseEnRelationAvenant {
       nombreConseillersCoselec: number;
       avisCoselec: string;
       insertedAt: Date;
-      type?: string;
+      phaseConventionnement?: string;
     };
   };
   $set?: {
@@ -108,10 +108,11 @@ const updateAvenantAjoutPoste =
           structure?.conventionnement?.statut ===
           StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
         ) {
-          paramsUpdateCollectionStructure.$push.coselec.type = 'avenant';
+          paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
+            '2';
           paramsUpdateCollectionMiseEnRelation.$push[
             'structureObj.coselec'
-          ].type = 'avenant';
+          ].phaseConventionnement = '2';
         }
       }
       if (statut === 'NÉGATIF') {

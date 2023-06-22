@@ -8,6 +8,8 @@ import {
   formatAdresseStructure,
   formatQpv,
   formatType,
+  getConseillersRecruter,
+  getConseillersValider,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -85,6 +87,7 @@ const getDetailStructureById =
                 $project: {
                   _id: 0,
                   statut: 1,
+                  reconventionnement: 1,
                   'conseillerObj.idPG': 1,
                   'conseillerObj.nom': 1,
                   'conseillerObj._id': 1,
@@ -176,16 +179,15 @@ const getDetailStructureById =
           prenom: conseiller?.conseillerObj?.prenom,
           _id: conseiller?.conseillerObj?._id,
           statut: conseiller?.statut,
+          reconventionnement: conseiller?.reconventionnement,
         };
       });
-      structure[0].conseillersValider = structure[0].conseillers?.filter(
-        (conseiller) => conseiller.statut === 'recrutee',
+      Object.assign(
+        structure[0],
+        getConseillersValider(structure[0].conseillers),
+        getConseillersRecruter(structure[0].conseillers),
       );
-      structure[0].conseillersRecruter = structure[0].conseillers?.filter(
-        (conseiller) =>
-          conseiller.statut === 'finalisee' ||
-          conseiller.statut === 'nouvelle_rupture',
-      );
+
       delete structure[0].conseillers;
 
       if (structure.length === 0) {

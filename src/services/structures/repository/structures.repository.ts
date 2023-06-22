@@ -109,6 +109,43 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
+const getConseillersValider = (conseillers) => {
+  const conseillersValiderReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'recrutee' &&
+      conseiller.phaseConventionnement === '2',
+  );
+  const conseillersValiderConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'recrutee' &&
+      conseiller.phaseConventionnement !== '2',
+  );
+  return {
+    conseillersValiderReconventionnement,
+    conseillersValiderConventionnement,
+  };
+};
+
+const getConseillersRecruter = (conseillers) => {
+  const conseillersRecruterConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.phaseConventionnement !== '2' &&
+      (conseiller.statut === 'finalisee' ||
+        conseiller.statut === 'nouvelle_rupture' ||
+        conseiller.statut === 'terminee'),
+  );
+  const conseillersRecruterReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.phaseConventionnement === '2' &&
+      (conseiller.statut === 'finalisee' ||
+        conseiller.statut === 'nouvelle_rupture'),
+  );
+  return {
+    conseillersRecruterConventionnement,
+    conseillersRecruterReconventionnement,
+  };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -123,4 +160,6 @@ export {
   formatType,
   filterSortColonne,
   getNameStructure,
+  getConseillersValider,
+  getConseillersRecruter,
 };

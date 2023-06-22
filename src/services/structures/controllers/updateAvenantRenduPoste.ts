@@ -11,7 +11,7 @@ interface ICoselecObject {
   nombreConseillersCoselec: number;
   avisCoselec: string;
   insertedAt: Date;
-  type?: string;
+  phaseConventionnement?: string;
 }
 
 const updateAvenantRenduPoste =
@@ -73,7 +73,7 @@ const updateAvenantRenduPoste =
         structure?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
-        coselecObject.type = 'avenant';
+        coselecObject.phaseConventionnement = '2';
       }
       const structureUpdated = await app
         .service(service.structures)
