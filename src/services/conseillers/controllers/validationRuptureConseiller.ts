@@ -419,7 +419,16 @@ const validationRuptureConseiller =
         res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      res.status(500).json({ message: error.message });
+      await app
+      .service(service.conseillers)
+      .Model.accessibleBy(req.ability, action.update)
+      .updateOne(
+        { _id: idConseiller },
+        {
+          $set: { ruptureError: true } ,
+        },
+      );
+    res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };

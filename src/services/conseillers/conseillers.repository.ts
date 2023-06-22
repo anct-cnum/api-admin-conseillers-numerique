@@ -193,12 +193,12 @@ const filterIsRuptureConseiller = (
   switch (rupture) {
     case 'finalisee_rupture':
       return { statut: { $eq: 'RUPTURE' } };
-    default: // contrat / nouvelle_rupture
+    default: // contrat / nouvelle_rupture / finalisee_rupture
       return {
-        statut: { $eq: 'RECRUTE' },
         $or: [
-          { datePrisePoste: { $gte: dateDebut, $lte: dateFin } },
-          { datePrisePoste: null },
+          { statut: { $eq: 'RUPTURE' } },
+          { statut: { $eq: 'RECRUTE' }, datePrisePoste: { $gte: dateDebut, $lte: dateFin } },
+          { statut: { $eq: 'RECRUTE' }, datePrisePoste: null },
         ],
       };
   }
