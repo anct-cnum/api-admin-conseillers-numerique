@@ -4,11 +4,11 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { StatutConventionnement } from '../../../ts/enum';
 
-const validationReconventionnement =
+const decisionReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const { statut } = req.body;
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -19,14 +19,13 @@ const validationReconventionnement =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: idStructure,
+            _id: new ObjectId(idStructure),
             statut: 'VALIDATION_COSELEC',
             'conventionnement.dossierReconventionnement.statut': 'accepte',
           },
           {
             $set: {
-              'conventionnement.statut':
-                StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+              'conventionnement.statut': statut,
             },
           },
         );
@@ -36,9 +35,24 @@ const validationReconventionnement =
           .json({ message: "Le reconventionnement n'a pas pu être validé" });
         return;
       }
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': new ObjectId(idStructure),
+            'structureObj.statut': 'VALIDATION_COSELEC',
+            'structureObj.conventionnement.dossierReconventionnement.statut':
+              'accepte',
+          },
+          {
+            $set: {
+              'structureObj.conventionnement.statut': statut,
+            },
+          },
+        );
       res.status(200).json({
-        statutReconventionnementUpdated:
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+        statutReconventionnementUpdated: statut,
       });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
@@ -50,4 +64,4 @@ const validationReconventionnement =
     }
   };
 
-export default validationReconventionnement;
+export default decisionReconventionnement;

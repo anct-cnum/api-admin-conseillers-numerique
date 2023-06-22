@@ -252,8 +252,12 @@ const filterDateDemandeAndStatutHistorique = (
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+      'conventionnement.statut': {
+        $in: [
+          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+          StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
+        ],
+      },
       'conventionnement.dossierReconventionnement.dateDeValidation': {
         $gte: dateDebut,
         $lte: dateFin,
@@ -301,8 +305,12 @@ const filterDateDemandeAndStatutHistorique = (
   return {
     $or: [
       {
-        'conventionnement.statut':
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+        'conventionnement.statut': {
+          $in: [
+            StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+            StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
+          ],
+        },
         'conventionnement.dossierReconventionnement.dateDeValidation': {
           $gte: dateDebut,
           $lte: dateFin,
