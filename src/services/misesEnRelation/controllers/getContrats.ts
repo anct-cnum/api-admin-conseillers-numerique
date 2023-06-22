@@ -4,17 +4,35 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
+  filterNomConseiller,
   filterStatutContrat,
   totalContrat,
 } from '../misesEnRelation.repository';
 import { validContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
-  (app: Application, checkAccess) => async (statut: string) =>
+  (app: Application, checkAccess) =>
+  async (statut: string, searchByNomConseiller: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $addFields: {
+          nomPrenomStr: {
+            $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: {
+            $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+          },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
       {
         $match: {
           ...filterStatutContrat(statut),
+          ...filterNomConseiller(searchByNomConseiller),
           $and: [checkAccess],
         },
       },
@@ -24,18 +42,60 @@ const getTotalMisesEnRelations =
 
 const getMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (skip: string, limit: number, statut: string) =>
+  async (
+    skip: string,
+    limit: number,
+    statut: string,
+    searchByNomConseiller: string,
+    ordre: string,
+  ) =>
     app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $addFields: {
+          nomPrenomStr: {
+            $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: {
+            $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+          },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
       {
         $match: {
           $and: [checkAccess],
           ...filterStatutContrat(statut),
+          ...filterNomConseiller(searchByNomConseiller),
         },
       },
       {
         $project: {
           emetteurRupture: 1,
+          createdAt: 1,
           emetteurRenouvellement: 1,
+          dateSorted: {
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: ['$statut', 'nouvelle_rupture'] },
+                  then: '$emetteurRupture.date',
+                },
+                {
+                  case: { $eq: ['$statut', 'renouvellement_initiee'] },
+                  then: '$emetteurRenouvellement.date',
+                },
+                {
+                  case: { $eq: ['$statut', 'recrutee'] },
+                  then: '$createdAt', // en attendant de le dev du parcours de recrutement
+                },
+              ],
+              default: null,
+            },
+          },
           'structureObj.nom': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,
@@ -45,7 +105,7 @@ const getMisesEnRelations =
           statut: 1,
         },
       },
-      { $sort: { 'structureObj.idPG': 1 } },
+      { $sort: { dateSorted: Number(ordre) } },
       {
         $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
       },
@@ -54,9 +114,15 @@ const getMisesEnRelations =
 
 const getContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, statut } = req.query;
+    const { page, statut, nomOrdre, ordre, searchByNomConseiller } = req.query;
     try {
-      const contratValidation = validContrat.validate({ page, statut });
+      const contratValidation = validContrat.validate({
+        page,
+        statut,
+        nomOrdre,
+        ordre,
+        searchByNomConseiller,
+      });
       if (contratValidation.error) {
         res.status(400).json({ message: contratValidation.error.message });
         return;
@@ -89,11 +155,13 @@ const getContrats =
         page,
         options.paginate.default,
         statut,
+        searchByNomConseiller,
+        ordre,
       );
-      const totalContrats = await getTotalMisesEnRelations(
-        app,
-        checkAccess,
-      )(statut);
+      const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
+        statut,
+        searchByNomConseiller,
+      );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalContrat(app, checkAccess);
       items.totalParContrat = {

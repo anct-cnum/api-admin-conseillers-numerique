@@ -4,17 +4,35 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
+  filterNomConseiller,
   filterStatutContratHistorique,
   totalHistoriqueContrat,
 } from '../misesEnRelation.repository';
 import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
-  (app: Application, checkAccess) => async (statut: string) =>
+  (app: Application, checkAccess) =>
+  async (statut: string, searchByNomConseiller: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $addFields: {
+          nomPrenomStr: {
+            $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: {
+            $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+          },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
       {
         $match: {
           ...filterStatutContratHistorique(statut),
+          ...filterNomConseiller(searchByNomConseiller),
           $and: [checkAccess],
         },
       },
@@ -30,19 +48,44 @@ const getMisesEnRelations =
     statut: string,
     dateDebut: Date,
     dateFin: Date,
+    searchByNomConseiller: string,
+    ordre: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: {
+            $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: {
+            $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+          },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
         $match: {
-          $and: [checkAccess],
-          $or: [
-            { 'emetteurRupture.date': { $gte: dateDebut, $lte: dateFin } },
+          $and: [
+            checkAccess,
             {
-              'emetteurRenouvellement.date': { $gte: dateDebut, $lte: dateFin },
+              $or: [
+                { 'emetteurRupture.date': { $gte: dateDebut, $lte: dateFin } },
+                {
+                  'emetteurRenouvellement.date': {
+                    $gte: dateDebut,
+                    $lte: dateFin,
+                  },
+                },
+                {
+                  createdAt: { $gte: dateDebut, $lte: dateFin }, // en attendant le dev du parcours de recrutement
+                },
+              ],
             },
-            {
-              dateRecrutement: { $gte: dateDebut, $lte: dateFin },
-            },
+            filterNomConseiller(searchByNomConseiller),
           ],
           ...filterStatutContratHistorique(statut),
         },
@@ -50,7 +93,47 @@ const getMisesEnRelations =
       {
         $project: {
           emetteurRupture: 1,
-          emetteurRenouvellement: 1, // à définir
+          createdAt: 1,
+          emetteurRenouvellement: 1,
+          dateSorted: {
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: ['$statut', 'finalisee_rupture'] },
+                  then: '$emetteurRupture.date',
+                },
+                {
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $ne: [
+                          { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
+                    ],
+                  },
+                  then: '$emetteurRenouvellement.date',
+                },
+                {
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $eq: [
+                          { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
+                    ],
+                  },
+                  then: '$createdAt',
+                },
+              ],
+              default: null,
+            },
+          },
           'structureObj.nom': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.prenom': 1,
@@ -64,7 +147,7 @@ const getMisesEnRelations =
           statut: 1,
         },
       },
-      { $sort: { 'structureObj.idPG': 1 } },
+      { $sort: { dateSorted: Number(ordre) } },
       {
         $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
       },
@@ -73,7 +156,7 @@ const getMisesEnRelations =
 
 const getHistoriqueContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, statut } = req.query;
+    const { page, statut, nomOrdre, ordre, searchByNomConseiller } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -84,6 +167,9 @@ const getHistoriqueContrats =
         statut,
         dateDebut,
         dateFin,
+        nomOrdre,
+        ordre,
+        searchByNomConseiller,
       });
       if (contratHistoriqueValidation.error) {
         res
@@ -121,6 +207,8 @@ const getHistoriqueContrats =
         statut,
         dateDebut,
         dateFin,
+        searchByNomConseiller,
+        ordre,
       );
       contrats.map((contrat) => {
         const item = contrat;
@@ -132,10 +220,10 @@ const getHistoriqueContrats =
         }
         return item;
       });
-      const totalContrats = await getTotalMisesEnRelations(
-        app,
-        checkAccess,
-      )(statut);
+      const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
+        statut,
+        searchByNomConseiller,
+      );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalHistoriqueContrat(app, checkAccess);
       items.totalParContrat = {
