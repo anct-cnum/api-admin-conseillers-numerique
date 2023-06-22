@@ -52,7 +52,7 @@ const updateMiseEnRelation =
             .Model.accessibleBy(req.ability, action.read)
             .find({
               query: {
-                statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
+                statut: { $in: ['recrutee', 'finalisee'] },
               },
             });
           if (
