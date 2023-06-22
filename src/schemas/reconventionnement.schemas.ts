@@ -25,6 +25,13 @@ const validHistoriqueConvention = Joi.object({
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  searchByNomStructure: Joi.string().error(
+    new Error('La recherche par nom de la structure est invalide'),
+  ),
 });
 
 const updateReconventionnement = Joi.object({

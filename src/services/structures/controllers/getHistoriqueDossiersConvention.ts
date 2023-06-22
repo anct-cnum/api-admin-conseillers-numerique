@@ -4,50 +4,36 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
 import {
   filterDateDemandeAndStatutHistorique,
+  sortHistoriqueDossierConventionnement,
   totalParHistoriqueConvention,
 } from '../repository/reconventionnement.repository';
-import { checkAccessReadRequestStructures } from '../repository/structures.repository';
+import {
+  checkAccessReadRequestStructures,
+  filterSearchBar,
+} from '../repository/structures.repository';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
-import { getCoselec } from '../../../utils';
-import { StatutConventionnement } from '../../../ts/enum';
-
-const getTotalStructures =
-  (app: Application, checkAccess) =>
-  async (typeConvention: string, dateDebut: Date, dateFin: Date) =>
-    app.service(service.structures).Model.aggregate([
-      {
-        $match: {
-          ...filterDateDemandeAndStatutHistorique(
-            typeConvention,
-            dateDebut,
-            dateFin,
-          ),
-          $and: [checkAccess],
-        },
-      },
-      { $group: { _id: null, count: { $sum: 1 } } },
-      { $project: { _id: 0, count_structures: '$count' } },
-    ]);
 
 const getStructures =
   (app: Application, checkAccess) =>
   async (
-    skip: string,
-    limit: number,
     typeConvention: string,
     dateDebut: Date,
     dateFin: Date,
+    searchByNomStructure: string,
   ) =>
     app.service(service.structures).Model.aggregate([
       {
         $match: {
-          $and: [checkAccess],
-          ...filterDateDemandeAndStatutHistorique(
-            typeConvention,
-            dateDebut,
-            dateFin,
-          ),
+          $and: [
+            checkAccess,
+            filterDateDemandeAndStatutHistorique(
+              typeConvention,
+              dateDebut,
+              dateFin,
+            ),
+            filterSearchBar(searchByNomStructure),
+          ],
         },
       },
       {
@@ -62,16 +48,11 @@ const getStructures =
           conventionnement: 1,
         },
       },
-      { $sort: { idPG: 1 } },
-      {
-        $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
-      },
-      { $limit: Number(limit) },
     ]);
 
 const getHistoriqueDossiersConvention =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, type } = req.query;
+    const { page, type, nomOrdre, ordre, searchByNomStructure } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -82,6 +63,9 @@ const getHistoriqueDossiersConvention =
         type,
         dateDebut,
         dateFin,
+        nomOrdre,
+        ordre,
+        searchByNomStructure,
       });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
@@ -115,18 +99,17 @@ const getHistoriqueDossiersConvention =
 
       const checkAccess = await checkAccessReadRequestStructures(app, req);
       const structures = await getStructures(app, checkAccess)(
-        page,
-        options.paginate.default,
         type,
         dateDebut,
         dateFin,
+        searchByNomStructure,
       );
-      const totalStructures = await getTotalStructures(app, checkAccess)(
+      const structuresFormat = sortHistoriqueDossierConventionnement(
         type,
-        dateDebut,
-        dateFin,
+        ordre,
+        structures,
       );
-      items.total = totalStructures[0]?.count_structures ?? 0;
+      items.total = structuresFormat.length;
       const totalConvention = await totalParHistoriqueConvention(
         app,
         req,
@@ -137,17 +120,10 @@ const getHistoriqueDossiersConvention =
         ...items.totalParConvention,
         ...totalConvention,
       };
-      items.data = structures.map((structure) => {
-        const item = { ...structure };
-        if (
-          item?.conventionnement?.statut ===
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
-        ) {
-          item.nombreConseillersCoselec =
-            getCoselec(structure)?.nombreConseillersCoselec ?? 0;
-        }
-        return item;
-      });
+      items.data = structuresFormat.slice(
+        (page - 1) * options.paginate.default,
+        page * options.paginate.default,
+      );
       items.limit = options.paginate.default;
       items.skip = page;
 
