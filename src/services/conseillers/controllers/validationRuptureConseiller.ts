@@ -420,15 +420,15 @@ const validationRuptureConseiller =
         return;
       }
       await app
-      .service(service.conseillers)
-      .Model.accessibleBy(req.ability, action.update)
-      .updateOne(
-        { _id: idConseiller },
-        {
-          $set: { ruptureError: true } ,
-        },
-      );
-    res.status(500).json({ message: error.message });
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          { _id: idConseiller },
+          {
+            $set: { ruptureError: true },
+          },
+        );
+      res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
