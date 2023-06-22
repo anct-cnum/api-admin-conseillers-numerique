@@ -335,6 +335,7 @@ export interface IStructures {
 }
 
 interface IDemandesCoselec {
+  dateSorted?: Date;
   statut: string;
   type: string;
   nombreDePostesAccordes?: number;

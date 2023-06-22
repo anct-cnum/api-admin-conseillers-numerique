@@ -469,6 +469,8 @@ const totalParHistoriqueConvention = async (
   };
 };
 
+const getTime = (date?: Date) => (date != null ? new Date(date).getTime() : 0);
+
 export {
   queryGetDemarcheReconventionnement,
   queryGetDossierReconventionnement,
@@ -479,4 +481,5 @@ export {
   filterDateDemandeAndStatutHistorique,
   totalParConvention,
   totalParHistoriqueConvention,
+  getTime,
 };

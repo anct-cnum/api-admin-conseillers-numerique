@@ -5,6 +5,13 @@ const validReconventionnement = Joi.object({
   type: Joi.string()
     .required()
     .error(new Error('Le type de convention est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  searchByNomStructure: Joi.string().error(
+    new Error('La recherche par nom de la structure est invalide'),
+  ),
 });
 
 const validHistoriqueConvention = Joi.object({
