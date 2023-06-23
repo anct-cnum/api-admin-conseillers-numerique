@@ -87,7 +87,6 @@ const getDetailStructureById =
                 $project: {
                   _id: 0,
                   statut: 1,
-                  reconventionnement: 1,
                   'conseillerObj.idPG': 1,
                   'conseillerObj.nom': 1,
                   'conseillerObj._id': 1,
@@ -179,7 +178,6 @@ const getDetailStructureById =
           prenom: conseiller?.conseillerObj?.prenom,
           _id: conseiller?.conseillerObj?._id,
           statut: conseiller?.statut,
-          reconventionnement: conseiller?.reconventionnement,
         };
       });
       Object.assign(
