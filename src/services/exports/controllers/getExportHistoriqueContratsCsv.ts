@@ -8,10 +8,11 @@ import {
   checkAccessReadRequestMisesEnRelation,
   filterStatutContratHistorique,
 } from '../../misesEnRelation/misesEnRelation.repository';
+import { filterNomConseiller } from '../../conseillers/conseillers.repository';
 
 const getExportHistoriqueContratsCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { statut } = req.query;
+    const { statut, nomOrdre, ordre, searchByNomConseiller } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -22,6 +23,9 @@ const getExportHistoriqueContratsCsv =
           statut,
           dateDebut,
           dateFin,
+          nomOrdre,
+          ordre,
+          searchByNomConseiller,
         },
       );
       if (contratHistoriqueExportValidation.error) {
@@ -36,18 +40,28 @@ const getExportHistoriqueContratsCsv =
         .Model.aggregate([
           {
             $match: {
-              $and: [checkAccess],
-              $or: [
-                { 'emetteurRupture.date': { $gte: dateDebut, $lte: dateFin } },
+              $and: [
+                checkAccess,
                 {
-                  'emetteurRenouvellement.date': {
-                    $gte: dateDebut,
-                    $lte: dateFin,
-                  },
+                  $or: [
+                    {
+                      'emetteurRupture.date': {
+                        $gte: dateDebut,
+                        $lte: dateFin,
+                      },
+                    },
+                    {
+                      'emetteurRenouvellement.date': {
+                        $gte: dateDebut,
+                        $lte: dateFin,
+                      },
+                    },
+                    {
+                      createdAt: { $gte: dateDebut, $lte: dateFin }, // en attendant le dev du parcours de recrutement
+                    },
+                  ],
                 },
-                {
-                  dateRecrutement: { $gte: dateDebut, $lte: dateFin },
-                },
+                filterNomConseiller(searchByNomConseiller),
               ],
               ...filterStatutContratHistorique(statut),
             },
@@ -56,7 +70,47 @@ const getExportHistoriqueContratsCsv =
             $project: {
               _id: 0,
               emetteurRupture: 1,
-              emetteurRenouvellement: 1, // à définir
+              createdAt: 1,
+              emetteurRenouvellement: 1,
+              dateSorted: {
+                $switch: {
+                  branches: [
+                    {
+                      case: { $eq: ['$statut', 'finalisee_rupture'] },
+                      then: '$emetteurRupture.date',
+                    },
+                    {
+                      case: {
+                        $and: [
+                          { $eq: ['$statut', 'finalisee'] },
+                          {
+                            $ne: [
+                              { $type: '$miseEnRelationConventionnement' },
+                              'missing',
+                            ],
+                          },
+                        ],
+                      },
+                      then: '$emetteurRenouvellement.date',
+                    },
+                    {
+                      case: {
+                        $and: [
+                          { $eq: ['$statut', 'finalisee'] },
+                          {
+                            $eq: [
+                              { $type: '$miseEnRelationConventionnement' },
+                              'missing',
+                            ],
+                          },
+                        ],
+                      },
+                      then: '$createdAt',
+                    },
+                  ],
+                  default: null,
+                },
+              },
               miseEnRelationConventionnement: 1,
               'structureObj.nom': 1,
               'conseillerObj.nom': 1,
@@ -69,6 +123,7 @@ const getExportHistoriqueContratsCsv =
               statut: 1,
             },
           },
+          { $sort: { dateSorted: Number(ordre) } },
         ]);
       contrats.map((contrat) => {
         const item = contrat;
@@ -77,7 +132,7 @@ const getExportHistoriqueContratsCsv =
           !contrat.miseEnRelationConventionnement
         ) {
           item.statut = 'Recrutement';
-          item.dateDeLaDemande = null;
+          item.dateDeLaDemande = contrat?.createdAt;
         }
         if (contrat.statut === 'finalisee_rupture') {
           item.statut = 'Rupture de contrat';

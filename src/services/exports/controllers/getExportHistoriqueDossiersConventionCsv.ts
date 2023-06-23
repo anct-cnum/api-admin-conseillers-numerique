@@ -4,14 +4,17 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvHistoriqueDossiersConvention } from '../exports.repository';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
-import { checkAccessReadRequestStructures } from '../../structures/repository/structures.repository';
+import {
+  checkAccessReadRequestStructures,
+  filterSearchBar,
+} from '../../structures/repository/structures.repository';
 import { filterDateDemandeAndStatutHistorique } from '../../structures/repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
 import { StatutConventionnement } from '../../../ts/enum';
 
 const getExportHistoriqueDossiersConventionCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type } = req.query;
+    const { type, nomOrdre, ordre, searchByNomStructure } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -22,6 +25,9 @@ const getExportHistoriqueDossiersConventionCsv =
       type,
       dateDebut,
       dateFin,
+      nomOrdre,
+      ordre,
+      searchByNomStructure,
     });
     if (pageValidation.error) {
       res.status(400).json({ message: pageValidation.error.message });
@@ -37,8 +43,11 @@ const getExportHistoriqueDossiersConventionCsv =
         .Model.aggregate([
           {
             $match: {
-              $and: [checkAccessStructure],
-              ...filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
+              $and: [
+                checkAccessStructure,
+                filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
+                filterSearchBar(searchByNomStructure),
+              ],
             },
           },
           {
