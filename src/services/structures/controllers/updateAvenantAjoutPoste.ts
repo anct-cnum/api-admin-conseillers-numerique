@@ -5,7 +5,10 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 interface IUpdateStructureAvenant {
   $push?: {
@@ -112,7 +115,7 @@ const updateAvenantAjoutPoste =
             '2';
           paramsUpdateCollectionMiseEnRelation.$push[
             'structureObj.coselec'
-          ].phaseConventionnement = '2';
+          ].phaseConventionnement = PhaseConventionnement.PHASE_2;
         }
       }
       if (statut === 'NÉGATIF') {

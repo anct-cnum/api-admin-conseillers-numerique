@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { PhaseConventionnement } from '../../../ts/enum';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -113,12 +114,12 @@ const getConseillersValider = (conseillers) => {
   const conseillersValiderReconventionnement = conseillers?.filter(
     (conseiller) =>
       conseiller.statut === 'recrutee' &&
-      conseiller.phaseConventionnement === '2',
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
   );
   const conseillersValiderConventionnement = conseillers?.filter(
     (conseiller) =>
       conseiller.statut === 'recrutee' &&
-      conseiller.phaseConventionnement !== '2',
+      conseiller.phaseConventionnement !== PhaseConventionnement.PHASE_2,
   );
   return {
     conseillersValiderReconventionnement,
@@ -129,14 +130,14 @@ const getConseillersValider = (conseillers) => {
 const getConseillersRecruter = (conseillers) => {
   const conseillersRecruterConventionnement = conseillers?.filter(
     (conseiller) =>
-      conseiller.phaseConventionnement !== '2' &&
+      conseiller.phaseConventionnement !== PhaseConventionnement.PHASE_2 &&
       (conseiller.statut === 'finalisee' ||
         conseiller.statut === 'nouvelle_rupture' ||
         conseiller.statut === 'terminee'),
   );
   const conseillersRecruterReconventionnement = conseillers?.filter(
     (conseiller) =>
-      conseiller.phaseConventionnement === '2' &&
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2 &&
       (conseiller.statut === 'finalisee' ||
         conseiller.statut === 'nouvelle_rupture'),
   );

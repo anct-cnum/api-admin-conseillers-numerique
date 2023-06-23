@@ -5,7 +5,10 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 interface ICoselecObject {
   nombreConseillersCoselec: number;
@@ -73,7 +76,7 @@ const updateAvenantRenduPoste =
         structure?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
-        coselecObject.phaseConventionnement = '2';
+        coselecObject.phaseConventionnement = PhaseConventionnement.PHASE_2;
       }
       const structureUpdated = await app
         .service(service.structures)
