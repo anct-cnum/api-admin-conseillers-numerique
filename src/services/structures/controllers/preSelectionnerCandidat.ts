@@ -8,7 +8,10 @@ import {
   IConseillers,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 const preSelectionnerCandidat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -44,7 +47,7 @@ const preSelectionnerCandidat =
       const phaseConventionnement =
         structure?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-          ? '2'
+          ? PhaseConventionnement.PHASE_2
           : '1';
       const objMiseEnRelation = {
         conseiller: new DBRef('conseillers', conseiller._id, database),

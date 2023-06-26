@@ -5,7 +5,10 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 const createContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -16,9 +19,10 @@ const createContrat =
         dateFinDeContrat,
         salaire,
         miseEnrelationId,
-        structureId,
       },
     } = req;
+
+    const structureId = req.user?.entity?.oid;
 
     if (!ObjectId.isValid(miseEnrelationId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -52,7 +56,7 @@ const createContrat =
       const getStructure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: new ObjectId(structureId) });
+        .findOne();
 
       if (!getStructure) {
         res.status(404).json({ message: "La structure n'existe pas" });
@@ -62,7 +66,7 @@ const createContrat =
       const phaseConventionnement =
         getStructure.conventionnement.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-          ? '2'
+          ? PhaseConventionnement.PHASE_2
           : '1';
 
       const duplicateMiseEnRelation = {

@@ -13,4 +13,12 @@ enum StatutConventionnement {
   RECONVENTIONNEMENT_VALIDÉ = 'RECONVENTIONNEMENT_VALIDÉ',
 }
 
-export { TypeDossierReconventionnement, StatutConventionnement };
+enum PhaseConventionnement {
+  PHASE_2 = '2',
+}
+
+export {
+  TypeDossierReconventionnement,
+  StatutConventionnement,
+  PhaseConventionnement,
+};
