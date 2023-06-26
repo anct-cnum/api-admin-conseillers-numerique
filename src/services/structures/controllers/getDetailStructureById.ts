@@ -194,7 +194,6 @@ const getDetailStructureById =
       }
 
       res.status(200).json(structure[0]);
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
