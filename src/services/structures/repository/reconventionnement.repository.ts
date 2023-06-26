@@ -541,10 +541,10 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures) =>
 
 const formatReconventionnementForDossierConventionnement = (
   structures,
-  regex,
+  regex: RegExp,
 ) =>
   structures
-    .filter((structure) => regex.test(structure?.conventionnement?.statut))
+    .filter((structure) => structure?.conventionnement?.statut.match(regex))
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
@@ -591,7 +591,7 @@ const sortDossierConventionnement = (
   }
   if (type.includes('tionnement') || type === 'toutes') {
     const regex = new RegExp(
-      `${StatutConventionnement.RECONVENTIONNEMENT_EN_COURS}$'`,
+      `${StatutConventionnement.RECONVENTIONNEMENT_EN_COURS}$`,
       'i',
     );
     reconventionnement = formatReconventionnementForDossierConventionnement(
@@ -625,7 +625,7 @@ const sortHistoriqueDossierConventionnement = (
   }
   if (type.includes('tionnement') || type === 'toutes') {
     const regex = new RegExp(
-      `(?:${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}|${StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ})$'`,
+      `(?:${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}|${StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ})$`,
       'i',
     );
     reconventionnement = formatReconventionnementForDossierConventionnement(
