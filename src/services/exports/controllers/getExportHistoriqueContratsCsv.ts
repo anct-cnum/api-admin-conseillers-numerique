@@ -39,6 +39,21 @@ const getExportHistoriqueContratsCsv =
         .service(service.misesEnRelation)
         .Model.aggregate([
           {
+            $addFields: {
+              nomPrenomStr: {
+                $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+              },
+            },
+          },
+          {
+            $addFields: {
+              prenomNomStr: {
+                $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+              },
+            },
+          },
+          { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+          {
             $match: {
               $and: [
                 checkAccess,
@@ -57,7 +72,21 @@ const getExportHistoriqueContratsCsv =
                       },
                     },
                     {
-                      createdAt: { $gte: dateDebut, $lte: dateFin }, // en attendant le dev du parcours de recrutement
+                      $and: [
+                        { 'emetteurRecrutement.date': { $exists: true } },
+                        {
+                          'emetteurRecrutement.date': {
+                            $gte: dateDebut,
+                            $lte: dateFin,
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      $and: [
+                        { 'emetteurRecrutement.date': { $exists: false } },
+                        { createdAt: { $gte: dateDebut, $lte: dateFin } },
+                      ],
                     },
                   ],
                 },
@@ -72,6 +101,7 @@ const getExportHistoriqueContratsCsv =
               emetteurRupture: 1,
               createdAt: 1,
               emetteurRenouvellement: 1,
+              emetteurRecrutement: 1,
               dateSorted: {
                 $switch: {
                   branches: [
@@ -125,14 +155,16 @@ const getExportHistoriqueContratsCsv =
           },
           { $sort: { dateSorted: Number(ordre) } },
         ]);
-      contrats.map((contrat) => {
+      contrats?.map((contrat) => {
         const item = contrat;
         if (
           contrat.statut === 'finalisee' &&
           !contrat.miseEnRelationConventionnement
         ) {
           item.statut = 'Recrutement';
-          item.dateDeLaDemande = contrat?.createdAt;
+          item.dateDeLaDemande = contrat?.emetteurRecrutement?.date
+            ? contrat?.emetteurRecrutement?.date
+            : contrat?.createdAt;
         }
         if (contrat.statut === 'finalisee_rupture') {
           item.statut = 'Rupture de contrat';

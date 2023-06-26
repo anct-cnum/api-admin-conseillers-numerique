@@ -77,6 +77,7 @@ const getMisesEnRelations =
           emetteurRupture: 1,
           createdAt: 1,
           emetteurRenouvellement: 1,
+          emetteurRecrutement: 1,
           dateSorted: {
             $switch: {
               branches: [
@@ -89,8 +90,32 @@ const getMisesEnRelations =
                   then: '$emetteurRenouvellement.date',
                 },
                 {
-                  case: { $eq: ['$statut', 'recrutee'] },
-                  then: '$createdAt', // en attendant de le dev du parcours de recrutement
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'recrutee'] },
+                      {
+                        $ne: [
+                          { $type: '$emetteurRecrutement.date' },
+                          'missing',
+                        ],
+                      },
+                    ],
+                  },
+                  then: '$emetteurRecrutement.date',
+                },
+                {
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'recrutee'] },
+                      {
+                        $eq: [
+                          { $type: '$emetteurRecrutement.date' },
+                          'missing',
+                        ],
+                      },
+                    ],
+                  },
+                  then: '$createdAt',
                 },
               ],
               default: null,

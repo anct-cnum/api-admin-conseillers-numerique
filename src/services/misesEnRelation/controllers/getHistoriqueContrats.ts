@@ -81,7 +81,21 @@ const getMisesEnRelations =
                   },
                 },
                 {
-                  createdAt: { $gte: dateDebut, $lte: dateFin }, // en attendant le dev du parcours de recrutement
+                  $and: [
+                    { 'emetteurRecrutement.date': { $exists: true } },
+                    {
+                      'emetteurRecrutement.date': {
+                        $gte: dateDebut,
+                        $lte: dateFin,
+                      },
+                    },
+                  ],
+                },
+                {
+                  $and: [
+                    { 'emetteurRecrutement.date': { $exists: false } },
+                    { createdAt: { $gte: dateDebut, $lte: dateFin } },
+                  ],
                 },
               ],
             },
@@ -95,6 +109,7 @@ const getMisesEnRelations =
           emetteurRupture: 1,
           createdAt: 1,
           emetteurRenouvellement: 1,
+          emetteurRecrutement: 1,
           dateSorted: {
             $switch: {
               branches: [
@@ -123,6 +138,32 @@ const getMisesEnRelations =
                       {
                         $eq: [
                           { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
+                      {
+                        $ne: [
+                          { $type: '$emetteurRecrutement.date' },
+                          'missing',
+                        ],
+                      },
+                    ],
+                  },
+                  then: '$emetteurRecrutement.date',
+                },
+                {
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $eq: [
+                          { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
+                      {
+                        $eq: [
+                          { $type: '$emetteurRecrutement.date' },
                           'missing',
                         ],
                       },

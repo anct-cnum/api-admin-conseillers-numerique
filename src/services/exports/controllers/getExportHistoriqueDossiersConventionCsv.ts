@@ -41,6 +41,7 @@ const getExportHistoriqueDossiersConventionCsv =
       const structures: any[] = await app
         .service(service.structures)
         .Model.aggregate([
+          { $addFields: { idPGStr: { $toString: '$idPG' } } },
           {
             $match: {
               $and: [

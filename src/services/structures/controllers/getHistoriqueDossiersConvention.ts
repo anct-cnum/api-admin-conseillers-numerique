@@ -23,6 +23,7 @@ const getStructures =
     searchByNomStructure: string,
   ) =>
     app.service(service.structures).Model.aggregate([
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
           $and: [
