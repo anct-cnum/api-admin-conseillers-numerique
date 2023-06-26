@@ -74,6 +74,16 @@ const updateDossierReconventionnement =
             $set: objectConventionnement,
           });
       } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
+        if (
+          motif ===
+          `Je ne sais pas encore si je souhaite reconventionner car je manque de visibilité sur les prochains mois`
+        ) {
+          res.status(200).json({
+            message:
+              'Structure indecise, le statut de la structure n a pas été modifié.',
+          });
+          return;
+        }
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)

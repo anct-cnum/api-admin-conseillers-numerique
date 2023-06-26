@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const createContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -15,10 +16,16 @@ const createContrat =
         dateFinDeContrat,
         salaire,
         miseEnrelationId,
+        structureId,
       },
     } = req;
 
     if (!ObjectId.isValid(miseEnrelationId)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
+
+    if (!ObjectId.isValid(structureId)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
@@ -42,6 +49,22 @@ const createContrat =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
+      const getStructure = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: new ObjectId(structureId) });
+
+      if (!getStructure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
+
+      const phaseConventionnement =
+        getStructure.conventionnement.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+          ? '2'
+          : '1';
+
       const duplicateMiseEnRelation = {
         ...miseEnRelation.toObject(),
         _id: new ObjectId(),
@@ -55,6 +78,7 @@ const createContrat =
         },
         miseEnRelationConventionnement: miseEnRelation._id,
         statut: 'renouvellement_initiee',
+        phaseConventionnement,
       };
       const canCreate = req.ability.can(
         action.create,

@@ -6,6 +6,7 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationAvenant } from '../../../schemas/structures.schemas';
 import getDetailStructureById from './getDetailStructureById';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -30,6 +31,22 @@ const createAvenant =
       return;
     }
 
+    const getStructure = await app
+      .service(service.structures)
+      .Model.accessibleBy(req.ability, action.read)
+      .findOne({ _id: new ObjectId(id) });
+
+    if (!getStructure) {
+      res.status(404).json({ message: "La structure n'existe pas" });
+      return;
+    }
+
+    const phaseConventionnement =
+      getStructure?.conventionnement?.statut ===
+      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+        ? '2'
+        : '1';
+
     const demandeCoselec = {
       id: new ObjectId(),
       ...(type === 'retrait'
@@ -40,6 +57,7 @@ const createAvenant =
       type,
       statut: 'en_cours',
       banniereValidationAvenant: false,
+      phaseConventionnement,
     };
 
     try {
