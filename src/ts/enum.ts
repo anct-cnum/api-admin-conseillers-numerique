@@ -15,6 +15,7 @@ enum StatutConventionnement {
 }
 
 enum PhaseConventionnement {
+  PHASE_1 = '1',
   PHASE_2 = '2',
 }
 

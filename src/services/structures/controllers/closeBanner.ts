@@ -22,7 +22,10 @@ const closeBanner =
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
-            { ...filter, statut: 'finalisee' },
+            {
+              ...filter,
+              $or: [{ statut: 'finalisee' }, { statut: 'terminee' }],
+            },
             {
               $set: { banniereValidationRenouvellement: false },
             },
@@ -63,7 +66,7 @@ const closeBanner =
               },
             },
             {
-              arrayFilters: [{ 'elem.statut': 'validee' }],
+              arrayFilters: [{ 'elem.banniereValidationAvenant': true }],
             },
           );
 
