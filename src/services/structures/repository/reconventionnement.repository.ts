@@ -665,4 +665,5 @@ export {
   totalParHistoriqueConvention,
   sortDossierConventionnement,
   sortHistoriqueDossierConventionnement,
+  sortArrayConventionnement,
 };
