@@ -57,7 +57,8 @@ const createContrat =
         },
         miseEnRelationConventionnement: miseEnRelation._id,
         statut: 'renouvellement_initiee',
-        PhaseConventionnement: PhaseConventionnement.PHASE_2,
+        phaseConventionnement: PhaseConventionnement.PHASE_2,
+        createdAt: new Date(),
       };
       const canCreate = req.ability.can(
         action.create,
