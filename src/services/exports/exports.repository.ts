@@ -261,7 +261,7 @@ const generateCsvStructure = async (
   app: Application,
 ) => {
   res.write(
-    'SIRET structure;ID Structure;Dénomination;Type;Statut;Code postal;Code commune;Code département;Code région;Téléphone;Email;Compte créé;Mot de passe choisi;Nombre de mises en relation;Nombre de conseillers souhaités;Validée en COSELEC;Nombre de conseillers validés par le COSELEC;Numéro COSELEC;ZRR;QPV;Nombre de quartiers QPV;Labelisée France Services;Raison sociale;Nom commune INSEE;Code commune INSEE;Adresse postale;Libellé catégorie juridique niv III;Grand Réseau;Nom Grand Réseau\n',
+    'SIRET structure;ID Structure;Dénomination;Type;Statut;Code postal;Code commune;Code département;Code région;Téléphone;Email;Compte créé;Mot de passe choisi;Nombre de mises en relation;Nombre de conseillers souhaités;Validée en COSELEC;Nombre de conseillers validés par le COSELEC;Numéro COSELEC;ZRR;QPV;Nombre de quartiers QPV;Labelisée France Services;Raison sociale;Nom commune INSEE;Code commune INSEE;Adresse postale;Libellé catégorie juridique niv III;Grand Réseau;Nom Grand Réseau;Emails administrateurs\n',
   );
   try {
     await Promise.all(
@@ -271,9 +271,9 @@ const generateCsvStructure = async (
           .Model.countDocuments({
             'structure.$id': new ObjectId(structure._id),
           });
-        const user: IUser = await app
+        const users: IUser[] = await app
           .service(service.users)
-          .Model.findOne({ 'entity.$id': new ObjectId(structure._id) });
+          .Model.find({ 'entity.$id': new ObjectId(structure._id) });
         const coselec = getCoselec(structure);
         let label = 'non renseigné';
         if (
@@ -300,6 +300,8 @@ const generateCsvStructure = async (
         }`;
 
         adresse = adresse.replace(/["',]/g, '');
+        // xxx la colonne mot de passe choisi n'est plus pertinente
+        // depuis l'ajout du multi-compte
         res.write(
           `${structure.siret};${structure.idPG};${structure.nom};${
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
@@ -310,7 +312,9 @@ const generateCsvStructure = async (
           };${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${
-            user !== null && user.passwordCreated ? 'oui' : 'non'
+            users !== null && users.length > 0 && users[0].passwordCreated
+              ? 'oui'
+              : 'non'
           };${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0
           };${structure.statut === 'VALIDATION_COSELEC' ? 'oui' : 'non'};${
@@ -335,7 +339,18 @@ const generateCsvStructure = async (
               : ''
           };"${adresse}";${
             structure.insee?.entreprise?.forme_juridique ?? ''
-          };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''}\n`,
+          };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''};"${
+            users !== null && users.length > 0
+              ? users
+                  .filter(
+                    (u) =>
+                      u.name?.toLowerCase() !==
+                      structure.contact?.email?.toLowerCase(),
+                  )
+                  .map((u) => u.name?.toLowerCase())
+                  .join(',')
+              : ''
+          }"\n`,
         );
       }),
     );
