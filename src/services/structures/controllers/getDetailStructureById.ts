@@ -77,6 +77,7 @@ const getDetailStructureById =
                           { $eq: ['finalisee', '$statut'] },
                           { $eq: ['nouvelle_rupture', '$statut'] },
                           { $eq: ['recrutee', '$statut'] },
+                          { $eq: ['terminee', '$statut'] },
                         ],
                       },
                     },
@@ -87,6 +88,7 @@ const getDetailStructureById =
                 $project: {
                   _id: 0,
                   statut: 1,
+                  phaseConventionnement: 1,
                   'conseillerObj.idPG': 1,
                   'conseillerObj.nom': 1,
                   'conseillerObj._id': 1,
@@ -178,6 +180,7 @@ const getDetailStructureById =
           prenom: conseiller?.conseillerObj?.prenom,
           _id: conseiller?.conseillerObj?._id,
           statut: conseiller?.statut,
+          phaseConventionnement: conseiller?.phaseConventionnement,
         };
       });
       Object.assign(
