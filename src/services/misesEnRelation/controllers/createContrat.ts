@@ -5,7 +5,6 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
-import { PhaseConventionnement } from '../../../ts/enum';
 
 const createContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -43,7 +42,6 @@ const createContrat =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-
       const duplicateMiseEnRelation = {
         ...miseEnRelation.toObject(),
         _id: new ObjectId(),
@@ -57,7 +55,6 @@ const createContrat =
         },
         miseEnRelationConventionnement: miseEnRelation._id,
         statut: 'renouvellement_initiee',
-        PhaseConventionnement: PhaseConventionnement.PHASE_2,
       };
       const canCreate = req.ability.can(
         action.create,
