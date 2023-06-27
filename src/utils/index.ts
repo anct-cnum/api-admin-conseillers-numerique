@@ -23,8 +23,7 @@ const getCoselecPositif = (structure) => {
     if (coselecsPositifs.length === 0) {
       coselecsPositifs = structure.coselec.filter(
         (c) =>
-          c.avisCoselec === 'POSITIF' &&
-          c.phaseConventionnement !== PhaseConventionnement.PHASE_2,
+          c.avisCoselec === 'POSITIF' && c.phaseConventionnement === undefined,
       );
     }
   }
@@ -39,8 +38,7 @@ const getCoselecPositifConventionnement = (structure) => {
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
       (c) =>
-        c.avisCoselec === 'POSITIF' &&
-        c.phaseConventionnement !== PhaseConventionnement.PHASE_2,
+        c.avisCoselec === 'POSITIF' && c.phaseConventionnement === undefined,
     );
   }
   // On prend le dernier

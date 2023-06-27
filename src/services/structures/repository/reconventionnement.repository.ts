@@ -504,7 +504,7 @@ const formatAvenantForDossierConventionnement = (structures) =>
         (demande) => demande.statut === 'en_cours',
       );
       if (!avenantEnCours) {
-        return [];
+        return {};
       }
       avenantEnCours.dateSorted = avenantEnCours.emetteurAvenant.date;
       avenantEnCours.typeConvention =
@@ -548,7 +548,7 @@ const formatReconventionnementForDossierConventionnement = (
   regex: RegExp,
 ) =>
   structures
-    .filter((structure) => structure?.conventionnement?.statut.match(regex))
+    .filter((structure) => structure?.conventionnement?.statut?.match(regex))
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
@@ -593,7 +593,7 @@ const sortDossierConventionnement = (
   if (type.includes('avenant') || type === 'toutes') {
     avenantSort = formatAvenantForDossierConventionnement(structures);
   }
-  if (type.includes('tionnement') || type === 'toutes') {
+  if (type === 'reconventionnement' || type === 'toutes') {
     const regex = new RegExp(
       `${StatutConventionnement.RECONVENTIONNEMENT_EN_COURS}$`,
       'i',
@@ -602,6 +602,8 @@ const sortDossierConventionnement = (
       structures,
       regex,
     );
+  }
+  if (type === 'conventionnement' || type === 'toutes') {
     conventionnement = formatConventionnementForDossierConventionnement(
       structures,
       StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
@@ -627,7 +629,7 @@ const sortHistoriqueDossierConventionnement = (
     avenantSort = formatAvenantForHistoriqueDossierConventionnement(structures);
     avenantSort = avenantSort.flat(1);
   }
-  if (type.includes('tionnement') || type === 'toutes') {
+  if (type === 'reconventionnement' || type === 'toutes') {
     const regex = new RegExp(
       `(?:${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}|${StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ})$`,
       'i',
@@ -636,6 +638,8 @@ const sortHistoriqueDossierConventionnement = (
       structures,
       regex,
     );
+  }
+  if (type === 'conventionnement' || type === 'toutes') {
     conventionnement = formatConventionnementForDossierConventionnement(
       structures,
       StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,

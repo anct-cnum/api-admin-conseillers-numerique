@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const decisionReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -12,6 +13,13 @@ const decisionReconventionnement =
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      if (
+        statut !== StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ &&
+        statut !== StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        res.status(400).json({ message: 'Statut incorrect' });
         return;
       }
       const structure = await app

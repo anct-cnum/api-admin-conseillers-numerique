@@ -119,7 +119,7 @@ const getConseillersValider = (conseillers) => {
   const conseillersValiderConventionnement = conseillers?.filter(
     (conseiller) =>
       conseiller.statut === 'recrutee' &&
-      conseiller.phaseConventionnement !== PhaseConventionnement.PHASE_2,
+      conseiller?.phaseConventionnement === undefined,
   );
   return {
     conseillersValiderReconventionnement,
@@ -130,7 +130,7 @@ const getConseillersValider = (conseillers) => {
 const getConseillersRecruter = (conseillers) => {
   const conseillersRecruterConventionnement = conseillers?.filter(
     (conseiller) =>
-      conseiller.phaseConventionnement !== PhaseConventionnement.PHASE_2 &&
+      conseiller?.phaseConventionnement === undefined &&
       (conseiller.statut === 'finalisee' ||
         conseiller.statut === 'nouvelle_rupture' ||
         conseiller.statut === 'terminee'),

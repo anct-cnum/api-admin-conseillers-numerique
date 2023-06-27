@@ -112,7 +112,7 @@ const updateAvenantAjoutPoste =
           StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
         ) {
           paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
-            '2';
+            PhaseConventionnement.PHASE_2;
           paramsUpdateCollectionMiseEnRelation.$push[
             'structureObj.coselec'
           ].phaseConventionnement = PhaseConventionnement.PHASE_2;

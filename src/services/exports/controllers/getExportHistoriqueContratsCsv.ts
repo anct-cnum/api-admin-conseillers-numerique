@@ -72,15 +72,10 @@ const getExportHistoriqueContratsCsv =
                       },
                     },
                     {
-                      $and: [
-                        { 'emetteurRecrutement.date': { $exists: true } },
-                        {
-                          'emetteurRecrutement.date': {
-                            $gte: dateDebut,
-                            $lte: dateFin,
-                          },
-                        },
-                      ],
+                      'emetteurRecrutement.date': {
+                        $gte: dateDebut,
+                        $lte: dateFin,
+                      },
                     },
                     {
                       $and: [
@@ -133,6 +128,32 @@ const getExportHistoriqueContratsCsv =
                               'missing',
                             ],
                           },
+                          {
+                            $ne: [
+                              { $type: '$emetteurRecrutement.date' },
+                              'missing',
+                            ],
+                          },
+                        ],
+                      },
+                      then: '$emetteurRecrutement.date',
+                    },
+                    {
+                      case: {
+                        $and: [
+                          { $eq: ['$statut', 'finalisee'] },
+                          {
+                            $eq: [
+                              { $type: '$miseEnRelationConventionnement' },
+                              'missing',
+                            ],
+                          },
+                          {
+                            $eq: [
+                              { $type: '$emetteurRecrutement.date' },
+                              'missing',
+                            ],
+                          },
                         ],
                       },
                       then: '$createdAt',
@@ -162,9 +183,8 @@ const getExportHistoriqueContratsCsv =
           !contrat.miseEnRelationConventionnement
         ) {
           item.statut = 'Recrutement';
-          item.dateDeLaDemande = contrat?.emetteurRecrutement?.date
-            ? contrat?.emetteurRecrutement?.date
-            : contrat?.createdAt;
+          item.dateDeLaDemande =
+            contrat?.emetteurRecrutement?.date ?? contrat?.createdAt;
         }
         if (contrat.statut === 'finalisee_rupture') {
           item.statut = 'Rupture de contrat';

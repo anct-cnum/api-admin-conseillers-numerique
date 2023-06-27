@@ -7,7 +7,6 @@ import { checkAccessReadRequestStructures } from '../repository/structures.repos
 import { getTypeDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
-import { PhaseConventionnement } from '../../../ts/enum';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -165,8 +164,7 @@ const getDetailDossierConvention =
         structure[0].conseillersRecruterConventionnement =
           structure[0]?.conseillers?.filter(
             (conseiller) =>
-              conseiller.phaseConventionnement !==
-                PhaseConventionnement.PHASE_2 &&
+              conseiller?.phaseConventionnement === undefined &&
               (conseiller.statut === 'finalisee' ||
                 conseiller.statut === 'nouvelle_rupture' ||
                 conseiller.statut === 'terminee'),

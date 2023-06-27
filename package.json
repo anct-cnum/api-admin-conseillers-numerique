@@ -20,7 +20,7 @@
 		"config": "config/"
 	},
 	"engines": {
-		"node": "^19.7.0",
+		"node": "^19.0.0",
 		"npm": ">= 3.0.0"
 	},
 	"scripts": {

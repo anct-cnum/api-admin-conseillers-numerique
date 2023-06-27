@@ -81,15 +81,10 @@ const getMisesEnRelations =
                   },
                 },
                 {
-                  $and: [
-                    { 'emetteurRecrutement.date': { $exists: true } },
-                    {
-                      'emetteurRecrutement.date': {
-                        $gte: dateDebut,
-                        $lte: dateFin,
-                      },
-                    },
-                  ],
+                  'emetteurRecrutement.date': {
+                    $gte: dateDebut,
+                    $lte: dateFin,
+                  },
                 },
                 {
                   $and: [
