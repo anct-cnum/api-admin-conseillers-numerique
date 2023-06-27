@@ -7,6 +7,7 @@ import { checkAccessReadRequestStructures } from '../repository/structures.repos
 import { getTypeDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
+import { PhaseConventionnement } from '../../../ts/enum';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -161,11 +162,15 @@ const getDetailDossierConvention =
             return item;
           }),
         );
-        structure[0].conseillersRecruter = structure[0]?.conseillers?.filter(
-          (conseiller) =>
-            conseiller.statutMiseEnrelation !== 'terminee' &&
-            conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
-        );
+        structure[0].conseillersRecruterConventionnement =
+          structure[0]?.conseillers?.filter(
+            (conseiller) =>
+              conseiller.phaseConventionnement !==
+                PhaseConventionnement.PHASE_2 &&
+              (conseiller.statut === 'finalisee' ||
+                conseiller.statut === 'nouvelle_rupture' ||
+                conseiller.statut === 'terminee'),
+          );
         structure[0].conseillersRenouveller = structure[0]?.conseillers?.filter(
           (conseiller) =>
             conseiller.reconventionnement === true &&

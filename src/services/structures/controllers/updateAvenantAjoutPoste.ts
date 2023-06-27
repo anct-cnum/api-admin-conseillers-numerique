@@ -121,9 +121,11 @@ const updateAvenantAjoutPoste =
       if (statut === 'NÉGATIF') {
         paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'refusee',
+          'demandesCoselec.$.banniereValidationAvenant': true,
         };
         paramsUpdateCollectionMiseEnRelation.$set = {
           'structureObj.demandesCoselec.$.statut': 'refusee',
+          'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
         };
         paramsUpdateCollectionStructure.$push = {
           coselec: {
