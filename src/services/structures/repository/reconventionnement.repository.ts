@@ -149,7 +149,7 @@ const getTypeDossierDemarcheSimplifiee = (formJuridique: string) =>
 
 const getUrlDossierReconventionnement = (
   idPG: number,
-  type: string,
+  type: string | undefined,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
   switch (type) {
@@ -166,7 +166,7 @@ const getUrlDossierReconventionnement = (
 
 const getUrlDossierConventionnement = (
   idPG: number,
-  type: string,
+  type: string | undefined,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
   switch (type) {

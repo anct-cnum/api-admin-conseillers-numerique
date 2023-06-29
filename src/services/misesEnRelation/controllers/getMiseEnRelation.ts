@@ -95,7 +95,7 @@ const getMiseEnRelation =
         coselec: getCoselec(structure),
         urlDossierConventionnement: getUrlDossierConventionnement(
           structure.idPG,
-          typeStructure.type,
+          typeStructure?.type,
           demarcheSimplifiee,
         ),
       };
