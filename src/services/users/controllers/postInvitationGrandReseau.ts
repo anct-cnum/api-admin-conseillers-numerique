@@ -117,7 +117,6 @@ const postInvitationGrandReseau =
         message: messageSuccess,
         account: user,
       });
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

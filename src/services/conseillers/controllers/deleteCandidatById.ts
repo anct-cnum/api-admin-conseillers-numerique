@@ -1,6 +1,7 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
@@ -9,7 +10,7 @@ import mailer from '../../../mailer';
 import { candidatSupprimePix } from '../../../emails';
 
 const { Pool } = require('pg');
-const aws = require('aws-sdk');
+
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 const verificationCandidaturesRecrutee =
@@ -157,15 +158,18 @@ const suppressionTotalCandidat =
 const suppressionCv = async (cv, app) => {
   try {
     const awsConfig = app.get('aws');
-    aws.config.update({
-      accessKeyId: awsConfig.access_key_id,
-      secretAccessKey: awsConfig.secret_access_key,
+    const client = new S3Client({
+      region: awsConfig.region,
+      credentials: {
+        accessKeyId: awsConfig.access_key_id,
+        secretAccessKey: awsConfig.secret_access_key,
+      },
+      endpoint: awsConfig.endpoint,
     });
-    const ep = new aws.Endpoint(awsConfig.endpoint);
-    const s3 = new aws.S3({ endpoint: ep });
 
     const paramsDelete = { Bucket: awsConfig.cv_bucket, Key: cv?.file };
-    await s3.deleteObject(paramsDelete).promise();
+    const command = new DeleteObjectCommand(paramsDelete);
+    await client.send(command);
   } catch (error) {
     throw new Error(error);
   }

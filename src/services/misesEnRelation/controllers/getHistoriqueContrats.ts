@@ -5,10 +5,10 @@ import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
-  filterStatutContrat,
-  totalContrat,
+  filterStatutContratHistorique,
+  totalHistoriqueContrat,
 } from '../misesEnRelation.repository';
-import { validContrat } from '../../../schemas/contrat.schemas';
+import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
@@ -31,7 +31,7 @@ const getTotalMisesEnRelations =
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
       {
         $match: {
-          ...filterStatutContrat(statut),
+          ...filterStatutContratHistorique(statut),
           ...filterNomConseiller(searchByNomConseiller),
           $and: [checkAccess],
         },
@@ -46,6 +46,8 @@ const getMisesEnRelations =
     skip: string,
     limit: number,
     statut: string,
+    dateDebut: Date,
+    dateFin: Date,
     searchByNomConseiller: string,
     ordre: string,
   ) =>
@@ -67,9 +69,34 @@ const getMisesEnRelations =
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
       {
         $match: {
-          $and: [checkAccess],
-          ...filterStatutContrat(statut),
-          ...filterNomConseiller(searchByNomConseiller),
+          $and: [
+            checkAccess,
+            {
+              $or: [
+                { 'emetteurRupture.date': { $gte: dateDebut, $lte: dateFin } },
+                {
+                  'emetteurRenouvellement.date': {
+                    $gte: dateDebut,
+                    $lte: dateFin,
+                  },
+                },
+                {
+                  'emetteurRecrutement.date': {
+                    $gte: dateDebut,
+                    $lte: dateFin,
+                  },
+                },
+                {
+                  $and: [
+                    { 'emetteurRecrutement.date': { $exists: false } },
+                    { createdAt: { $gte: dateDebut, $lte: dateFin } },
+                  ],
+                },
+              ],
+            },
+            filterNomConseiller(searchByNomConseiller),
+          ],
+          ...filterStatutContratHistorique(statut),
         },
       },
       {
@@ -82,17 +109,33 @@ const getMisesEnRelations =
             $switch: {
               branches: [
                 {
-                  case: { $eq: ['$statut', 'nouvelle_rupture'] },
+                  case: { $eq: ['$statut', 'finalisee_rupture'] },
                   then: '$emetteurRupture.date',
                 },
                 {
-                  case: { $eq: ['$statut', 'renouvellement_initiee'] },
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $ne: [
+                          { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
+                    ],
+                  },
                   then: '$emetteurRenouvellement.date',
                 },
                 {
                   case: {
                     $and: [
-                      { $eq: ['$statut', 'recrutee'] },
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $eq: [
+                          { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
                       {
                         $ne: [
                           { $type: '$emetteurRecrutement.date' },
@@ -106,7 +149,13 @@ const getMisesEnRelations =
                 {
                   case: {
                     $and: [
-                      { $eq: ['$statut', 'recrutee'] },
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $eq: [
+                          { $type: '$miseEnRelationConventionnement' },
+                          'missing',
+                        ],
+                      },
                       {
                         $eq: [
                           { $type: '$emetteurRecrutement.date' },
@@ -127,6 +176,10 @@ const getMisesEnRelations =
           'structureObj.idPG': 1,
           'conseillerObj.idPG': 1,
           'conseillerObj._id': 1,
+          typeDeContrat: 1,
+          dateDebutDeContrat: 1,
+          dateFinDeContrat: 1,
+          miseEnRelationConventionnement: 1,
           statut: 1,
         },
       },
@@ -137,19 +190,27 @@ const getMisesEnRelations =
       { $limit: Number(limit) },
     ]);
 
-const getContrats =
+const getHistoriqueContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const { page, statut, nomOrdre, ordre, searchByNomConseiller } = req.query;
+    const dateDebut: Date = new Date(req.query.dateDebut);
+    const dateFin: Date = new Date(req.query.dateFin);
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
     try {
-      const contratValidation = validContrat.validate({
+      const contratHistoriqueValidation = validHistoriqueContrat.validate({
         page,
         statut,
+        dateDebut,
+        dateFin,
         nomOrdre,
         ordre,
         searchByNomConseiller,
       });
-      if (contratValidation.error) {
-        res.status(400).json({ message: contratValidation.error.message });
+      if (contratHistoriqueValidation.error) {
+        res
+          .status(400)
+          .json({ message: contratHistoriqueValidation.error.message });
         return;
       }
       const items: {
@@ -180,30 +241,41 @@ const getContrats =
         page,
         options.paginate.default,
         statut,
+        dateDebut,
+        dateFin,
         searchByNomConseiller,
         ordre,
       );
+      contrats.map((contrat) => {
+        const item = contrat;
+        if (
+          contrat.statut === 'finalisee' &&
+          contrat.miseEnRelationConventionnement
+        ) {
+          item.statut = 'renouvelee';
+        }
+        return item;
+      });
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
         statut,
         searchByNomConseiller,
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
-      const totalConvention = await totalContrat(app, checkAccess);
+      const totalConvention = await totalHistoriqueContrat(app, checkAccess);
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,
         recrutement:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'recrutee',
+            (totalParStatut) => totalParStatut.statut === 'finalisee',
           )?.count ?? 0,
         renouvellementDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) =>
-              totalParStatut.statut === 'renouvellement_initiee',
+            (totalParStatut) => totalParStatut.statut === 'renouvelee', // statut à définir pour le renouvellement de contrat
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'nouvelle_rupture',
+            (totalParStatut) => totalParStatut.statut === 'finalisee_rupture',
           )?.count ?? 0,
       };
       items.data = contrats;
@@ -220,4 +292,4 @@ const getContrats =
     }
   };
 
-export default getContrats;
+export default getHistoriqueContrats;

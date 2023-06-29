@@ -48,6 +48,9 @@ const formatDateWithoutGetTime = (date: Date) => {
   return 'non renseignée';
 };
 
+const checkIfCcp1 = (statut) =>
+  statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
+
 const conseillerByMisesEnRelation = async (
   idConseiller: ObjectId,
   app: Application,
@@ -124,7 +127,9 @@ const generateCsvCandidatByStructure = async (
   app: Application,
 ) => {
   const promises = [];
-  res.write('Nom;Prénom;Email;Code postal;Expérience;Test PIX;CV\n');
+  res.write(
+    'Nom;Prénom;Email;Code postal;Formation CCP1;Expérience;Test PIX;CV\n',
+  );
   try {
     for (const miseEnrelation of misesEnRelations) {
       promises.push(
@@ -134,9 +139,11 @@ const generateCsvCandidatByStructure = async (
               res.write(
                 `${conseiller.nom};${conseiller.prenom};${conseiller.email};${
                   conseiller.codePostal
-                };${conseiller.aUneExperienceMedNum ? 'oui' : 'non'};${
-                  conseiller.pix === undefined ? 'non' : 'oui'
-                };${conseiller.cv === undefined ? 'non' : 'oui'}\n`,
+                };${checkIfCcp1(conseiller.statut)};${
+                  conseiller.aUneExperienceMedNum ? 'oui' : 'non'
+                };${conseiller.pix === undefined ? 'non' : 'oui'};${
+                  conseiller.cv === undefined ? 'non' : 'oui'
+                }\n`,
               );
               resolve();
             },
@@ -200,6 +207,7 @@ const generateCsvConseillersWithoutCRA = async (
       'Siret de la structure',
       'Nom de la structure',
       'Code postal de la structure',
+      'Coordonnées de la structure',
     ];
     res.write(
       [
@@ -228,6 +236,12 @@ const generateCsvConseillersWithoutCRA = async (
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
             statCnfsWithoutCRA.structure.codePostal,
+            statCnfsWithoutCRA.structure?.contact?.telephone?.length >= 10
+              ? statCnfsWithoutCRA.structure?.contact?.telephone.replace(
+                  /[- ]/g,
+                  '',
+                )
+              : 'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -247,7 +261,7 @@ const generateCsvStructure = async (
   app: Application,
 ) => {
   res.write(
-    'SIRET structure;ID Structure;Dénomination;Type;Statut;Code postal;Code commune;Code département;Code région;Téléphone;Email;Compte créé;Mot de passe choisi;Nombre de mises en relation;Nombre de conseillers souhaités;Validée en COSELEC;Nombre de conseillers validés par le COSELEC;Numéro COSELEC;ZRR;QPV;Nombre de quartiers QPV;Labelisée France Services;Raison sociale;Nom commune INSEE;Code commune INSEE;Adresse postale;Libellé catégorie juridique niv III;Grand Réseau;Nom Grand Réseau\n',
+    'SIRET structure;ID Structure;Dénomination;Type;Statut;Code postal;Code commune;Code département;Code région;Téléphone;Email;Compte créé;Mot de passe choisi;Nombre de mises en relation;Nombre de conseillers souhaités;Validée en COSELEC;Nombre de conseillers validés par le COSELEC;Numéro COSELEC;ZRR;QPV;Nombre de quartiers QPV;Labelisée France Services;Raison sociale;Nom commune INSEE;Code commune INSEE;Adresse postale;Libellé catégorie juridique niv III;Grand Réseau;Nom Grand Réseau;Emails administrateurs\n',
   );
   try {
     await Promise.all(
@@ -257,9 +271,9 @@ const generateCsvStructure = async (
           .Model.countDocuments({
             'structure.$id': new ObjectId(structure._id),
           });
-        const user: IUser = await app
+        const users: IUser[] = await app
           .service(service.users)
-          .Model.findOne({ 'entity.$id': new ObjectId(structure._id) });
+          .Model.find({ 'entity.$id': new ObjectId(structure._id) });
         const coselec = getCoselec(structure);
         let label = 'non renseigné';
         if (
@@ -273,19 +287,19 @@ const generateCsvStructure = async (
         ) {
           label = 'non';
         }
-        let adresse = `${
-          structure?.insee?.etablissement?.adresse?.numero_voie ?? ''
-        } ${structure?.insee?.etablissement?.adresse?.type_voie ?? ''} ${
-          structure?.insee?.etablissement?.adresse?.nom_voie ?? ''
-        }\n${
-          structure?.insee?.etablissement?.adresse?.complement_adresse
-            ? `${structure.insee.etablissement.adresse.complement_adresse}\n`
+        let adresse = `${structure?.insee?.adresse?.numero_voie ?? ''}
+        ${structure?.insee?.adresse?.type_voie ?? ''}
+        ${structure?.insee?.adresse?.libelle_voie ?? ''}\n${
+          structure?.insee?.adresse?.complement_adresse
+            ? `${structure.insee.adresse.complement_adresse}\n`
             : ''
-        }${structure?.insee?.etablissement?.adresse?.code_postal ?? ''} ${
-          structure?.insee?.etablissement?.adresse?.localite ?? ''
+        }${structure?.insee?.adresse?.code_postal ?? ''} ${
+          structure?.insee?.adresse?.libelle_commune ?? ''
         }`;
 
         adresse = adresse.replace(/["',]/g, '');
+        // xxx la colonne mot de passe choisi n'est plus pertinente
+        // depuis l'ajout du multi-compte
         res.write(
           `${structure.siret};${structure.idPG};${structure.nom};${
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
@@ -296,7 +310,9 @@ const generateCsvStructure = async (
           };${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${
-            user !== null && user.passwordCreated ? 'oui' : 'non'
+            users !== null && users.length > 0 && users[0].passwordCreated
+              ? 'oui'
+              : 'non'
           };${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0
           };${structure.statut === 'VALIDATION_COSELEC' ? 'oui' : 'non'};${
@@ -308,20 +324,33 @@ const generateCsvStructure = async (
           };${structure.estZRR ? 'oui' : 'non'};${
             structure.qpvStatut ?? 'Non défini'
           };${structure?.qpvListe ? structure.qpvListe.length : 0};${label};${
-            structure.insee?.entreprise?.raison_sociale
-              ? structure.insee?.entreprise?.raison_sociale
+            structure.insee?.unite_legale?.personne_morale_attributs
+              ?.raison_sociale
+              ? structure.insee?.unite_legale?.personne_morale_attributs
+                  ?.raison_sociale
               : ''
           };${
-            structure.insee?.etablissement?.commune_implantation?.value
-              ? structure.insee?.etablissement?.commune_implantation?.value
+            structure.insee?.adresse?.libelle_commune
+              ? structure.insee?.adresse?.libelle_commune
               : ''
           };${
-            structure.insee?.etablissement?.commune_implantation?.code
-              ? structure.insee?.etablissement?.commune_implantation?.code
+            structure.insee?.adresse?.code_commune
+              ? structure.insee?.adresse?.code_commune
               : ''
           };"${adresse}";${
-            structure.insee?.entreprise?.forme_juridique ?? ''
-          };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''}\n`,
+            structure.insee?.unite_legale?.forme_juridique?.libelle ?? ''
+          };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''};"${
+            users.length > 0
+              ? users
+                  .filter(
+                    (u) =>
+                      u.name?.toLowerCase() !==
+                      structure.contact?.email?.toLowerCase(),
+                  )
+                  .map((u) => u.name?.toLowerCase())
+                  .join(',')
+              : ''
+          }"\n`,
         );
       }),
     );
@@ -602,6 +631,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Email personnelle',
       'Statut',
       'Date de recrutement',
+      'Date de début de contrat',
+      'date de fin de contrat',
       "Date d'entrée en formation",
       'Date de sortie de formation',
       'Disponibilité',
@@ -629,6 +660,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               miseEnRelation?.dossierIncompletRupture,
             ),
             formatDate(miseEnRelation?.dateRecrutement),
+            formatDate(miseEnRelation?.dateDebutDeContrat),
+            formatDate(miseEnRelation?.dateFinDeContrat),
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
@@ -759,9 +792,51 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure?._id,
             structure?.nom,
-            formatDate(structure?.conventionnement?.dateDeCreation),
-            structure?.conventionnement?.nbPostesAttribuees ?? 'Non renseigné',
-            structure?.conventionnement?.statut,
+            formatDate(structure?.dateDeCreation),
+            structure?.nbPostesAttribuees ?? 'Non renseigné',
+            structure?.statut,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
+const generateCsvHistoriqueContrats = async (
+  contrats: any[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom du candidat',
+      'Date de la demande',
+      'Type de la demande',
+      'Type de contrat',
+      'Début de contrat',
+      'Fin de contrat',
+    ];
+
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...contrats.map((contrat) =>
+          [
+            contrat?.structureObj?.idPG,
+            contrat?.structureObj?.nom,
+            `${contrat?.conseillerObj?.prenom} ${contrat?.conseillerObj?.nom}`,
+            formatDate(contrat?.dateDeLaDemande),
+            contrat?.statut ?? 'Non renseigné',
+            contrat?.typeDeContrat ?? 'Non renseigné',
+            formatDate(contrat?.dateDebutDeContrat),
+            formatDate(contrat?.dateFinDeContrat),
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -788,4 +863,5 @@ export {
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,
+  generateCsvHistoriqueContrats,
 };

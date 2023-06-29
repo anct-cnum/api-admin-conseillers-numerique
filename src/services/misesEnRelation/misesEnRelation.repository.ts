@@ -13,16 +13,24 @@ const checkAccessReadRequestMisesEnRelation = async (
     .getQuery();
 
 const filterNomConseiller = (nom: string) => {
-  const formatNom = nom?.trim();
-  if (/^\d+$/.test(formatNom)) {
-    return { 'conseillerObj.idPG': { $eq: parseInt(formatNom, 10) } };
-  }
-  if (formatNom) {
+  const inputSearchBar = nom?.trim();
+  if (inputSearchBar) {
     return {
-      'conseillerObj.nom': {
-        $regex: `(?'name'${formatNom}.*$)`,
-        $options: 'i',
-      },
+      $or: [
+        {
+          nomPrenomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          prenomNomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+      ],
     };
   }
   return {};
@@ -46,6 +54,20 @@ const filterDiplome = (diplome: string) => {
   return {};
 };
 
+const filterCCP1 = (ccp1: string) => {
+  if (ccp1 === 'true') {
+    return {
+      'conseillerObj.statut': { $in: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  if (ccp1 === 'false') {
+    return {
+      'conseillerObj.statut': { $nin: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  return {};
+};
+
 const filterCv = (cv: string) => {
   if (cv === 'true') {
     return { 'conseillerObj.cv': { $exists: true } };
@@ -61,7 +83,16 @@ const filterStatut = (statut: string) => {
   if (statut !== 'toutes') {
     return { statut: { $eq: statut } };
   }
-  return { statut: { $ne: 'non_disponible' } };
+  return {
+    statut: {
+      $nin: [
+        'finalisee_non_disponible',
+        'non_disponible',
+        'renouvellement_initiee',
+        'terminee',
+      ],
+    },
+  };
 };
 
 const filterStatutContrat = (statut: string) => {
@@ -70,8 +101,69 @@ const filterStatutContrat = (statut: string) => {
   }
   return {
     statut: {
-      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
+      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
     },
+  };
+};
+
+const filterStatutContratHistorique = (statut: string) => {
+  if (statut !== 'toutes' && statut !== 'renouvelee') {
+    return { statut: { $eq: statut } };
+  }
+  if (statut === 'renouvelee') {
+    return {
+      statut: 'finalisee',
+      miseEnRelationConventionnement: { $exists: true },
+    };
+  }
+  return {
+    statut: {
+      $in: ['finalisee', 'finalisee_rupture'],
+    },
+  };
+};
+
+const totalHistoriqueContrat = async (app: Application, checkAccess) => {
+  const contrat = await app.service(service.misesEnRelation).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+        statut: {
+          $in: ['finalisee_rupture', 'finalisee'],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          statut: '$statut',
+          miseEnRelationConventionnement: '$miseEnRelationConventionnement',
+        },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        statut: '$_id.statut',
+        miseEnRelationConventionnement: '$_id.miseEnRelationConventionnement',
+        count: 1,
+      },
+    },
+  ]);
+  contrat.map((contratFormat) => {
+    const item = contratFormat;
+    if (contratFormat.miseEnRelationConventionnement) {
+      item.statut = 'renouvelee';
+      delete item.miseEnRelationConventionnement;
+    }
+    return item;
+  });
+  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
+
+  return {
+    contrat,
+    total,
   };
 };
 
@@ -81,7 +173,7 @@ const totalContrat = async (app: Application, checkAccess) => {
       $match: {
         $and: [checkAccess],
         statut: {
-          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement'],
+          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
         },
       },
     },
@@ -112,8 +204,11 @@ export {
   filterNomConseiller,
   filterPix,
   filterDiplome,
+  filterCCP1,
   filterCv,
   filterStatut,
   filterStatutContrat,
+  filterStatutContratHistorique,
+  totalHistoriqueContrat,
   totalContrat,
 };

@@ -36,8 +36,33 @@ const getMisesEnRelationStructure =
               $and: [query],
               'structure.$id': new ObjectId(idStructure),
               statut: {
-                $in: ['finalisee', 'nouvelle_rupture'],
+                $in: [
+                  'finalisee',
+                  'nouvelle_rupture',
+                  'renouvellement_initiee',
+                  'recrutee',
+                  'finalisee_rupture',
+                ],
               },
+            },
+          },
+          {
+            $lookup: {
+              from: 'misesEnRelation',
+              localField: 'miseEnRelationConventionnement',
+              foreignField: '_id',
+              as: 'originalMiseEnRelation',
+            },
+          },
+          {
+            $unwind: {
+              path: '$originalMiseEnRelation',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $match: {
+              miseEnRelationReconventionnement: { $eq: null },
             },
           },
           {
@@ -48,7 +73,28 @@ const getMisesEnRelationStructure =
               dateDebutDeContrat: 1,
               dateFinDeContrat: 1,
               typeDeContrat: 1,
+              salaire: 1,
+              originalMiseEnRelation: 1,
+              miseEnRelationConventionnement: 1,
+              miseEnRelationReconventionnement: 1,
+              banniereValidationRenouvellement: 1,
+              createdAt: 1,
             },
+          },
+          {
+            $sort: {
+              'conseillerObj._id': 1,
+              createdAt: -1,
+            },
+          },
+          {
+            $group: {
+              _id: '$conseillerObj._id',
+              miseEnRelation: { $first: '$$ROOT' },
+            },
+          },
+          {
+            $replaceRoot: { newRoot: '$miseEnRelation' },
           },
         ]);
       res.status(200).json(misesEnRelation);

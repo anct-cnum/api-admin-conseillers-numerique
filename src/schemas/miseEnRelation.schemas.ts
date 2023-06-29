@@ -1,4 +1,4 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 
 const validMiseEnRelation = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
@@ -23,6 +23,7 @@ const validMiseEnRelation = Joi.object({
     .error(new Error('Le filtre statut est invalide')),
   pix: Joi.string().error(new Error('Le filtre pix est invalide')),
   cv: Joi.string().error(new Error('Le filtre cv est invalide')),
+  ccp1: Joi.string().error(new Error('Le filtre CCP1 est invalide')),
   diplome: Joi.string().error(new Error('Le filtre diplôme est invalide')),
 });
 

@@ -6,7 +6,6 @@ import { generateCsvListeStructures } from '../exports.repository';
 import { validExportStructures } from '../../../schemas/structures.schemas';
 import {
   checkAccessReadRequestStructures,
-  filterComs,
   filterDepartement,
   filterSearchBar,
   filterRegion,
@@ -18,16 +17,8 @@ import { getNombreCrasByArrayConseillerId } from '../../cras/cras.repository';
 
 const getExportListeStructuresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const {
-      ordre,
-      nomOrdre,
-      type,
-      statut,
-      searchByNom,
-      departement,
-      region,
-      coms,
-    } = req.query;
+    const { ordre, nomOrdre, type, statut, searchByNom, departement, region } =
+      req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
     const emailValidation = validExportStructures.validate({
@@ -40,7 +31,6 @@ const getExportListeStructuresCsv =
       searchByNom,
       departement,
       region,
-      coms,
     });
 
     if (emailValidation.error) {
@@ -64,7 +54,6 @@ const getExportListeStructuresCsv =
             ...filterStatut(statut),
             ...filterRegion(region),
             ...filterDepartement(departement),
-            ...filterComs(coms),
             ...filterSearchBar(searchByNom),
           },
         },

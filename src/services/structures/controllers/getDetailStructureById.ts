@@ -8,6 +8,8 @@ import {
   formatAdresseStructure,
   formatQpv,
   formatType,
+  getConseillersRecruter,
+  getConseillersValider,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -19,9 +21,10 @@ import {
   getUrlDossierReconventionnement,
   getTypeDossierDemarcheSimplifiee,
 } from '../repository/reconventionnement.repository';
-import { getCoselec } from '../../../utils';
+import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -74,6 +77,7 @@ const getDetailStructureById =
                           { $eq: ['finalisee', '$statut'] },
                           { $eq: ['nouvelle_rupture', '$statut'] },
                           { $eq: ['recrutee', '$statut'] },
+                          { $eq: ['terminee', '$statut'] },
                         ],
                       },
                     },
@@ -84,6 +88,7 @@ const getDetailStructureById =
                 $project: {
                   _id: 0,
                   statut: 1,
+                  phaseConventionnement: 1,
                   'conseillerObj.idPG': 1,
                   'conseillerObj.nom': 1,
                   'conseillerObj._id': 1,
@@ -108,6 +113,8 @@ const getDetailStructureById =
             contact: 1,
             conseillers: '$misesEnRelation',
             conventionnement: 1,
+            demandesCoselec: 1,
+            lastDemandeCoselec: { $arrayElemAt: ['$demandesCoselec', -1] },
           },
         },
       ]);
@@ -136,10 +143,13 @@ const getDetailStructureById =
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
       const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure[0]?.insee?.entreprise?.forme_juridique,
+        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       const coselec = getCoselec(structure[0]);
+      const coselecConventionnement = getCoselecConventionnement(structure[0]);
       structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
+      structure[0].posteValiderCoselecConventionnement =
+        coselecConventionnement?.nombreConseillersCoselec;
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
@@ -148,15 +158,21 @@ const getDetailStructureById =
       structure[0].users = users;
       structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
         structure[0].idPG,
-        typeStructure.type,
+        typeStructure?.type,
         demarcheSimplifiee,
       );
       structure[0].urlDossierReconventionnement =
         getUrlDossierReconventionnement(
           structure[0].idPG,
-          typeStructure.type,
+          typeStructure?.type,
           demarcheSimplifiee,
         );
+      if (
+        structure[0]?.conventionnement?.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        structure[0].urlDossierReconventionnementMessagerie = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+      }
       structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
         return {
           idPG: conseiller?.conseillerObj?.idPG,
@@ -164,16 +180,15 @@ const getDetailStructureById =
           prenom: conseiller?.conseillerObj?.prenom,
           _id: conseiller?.conseillerObj?._id,
           statut: conseiller?.statut,
+          phaseConventionnement: conseiller?.phaseConventionnement,
         };
       });
-      structure[0].conseillersValider = structure[0].conseillers?.filter(
-        (conseiller) => conseiller.statut === 'recrutee',
+      Object.assign(
+        structure[0],
+        getConseillersValider(structure[0].conseillers),
+        getConseillersRecruter(structure[0].conseillers),
       );
-      structure[0].conseillersRecruter = structure[0].conseillers?.filter(
-        (conseiller) =>
-          conseiller.statut === 'finalisee' ||
-          conseiller.statut === 'nouvelle_rupture',
-      );
+
       delete structure[0].conseillers;
 
       if (structure.length === 0) {
@@ -182,7 +197,6 @@ const getDetailStructureById =
       }
 
       res.status(200).json(structure[0]);
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

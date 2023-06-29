@@ -23,7 +23,7 @@ const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
   type: string,
   cursor: string,
-) =>
+): Promise<any> =>
   graphQLClient
     .request(queryGetDemarcheReconventionnement(), {
       demarcheNumber: getDemarcheNumber(type),
@@ -220,6 +220,9 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve) => {
       try {
+        const structure = await app
+          .service(service.structures)
+          .Model.findOne({ idPG: dossier.idPG });
         const structureUpdated = await app
           .service(service.structures)
           .Model.updateOne(
@@ -234,13 +237,13 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               },
               $or: [
                 {
-                  'conventionnement.dossierReconventionnement.dateDernierModification':
+                  'conventionnement.dossierReconventionnement.dateDerniereModification':
                     {
                       $gt: new Date(dossier.dateDerniereModification),
                     },
                 },
                 {
-                  'conventionnement.dossierReconventionnement.dateDernierModification':
+                  'conventionnement.dossierReconventionnement.dateDerniereModification':
                     {
                       $exists: false,
                     },
@@ -249,16 +252,18 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
             },
             {
               'conventionnement.statut':
-                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
+                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
+                structure?.conventionnement?.statut
+                  ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+                  : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
               'conventionnement.dossierReconventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),
                 dateFinProchainContrat: dossier.dateFinProchainContrat
                   ? new Date(dossier.dateFinProchainContrat)
                   : null,
-                nbPostesAttribuees: dossier.nbPostesAttribuees,
                 statut: dossier.statut,
-                dateDernierModification: new Date(
+                dateDerniereModification: new Date(
                   dossier.dateDerniereModification,
                 ),
               },

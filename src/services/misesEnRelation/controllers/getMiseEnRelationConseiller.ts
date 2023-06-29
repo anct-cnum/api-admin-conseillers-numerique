@@ -10,7 +10,7 @@ import {
   getUrlDossierConventionnement,
 } from '../../structures/repository/reconventionnement.repository';
 
-const getMiseEnRelation =
+const getMiseEnRelationConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
     const demarcheSimplifiee = app.get('demarche_simplifiee');
@@ -80,7 +80,7 @@ const getMiseEnRelation =
         return;
       }
       const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.unite_legale?.forme_juridique?.libelle,
+        structure?.insee?.entreprise?.forme_juridique,
       );
       const candidatFormat = {
         ...candidat[0],
@@ -104,6 +104,14 @@ const getMiseEnRelation =
       delete candidatFormat.dateRecrutement;
       delete candidatFormat.dateRupture;
       delete candidatFormat.motifRupture;
+      candidatFormat.misesEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.find({
+          'conseiller.$id': candidatFormat._id,
+          statut: {
+            $in: ['finalisee', 'nouvelle_rupture', 'finalisee_rupture'],
+          },
+        });
       res.status(200).json(candidatFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
@@ -115,4 +123,4 @@ const getMiseEnRelation =
     }
   };
 
-export default getMiseEnRelation;
+export default getMiseEnRelationConseiller;

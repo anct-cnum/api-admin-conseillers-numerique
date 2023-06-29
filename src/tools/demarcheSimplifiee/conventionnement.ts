@@ -23,7 +23,7 @@ const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,
   type: string,
   cursor: string,
-) =>
+): Promise<any> =>
   graphQLClient
     .request(queryGetDemarcheReconventionnement(), {
       demarcheNumber: getDemarcheNumber(type),
@@ -186,6 +186,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                   $nin: [
                     StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
                     StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
+                    StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
                   ],
                 },
                 $or: [
@@ -210,7 +211,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                   numero: dossier._id,
                   dateDeCreation: new Date(dossier.dateDeCreation),
                   statut: dossier.statut,
-                  dateDernierModification: new Date(
+                  dateDerniereModification: new Date(
                     dossier.dateDerniereModification,
                   ),
                 },
