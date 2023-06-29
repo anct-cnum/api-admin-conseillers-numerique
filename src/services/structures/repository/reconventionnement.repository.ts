@@ -488,10 +488,10 @@ const getTimestampByDate = (date?: Date) =>
 const sortArrayConventionnement = (structures, ordre) =>
   structures.sort((a, b) => {
     if (getTimestampByDate(a.dateSorted) < getTimestampByDate(b.dateSorted)) {
-      return ordre;
+      return ordre < 0 ? 1 : -1;
     }
     if (getTimestampByDate(a.dateSorted) > getTimestampByDate(b.dateSorted)) {
-      return ordre < 0 ? 1 : -1;
+      return ordre;
     }
     return 0;
   });
