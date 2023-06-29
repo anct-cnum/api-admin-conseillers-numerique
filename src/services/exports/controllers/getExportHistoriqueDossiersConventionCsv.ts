@@ -4,14 +4,20 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvHistoriqueDossiersConvention } from '../exports.repository';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
-import { checkAccessReadRequestStructures } from '../../structures/repository/structures.repository';
-import { filterDateDemandeAndStatutHistorique } from '../../structures/repository/reconventionnement.repository';
+import {
+  checkAccessReadRequestStructures,
+  filterSearchBar,
+} from '../../structures/repository/structures.repository';
+import {
+  filterDateDemandeAndStatutHistorique,
+  sortArrayConventionnement,
+} from '../../structures/repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
 import { StatutConventionnement } from '../../../ts/enum';
 
 const getExportHistoriqueDossiersConventionCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type } = req.query;
+    const { type, nomOrdre, ordre, searchByNomStructure } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -22,6 +28,9 @@ const getExportHistoriqueDossiersConventionCsv =
       type,
       dateDebut,
       dateFin,
+      nomOrdre,
+      ordre,
+      searchByNomStructure,
     });
     if (pageValidation.error) {
       res.status(400).json({ message: pageValidation.error.message });
@@ -35,10 +44,14 @@ const getExportHistoriqueDossiersConventionCsv =
       const structures: any[] = await app
         .service(service.structures)
         .Model.aggregate([
+          { $addFields: { idPGStr: { $toString: '$idPG' } } },
           {
             $match: {
-              $and: [checkAccessStructure],
-              ...filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
+              $and: [
+                checkAccessStructure,
+                filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
+                filterSearchBar(searchByNomStructure),
+              ],
             },
           },
           {
@@ -76,6 +89,7 @@ const getExportHistoriqueDossiersConventionCsv =
                     ? avenant.nombreDePostesAccordes
                     : avenant.nombreDePostesSouhaites;
                 item.dateDeCreation = avenant.emetteurAvenant.date;
+                item.dateSorted = avenant.emetteurAvenant.date;
                 item.statut = 'Avenant · ajout de poste';
                 return item;
               });
@@ -107,6 +121,7 @@ const getExportHistoriqueDossiersConventionCsv =
                 item.nom = structure.nom;
                 item.nbPostesAttribuees = avenant.nombreDePostesSouhaites;
                 item.dateDeCreation = avenant.emetteurAvenant.date;
+                item.dateSorted = avenant.emetteurAvenant.date;
                 item.statut = 'Avenant · poste rendu';
                 return item;
               });
@@ -128,17 +143,21 @@ const getExportHistoriqueDossiersConventionCsv =
               StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
             ) {
               const coselec = getCoselec(item);
+              item.dateSorted =
+                item.conventionnement?.dossierConventionnement?.dateDeCreation;
               item.nbPostesAttribuees = coselec?.nombreConseillersCoselec ?? 0;
               item.dateDeCreation =
-                item.conventionnement.dossierConventionnement.dateDeCreation;
+                item.conventionnement?.dossierConventionnement?.dateDeCreation;
               item.statut = 'Conventionnement';
 
               return item;
             }
+            item.dateSorted =
+              item.conventionnement?.dossierReconventionnement?.dateDeCreation;
             item.nbPostesAttribuees =
-              item.conventionnement.dossierReconventionnement.nbPostesAttribuees;
+              item.conventionnement?.dossierReconventionnement?.nbPostesAttribuees;
             item.dateDeCreation =
-              item.conventionnement.dossierReconventionnement.dateDeCreation;
+              item.conventionnement?.dossierReconventionnement?.dateDeCreation;
             item.statut = 'Reconventionnement';
 
             return item;
@@ -148,7 +167,8 @@ const getExportHistoriqueDossiersConventionCsv =
           structuresFormat = structuresFormat.concat(conventionnement);
         }
       }
-      generateCsvHistoriqueDossiersConvention(structuresFormat, res);
+      const structureSort = sortArrayConventionnement(structuresFormat, ordre);
+      generateCsvHistoriqueDossiersConvention(structureSort, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

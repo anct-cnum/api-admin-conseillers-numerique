@@ -5,7 +5,10 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 interface IUpdateStructureAvenant {
   $push?: {
@@ -13,7 +16,7 @@ interface IUpdateStructureAvenant {
       nombreConseillersCoselec: number;
       avisCoselec: string;
       insertedAt: Date;
-      type?: string;
+      phaseConventionnement?: string;
     };
   };
   $set?: {
@@ -29,7 +32,7 @@ interface IUpdateMiseEnRelationAvenant {
       nombreConseillersCoselec: number;
       avisCoselec: string;
       insertedAt: Date;
-      type?: string;
+      phaseConventionnement?: string;
     };
   };
   $set?: {
@@ -108,18 +111,21 @@ const updateAvenantAjoutPoste =
           structure?.conventionnement?.statut ===
           StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
         ) {
-          paramsUpdateCollectionStructure.$push.coselec.type = 'avenant';
+          paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
+            PhaseConventionnement.PHASE_2;
           paramsUpdateCollectionMiseEnRelation.$push[
             'structureObj.coselec'
-          ].type = 'avenant';
+          ].phaseConventionnement = PhaseConventionnement.PHASE_2;
         }
       }
       if (statut === 'NÉGATIF') {
         paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'refusee',
+          'demandesCoselec.$.banniereValidationAvenant': true,
         };
         paramsUpdateCollectionMiseEnRelation.$set = {
           'structureObj.demandesCoselec.$.statut': 'refusee',
+          'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
         };
         paramsUpdateCollectionStructure.$push = {
           coselec: {

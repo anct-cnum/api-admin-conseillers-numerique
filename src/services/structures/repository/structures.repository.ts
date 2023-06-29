@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { PhaseConventionnement } from '../../../ts/enum';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -109,6 +110,43 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
+const getConseillersValider = (conseillers) => {
+  const conseillersValiderReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'recrutee' &&
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
+  );
+  const conseillersValiderConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'recrutee' &&
+      conseiller?.phaseConventionnement === undefined,
+  );
+  return {
+    conseillersValiderReconventionnement,
+    conseillersValiderConventionnement,
+  };
+};
+
+const getConseillersRecruter = (conseillers) => {
+  const conseillersRecruterConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller?.phaseConventionnement === undefined &&
+      (conseiller.statut === 'finalisee' ||
+        conseiller.statut === 'nouvelle_rupture' ||
+        conseiller.statut === 'terminee'),
+  );
+  const conseillersRecruterReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2 &&
+      (conseiller.statut === 'finalisee' ||
+        conseiller.statut === 'nouvelle_rupture'),
+  );
+  return {
+    conseillersRecruterConventionnement,
+    conseillersRecruterReconventionnement,
+  };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -123,4 +161,6 @@ export {
   formatType,
   filterSortColonne,
   getNameStructure,
+  getConseillersValider,
+  getConseillersRecruter,
 };

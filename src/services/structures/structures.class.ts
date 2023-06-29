@@ -14,7 +14,7 @@ import {
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
-  validationReconventionnement,
+  decisionReconventionnement,
   createAvenant,
   closeBanner,
   updateAvenantAjoutPoste,
@@ -106,10 +106,10 @@ export default class Structures extends Service {
       getDetailDossierConvention(app),
     );
     app.patch(
-      '/validation/reconventionnement/:id',
+      '/decision/reconventionnement/:id',
       authenticateMode(app),
       createAbilities(app),
-      validationReconventionnement(app),
+      decisionReconventionnement(app),
     );
     app.patch(
       '/reconventionnement',

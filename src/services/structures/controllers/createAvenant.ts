@@ -48,7 +48,7 @@ const createAvenant =
       getStructure?.conventionnement?.statut ===
       StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
         ? PhaseConventionnement.PHASE_2
-        : '1';
+        : PhaseConventionnement.PHASE_1;
 
     const demandeCoselec = {
       id: new ObjectId(),

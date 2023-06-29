@@ -2,6 +2,7 @@
 import { invitationActiveCompte } from '../emails';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
+import { PhaseConventionnement } from '../ts/enum';
 
 /**
  * On cherche le bon coselec avec avis POSITIF :
@@ -15,11 +16,14 @@ const getCoselecPositif = (structure) => {
   let coselecsPositifs = null;
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
-      (c) => c.avisCoselec === 'POSITIF' && c.type === 'avenant',
+      (c) =>
+        c.avisCoselec === 'POSITIF' &&
+        c.phaseConventionnement === PhaseConventionnement.PHASE_2,
     );
     if (coselecsPositifs.length === 0) {
       coselecsPositifs = structure.coselec.filter(
-        (c) => c.avisCoselec === 'POSITIF' && c.type !== 'avenant',
+        (c) =>
+          c.avisCoselec === 'POSITIF' && c.phaseConventionnement === undefined,
       );
     }
   }
@@ -33,7 +37,8 @@ const getCoselecPositifConventionnement = (structure) => {
   let coselecsPositifs = null;
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
-      (c) => c.avisCoselec === 'POSITIF' && c.type !== 'avenant',
+      (c) =>
+        c.avisCoselec === 'POSITIF' && c.phaseConventionnement === undefined,
     );
   }
   // On prend le dernier

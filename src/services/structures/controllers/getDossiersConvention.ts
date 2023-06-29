@@ -4,33 +4,27 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validReconventionnement } from '../../../schemas/reconventionnement.schemas';
 import {
   filterStatut,
+  sortDossierConventionnement,
   totalParConvention,
 } from '../repository/reconventionnement.repository';
-import { checkAccessReadRequestStructures } from '../repository/structures.repository';
+import {
+  checkAccessReadRequestStructures,
+  filterSearchBar,
+} from '../repository/structures.repository';
 import service from '../../../helpers/services';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
-
-const getTotalStructures =
-  (app: Application, checkAccess) => async (typeConvention: string) =>
-    app.service(service.structures).Model.aggregate([
-      {
-        $match: {
-          ...filterStatut(typeConvention),
-          $and: [checkAccess],
-        },
-      },
-      { $group: { _id: null, count: { $sum: 1 } } },
-      { $project: { _id: 0, count_structures: '$count' } },
-    ]);
 
 const getStructures =
   (app: Application, checkAccess) =>
-  async (skip: string, limit: number, typeConvention: string) =>
+  async (typeConvention: string, searchByNomStructure: string) =>
     app.service(service.structures).Model.aggregate([
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          $and: [checkAccess],
-          ...filterStatut(typeConvention),
+          $and: [
+            checkAccess,
+            filterSearchBar(searchByNomStructure),
+            filterStatut(typeConvention),
+          ],
         },
       },
       {
@@ -44,18 +38,19 @@ const getStructures =
           demandesCoselec: 1,
         },
       },
-      { $sort: { idPG: 1 } },
-      {
-        $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
-      },
-      { $limit: Number(limit) },
     ]);
 
 const getDossiersConvention =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, type } = req.query;
+    const { page, type, nomOrdre, ordre, searchByNomStructure } = req.query;
     try {
-      const pageValidation = validReconventionnement.validate({ page, type });
+      const pageValidation = validReconventionnement.validate({
+        page,
+        type,
+        nomOrdre,
+        ordre,
+        searchByNomStructure,
+      });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
         return;
@@ -87,19 +82,25 @@ const getDossiersConvention =
       };
 
       const checkAccess = await checkAccessReadRequestStructures(app, req);
-      const structures: IStructures = await getStructures(app, checkAccess)(
-        page,
-        options.paginate.default,
+      const structures: any = await getStructures(app, checkAccess)(
         type,
+        searchByNomStructure,
       );
-      const totalStructures = await getTotalStructures(app, checkAccess)(type);
-      items.total = totalStructures[0]?.count_structures ?? 0;
+      const structuresFormat = sortDossierConventionnement(
+        type,
+        ordre,
+        structures,
+      );
+      items.total = structuresFormat.length;
       const totalConvention = await totalParConvention(app, req);
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,
       };
-      items.data = structures;
+      items.data = structuresFormat.slice(
+        (page - 1) * options.paginate.default,
+        page * options.paginate.default,
+      );
       items.limit = options.paginate.default;
       items.skip = page;
 

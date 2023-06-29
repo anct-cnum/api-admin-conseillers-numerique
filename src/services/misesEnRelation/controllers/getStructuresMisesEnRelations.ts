@@ -30,6 +30,21 @@ const countMisesEnRelation =
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: {
+            $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: {
+            $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+          },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
         $match: {
           'structure.$id': structureId,
           ...filterPix(pix),
@@ -74,6 +89,21 @@ const getMisesEnRelation =
     limit: number,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $addFields: {
+          nomPrenomStr: {
+            $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: {
+            $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+          },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
       {
         $match: {
           'structure.$id': structureId,
