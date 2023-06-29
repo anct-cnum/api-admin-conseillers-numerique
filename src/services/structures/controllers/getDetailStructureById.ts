@@ -143,7 +143,7 @@ const getDetailStructureById =
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
       const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure[0]?.insee?.entreprise?.forme_juridique,
+        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       const coselec = getCoselec(structure[0]);
       const coselecConventionnement = getCoselecConventionnement(structure[0]);

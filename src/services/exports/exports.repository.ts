@@ -287,16 +287,14 @@ const generateCsvStructure = async (
         ) {
           label = 'non';
         }
-        let adresse = `${
-          structure?.insee?.etablissement?.adresse?.numero_voie ?? ''
-        } ${structure?.insee?.etablissement?.adresse?.type_voie ?? ''} ${
-          structure?.insee?.etablissement?.adresse?.nom_voie ?? ''
-        }\n${
-          structure?.insee?.etablissement?.adresse?.complement_adresse
-            ? `${structure.insee.etablissement.adresse.complement_adresse}\n`
+        let adresse = `${structure?.insee?.adresse?.numero_voie ?? ''}
+        ${structure?.insee?.adresse?.type_voie ?? ''}
+        ${structure?.insee?.adresse?.libelle_voie ?? ''}\n${
+          structure?.insee?.adresse?.complement_adresse
+            ? `${structure.insee.adresse.complement_adresse}\n`
             : ''
-        }${structure?.insee?.etablissement?.adresse?.code_postal ?? ''} ${
-          structure?.insee?.etablissement?.adresse?.localite ?? ''
+        }${structure?.insee?.adresse?.code_postal ?? ''} ${
+          structure?.insee?.adresse?.libelle_commune ?? ''
         }`;
 
         adresse = adresse.replace(/["',]/g, '');
@@ -322,19 +320,21 @@ const generateCsvStructure = async (
           };${structure.estZRR ? 'oui' : 'non'};${
             structure.qpvStatut ?? 'Non défini'
           };${structure?.qpvListe ? structure.qpvListe.length : 0};${label};${
-            structure.insee?.entreprise?.raison_sociale
-              ? structure.insee?.entreprise?.raison_sociale
+            structure.insee?.unite_legale?.personne_morale_attributs
+              ?.raison_sociale
+              ? structure.insee?.unite_legale?.personne_morale_attributs
+                  ?.raison_sociale
               : ''
           };${
-            structure.insee?.etablissement?.commune_implantation?.value
-              ? structure.insee?.etablissement?.commune_implantation?.value
+            structure.insee?.adresse?.libelle_commune
+              ? structure.insee?.adresse?.libelle_commune
               : ''
           };${
-            structure.insee?.etablissement?.commune_implantation?.code
-              ? structure.insee?.etablissement?.commune_implantation?.code
+            structure.insee?.adresse?.code_commune
+              ? structure.insee?.adresse?.code_commune
               : ''
           };"${adresse}";${
-            structure.insee?.entreprise?.forme_juridique ?? ''
+            structure.insee?.unite_legale?.forme_juridique?.libelle ?? ''
           };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''}\n`,
         );
       }),

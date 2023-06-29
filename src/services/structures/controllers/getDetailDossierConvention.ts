@@ -69,7 +69,7 @@ const getDetailStructureWithConseillers =
           conventionnement: 1,
           demandesCoselec: 1,
           nombreConseillersSouhaites: 1,
-          'insee.entreprise.forme_juridique': 1,
+          'insee.forme_juridique.libelle': 1,
           conseillers: '$conseillers',
         },
       },
@@ -127,7 +127,7 @@ const getDetailDossierConvention =
       }
 
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure[0]?.insee?.entreprise?.forme_juridique,
+        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       if (typeDossierDs === null) {
         res.status(500).json({
