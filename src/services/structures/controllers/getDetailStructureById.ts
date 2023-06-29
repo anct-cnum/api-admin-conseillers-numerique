@@ -158,13 +158,13 @@ const getDetailStructureById =
       structure[0].users = users;
       structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
         structure[0].idPG,
-        typeStructure.type,
+        typeStructure?.type,
         demarcheSimplifiee,
       );
       structure[0].urlDossierReconventionnement =
         getUrlDossierReconventionnement(
           structure[0].idPG,
-          typeStructure.type,
+          typeStructure?.type,
           demarcheSimplifiee,
         );
       if (
