@@ -13,16 +13,24 @@ const checkAccessReadRequestMisesEnRelation = async (
     .getQuery();
 
 const filterNomConseiller = (nom: string) => {
-  const formatNom = nom?.trim();
-  if (/^\d+$/.test(formatNom)) {
-    return { 'conseillerObj.idPG': { $eq: parseInt(formatNom, 10) } };
-  }
-  if (formatNom) {
+  const inputSearchBar = nom?.trim();
+  if (inputSearchBar) {
     return {
-      'conseillerObj.nom': {
-        $regex: `(?'name'${formatNom}.*$)`,
-        $options: 'i',
-      },
+      $or: [
+        {
+          nomPrenomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          prenomNomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+      ],
     };
   }
   return {};

@@ -3,6 +3,13 @@ const Joi = require('joi');
 const validContrat = Joi.object({
   page: Joi.number().required().error(new Error('La pagination est invalide')),
   statut: Joi.string().required().error(new Error('Le statut est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  searchByNomConseiller: Joi.string().error(
+    new Error('La recherche par nom de la conseiller est invalide'),
+  ),
 });
 
 const validCreationContrat = Joi.object({
@@ -31,6 +38,13 @@ const validHistoriqueContrat = Joi.object({
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  searchByNomConseiller: Joi.string().error(
+    new Error('La recherche par nom de la conseiller est invalide'),
+  ),
 });
 
 export { validContrat, validHistoriqueContrat, validCreationContrat };

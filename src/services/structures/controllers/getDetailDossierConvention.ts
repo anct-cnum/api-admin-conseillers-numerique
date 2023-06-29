@@ -69,7 +69,7 @@ const getDetailStructureWithConseillers =
           conventionnement: 1,
           demandesCoselec: 1,
           nombreConseillersSouhaites: 1,
-          'insee.entreprise.forme_juridique': 1,
+          'insee.forme_juridique.libelle': 1,
           conseillers: '$conseillers',
         },
       },
@@ -127,7 +127,7 @@ const getDetailDossierConvention =
       }
 
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure[0]?.insee?.entreprise?.forme_juridique,
+        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       if (typeDossierDs === null) {
         res.status(500).json({
@@ -161,11 +161,14 @@ const getDetailDossierConvention =
             return item;
           }),
         );
-        structure[0].conseillersRecruter = structure[0]?.conseillers?.filter(
-          (conseiller) =>
-            conseiller.statutMiseEnrelation !== 'terminee' &&
-            conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
-        );
+        structure[0].conseillersRecruterConventionnement =
+          structure[0]?.conseillers?.filter(
+            (conseiller) =>
+              conseiller?.phaseConventionnement === undefined &&
+              (conseiller.statut === 'finalisee' ||
+                conseiller.statut === 'nouvelle_rupture' ||
+                conseiller.statut === 'terminee'),
+          );
         structure[0].conseillersRenouveller = structure[0]?.conseillers?.filter(
           (conseiller) =>
             conseiller.reconventionnement === true &&

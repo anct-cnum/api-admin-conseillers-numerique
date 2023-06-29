@@ -41,6 +41,7 @@ const getMisesEnRelationStructure =
                   'nouvelle_rupture',
                   'renouvellement_initiee',
                   'recrutee',
+                  'finalisee_rupture',
                 ],
               },
             },
@@ -77,7 +78,23 @@ const getMisesEnRelationStructure =
               miseEnRelationConventionnement: 1,
               miseEnRelationReconventionnement: 1,
               banniereValidationRenouvellement: 1,
+              createdAt: 1,
             },
+          },
+          {
+            $sort: {
+              'conseillerObj._id': 1,
+              createdAt: -1,
+            },
+          },
+          {
+            $group: {
+              _id: '$conseillerObj._id',
+              miseEnRelation: { $first: '$$ROOT' },
+            },
+          },
+          {
+            $replaceRoot: { newRoot: '$miseEnRelation' },
           },
         ]);
       res.status(200).json(misesEnRelation);

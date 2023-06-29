@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { PhaseConventionnement } from '../../../ts/enum';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -76,14 +77,14 @@ const filterType = (type: string) => {
 const filterStatut = (statut: string) => (statut ? { statut } : {});
 
 const formatAdresseStructure = (insee) => {
-  const adresse = `${insee?.etablissement?.adresse?.numero_voie ?? ''} ${
-    insee?.etablissement?.adresse?.type_voie ?? ''
-  } ${insee?.etablissement?.adresse?.nom_voie ?? ''} ${
-    insee?.etablissement?.adresse?.complement_adresse
-      ? `${insee.etablissement.adresse.complement_adresse} `
+  const adresse = `${insee?.adresse?.numero_voie ?? ''} ${
+    insee?.adresse?.type_voie ?? ''
+  } ${insee?.adresse?.libelle_voie ?? ''} ${
+    insee?.adresse?.complement_adresse
+      ? `${insee.adresse.complement_adresse} `
       : ' '
-  }${insee?.etablissement?.adresse?.code_postal ?? ''} ${
-    insee?.etablissement?.adresse?.localite ?? ''
+  }${insee?.adresse?.code_postal ?? ''} ${
+    insee?.adresse?.libelle_commune ?? ''
   }`;
 
   return adresse.replace(/["']/g, '');
@@ -109,6 +110,43 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
+const getConseillersValider = (conseillers) => {
+  const conseillersValiderReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'recrutee' &&
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
+  );
+  const conseillersValiderConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'recrutee' &&
+      conseiller?.phaseConventionnement === undefined,
+  );
+  return {
+    conseillersValiderReconventionnement,
+    conseillersValiderConventionnement,
+  };
+};
+
+const getConseillersRecruter = (conseillers) => {
+  const conseillersRecruterConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller?.phaseConventionnement === undefined &&
+      (conseiller.statut === 'finalisee' ||
+        conseiller.statut === 'nouvelle_rupture' ||
+        conseiller.statut === 'terminee'),
+  );
+  const conseillersRecruterReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2 &&
+      (conseiller.statut === 'finalisee' ||
+        conseiller.statut === 'nouvelle_rupture'),
+  );
+  return {
+    conseillersRecruterConventionnement,
+    conseillersRecruterReconventionnement,
+  };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -123,4 +161,6 @@ export {
   formatType,
   filterSortColonne,
   getNameStructure,
+  getConseillersValider,
+  getConseillersRecruter,
 };

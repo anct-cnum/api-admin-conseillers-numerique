@@ -94,6 +94,12 @@ const updateMiseEnRelation =
           date: new Date(),
         };
       }
+      if (req.body.statut === 'recrutee') {
+        update.emetteurRecrutement = {
+          email: req.user.name,
+          date: new Date(),
+        };
+      }
       const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)

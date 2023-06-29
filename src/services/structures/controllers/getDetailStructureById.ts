@@ -8,6 +8,8 @@ import {
   formatAdresseStructure,
   formatQpv,
   formatType,
+  getConseillersRecruter,
+  getConseillersValider,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -75,6 +77,7 @@ const getDetailStructureById =
                           { $eq: ['finalisee', '$statut'] },
                           { $eq: ['nouvelle_rupture', '$statut'] },
                           { $eq: ['recrutee', '$statut'] },
+                          { $eq: ['terminee', '$statut'] },
                         ],
                       },
                     },
@@ -85,6 +88,7 @@ const getDetailStructureById =
                 $project: {
                   _id: 0,
                   statut: 1,
+                  phaseConventionnement: 1,
                   'conseillerObj.idPG': 1,
                   'conseillerObj.nom': 1,
                   'conseillerObj._id': 1,
@@ -139,7 +143,7 @@ const getDetailStructureById =
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
       const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure[0]?.insee?.entreprise?.forme_juridique,
+        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       const coselec = getCoselec(structure[0]);
       const coselecConventionnement = getCoselecConventionnement(structure[0]);
@@ -154,13 +158,13 @@ const getDetailStructureById =
       structure[0].users = users;
       structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
         structure[0].idPG,
-        typeStructure.type,
+        typeStructure?.type,
         demarcheSimplifiee,
       );
       structure[0].urlDossierReconventionnement =
         getUrlDossierReconventionnement(
           structure[0].idPG,
-          typeStructure.type,
+          typeStructure?.type,
           demarcheSimplifiee,
         );
       if (
@@ -176,16 +180,15 @@ const getDetailStructureById =
           prenom: conseiller?.conseillerObj?.prenom,
           _id: conseiller?.conseillerObj?._id,
           statut: conseiller?.statut,
+          phaseConventionnement: conseiller?.phaseConventionnement,
         };
       });
-      structure[0].conseillersValider = structure[0].conseillers?.filter(
-        (conseiller) => conseiller.statut === 'recrutee',
+      Object.assign(
+        structure[0],
+        getConseillersValider(structure[0].conseillers),
+        getConseillersRecruter(structure[0].conseillers),
       );
-      structure[0].conseillersRecruter = structure[0].conseillers?.filter(
-        (conseiller) =>
-          conseiller.statut === 'finalisee' ||
-          conseiller.statut === 'nouvelle_rupture',
-      );
+
       delete structure[0].conseillers;
 
       if (structure.length === 0) {
