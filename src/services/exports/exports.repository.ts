@@ -340,7 +340,7 @@ const generateCsvStructure = async (
           };"${adresse}";${
             structure.insee?.entreprise?.forme_juridique ?? ''
           };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''};"${
-            users !== null && users.length > 0
+            users.length > 0
               ? users
                   .filter(
                     (u) =>
