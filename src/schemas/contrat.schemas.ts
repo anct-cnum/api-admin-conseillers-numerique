@@ -10,10 +10,6 @@ const validContrat = Joi.object({
   searchByNomConseiller: Joi.string().error(
     new Error('La recherche par nom de la conseiller est invalide'),
   ),
-  departement: Joi.string().error(
-    new Error('Le filtre département est invalide'),
-  ),
-  region: Joi.string().error(new Error('Le filtre région est invalide')),
 });
 
 const validCreationContrat = Joi.object({
@@ -49,10 +45,6 @@ const validHistoriqueContrat = Joi.object({
   searchByNomConseiller: Joi.string().error(
     new Error('La recherche par nom de la conseiller est invalide'),
   ),
-  departement: Joi.string().error(
-    new Error('Le filtre département est invalide'),
-  ),
-  region: Joi.string().error(new Error('Le filtre région est invalide')),
 });
 
 export { validContrat, validHistoriqueContrat, validCreationContrat };

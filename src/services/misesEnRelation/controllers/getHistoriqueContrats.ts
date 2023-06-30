@@ -4,9 +4,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
-  filterDepartement,
   filterNomConseiller,
-  filterRegion,
   filterStatutContratHistorique,
   totalHistoriqueContrat,
 } from '../misesEnRelation.repository';
@@ -14,12 +12,7 @@ import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (
-    statut: string,
-    searchByNomConseiller: string,
-    region: string,
-    departement: string,
-  ) =>
+  async (statut: string, searchByNomConseiller: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $addFields: {
@@ -40,8 +33,6 @@ const getTotalMisesEnRelations =
         $match: {
           ...filterStatutContratHistorique(statut),
           ...filterNomConseiller(searchByNomConseiller),
-          ...filterRegion(region),
-          ...filterDepartement(departement),
           $and: [checkAccess],
         },
       },
@@ -58,8 +49,6 @@ const getMisesEnRelations =
     dateDebut: Date,
     dateFin: Date,
     searchByNomConseiller: string,
-    region: string,
-    departement: string,
     ordre: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -108,8 +97,6 @@ const getMisesEnRelations =
             filterNomConseiller(searchByNomConseiller),
           ],
           ...filterStatutContratHistorique(statut),
-          ...filterRegion(region),
-          ...filterDepartement(departement),
         },
       },
       {
@@ -205,15 +192,7 @@ const getMisesEnRelations =
 
 const getHistoriqueContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const {
-      page,
-      statut,
-      nomOrdre,
-      ordre,
-      searchByNomConseiller,
-      region,
-      departement,
-    } = req.query;
+    const { page, statut, nomOrdre, ordre, searchByNomConseiller } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -227,8 +206,6 @@ const getHistoriqueContrats =
         nomOrdre,
         ordre,
         searchByNomConseiller,
-        region,
-        departement,
       });
       if (contratHistoriqueValidation.error) {
         res
@@ -267,8 +244,6 @@ const getHistoriqueContrats =
         dateDebut,
         dateFin,
         searchByNomConseiller,
-        region,
-        departement,
         ordre,
       );
       contrats.map((contrat) => {
@@ -284,8 +259,6 @@ const getHistoriqueContrats =
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
         statut,
         searchByNomConseiller,
-        region,
-        departement,
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalHistoriqueContrat(app, checkAccess);

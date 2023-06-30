@@ -9,8 +9,6 @@ import {
 } from '../repository/reconventionnement.repository';
 import {
   checkAccessReadRequestStructures,
-  filterDepartement,
-  filterRegion,
   filterSearchBar,
 } from '../repository/structures.repository';
 import service from '../../../helpers/services';
@@ -23,8 +21,6 @@ const getStructures =
     dateDebut: Date,
     dateFin: Date,
     searchByNomStructure: string,
-    region: string,
-    departement: string,
   ) =>
     app.service(service.structures).Model.aggregate([
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -39,8 +35,6 @@ const getStructures =
             ),
             filterSearchBar(searchByNomStructure),
           ],
-          ...filterRegion(region),
-          ...filterDepartement(departement),
         },
       },
       {
@@ -59,15 +53,7 @@ const getStructures =
 
 const getHistoriqueDossiersConvention =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const {
-      page,
-      type,
-      nomOrdre,
-      ordre,
-      searchByNomStructure,
-      region,
-      departement,
-    } = req.query;
+    const { page, type, nomOrdre, ordre, searchByNomStructure } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -81,8 +67,6 @@ const getHistoriqueDossiersConvention =
         nomOrdre,
         ordre,
         searchByNomStructure,
-        region,
-        departement,
       });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
@@ -120,8 +104,6 @@ const getHistoriqueDossiersConvention =
         dateDebut,
         dateFin,
         searchByNomStructure,
-        region,
-        departement,
       );
       const structuresFormat = sortHistoriqueDossierConventionnement(
         type,

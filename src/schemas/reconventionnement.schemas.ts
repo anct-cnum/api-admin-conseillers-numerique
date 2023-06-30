@@ -12,10 +12,6 @@ const validReconventionnement = Joi.object({
   searchByNomStructure: Joi.string().error(
     new Error('La recherche par nom de la structure est invalide'),
   ),
-  departement: Joi.string().error(
-    new Error('Le filtre département est invalide'),
-  ),
-  region: Joi.string().error(new Error('Le filtre région est invalide')),
 });
 
 const validHistoriqueConvention = Joi.object({
@@ -36,10 +32,6 @@ const validHistoriqueConvention = Joi.object({
   searchByNomStructure: Joi.string().error(
     new Error('La recherche par nom de la structure est invalide'),
   ),
-  departement: Joi.string().error(
-    new Error('Le filtre département est invalide'),
-  ),
-  region: Joi.string().error(new Error('Le filtre région est invalide')),
 });
 
 const updateReconventionnement = Joi.object({

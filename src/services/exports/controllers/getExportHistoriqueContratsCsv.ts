@@ -6,22 +6,13 @@ import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 import { generateCsvHistoriqueContrats } from '../exports.repository';
 import {
   checkAccessReadRequestMisesEnRelation,
-  filterDepartement,
-  filterRegion,
   filterStatutContratHistorique,
 } from '../../misesEnRelation/misesEnRelation.repository';
 import { filterNomConseiller } from '../../conseillers/conseillers.repository';
 
 const getExportHistoriqueContratsCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const {
-      statut,
-      nomOrdre,
-      ordre,
-      searchByNomConseiller,
-      region,
-      departement,
-    } = req.query;
+    const { statut, nomOrdre, ordre, searchByNomConseiller } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -35,8 +26,6 @@ const getExportHistoriqueContratsCsv =
           nomOrdre,
           ordre,
           searchByNomConseiller,
-          region,
-          departement,
         },
       );
       if (contratHistoriqueExportValidation.error) {
@@ -99,8 +88,6 @@ const getExportHistoriqueContratsCsv =
                 filterNomConseiller(searchByNomConseiller),
               ],
               ...filterStatutContratHistorique(statut),
-              ...filterRegion(region),
-              ...filterDepartement(departement),
             },
           },
           {
