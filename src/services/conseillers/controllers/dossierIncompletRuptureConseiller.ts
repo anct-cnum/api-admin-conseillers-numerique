@@ -8,7 +8,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 const dossierIncompletRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    const { dateFinDeContrat, dossierIncomplet } = req.body;
+    const { dateFinDeContrat } = req.body;
     if (!dateFinDeContrat) {
       res.status(400).json({
         message: 'Aucune date de fin de contrat renseignée',
@@ -33,7 +33,7 @@ const dossierIncompletRuptureConseiller =
           },
           {
             $set: {
-              dossierIncompletRupture: dossierIncomplet,
+              dossierIncompletRupture: true,
               dateRupture: new Date(dateFinDeContrat),
             },
           },
