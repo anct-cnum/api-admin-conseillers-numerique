@@ -182,25 +182,33 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               {
                 idPG: dossier.idPG,
                 statut: 'VALIDATION_COSELEC',
-                'conventionnement.statut': {
-                  $nin: [
-                    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-                    StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-                    StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
-                  ],
-                },
-                $or: [
+                $and: [
                   {
-                    'conventionnement.dossierConventionnement.dateDernierModification':
+                    $or: [
                       {
-                        $gt: new Date(dossier.dateDerniereModification),
+                        'conventionnement.statut':
+                          StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
                       },
+                      {
+                        'conventionnement.statut': { $exists: false },
+                      },
+                    ],
                   },
                   {
-                    'conventionnement.dossierConventionnement.dateDernierModification':
+                    $or: [
                       {
-                        $exists: false,
+                        'conventionnement.dossierConventionnement.dateDernierModification':
+                          {
+                            $gt: new Date(dossier.dateDerniereModification),
+                          },
                       },
+                      {
+                        'conventionnement.dossierConventionnement.dateDernierModification':
+                          {
+                            $exists: false,
+                          },
+                      },
+                    ],
                   },
                 ],
               },
@@ -218,6 +226,55 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               },
             );
           if (structureUpdated.modifiedCount === 1) {
+            await app.service(service.misesEnRelation).Model.updateMany(
+              {
+                'structureObj.idPG': dossier.idPG,
+                'structureObj.statut': 'VALIDATION_COSELEC',
+                $and: [
+                  {
+                    $or: [
+                      {
+                        'structureObj.conventionnement.statut':
+                          StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+                      },
+                      {
+                        'structureObj.conventionnement.statut': {
+                          $exists: false,
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    $or: [
+                      {
+                        'structureObj.conventionnement.dossierConventionnement.dateDernierModification':
+                          {
+                            $gt: new Date(dossier.dateDerniereModification),
+                          },
+                      },
+                      {
+                        'structureObj.conventionnement.dossierConventionnement.dateDernierModification':
+                          {
+                            $exists: false,
+                          },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                'structureObj.conventionnement.statut':
+                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+                'structureObj.conventionnement.dossierConventionnement': {
+                  numero: dossier._id,
+                  dateDeCreation: new Date(dossier.dateDeCreation),
+                  statut: dossier.statut,
+                  dateDerniereModification: new Date(
+                    dossier.dateDerniereModification,
+                  ),
+                },
+              },
+            );
             logger.info(`Structure [${dossier.idPG}] mise à jour avec succès`);
           }
           resolve(p);
