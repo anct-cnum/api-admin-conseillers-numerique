@@ -36,6 +36,19 @@ const filterNomConseiller = (nom: string) => {
   return {};
 };
 
+const filterDepartement = (departement: string) => {
+  if (departement === '978') {
+    return { 'conseillerObj.codeCom': departement };
+  }
+  if (departement) {
+    return { 'conseillerObj.codeDepartement': departement };
+  }
+  return {};
+};
+
+const filterRegion = (region: string) =>
+  region ? { 'conseillerObj.codeRegion': region } : {};
+
 const filterPix = (pix: string) => {
   if (pix) {
     const pixInt = pix.split(',').map((k: string) => parseInt(k, 10));
@@ -202,6 +215,8 @@ const totalContrat = async (app: Application, checkAccess) => {
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
+  filterDepartement,
+  filterRegion,
   filterPix,
   filterDiplome,
   filterCCP1,

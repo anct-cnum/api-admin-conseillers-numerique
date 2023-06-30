@@ -6,6 +6,8 @@ import { generateCsvHistoriqueDossiersConvention } from '../exports.repository';
 import { validHistoriqueConvention } from '../../../schemas/reconventionnement.schemas';
 import {
   checkAccessReadRequestStructures,
+  filterDepartement,
+  filterRegion,
   filterSearchBar,
 } from '../../structures/repository/structures.repository';
 import {
@@ -17,7 +19,8 @@ import { StatutConventionnement } from '../../../ts/enum';
 
 const getExportHistoriqueDossiersConventionCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type, nomOrdre, ordre, searchByNomStructure } = req.query;
+    const { type, nomOrdre, ordre, searchByNomStructure, region, departement } =
+      req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -31,6 +34,8 @@ const getExportHistoriqueDossiersConventionCsv =
       nomOrdre,
       ordre,
       searchByNomStructure,
+      region,
+      departement,
     });
     if (pageValidation.error) {
       res.status(400).json({ message: pageValidation.error.message });
@@ -52,6 +57,8 @@ const getExportHistoriqueDossiersConventionCsv =
                 filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
                 filterSearchBar(searchByNomStructure),
               ],
+              ...filterRegion(region),
+              ...filterDepartement(departement),
             },
           },
           {
