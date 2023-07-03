@@ -45,10 +45,9 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           },
           {
             'conventionnement.statut':
-              match.conventionnement.statut ===
-              StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
-                ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
-                : StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
+              match?.conventionnement?.statut === undefined
+                ? StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+                : match.conventionnement.statut,
             'conventionnement.dossierConventionnement': {
               statut: dossier.dossier.state,
               numero: dossier.dossier.number,
@@ -65,6 +64,31 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           },
         );
       if (structureUpdated.modifiedCount === 1) {
+        await app.service(service.misesEnRelation).Model.updateMany(
+          {
+            'structure.$id': match._id,
+            'structureObj.statut': 'VALIDATION_COSELEC',
+          },
+          {
+            'structureObj.conventionnement.statut':
+              match?.conventionnement?.statut === undefined
+                ? StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+                : match.conventionnement.statut,
+            'structureObj.conventionnement.dossierConventionnement': {
+              statut: dossier.dossier.state,
+              numero: dossier.dossier.number,
+              dateDeCreation: new Date(
+                dossier.dossier.datePassageEnConstruction,
+              ),
+              dateDerniereModification: new Date(
+                dossier.dossier.dateDerniereModification,
+              ),
+              dateDeValidation: dossier.dossier.dateTraitement
+                ? new Date(dossier.dossier.dateTraitement)
+                : null,
+            },
+          },
+        );
         logger.info(`Structure [${structure.ID}] mise à jour avec succès`);
       }
     }
