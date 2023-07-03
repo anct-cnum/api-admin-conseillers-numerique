@@ -8,6 +8,7 @@ import {
 } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from './getStatsGlobales';
+import { validStatGrandReseau } from '../../../schemas/stats.schemas';
 
 const departements = require('../../../../datas/imports/departements-region.json');
 const codesRegions = require('../../../../datas/imports/code_region.json');
@@ -17,14 +18,32 @@ const getStatsNationalesGrandReseau =
   // eslint-disable-next-line consistent-return
   async (req: IRequest, res: Response) => {
     try {
-      const dateDebut = new Date(String(req.query.dateDebut));
+      const dateDebut = new Date(req.query.dateDebut);
       dateDebut.setUTCHours(0, 0, 0, 0);
-      const dateFin = new Date(String(req.query.dateFin));
+      const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
       const { codePostal, ville, codeRegion, numeroDepartement } = req.query;
-      const structureIds = JSON.parse(req.query.structureIds);
-      const conseillerIds = JSON.parse(req.query.conseillerIds);
+      const structureIds = req.query.structureIds
+        ? JSON.parse(req.query.structureIds)
+        : [];
+      const conseillerIds = req.query.conseillerIds
+        ? JSON.parse(req.query.conseillerIds)
+        : [];
+      if (!exportStats) {
+        const statsValidation = validStatGrandReseau.validate({
+          dateDebut,
+          dateFin,
+          codePostal,
+          ville,
+          codeRegion,
+          numeroDepartement,
+        });
 
+        if (statsValidation.error) {
+          res.status(400).json({ message: statsValidation.error.message });
+          return;
+        }
+      }
       let numerosDepartements: number[];
 
       // Rajout de la date dans la requête
@@ -35,11 +54,7 @@ const getStatsNationalesGrandReseau =
         },
       };
       // Si la requête contient un code région, on l'ajoute à la requête
-      if (
-        codeRegion !== '' &&
-        codeRegion !== 'undefined' &&
-        codeRegion !== 'tous'
-      ) {
+      if (codeRegion) {
         const regionInfos = codesRegions.find(
           (region: ICodeRegion) => codeRegion === region.code,
         );
@@ -64,11 +79,7 @@ const getStatsNationalesGrandReseau =
         }
       }
       // Si la requête contient un numéro de département, on l'ajoute à la requête
-      if (
-        numeroDepartement !== '' &&
-        numeroDepartement !== 'undefined' &&
-        numeroDepartement !== 'tous'
-      ) {
+      if (numeroDepartement) {
         // Si le numéro de département est la Corse du Sud 2A, on ajoute les codes postaux de la Corse du Sud
         if (numeroDepartement === '2A') {
           query['cra.codePostal'] = { $regex: `^200.*|^201.*` };
@@ -94,7 +105,7 @@ const getStatsNationalesGrandReseau =
         };
       }
       // Si la requête contient une ville, on l'ajoute à la requête avec le code postal associé
-      if (ville !== '' && ville !== 'undefined' && codePostal !== 'tous') {
+      if (ville && codePostal) {
         query['cra.codePostal'] = codePostal;
         query['cra.nomCommune'] = ville;
       }
@@ -121,13 +132,15 @@ const getStatsNationalesGrandReseau =
       );
 
       if (exportStats) {
+        // eslint-disable-next-line consistent-return
         return donneesStats;
       }
 
       res.status(200).json(donneesStats);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        return res.status(403).json({ message: 'Accès refusé' });
+        res.status(403).json({ message: 'Accès refusé' });
+        return;
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

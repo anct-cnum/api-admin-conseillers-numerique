@@ -1,0 +1,73 @@
+[
+  {
+    "type": "entreprise",
+    "numero_demarche_reconventionnement": 69686,
+    "numero_demarche_conventionnement": 38614,
+    "categorie": [
+      "Autre SARL coopérative",
+      "SA d'économie mixte à conseil d'administration",
+      "SAS, société par actions simplifiée",
+      "SA à conseil d'administration (s.a.i.)",
+      "Fondation",
+      "Société à responsabilité limitée (sans autre indication)",
+      "SARL coopérative ouvrière de production (SCOP)",
+      "Mutualité sociale agricole",
+      "Établissement d'hospitalisation",
+      "Autre SA coopérative à conseil d'administration",
+      "Autre SA coopérative à directoire",
+      "SA nationale à conseil d'administration",
+      "Mutuelle",
+      "SA de HLM à directoire",
+      "Groupement de coopération sanitaire à gestion privée",
+      "Autre groupement de droit privé non doté de la personnalité morale",
+      "Groupement d'employeurs",
+      "Entrepreneur individuel"
+    ]
+  },
+  {
+    "type": "association",
+    "numero_demarche_reconventionnement": 69687,
+    "numero_demarche_conventionnement": 43266,
+    "categorie": [
+      "Association déclarée",
+      "Association de droit local (Bas-Rhin, Haut-Rhin et Moselle)",
+      "Association déclarée, reconnue d'utilité publique",
+      "Association déclarée d'insertion par l'économique",
+      "Association intermédiaire",
+      "Association non déclarée"
+    ]
+  },
+  {
+    "type": "structure_publique",
+    "numero_demarche_reconventionnement": 69665,
+    "numero_demarche_conventionnement": 38389,
+    "categorie": [
+      "Commune et commune nouvelle",
+      "Syndicat mixte ouvert",
+      "Communauté de communes",
+      "Département",
+      "Syndicat intercommunal à vocation unique (SIVU)",
+      "Centre communal d'action sociale",
+      "Centre Intercommunal d'action sociale (CIAS)",
+      "Communauté d'agglomération",
+      "Syndicat intercommunal à vocation multiple (SIVOM)",
+      "Régie d'une collectivité locale à caractère administratif",
+      "Groupement d'intérêt public (GIP)",
+      "Pôle d'équilibre territorial et rural (PETR)",
+      "Communauté urbaine",
+      "Métropole",
+      "Établissement public local à caractère industriel ou commercial",
+      "Caisse des écoles",
+      "Syndicat mixte fermé",
+      "Autre établissement public national administratif à compétence territoriale limitée",
+      "Organisme consulaire",
+      "(Autre) Collectivité territoriale",
+      "Établissement public national à caractère industriel ou commercial non doté d'un comptable public",
+      "Établissement public national à caractère scientifique culturel et professionnel",
+      "Établissement public national à caractère administratif",
+      "Régie d'une collectivité locale à caractère industriel ou commercial",
+      "Autre personne morale de droit administratif",
+      "Établissement public national à caractère industriel ou commercial doté d'un comptable public"
+    ]
+  }
+]

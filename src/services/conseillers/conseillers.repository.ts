@@ -31,12 +31,25 @@ const formatStatutMisesEnRelation = (
 };
 
 const filterNomConseiller = (nom: string) => {
-  const formatNom = nom?.trim();
-  if (/^\d+$/.test(formatNom)) {
-    return { idPG: { $eq: parseInt(formatNom, 10) } };
-  }
-  if (formatNom) {
-    return { nom: { $regex: `(?'name'${formatNom}.*$)`, $options: 'i' } };
+  const inputSearchBar = nom?.trim();
+  if (inputSearchBar) {
+    return {
+      $or: [
+        {
+          nomPrenomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          prenomNomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
+      ],
+    };
   }
   return {};
 };
@@ -85,6 +98,20 @@ const filterDiplome = (diplome: string) => {
   return {};
 };
 
+const filterCCP1 = (ccp1: string) => {
+  if (ccp1 === 'true') {
+    return {
+      statut: { $in: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  if (ccp1 === 'false') {
+    return {
+      statut: { $nin: ['RECRUTE', 'RUPTURE'] },
+    };
+  }
+  return {};
+};
+
 const filterCv = (cv: string) => {
   if (cv === 'true') {
     return { cv: { $exists: true } };
@@ -96,10 +123,15 @@ const filterCv = (cv: string) => {
   return {};
 };
 
-const filterDepartement = (departement: string) =>
-  departement ? { codeDepartement: departement } : {};
-
-const filterComs = (coms: string) => (coms ? { codeCom: coms } : {});
+const filterDepartement = (departement: string) => {
+  if (departement === '978') {
+    return { codeCom: departement };
+  }
+  if (departement) {
+    return { codeDepartement: departement };
+  }
+  return {};
+};
 
 const filtrePiecesManquantes = (piecesManquantes: boolean) =>
   piecesManquantes
@@ -159,28 +191,17 @@ const filterIsRuptureConseiller = (
   dateFin: Date,
 ) => {
   switch (rupture) {
-    case 'nouvelle_rupture':
-      return {
-        statut: { $eq: 'RECRUTE' },
-        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
-      };
     case 'finalisee_rupture':
       return { statut: { $eq: 'RUPTURE' } };
-    case 'contrat':
-      return {
-        statut: { $eq: 'RECRUTE' },
-        datePrisePoste: { $gt: dateDebut, $lt: dateFin },
-      };
-    default:
+    default: // contrat / nouvelle_rupture / finalisee_rupture
       return {
         $or: [
           { statut: { $eq: 'RUPTURE' } },
           {
-            $and: [
-              { statut: { $eq: 'RECRUTE' } },
-              { datePrisePoste: { $gt: dateDebut, $lt: dateFin } },
-            ],
+            statut: { $eq: 'RECRUTE' },
+            datePrisePoste: { $gte: dateDebut, $lte: dateFin },
           },
+          { statut: { $eq: 'RECRUTE' }, datePrisePoste: null },
         ],
       };
   }
@@ -196,8 +217,8 @@ export {
   filterIsRuptureConseiller,
   filterRegion,
   filterDepartement,
-  filterComs,
   filterCv,
   filterDiplome,
   filterPix,
+  filterCCP1,
 };

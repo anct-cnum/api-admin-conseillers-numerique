@@ -106,9 +106,18 @@ export default class Users extends Service {
       createAbilities(app),
       postGestionnaireRelanceInvitation(app),
     );
-    // Sentry test
+
+    /* Routes techniques */
+
+    // Intégration test Sentry
     app.get('/debug-sentry', function mainHandler() {
       throw new Error('My first Sentry error!');
+    });
+
+    // Monitoring clever
+    // eslint-disable @typescript-eslint/no-unused-vars
+    app.get('/', (req, res) => {
+      res.sendStatus(200);
     });
   }
 }

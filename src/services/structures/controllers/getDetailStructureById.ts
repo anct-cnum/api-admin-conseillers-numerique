@@ -8,20 +8,40 @@ import {
   formatAdresseStructure,
   formatQpv,
   formatType,
-} from '../structures.repository';
+  getConseillersRecruter,
+  getConseillersValider,
+} from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
   getNombreAccompagnementsByArrayConseillerId,
   getNombreCrasByArrayConseillerId,
 } from '../../cras/cras.repository';
-import { getCoselec } from '../../../utils';
+import {
+  getUrlDossierConventionnement,
+  getUrlDossierReconventionnement,
+  getTypeDossierDemarcheSimplifiee,
+} from '../repository/reconventionnement.repository';
+import { getCoselec, getCoselecConventionnement } from '../../../utils';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { action } from '../../../helpers/accessControl/accessList';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const demarcheSimplifiee = app.get('demarche_simplifiee');
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      const findStructure: IStructures = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: new ObjectId(idStructure) });
+
+      if (!findStructure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
       const checkAccessStructure = await checkAccessReadRequestStructures(
@@ -37,20 +57,42 @@ const getDetailStructureById =
         },
         {
           $lookup: {
-            from: 'conseillers',
-            let: { idStructure: '$_id' },
-            as: 'conseillers',
+            from: 'misesEnRelation',
+            let: {
+              idStructure: '$_id',
+            },
+            as: 'misesEnRelation',
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: ['$$idStructure', '$structureId'] },
+                  $and: [
+                    {
+                      $expr: {
+                        $eq: ['$$idStructure', '$structureObj._id'],
+                      },
+                    },
+                    {
+                      $expr: {
+                        $or: [
+                          { $eq: ['finalisee', '$statut'] },
+                          { $eq: ['nouvelle_rupture', '$statut'] },
+                          { $eq: ['recrutee', '$statut'] },
+                          { $eq: ['terminee', '$statut'] },
+                        ],
+                      },
+                    },
+                  ],
                 },
               },
               {
                 $project: {
-                  nom: 1,
-                  prenom: 1,
-                  idPG: 1,
+                  _id: 0,
+                  statut: 1,
+                  phaseConventionnement: 1,
+                  'conseillerObj.idPG': 1,
+                  'conseillerObj.nom': 1,
+                  'conseillerObj._id': 1,
+                  'conseillerObj.prenom': 1,
                 },
               },
             ],
@@ -69,10 +111,17 @@ const getDetailStructureById =
             createdAt: 1,
             coselec: 1,
             contact: 1,
-            conseillers: '$conseillers',
+            conseillers: '$misesEnRelation',
+            conventionnement: 1,
+            demandesCoselec: 1,
+            lastDemandeCoselec: { $arrayElemAt: ['$demandesCoselec', -1] },
           },
         },
       ]);
+      if (structure.length === 0) {
+        res.status(404).json({ message: 'Structure non trouvée' });
+        return;
+      }
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByArrayConseillerId(
@@ -93,14 +142,54 @@ const getDetailStructureById =
         },
         { $project: { name: 1, roles: 1, passwordCreated: 1 } },
       ]);
+      const typeStructure = getTypeDossierDemarcheSimplifiee(
+        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
+      );
       const coselec = getCoselec(structure[0]);
+      const coselecConventionnement = getCoselecConventionnement(structure[0]);
       structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
+      structure[0].posteValiderCoselecConventionnement =
+        coselecConventionnement?.nombreConseillersCoselec;
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
+      structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
+        structure[0].idPG,
+        typeStructure?.type,
+        demarcheSimplifiee,
+      );
+      structure[0].urlDossierReconventionnement =
+        getUrlDossierReconventionnement(
+          structure[0].idPG,
+          typeStructure?.type,
+          demarcheSimplifiee,
+        );
+      if (
+        structure[0]?.conventionnement?.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        structure[0].urlDossierReconventionnementMessagerie = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+      }
+      structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
+        return {
+          idPG: conseiller?.conseillerObj?.idPG,
+          nom: conseiller?.conseillerObj?.nom,
+          prenom: conseiller?.conseillerObj?.prenom,
+          _id: conseiller?.conseillerObj?._id,
+          statut: conseiller?.statut,
+          phaseConventionnement: conseiller?.phaseConventionnement,
+        };
+      });
+      Object.assign(
+        structure[0],
+        getConseillersValider(structure[0].conseillers),
+        getConseillersRecruter(structure[0].conseillers),
+      );
+
+      delete structure[0].conseillers;
 
       if (structure.length === 0) {
         res.status(404).json({ message: 'Structure non trouvée' });
@@ -108,7 +197,6 @@ const getDetailStructureById =
       }
 
       res.status(200).json(structure[0]);
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

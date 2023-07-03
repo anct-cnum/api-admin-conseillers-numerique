@@ -13,6 +13,7 @@ import {
   filterNomStructure,
   filterRegion,
   formatStatutMisesEnRelation,
+  filterDepartement,
 } from '../conseillers.repository';
 import { getNombreCras } from '../../cras/cras.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
@@ -53,15 +54,28 @@ const getConseillersRecruter =
     isCoordinateur: string,
     searchByConseiller: string,
     region: string,
+    departement: string,
     rupture: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
+      {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
           ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
+          ...filterDepartement(departement),
           $and: [checkAccess],
         },
       },
@@ -132,6 +146,7 @@ const getConseillersStatutRecrute =
       searchByConseiller,
       searchByStructure,
       region,
+      departement,
       piecesManquantes,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
@@ -147,6 +162,7 @@ const getConseillersStatutRecrute =
       searchByConseiller,
       searchByStructure,
       region,
+      departement,
       piecesManquantes,
     });
 
@@ -180,6 +196,7 @@ const getConseillersStatutRecrute =
         coordinateur as string,
         searchByConseiller as string,
         region as string,
+        departement as string,
         rupture as string,
       );
       const conseillerRecruter = conseillers.filter(

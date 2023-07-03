@@ -70,6 +70,14 @@ export default function (app: Application): Model<any> {
       coselecAt: { type: Date },
 
       reseau: { type: String },
+
+      contact: { type: Object },
+
+      conventionnement: {
+        statut: { type: String },
+        dossierReconventionnement: { type: Object },
+        dossierConventionnement: { type: Object },
+      },
     },
     { strict: false },
   );

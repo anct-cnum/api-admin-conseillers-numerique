@@ -8,6 +8,22 @@ import {
   IConseillers,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
+
+interface IObjetMiseEnRelation {
+  conseiller: DBRef;
+  structure: DBRef;
+  statut: string;
+  type: string;
+  createdAt: Date;
+  conseillerCreatedAt: Date;
+  conseillerObj: IConseillers;
+  structureObj: IStructures;
+  phaseConventionnement?: string;
+}
 
 const preSelectionnerCandidat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -40,7 +56,7 @@ const preSelectionnerCandidat =
       }
       const connect = app.get('mongodb');
       const database = connect.substr(connect.lastIndexOf('/') + 1);
-      const objMiseEnRelation = {
+      const objMiseEnRelation: IObjetMiseEnRelation = {
         conseiller: new DBRef('conseillers', conseiller._id, database),
         structure: new DBRef('structures', structure._id, database),
         statut: 'interessee',
@@ -50,6 +66,13 @@ const preSelectionnerCandidat =
         conseillerObj: conseiller,
         structureObj: structure,
       };
+      if (
+        structure?.conventionnement?.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        objMiseEnRelation.phaseConventionnement = PhaseConventionnement.PHASE_2;
+      }
+
       await app.service(service.misesEnRelation).create(objMiseEnRelation);
 
       res.status(201).send({

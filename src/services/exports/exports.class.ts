@@ -22,6 +22,8 @@ import {
   getExportListeStructuresCsv,
   getExportListeGestionnairesCsv,
   getExportConseillersCsv,
+  getExportHistoriqueDossiersConventionCsv,
+  getExportHistoriqueContratsCsv,
 } from './controllers';
 
 interface Data {}
@@ -115,6 +117,18 @@ export class Exports implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getExportListeGestionnairesCsv(app),
+    );
+    app.get(
+      '/exports/historique-dossiers-convention-csv',
+      authenticateMode(app),
+      createAbilities(app),
+      getExportHistoriqueDossiersConventionCsv(app),
+    );
+    app.get(
+      '/exports/historique-contrats-csv',
+      authenticateMode(app),
+      createAbilities(app),
+      getExportHistoriqueContratsCsv(app),
     );
   }
 

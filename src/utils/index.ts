@@ -4,6 +4,7 @@ import { invitationActiveCompte, invitationMultiRoleCompte } from '../emails';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 import { IRequest } from '../ts/interfaces/global.interfaces';
+import { PhaseConventionnement } from '../ts/enum';
 
 /**
  * On cherche le bon coselec avec avis POSITIF :
@@ -17,7 +18,29 @@ const getCoselecPositif = (structure) => {
   let coselecsPositifs = null;
   if ('coselec' in structure && structure.coselec !== null) {
     coselecsPositifs = structure.coselec.filter(
-      (c) => c.avisCoselec === 'POSITIF',
+      (c) =>
+        c.avisCoselec === 'POSITIF' &&
+        c.phaseConventionnement === PhaseConventionnement.PHASE_2,
+    );
+    if (coselecsPositifs.length === 0) {
+      coselecsPositifs = structure.coselec.filter(
+        (c) =>
+          c.avisCoselec === 'POSITIF' && c.phaseConventionnement === undefined,
+      );
+    }
+  }
+  // On prend le dernier
+  return coselecsPositifs !== null && coselecsPositifs.length > 0
+    ? coselecsPositifs.slice(-1).pop()
+    : null;
+};
+
+const getCoselecPositifConventionnement = (structure) => {
+  let coselecsPositifs = null;
+  if ('coselec' in structure && structure.coselec !== null) {
+    coselecsPositifs = structure.coselec.filter(
+      (c) =>
+        c.avisCoselec === 'POSITIF' && c.phaseConventionnement === undefined,
     );
   }
   // On prend le dernier
@@ -56,6 +79,13 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
+const getCoselecConventionnement = (structure) => {
+  if (structure.statut === 'VALIDATION_COSELEC') {
+    return getCoselecPositifConventionnement(structure);
+  }
+  return getLastCoselec(structure);
+};
+
 const deleteUser = async (app: Application, req: IRequest, email: string) => {
   await app
     .service(service.users)
@@ -87,12 +117,27 @@ const envoiEmailMultiRole = (app, mailer, user) => {
   return message.send(user);
 };
 
+const formatDateGMT = (date: Date) => {
+  const dateTodayTimezoneParis = new Date(
+    new Date().toLocaleString('en', { timeZone: 'Europe/Paris' }),
+  );
+  const dateTodayTimezoneUTC = new Date(
+    new Date().toLocaleString('en', { timeZone: 'UTC' }),
+  );
+  const offsetTimezone =
+    dateTodayTimezoneParis.getTime() - dateTodayTimezoneUTC.getTime();
+
+  return new Date(date.getTime() + offsetTimezone);
+};
+
 export {
   getCoselecPositif,
+  getCoselecConventionnement,
   getLastCoselec,
   getCoselec,
   deleteUser,
   envoiEmailInvit,
   deleteRoleUser,
   envoiEmailMultiRole,
+  formatDateGMT,
 };

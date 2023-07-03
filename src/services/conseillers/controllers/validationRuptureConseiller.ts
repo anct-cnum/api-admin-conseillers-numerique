@@ -116,6 +116,9 @@ const updateConseillerRupture =
               codeRegionStructure: '',
               codeDepartementStructure: '',
               hasPermanence: '',
+              coordinateurs: '',
+              listeSubordonnes: '',
+              estCoordinateur: '',
             },
           },
           { returnOriginal: false },
@@ -418,6 +421,15 @@ const validationRuptureConseiller =
         res.status(403).json({ message: 'Accès refusé' });
         return;
       }
+      await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          { _id: idConseiller },
+          {
+            $set: { ruptureError: true },
+          },
+        );
       res.status(500).json({ message: error.message });
       throw new Error(error);
     }

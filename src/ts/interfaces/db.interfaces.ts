@@ -95,6 +95,8 @@ export interface IMisesEnRelation {
   resendMailCnfsRupture: boolean | undefined;
 
   dossierIncompletRupture: boolean | undefined;
+
+  reconventionnement: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -235,6 +237,8 @@ export interface IConseillers {
 
     competence3: boolean;
   };
+
+  inactivite: boolean;
 }
 
 export interface IStructures {
@@ -305,49 +309,136 @@ export interface IStructures {
     email: string;
 
     telephone: string;
+
+    inactivite: boolean;
   };
-  insee: {
-    etablissement: IEtablissement;
-    entreprise: IEntreprise;
-  };
+  insee: Iinsee;
   estZRR: boolean;
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  conventionnement: {
+    statut: string;
+    dossierReconventionnement: {
+      numero: number;
+      dateDeCreation: Date;
+      dateFinProchainContrat: Date;
+      nbPostesAttribuees: number;
+      statut: string;
+      dateDernierModification: Date;
+    };
+    dossierConventionnement: {
+      numero: number;
+      dateDeCreation: Date;
+      statut: string;
+      dateDernierModification: Date;
+    };
+  };
+  demandesCoselec: IDemandesCoselec[];
 }
 
-interface IEtablissement {
-  siege_social: boolean;
+interface IDemandesCoselec {
+  statut: string;
+  type: string;
+  nombreDePostesAccordes?: number;
+  nombreDePostesSouhaites: number;
+  motif: string;
+  emetteurAvenant: {
+    date: Date;
+    email: string;
+  };
+  banniereValidationAvenant: boolean;
+}
+interface Iinsee {
   siret: string;
-  naf: string;
-  libelle_naf: string;
-  date_mise_a_jour: number;
-  commune_implantation: {
+  siege_social: boolean;
+  etat_administratif: string;
+  date_fermeture: string;
+  enseigne: string;
+  activite_principale: {
     code: string;
-    value: string;
+    nomenclature: string;
+    libelle: string;
+  };
+  tranche_effectif_salarie: {
+    de: number;
+    a: number;
+    code: string;
+    date_reference: string;
+    intitule: string;
+  };
+  diffusable_commercialement: boolean;
+  status_diffusion: string;
+  date_creation: number;
+  unite_legale: {
+    siren: string;
+    rna: string;
+    siret_siege_social: string;
+    type: string;
+    personne_morale_attributs: {
+      raison_sociale: string;
+      sigle: string;
+    };
+    personne_physique_attributs: {
+      pseudonyme: string;
+      prenom_usuel: string;
+      prenom_1: string;
+      prenom_2: string;
+      prenom_3: string;
+      prenom_4: string;
+      nom_usage: string;
+      nom_naissance: string;
+      sexe: string;
+    };
+    categorie_entreprise: string;
+    status_diffusion: string;
+    diffusable_commercialement: boolean;
+    forme_juridique: {
+      code: string;
+      libelle: string;
+    };
+    activite_principale: {
+      code: string;
+      nomenclature: string;
+      libelle: string;
+    };
+    tranche_effectif_salarie: {
+      de: number;
+      a: number;
+      code: string;
+      date_reference: string;
+      intitule: string;
+    };
+    economie_sociale_et_solidaire: boolean;
+    date_creation: number;
+    etat_administratif: string;
   };
   adresse: {
-    l1: string;
-    l2: string;
-    l3: string;
-    l4: string;
-    l5: string;
-    l6: string;
-    l7: string;
-    numero_voie: string;
-    type_voie: string;
-    nom_voie: string;
+    status_diffusion: string;
     complement_adresse: string;
+    numero_voie: string;
+    indice_repetition_voie: string;
+    type_voie: string;
+    libelle_voie: string;
     code_postal: string;
-    localite: string;
+    libelle_commune: string;
+    libelle_commune_etranger: string;
+    distribution_speciale: string;
+    code_commune: string;
+    code_cedex: string;
+    libelle_cedex: string;
+    code_pays_etranger: string;
+    libelle_pays_etranger: string;
+    acheminement_postal: {
+      l1: string;
+      l2: string;
+      l3: string;
+      l4: string;
+      l5: string;
+      l6: string;
+      l7: string;
+    };
   };
-}
-
-interface IEntreprise {
-  siren: string;
-  numero_tva_intracommunautaire: string;
-  forme_juridique: string;
-  raison_sociale: string;
 }
 
 export interface IPermanences {

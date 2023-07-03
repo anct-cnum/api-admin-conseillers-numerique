@@ -9,11 +9,10 @@ import {
   filterRegion,
   filterStatut,
   filterType,
-  filterNomStructure,
+  filterSearchBar,
   checkAccessReadRequestStructures,
-  filterComs,
   filterSortColonne,
-} from '../structures.repository';
+} from '../repository/structures.repository';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -24,10 +23,10 @@ const getTotalStructures =
     statut: string,
     region: string,
     departement: string,
-    coms: string,
     searchByName: string,
   ) =>
     app.service(service.structures).Model.aggregate([
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
           createdAt: { $gt: dateDebut, $lt: dateFin },
@@ -36,8 +35,7 @@ const getTotalStructures =
           ...filterStatut(statut),
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterComs(coms),
-          ...filterNomStructure(searchByName),
+          ...filterSearchBar(searchByName),
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
@@ -53,13 +51,13 @@ const getStructuresAvecFiltre =
     statut: string,
     region: string,
     departement: string,
-    coms: string,
     searchByName: string,
     sortColonne: object,
     skip: string,
     limit: number,
   ) =>
     app.service(service.structures).Model.aggregate([
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
           createdAt: { $gt: dateDebut, $lt: dateFin },
@@ -68,8 +66,7 @@ const getStructuresAvecFiltre =
           ...filterStatut(statut),
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterComs(coms),
-          ...filterNomStructure(searchByName),
+          ...filterSearchBar(searchByName),
         },
       },
       {
@@ -77,10 +74,10 @@ const getStructuresAvecFiltre =
           _id: 1,
           idPG: 1,
           nom: 1,
+          siret: 1,
           'contact.prenom': 1,
           'contact.nom': 1,
           'contact.email': 1,
-          'contact.telephone': 1,
         },
       },
       { $sort: sortColonne },
@@ -101,7 +98,6 @@ const getStructures =
       searchByNom,
       departement,
       region,
-      coms,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
@@ -116,7 +112,6 @@ const getStructures =
       searchByNom,
       departement,
       region,
-      coms,
     });
 
     if (emailValidation.error) {
@@ -144,7 +139,6 @@ const getStructures =
         statut as string,
         region as string,
         departement as string,
-        coms as string,
         searchByNom as string,
         sortColonne,
         skip as string,
@@ -158,7 +152,6 @@ const getStructures =
           statut as string,
           region as string,
           departement as string,
-          coms as string,
           searchByNom as string,
         );
         items.data = structures;

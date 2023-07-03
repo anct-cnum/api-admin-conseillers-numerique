@@ -6,12 +6,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import {
-  deleteRoleUser,
-  deleteUser,
-  envoiEmailInvit,
-  envoiEmailMultiRole,
-} from '../../../utils/index';
+import { deleteUser, envoiEmailInvit } from '../../../utils/index';
 
 const { v4: uuidv4 } = require('uuid');
 const { DBRef, ObjectId } = require('mongodb');
@@ -21,7 +16,6 @@ const postInvitationStructure =
     const { email, structureId } = req.body;
     let errorSmtpMail: Error | null = null;
     let messageSuccess: string = '';
-    let user: IUser | null = null;
     try {
       const errorJoi = await validationEmail.validate(email);
       if (errorJoi?.error) {
@@ -32,7 +26,8 @@ const postInvitationStructure =
       const database = connect.substr(connect.lastIndexOf('/') + 1);
       const oldUser = await app
         .service(service.users)
-        .Model.findOne({ name: email.toLowerCase() });
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
         if (!canCreate) {
@@ -41,7 +36,7 @@ const postInvitationStructure =
           });
           return;
         }
-        user = await app.service(service.users).create({
+        const user: IUser = await app.service(service.users).create({
           name: email.toLowerCase(),
           roles: ['structure'],
           entity: new DBRef('structures', new ObjectId(structureId), database),
@@ -54,14 +49,7 @@ const postInvitationStructure =
           resend: false,
         });
 
-        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user).catch(
-          async () => {
-            await deleteUser(app, req, email);
-            return new Error(
-              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-            );
-          },
-        );
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {
@@ -70,14 +58,15 @@ const postInvitationStructure =
           });
           return;
         }
-        if (!oldUser.roles.includes('grandReseau')) {
+        if (
+          oldUser.roles.includes('conseiller') ||
+          oldUser.roles.includes('candidat')
+        ) {
           res.status(409).json({
-            message:
-              'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
+            message: 'Le compte est déjà utilisé par un candidat ou conseiller',
           });
           return;
         }
-
         const query = {
           $push: {
             roles: 'structure',
@@ -98,44 +87,26 @@ const postInvitationStructure =
             mailSentDate: null,
           });
         }
-        user = await app
+        const user = await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate(oldUser._id, query, { new: true });
         if (!oldUser.sub) {
-          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user).catch(
-            async () => {
-              const queryRoleStructure = {
-                $pull: {
-                  roles: 'structure',
-                },
-                $unset: {
-                  entity: '',
-                },
-              };
-              await deleteRoleUser(app, req, email, queryRoleStructure);
-              return new Error(
-                "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-              );
-            },
-          );
+          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
           messageSuccess = `Le rôle structure a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
         } else {
-          await envoiEmailMultiRole(app, mailer, user);
           messageSuccess = `Le rôle structure a été ajouté au compte ${email}`;
         }
       }
       if (errorSmtpMail instanceof Error) {
+        await deleteUser(app, req, email);
         res.status(503).json({
-          message: errorSmtpMail.message,
+          message:
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
         });
         return;
       }
-      res.status(200).json({
-        message: messageSuccess,
-        account: user,
-      });
-      return;
+      res.status(200).json(messageSuccess);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

@@ -62,3 +62,24 @@ export interface ICodesPostauxQuery {
     $regex: string;
   };
 }
+
+export interface IDossierDS {
+  _id?: string;
+  idPG?: number;
+  dateDeCreation?: Date;
+  dateFinProchainContrat?: Date;
+  dateDerniereModification?: Date;
+  nbPostesAttribuees?: number;
+  statut?: string;
+}
+
+export interface IConfigurationDemarcheSimplifiee {
+  url_association_reconventionnement: string;
+  url_entreprise_reconventionnement: string;
+  url_structure_publique_reconventionnement: string;
+  url_association_conventionnement: string;
+  url_entreprise_conventionnement: string;
+  url_structure_publique_conventionnement: string;
+  token_api: string;
+  endpoint: string;
+}

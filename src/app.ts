@@ -8,6 +8,8 @@ import socketio from '@feathersjs/socketio';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import cookieParser from 'cookie-parser';
+import favicon from 'serve-favicon';
+import path from 'path';
 import logger from './logger';
 import services from './services';
 import appHooks from './app.hooks';
@@ -54,6 +56,12 @@ app.use(compress());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(favicon(path.join(__dirname, 'favicon.ico')));
+} else {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
 // Set up Plugins and providers
 app.configure(express.rest());

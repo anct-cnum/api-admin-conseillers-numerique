@@ -23,10 +23,10 @@ const dossierIncompletRuptureConseiller =
       return;
     }
     try {
-      await app
+      const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             'conseiller.$id': new ObjectId(idConseiller),
             statut: 'nouvelle_rupture',
@@ -37,9 +37,12 @@ const dossierIncompletRuptureConseiller =
               dateRupture: new Date(dateFinDeContrat),
             },
           },
+          {
+            new: true,
+          },
         );
 
-      res.status(200).json({ dossierIncompletRupture: true });
+      res.status(200).json(miseEnRelationUpdated);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

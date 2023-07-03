@@ -40,8 +40,19 @@
     "access_token_duration": "INCLUSION_CONNECT_ACCESSTOKENDURATION",
     "refresh_token_duration": "INCLUSION_CONNECT_REFRESHTOKENDURATION"
   },
+  "demarche_simplifiee": {
+    "token_api": "DEMARCHE_SIMPLIFIEE_TOKEN_API",
+    "url_entreprise_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE_RECONVENTIONNEMENT",
+    "url_association_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION_RECONVENTIONNEMENT",
+    "url_structure_publique_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_STRUCTURE_PUBLIQUE_RECONVENTIONNEMENT",
+    "url_entreprise_conventionnement": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE_CONVENTIONNEMENT",
+    "url_association_conventionnement": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION_CONVENTIONNEMENT",
+    "url_structure_publique_conventionnement": "DEMARCHE_SIMPLIFIEE_URL_STRUCTURE_PUBLIQUE_CONVENTIONNEMENT",
+    "endpoint": "DEMARCHE_SIMPLIFIEE_ENDPOINT"
+  },
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {
+    "region": "AWS_REGION",
     "endpoint": "AWS_ENDPOINT",
     "access_key_id": "AWS_ACCESS_KEY_ID",
     "secret_access_key": "AWS_ACCESS_KEY_SECRET",

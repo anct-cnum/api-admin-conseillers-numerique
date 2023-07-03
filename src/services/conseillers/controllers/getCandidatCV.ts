@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { NotFound, Forbidden } from '@feathersjs/errors';
-import aws from 'aws-sdk';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import crypto from 'crypto';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
@@ -61,30 +61,33 @@ const getCandidatCV =
 
       // Récupération du CV crypté
       const awsConfig = app.get('aws');
-      aws.config.update({
-        accessKeyId: awsConfig.access_key_id,
-        secretAccessKey: awsConfig.secret_access_key,
+      const client = new S3Client({
+        region: awsConfig.region,
+        credentials: {
+          accessKeyId: awsConfig.access_key_id,
+          secretAccessKey: awsConfig.secret_access_key,
+        },
+        endpoint: awsConfig.endpoint,
       });
-      const ep = new aws.Endpoint(awsConfig.endpoint);
-      const s3 = new aws.S3({ endpoint: ep });
 
       const params = {
         Bucket: awsConfig.cv_bucket,
         Key: conseiller.cv.file,
       };
-      s3.getObject(params, function (error, data) {
-        if (error) {
-          res.status(500).json({ message: 'La récupération du cv a échoué.' });
-        } else {
+      const command = new GetObjectCommand(params);
+      client
+        .send(command)
+        .then(async (data) => {
           // Dechiffrement du CV (le buffer se trouve dans data.Body)
           const cryptoConfig = app.get('crypto');
           const key = crypto
             .createHash('sha256')
             .update(cryptoConfig.key)
             .digest('base64')
-            .substr(0, 32);
+            .substring(0, 32);
+          const file = await data.Body.transformToByteArray();
           // @ts-ignore: Unreachable code error
-          const iv = data.Body.slice(0, 16);
+          const iv = file.slice(0, 16);
           // @ts-ignore: Unreachable code error
           const decipher = crypto.createDecipheriv(
             cryptoConfig.algorithm,
@@ -93,13 +96,16 @@ const getCandidatCV =
           );
           const bufferDecrypt = Buffer.concat([
             // @ts-ignore: Unreachable code error
-            decipher.update(data.Body.slice(16)),
+            decipher.update(file.slice(16)),
             decipher.final(),
           ]);
 
           res.send(bufferDecrypt);
-        }
-      });
+        })
+        .catch((error) => {
+          res.status(500).json({ message: 'La récupération du cv a échoué.' });
+          throw new Error(error);
+        });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

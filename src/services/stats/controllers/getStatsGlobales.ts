@@ -17,6 +17,7 @@ import {
   getCodesPostauxGrandReseau,
   getStructures,
   getConseillers,
+  getStatsTempsAccompagnement,
 } from '../stats.repository';
 
 const getStatsGlobales = async (
@@ -54,6 +55,13 @@ const getStatsGlobales = async (
     );
 
     const statsRecurrence = await getPersonnesRecurrentes(
+      query,
+      ability,
+      action,
+      app,
+    );
+
+    const statsTempsAccompagnement = await getStatsTempsAccompagnement(
       query,
       ability,
       action,
@@ -109,6 +117,7 @@ const getStatsGlobales = async (
       tauxTotalUsagersAccompagnes: 0,
       statsThemes,
       statsLieux,
+      statsTempsAccompagnement,
       statsDurees,
       statsAges,
       statsUsagers,
@@ -136,6 +145,12 @@ const getStatsGlobales = async (
     donneesStats.statsLieux = await conversionPourcentage(
       donneesStats.statsLieux,
       donneesStats.nbAccompagnement,
+    );
+    donneesStats.statsTempsAccompagnement = await conversionPourcentage(
+      donneesStats.statsTempsAccompagnement,
+      donneesStats.statsTempsAccompagnement.find(
+        (temps) => temps.nom === 'total',
+      ).valeur,
     );
     donneesStats.statsAges = await conversionPourcentage(
       donneesStats.statsAges,

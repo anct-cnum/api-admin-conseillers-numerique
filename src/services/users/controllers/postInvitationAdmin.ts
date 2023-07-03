@@ -13,6 +13,8 @@ const { v4: uuidv4 } = require('uuid');
 const postInvitationAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, nom, prenom } = req.body;
+    let errorSmtpMail: Error | null = null;
+    let messageSuccess: string = '';
     try {
       const canCreate = req.ability.can(action.create, ressource.users);
       if (!canCreate) {
@@ -43,35 +45,71 @@ const postInvitationAdmin =
           mailSentDate: null,
           passwordCreated: false,
         });
-        const errorSmtpMail = await envoiEmailInvit(
-          app,
-          req,
-          mailer,
-          user,
-        ).catch(async () => {
-          await deleteUser(app, req, email);
-          return new Error(
-            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-          );
-        });
-        if (errorSmtpMail instanceof Error) {
-          res.status(503).json({
-            message: errorSmtpMail.message,
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        messageSuccess = `L'admin ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
+      } else {
+        if (oldUser.roles.includes('admin')) {
+          res.status(409).json({
+            message: `Ce compte possède déjà le rôle admin`,
           });
           return;
         }
-        res
-          .status(200)
-          .json(
-            `L'admin ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
-          );
+        if (
+          oldUser.roles.includes('conseiller') ||
+          oldUser.roles.includes('candidat')
+        ) {
+          res.status(409).json({
+            message: 'Le compte est déjà utilisé par un candidat ou conseiller',
+          });
+          return;
+        }
+
+        if (!oldUser.roles.includes('grandReseau')) {
+          res.status(409).json({
+            message:
+              'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
+          });
+          return;
+        }
+
+        const query = {
+          $push: {
+            roles: 'admin',
+          },
+          $set: {
+            nom,
+            prenom,
+            migrationDashboard: true,
+          },
+        };
+        if (!oldUser.sub) {
+          Object.assign(query.$set, {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+          });
+        }
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(oldUser._id, query, { new: true });
+        if (!oldUser.sub) {
+          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+          messageSuccess = `Le rôle admin a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
+        } else {
+          messageSuccess = `Le rôle admin a été ajouté au compte ${email}`;
+        }
+      }
+
+      if (errorSmtpMail instanceof Error) {
+        await deleteUser(app, req, email);
+        res.status(503).json({
+          message:
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+        });
         return;
       }
-      res.status(409).json({
-        message:
-          'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
-      });
-      return;
+      res.status(200).json(messageSuccess);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

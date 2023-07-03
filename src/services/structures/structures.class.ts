@@ -8,8 +8,17 @@ import {
   preSelectionnerCandidat,
   updateEmailStructure,
   updateSiretStructure,
-  updateStructure,
+  updateContactStructure,
   verifySiretStructure,
+  getDossiersConvention,
+  getDetailDossierConvention,
+  getHistoriqueDossiersConvention,
+  updateDossierReconventionnement,
+  decisionReconventionnement,
+  createAvenant,
+  closeBanner,
+  updateAvenantAjoutPoste,
+  updateAvenantRenduPoste,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -37,10 +46,10 @@ export default class Structures extends Service {
       getDetailStructureById(app),
     );
     app.patch(
-      '/structure/:id',
+      '/structure/contact/:id',
       authenticateMode(app),
       createAbilities(app),
-      updateStructure(app),
+      updateContactStructure(app),
     );
     app.get(
       '/structure/verify-siret/:siret',
@@ -77,6 +86,60 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getStructuresMisesEnRelationsStats(app),
+    );
+    app.get(
+      '/conventions/',
+      authenticateMode(app),
+      createAbilities(app),
+      getDossiersConvention(app, options),
+    );
+    app.get(
+      '/historique/conventions/',
+      authenticateMode(app),
+      createAbilities(app),
+      getHistoriqueDossiersConvention(app, options),
+    );
+    app.get(
+      '/convention/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      getDetailDossierConvention(app),
+    );
+    app.patch(
+      '/decision/reconventionnement/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      decisionReconventionnement(app),
+    );
+    app.patch(
+      '/reconventionnement',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDossierReconventionnement(app),
+    );
+    app.patch(
+      '/banniere/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBanner(app),
+    );
+    app.patch(
+      '/avenant/creation/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      createAvenant(app),
+    );
+    app.patch(
+      '/avenant/ajout-poste/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateAvenantAjoutPoste(app),
+    );
+    app.patch(
+      '/avenant/rendu-poste/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateAvenantRenduPoste(app),
     );
   }
 }
