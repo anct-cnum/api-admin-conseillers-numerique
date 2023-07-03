@@ -6,12 +6,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserGrandReseau } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import {
-  deleteRoleUser,
-  deleteUser,
-  envoiEmailInvit,
-  envoiEmailMultiRole,
-} from '../../../utils/index';
+import { deleteUser } from '../../../utils/index';
+import { envoiEmailInvit, envoiEmailMultiRole } from '../../../utils/email';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -19,6 +15,7 @@ const postInvitationGrandReseau =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, reseau, nom, prenom } = req.body;
     let errorSmtpMail: Error | null = null;
+    let errorSmtpMailMultiRole: Error | null = null;
     let user: IUser | null = null;
     let messageSuccess: string = '';
     try {
@@ -36,7 +33,8 @@ const postInvitationGrandReseau =
       }
       const oldUser = await app
         .service(service.users)
-        .Model.findOne({ name: email.toLowerCase() });
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         user = await app.service(service.users).create({
           name: email.toLowerCase(),
@@ -51,14 +49,7 @@ const postInvitationGrandReseau =
           mailSentDate: null,
           passwordCreated: false,
         });
-        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user).catch(
-          async () => {
-            await deleteUser(app, req, email);
-            return new Error(
-              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-            );
-          },
-        );
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
         messageSuccess =
           'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui a été envoyé';
       } else {
@@ -68,64 +59,49 @@ const postInvitationGrandReseau =
           });
           return;
         }
-
-        if (!oldUser.roles.includes('structure')) {
+        if (oldUser.roles.includes('structure')) {
+          const query = {
+            $push: {
+              roles: 'grandReseau',
+            },
+            $set: {
+              nom,
+              prenom,
+              migrationDashboard: true,
+              reseau,
+            },
+          };
+          if (!oldUser.sub) {
+            Object.assign(query.$set, {
+              token: uuidv4(),
+              tokenCreatedAt: new Date(),
+              mailSentDate: null,
+            });
+          }
+          user = await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .findOneAndUpdate(oldUser._id, query, { new: true });
+          if (!oldUser.sub) {
+            errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+            messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
+          } else {
+            user.sub = 'xxxxxxxxx';
+            messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}`;
+          }
+          errorSmtpMailMultiRole = await envoiEmailMultiRole(app, mailer, user);
+        } else {
           res.status(409).json({
-            message:
-              'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
+            message: 'Ce compte est déjà utilisé',
           });
           return;
         }
-
-        const query = {
-          $push: {
-            roles: 'grandReseau',
-          },
-          $set: {
-            nom,
-            prenom,
-            migrationDashboard: true,
-            reseau,
-          },
-        };
-        if (!oldUser.sub) {
-          Object.assign(query.$set, {
-            token: uuidv4(),
-            tokenCreatedAt: new Date(),
-            mailSentDate: null,
-          });
-        }
-        user = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(oldUser._id, query, { new: true });
-        if (!oldUser.sub) {
-          errorSmtpMail = await envoiEmailInvit(app, req, mailer, user).catch(
-            async () => {
-              const queryRoleGrandReseau = {
-                $pull: {
-                  roles: 'grandReseau',
-                },
-                $unset: {
-                  reseau: '',
-                },
-              };
-              await deleteRoleUser(app, req, email, queryRoleGrandReseau);
-              return new Error(
-                "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-              );
-            },
-          );
-          messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
-        } else {
-          await envoiEmailMultiRole(app, mailer, user);
-          user.sub = 'xxxxxxxxx';
-          messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}`;
-        }
       }
-      if (errorSmtpMail instanceof Error) {
+      if ((errorSmtpMail || errorSmtpMailMultiRole) instanceof Error) {
+        await deleteUser(app, req, email);
         res.status(503).json({
-          message: errorSmtpMail.message,
+          message:
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
         });
         return;
       }

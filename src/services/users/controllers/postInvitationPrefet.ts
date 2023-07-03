@@ -6,7 +6,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserPrefet } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser, envoiEmailInvit } from '../../../utils/index';
+import { deleteUser } from '../../../utils/index';
+import { envoiEmailInvit } from '../../../utils/email';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -44,20 +45,17 @@ const postInvitationPrefet =
           passwordCreated: false,
           ...localite,
         });
-        const errorSmtpMail = await envoiEmailInvit(
+        const errorSmtpMail: Error | null = await envoiEmailInvit(
           app,
           req,
           mailer,
           user,
-        ).catch(async () => {
-          await deleteUser(app, req, email);
-          return new Error(
-            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-          );
-        });
+        );
         if (errorSmtpMail instanceof Error) {
+          await deleteUser(app, req, email);
           res.status(503).json({
-            message: errorSmtpMail.message,
+            message:
+              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
           });
           return;
         }
@@ -66,13 +64,11 @@ const postInvitationPrefet =
           .json(
             `Le préfet ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
           );
-        return;
+      } else {
+        res.status(409).json({
+          message: 'Ce compte est déjà utilisé',
+        });
       }
-      res.status(409).json({
-        message:
-          'Cette adresse mail est déjà utilisée, veuillez choisir une autre adresse mail',
-      });
-      return;
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

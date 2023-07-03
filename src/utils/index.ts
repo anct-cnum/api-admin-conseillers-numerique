@@ -1,6 +1,5 @@
 /* eslint-disable no-bitwise */
 import { Application } from '@feathersjs/express';
-import { invitationActiveCompte, invitationMultiRoleCompte } from '../emails';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 import { IRequest } from '../ts/interfaces/global.interfaces';
@@ -105,18 +104,6 @@ const deleteRoleUser = async (
     .updateOne({ name: email.toLowerCase() }, query);
 };
 
-const envoiEmailInvit = (app, req, mailer, user) => {
-  const mailerInstance = mailer(app);
-  const message = invitationActiveCompte(app, mailerInstance, req);
-  return message.send(user);
-};
-
-const envoiEmailMultiRole = (app, mailer, user) => {
-  const mailerInstance = mailer(app);
-  const message = invitationMultiRoleCompte(mailerInstance);
-  return message.send(user);
-};
-
 const formatDateGMT = (date: Date) => {
   const dateTodayTimezoneParis = new Date(
     new Date().toLocaleString('en', { timeZone: 'Europe/Paris' }),
@@ -136,8 +123,6 @@ export {
   getLastCoselec,
   getCoselec,
   deleteUser,
-  envoiEmailInvit,
   deleteRoleUser,
-  envoiEmailMultiRole,
   formatDateGMT,
 };
