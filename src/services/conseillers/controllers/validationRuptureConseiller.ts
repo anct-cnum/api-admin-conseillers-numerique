@@ -117,6 +117,8 @@ const updateConseillerRupture =
               codeDepartementStructure: '',
               hasPermanence: '',
               coordinateurs: '',
+              listeSubordonnes: '',
+              estCoordinateur: '',
             },
           },
           { returnOriginal: false },
