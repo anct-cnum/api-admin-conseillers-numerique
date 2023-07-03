@@ -34,7 +34,6 @@ const getMisesEnRelationStructure =
           {
             $match: {
               $and: [query],
-              'structure.$id': new ObjectId(idStructure),
               statut: {
                 $in: [
                   'finalisee',

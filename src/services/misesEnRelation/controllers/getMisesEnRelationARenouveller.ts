@@ -35,7 +35,6 @@ const getMisesEnRelationARenouveller =
           {
             $match: {
               $and: [query],
-              'structure.$id': new ObjectId(idStructure),
               statut: 'finalisee',
               miseEnRelationConventionnement: { $exists: false },
             },

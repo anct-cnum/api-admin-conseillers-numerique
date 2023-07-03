@@ -233,6 +233,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                 $nin: [
                   StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
                   StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+                  StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
                 ],
               },
               $or: [
@@ -270,6 +271,51 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
             },
           );
         if (structureUpdated.modifiedCount === 1) {
+          await app.service(service.misesEnRelation).Model.updateMany(
+            {
+              'structure.$id': structure._id,
+              'structureObj.statut': 'VALIDATION_COSELEC',
+              'structureObj.conventionnement.statut': {
+                $nin: [
+                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+                  StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+                  StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
+                ],
+              },
+              $or: [
+                {
+                  'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
+                    {
+                      $gt: new Date(dossier.dateDerniereModification),
+                    },
+                },
+                {
+                  'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
+                    {
+                      $exists: false,
+                    },
+                },
+              ],
+            },
+            {
+              'structureObj.conventionnement.statut':
+                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
+                structure?.conventionnement?.statut
+                  ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+                  : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
+              'structureObj.conventionnement.dossierReconventionnement': {
+                numero: dossier._id,
+                dateDeCreation: new Date(dossier.dateDeCreation),
+                dateFinProchainContrat: dossier.dateFinProchainContrat
+                  ? new Date(dossier.dateFinProchainContrat)
+                  : null,
+                statut: dossier.statut,
+                dateDerniereModification: new Date(
+                  dossier.dateDerniereModification,
+                ),
+              },
+            },
+          );
           logger.info(`Structure [${dossier.idPG}] mise à jour avec succès`);
         }
         resolve(p);
