@@ -106,19 +106,26 @@ const getStructures = async (
     {
       $lookup: {
         from: 'structures',
-        localField: 'uniqueStructures',
-        foreignField: '_id',
+        let: { uniqueStructureId: '$uniqueStructures' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $in: ['$_id', '$$uniqueStructureId'],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              nom: 1,
+              codePostal: 1
+            }
+          }
+        ],
         as: 'structures',
       },
-    },
-    {
-      $project: {
-        'structures._id': 1,
-        'structures.nom': 1,
-        'structures.codePostal': 1,
-        _id: 0,
-      },
-    },
+    }
   ]);
 
   return structures;
@@ -164,23 +171,29 @@ const getConseillers = async (
     {
       $lookup: {
         from: 'conseillers',
-        localField: 'uniqueConseillers',
-        foreignField: '_id',
+        let: { uniqueConseillerId: '$uniqueConseillers' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $in: ['$_id', '$$uniqueConseillerId'],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              emailCN: '$emailCN.address',
+            },
+          },
+        ],
         as: 'conseillers',
       },
     },
     {
       $project: {
-        conseillers: {
-          $map: {
-            input: '$conseillers',
-            as: 'conseiller',
-            in: {
-              _id: '$$conseiller._id',
-              emailCN: '$$conseiller.emailCN.address',
-            },
-          },
-        },
+        'conseillers._id': 1,
+        'conseillers.emailCN': 1,
         _id: 0,
       },
     },
