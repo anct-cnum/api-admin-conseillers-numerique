@@ -119,13 +119,13 @@ const getStructures = async (
             $project: {
               _id: 1,
               nom: 1,
-              codePostal: 1
-            }
-          }
+              codePostal: 1,
+            },
+          },
         ],
         as: 'structures',
       },
-    }
+    },
   ]);
 
   return structures;
