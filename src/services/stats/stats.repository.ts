@@ -197,9 +197,7 @@ const getConseillers = async (
     },
     {
       $project: {
-        'conseillers._id': 1,
-        'conseillers.emailCN': 1,
-        _id: 0,
+        uniqueConseillers: 0,
       },
     },
   ]);
