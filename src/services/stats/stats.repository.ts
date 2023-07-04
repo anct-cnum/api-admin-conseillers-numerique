@@ -126,6 +126,11 @@ const getStructures = async (
         as: 'structures',
       },
     },
+    {
+      $project: {
+        uniqueStructures: 0,
+      },
+    },
   ]);
 
   return structures;
