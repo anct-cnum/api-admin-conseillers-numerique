@@ -44,7 +44,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       return;
     }
     if (user.roles.includes('structure')) {
-      query = { ...query, ...{ mailSentCoselecDate: new Date() } };
+      query = { ...query, ...{ mailSentCoselecDate: new Date() } }; // Ne pas envoyer le mail coselec
     }
     await app
       .service(service.users)
@@ -76,7 +76,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     }
 
     if (options.role === 'structure') {
-      query = { ...query, ...{ mailSentCoselecDate: new Date() } };
+      query = { ...query, ...{ mailSentCoselecDate: new Date() } }; // Ne pas envoyer le mail coselec
     }
 
     users.forEach(async (user: IUser) => {
