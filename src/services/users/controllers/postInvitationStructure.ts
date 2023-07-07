@@ -6,7 +6,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validationEmail } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser } from '../../../utils/index';
+import { deleteRoleUser, deleteUser } from '../../../utils/index';
 import {
   envoiEmailInformationValidationCoselec,
   envoiEmailInvit,
@@ -20,8 +20,6 @@ const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, structureId } = req.body;
     let errorSmtpMailInvit: Error | null = null;
-    let errorSmtpMailMultiRole: Error | null = null;
-    let errorSmtpMailValidationCoselec: Error | null = null;
     let messageSuccess: string = '';
     try {
       const errorJoi = await validationEmail.validate(email);
@@ -55,8 +53,16 @@ const postInvitationStructure =
           mailSentDate: null,
           resend: false,
         });
-
-        errorSmtpMailInvit = await envoiEmailInvit(app, req, mailer, user);
+        if (errorSmtpMailInvit instanceof Error) {
+          await deleteUser(app, req, email);
+          res.status(503).json({
+            message:
+              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+          });
+          return;
+        }
+        await envoiEmailInvit(app, req, mailer, user);
+        await envoiEmailInformationValidationCoselec(app, mailer, user);
         messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {
@@ -71,7 +77,6 @@ const postInvitationStructure =
               roles: 'structure',
             },
             $set: {
-              migrationDashboard: true,
               entity: new DBRef(
                 'structures',
                 new ObjectId(structureId),
@@ -96,27 +101,29 @@ const postInvitationStructure =
           } else {
             messageSuccess = `Le rôle structure a été ajouté au compte ${email}`;
           }
-          errorSmtpMailMultiRole = await envoiEmailMultiRole(app, mailer, user);
-          errorSmtpMailValidationCoselec =
-            await envoiEmailInformationValidationCoselec(app, mailer, user);
+          if (errorSmtpMailInvit instanceof Error) {
+            await deleteRoleUser(app, req, email, {
+              $pull: {
+                roles: 'structure',
+              },
+              $unset: {
+                entity: '',
+              },
+            });
+            res.status(503).json({
+              message:
+                "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+            });
+            return;
+          }
+          await envoiEmailMultiRole(app, mailer, user);
+          await envoiEmailInformationValidationCoselec(app, mailer, user);
         } else {
           res.status(409).json({
             message: 'Ce compte est déjà utilisé',
           });
           return;
         }
-      }
-      if (
-        (errorSmtpMailInvit ||
-          errorSmtpMailMultiRole ||
-          errorSmtpMailValidationCoselec) instanceof Error
-      ) {
-        await deleteUser(app, req, email);
-        res.status(503).json({
-          message:
-            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-        });
-        return;
       }
       res.status(200).json(messageSuccess);
     } catch (error) {

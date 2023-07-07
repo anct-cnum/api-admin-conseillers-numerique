@@ -6,7 +6,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserGrandReseau } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser } from '../../../utils/index';
+import { deleteRoleUser, deleteUser } from '../../../utils/index';
 import { envoiEmailInvit, envoiEmailMultiRole } from '../../../utils/email';
 
 const { v4: uuidv4 } = require('uuid');
@@ -15,7 +15,6 @@ const postInvitationGrandReseau =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, reseau, nom, prenom } = req.body;
     let errorSmtpMail: Error | null = null;
-    let errorSmtpMailMultiRole: Error | null = null;
     let user: IUser | null = null;
     let messageSuccess: string = '';
     try {
@@ -50,6 +49,14 @@ const postInvitationGrandReseau =
           passwordCreated: false,
         });
         errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+        if (errorSmtpMail instanceof Error) {
+          await deleteUser(app, req, email);
+          res.status(503).json({
+            message:
+              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+          });
+          return;
+        }
         messageSuccess =
           'Invitation envoyée, le nouvel administrateur a été ajouté, un mail de création de compte lui a été envoyé';
       } else {
@@ -67,7 +74,6 @@ const postInvitationGrandReseau =
             $set: {
               nom,
               prenom,
-              migrationDashboard: true,
               reseau,
             },
           };
@@ -89,21 +95,30 @@ const postInvitationGrandReseau =
             user.sub = 'xxxxxxxxx';
             messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}`;
           }
-          errorSmtpMailMultiRole = await envoiEmailMultiRole(app, mailer, user);
+          if (errorSmtpMail instanceof Error) {
+            await deleteRoleUser(app, req, email, {
+              $pull: {
+                roles: 'grandReseau',
+              },
+              $unset: {
+                nom: '',
+                prenom: '',
+                reseau: '',
+              },
+            });
+            res.status(503).json({
+              message:
+                "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+            });
+            return;
+          }
+          await envoiEmailMultiRole(app, mailer, user);
         } else {
           res.status(409).json({
             message: 'Ce compte est déjà utilisé',
           });
           return;
         }
-      }
-      if ((errorSmtpMail || errorSmtpMailMultiRole) instanceof Error) {
-        await deleteUser(app, req, email);
-        res.status(503).json({
-          message:
-            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
-        });
-        return;
       }
       res.status(200).json({
         message: messageSuccess,
