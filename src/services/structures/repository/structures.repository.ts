@@ -100,7 +100,7 @@ const filterSortColonne = (nomOrdre: string, ordre: number) => {
 
 const formatQpv = (qpv: string) => (qpv === 'Oui' ? 'Oui' : 'Non');
 
-const formatZrr = (estZRR: string) => (estZRR === 'Oui' ? 'Oui' : 'Non');
+const formatZrr = (estZRR: string) => (estZRR === true ? 'Oui' : 'Non');
 
 const formatType = (type: string) => (type === 'PRIVATE' ? 'Privée' : 'Public');
 
