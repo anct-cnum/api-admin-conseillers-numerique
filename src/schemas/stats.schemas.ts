@@ -19,10 +19,15 @@ const validStatConseiller = Joi.object({
   idConseiller: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .error(new Error("L'id du conseiller est invalide")),
-  codePostal: Joi.string().error(
-    new Error('Le filtre code postal est invalide'),
-  ),
-  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
+  codePostal: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le filtre code postal est invalide')),
+  ville: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le filtre ville est invalide')),
+  codeCommune: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le code commune est invalide')),
 });
 
 const validStatStructure = Joi.object({

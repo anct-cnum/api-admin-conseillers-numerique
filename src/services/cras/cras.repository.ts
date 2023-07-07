@@ -92,6 +92,7 @@ const getCodesPostauxStatistiquesCras =
       {
         $match: {
           'conseiller.$id': { $in: conseillersId },
+          'cra.codeCommune': { $ne: null },
           $and: [checkAccess],
         },
       },
@@ -132,7 +133,7 @@ const createArrayForFiltreCodePostaux = (
         villes: [
           { ville: paire._id.ville, codeCommune: paire._id.codeCommune },
         ],
-        codeCommune: []
+        codeCommune: [],
       });
     }
   });
@@ -141,13 +142,17 @@ const createArrayForFiltreCodePostaux = (
     ...e,
     villes: [
       ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
-    ].filter((i) => i.codeCommune).map((i) => i.ville),
+    ]
+      .filter((i) => i.codeCommune)
+      .map((i) => i.ville),
     codeCommune: [
       ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
     ],
   }));
 
-const liste = notDoublonListeDefinitive.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+  const liste = notDoublonListeDefinitive.sort(
+    (a, b) => parseInt(a.id, 10) - parseInt(b.id, 10),
+  );
 
   return liste;
 };
