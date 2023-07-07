@@ -97,33 +97,59 @@ const getCodesPostauxStatistiquesCras =
       },
       {
         $group: {
-          _id: { ville: '$cra.nomCommune', codePostal: '$cra.codePostal' },
+          _id: {
+            ville: '$cra.nomCommune',
+            codePostal: '$cra.codePostal',
+            codeCommune: '$cra.codeCommune',
+          },
         },
       },
     ]);
 
 const createArrayForFiltreCodePostaux = (
-  listCodePostaux: Array<{ _id: { ville: string; codePostal: string } }>,
+  listCodePostaux: Array<{
+    _id: { ville: string; codePostal: string; codeCommune: string[] };
+  }>,
 ) => {
-  const listeDefinitive: Array<{ id: string; codePostal: string[] }> = [];
+  const listeDefinitive: Array<{
+    id: string;
+    codeCommune: string[];
+    villes: Array<{ ville: string; codeCommune: string[] }>;
+  }> = [];
   listCodePostaux.forEach((paire) => {
     if (
       listeDefinitive.findIndex((item) => item.id === paire._id.codePostal) > -1
     ) {
       listeDefinitive
         .find((item) => item.id === paire._id.codePostal)
-        .codePostal.push(`${paire._id.codePostal} - ${paire._id.ville}`);
+        .villes.push({
+          ville: paire._id.ville,
+          codeCommune: paire._id.codeCommune,
+        });
     } else {
       listeDefinitive.push({
         id: paire._id.codePostal,
-        codePostal: [`${paire._id.codePostal} - ${paire._id.ville}`],
+        villes: [
+          { ville: paire._id.ville, codeCommune: paire._id.codeCommune },
+        ],
+        codeCommune: []
       });
     }
   });
 
-  listeDefinitive.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+  const notDoublonListeDefinitive = listeDefinitive.map((e) => ({
+    ...e,
+    villes: [
+      ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
+    ].filter((i) => i.codeCommune).map((i) => i.ville),
+    codeCommune: [
+      ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
+    ],
+  }));
 
-  return listeDefinitive;
+const liste = notDoublonListeDefinitive.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+
+  return liste;
 };
 
 export {
