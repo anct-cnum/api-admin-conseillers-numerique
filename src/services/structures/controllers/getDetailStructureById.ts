@@ -7,6 +7,7 @@ import {
   checkAccessReadRequestStructures,
   formatAdresseStructure,
   formatQpv,
+  formatZrr,
   formatType,
   getConseillersRecruter,
   getConseillersValider,
@@ -103,6 +104,7 @@ const getDetailStructureById =
             idPG: 1,
             nom: 1,
             qpvStatut: 1,
+            estZRR: 1,
             statut: 1,
             insee: 1,
             type: 1,
@@ -122,17 +124,6 @@ const getDetailStructureById =
         res.status(404).json({ message: 'Structure non trouvée' });
         return;
       }
-      const checkAccessCras = await checkAccessRequestCras(app, req);
-
-      const craCount = await getNombreCrasByArrayConseillerId(
-        app,
-        req,
-      )(structure[0].conseillers?.map((conseiller) => conseiller._id));
-      const accompagnementsCount =
-        await getNombreAccompagnementsByArrayConseillerId(
-          app,
-          checkAccessCras,
-        )(structure[0].conseillers?.map((conseiller) => conseiller._id));
 
       const users = await app.service(service.users).Model.aggregate([
         {
@@ -150,9 +141,8 @@ const getDetailStructureById =
       structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
       structure[0].posteValiderCoselecConventionnement =
         coselecConventionnement?.nombreConseillersCoselec;
-      structure[0].craCount = craCount;
-      structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
+      structure[0].estZRR = formatZrr(structure[0].estZRR);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
@@ -188,14 +178,25 @@ const getDetailStructureById =
         getConseillersValider(structure[0].conseillers),
         getConseillersRecruter(structure[0].conseillers),
       );
+      const checkAccessCras = await checkAccessRequestCras(app, req);
 
+      const craCount = await getNombreCrasByArrayConseillerId(
+        app,
+        req,
+      )(structure[0].conseillers?.map((conseiller) => conseiller._id));
+      const accompagnementsCount =
+        await getNombreAccompagnementsByArrayConseillerId(
+          app,
+          checkAccessCras,
+        )(structure[0].conseillers?.map((conseiller) => conseiller._id));
+      structure[0].craCount = craCount;
+      structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       delete structure[0].conseillers;
 
       if (structure.length === 0) {
         res.status(404).json({ message: 'Structure non trouvée' });
         return;
       }
-
       res.status(200).json(structure[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

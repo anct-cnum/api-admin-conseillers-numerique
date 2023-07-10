@@ -1,0 +1,59 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text>
+            Après délibération du Comité national de sélection, et sur le fondement de l'avis formulé par votre
+            préfecture de département, nous vous informons que votre structure est éligible à l'accueil
+            de <%= nombreConseillersCoselec %> Conseiller(s) numérique(s) France Services.
+          </mj-text>
+          <mj-text font-weight="bold" font-size="20px">
+            Comment procéder au recrutement ?
+          </mj-text>
+          <mj-text>
+            Vous devez accéder à votre tableau de pilotage pour gérer vos recrutements.
+            Vous recevrez un email “Bienvenue sur votre nouveau tableau de pilotage conseiller
+            numérique France service” pour vous expliquer comment créer votre compte.
+          </mj-text>
+          <mj-text>
+            Une fois l’étape de création de compte faite, vous pouvez désormais procéder au recrutement
+            sur le tableau de pilotage.
+          </mj-text>
+          <mj-text>
+            Nous comptons sur votre mobilisation pour recruter le ou les conseiller(s)
+            numérique(s) France Services dans les meilleurs délais.
+          </mj-text>
+          <mj-text>
+            En tout état de cause, si le recrutement devait intervenir dans un délai supérieur à trois mois,
+            la validation de votre structure pourrait être réévaluée pour privilégier les recrutements
+            les plus rapides dans le cadre du dispositif Conseiller numérique France Services.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-column width="600px">
+        <mj-button
+          font-size="14px"
+          href="https://go.crisp.chat/chat/embed/?website_id=ea669e13-e40f-40c8-be23-e43565c0e62c"
+          text-decoration="underline"
+          background-color
+          color="#0063CB"
+        >
+          Besoin d’aide ? Nous restons à votre disposition pour vous accompagner
+        </mj-button>
+      </mj-column>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
