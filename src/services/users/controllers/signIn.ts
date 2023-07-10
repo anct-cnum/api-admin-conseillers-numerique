@@ -53,6 +53,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               userInDB = await app.service('users').Model.findOneAndUpdate(
                 {
                   token: req.query.verificationToken,
+                  name: keycloakUser.email,
                   roles: { $in: allowedRoles },
                 },
                 {
