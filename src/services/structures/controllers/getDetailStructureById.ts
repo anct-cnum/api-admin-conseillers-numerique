@@ -7,6 +7,7 @@ import {
   checkAccessReadRequestStructures,
   formatAdresseStructure,
   formatQpv,
+  formatZrr,
   formatType,
   getConseillersRecruter,
   getConseillersValider,
@@ -103,6 +104,7 @@ const getDetailStructureById =
             idPG: 1,
             nom: 1,
             qpvStatut: 1,
+            estZRR: 1,
             statut: 1,
             insee: 1,
             type: 1,
@@ -140,6 +142,7 @@ const getDetailStructureById =
       structure[0].posteValiderCoselecConventionnement =
         coselecConventionnement?.nombreConseillersCoselec;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
+      structure[0].estZRR = formatZrr(structure[0].estZRR);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
