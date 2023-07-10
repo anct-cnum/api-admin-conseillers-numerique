@@ -101,8 +101,6 @@ const postInvitationGrandReseau =
                 roles: 'grandReseau',
               },
               $unset: {
-                nom: '',
-                prenom: '',
                 reseau: '',
               },
             });
