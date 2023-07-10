@@ -1,7 +1,8 @@
 /* eslint-disable no-bitwise */
-import { invitationActiveCompte } from '../emails';
+import { Application } from '@feathersjs/express';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
+import { IRequest } from '../ts/interfaces/global.interfaces';
 import { PhaseConventionnement } from '../ts/enum';
 
 /**
@@ -84,17 +85,23 @@ const getCoselecConventionnement = (structure) => {
   return getLastCoselec(structure);
 };
 
-const deleteUser = async (app, req, email) => {
+const deleteUser = async (app: Application, req: IRequest, email: string) => {
   await app
     .service(service.users)
     .Model.accessibleBy(req.ability, action.delete)
     .deleteOne({ name: email.toLowerCase() });
 };
 
-const envoiEmailInvit = (app, req, mailer, user) => {
-  const mailerInstance = mailer(app);
-  const message = invitationActiveCompte(app, mailerInstance, req);
-  return message.send(user).catch((errSmtp: Error) => errSmtp);
+const deleteRoleUser = async (
+  app: Application,
+  req: IRequest,
+  email: string,
+  query: object,
+) => {
+  await app
+    .service(service.users)
+    .Model.accessibleBy(req.ability, action.update)
+    .updateOne({ name: email.toLowerCase() }, query);
 };
 
 const formatDateGMT = (date: Date) => {
@@ -116,6 +123,6 @@ export {
   getLastCoselec,
   getCoselec,
   deleteUser,
-  envoiEmailInvit,
+  deleteRoleUser,
   formatDateGMT,
 };
