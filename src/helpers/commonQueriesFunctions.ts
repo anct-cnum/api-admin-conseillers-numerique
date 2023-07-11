@@ -21,19 +21,22 @@ const findNumDepartementsByRegion = (hubRegion: string[]): Array<string> => {
     .map((departement: IDepartement) => departement.num_dep);
 };
 
-const getConseillersById =
-  (app: Application) => async (structuresIds: ObjectId[]) => {
-    try {
-      const conseillersIds: ObjectId[] = await app
-        .service(service.conseillers)
-        .Model.find({ structureId: { $in: structuresIds } })
-        .distinct('_id');
+const getConseillersById = (app: Application) => async (structuresIds: any) => {
+  try {
+    const query = Array.isArray(structuresIds)
+      ? { $in: structuresIds }
+      : { $eq: structuresIds };
 
-      return conseillersIds;
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
+    const conseillersIds: ObjectId[] = await app
+      .service(service.conseillers)
+      .Model.find({ structureId: query })
+      .distinct('_id');
+
+    return conseillersIds;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 export {
   findDepartementOrRegion,
