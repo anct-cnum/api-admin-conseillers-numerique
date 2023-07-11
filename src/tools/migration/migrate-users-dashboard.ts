@@ -24,13 +24,14 @@ execute(__filename, async ({ app, logger, exit }) => {
 
   // pas de users existants grandReseau à migrer & 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
   const allowedRoles = ['admin', 'structure'];
-  let query = {
-    token: uuidv4(),
-    tokenCreatedAt: new Date(),
-    mailSentDate: null,
-    migrationDashboard: true,
-  };
   if (options.email) {
+    let query = {
+      token: uuidv4(),
+      tokenCreatedAt: new Date(),
+      mailSentDate: null,
+      migrationDashboard: true,
+    };
+
     const user: IUser = await app.service(service.users).Model.findOne({
       name: options.email.toLowerCase(),
       migrationDashboard: { $ne: true }, // utile notamment avec le multi rôle
@@ -75,17 +76,27 @@ execute(__filename, async ({ app, logger, exit }) => {
       return;
     }
 
-    if (options.role === 'structure') {
-      query = { ...query, ...{ mailSentCoselecDate: new Date() } }; // Ne pas envoyer le mail coselec
-    }
-
     users.forEach(async (user: IUser) => {
       // eslint-disable-next-line no-async-promise-executor
       const p = new Promise<void>(async (resolve) => {
         try {
+          let queryRole = {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+            migrationDashboard: true,
+          };
+
+          if (options.role === 'structure') {
+            queryRole = {
+              ...queryRole,
+              ...{ mailSentCoselecDate: new Date() },
+            }; // Ne pas envoyer le mail coselec
+          }
+
           await app
             .service(service.users)
-            .Model.updateOne({ name: user.name }, query);
+            .Model.updateOne({ name: user.name }, queryRole);
           logger.info(`Utilisateur ${user.name} invité au tableau de bord`);
           resolve(p);
         } catch (e) {
