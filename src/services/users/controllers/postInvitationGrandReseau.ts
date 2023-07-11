@@ -30,10 +30,10 @@ const postInvitationGrandReseau =
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
+      // Pas d'access control car on controle si l'email n'existe pas déjà en base
       const oldUser = await app
         .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ name: email.toLowerCase() });
+        .Model.findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         user = await app.service(service.users).create({
           name: email.toLowerCase(),
