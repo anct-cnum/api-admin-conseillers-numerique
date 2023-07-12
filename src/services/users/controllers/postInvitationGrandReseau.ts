@@ -86,8 +86,7 @@ const postInvitationGrandReseau =
           }
           user = await app
             .service(service.users)
-            .Model.accessibleBy(req.ability, action.update)
-            .findOneAndUpdate(oldUser._id, query, { new: true });
+            .Model.findOneAndUpdate(oldUser._id, query, { new: true });
           if (!oldUser.sub) {
             errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
             messageSuccess = `Le rôle grand réseau a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
@@ -120,7 +119,12 @@ const postInvitationGrandReseau =
       }
       res.status(200).json({
         message: messageSuccess,
-        account: user,
+        account: {
+          _id: user?._id,
+          name: user?.name,
+          roles: user?.roles,
+          passwordCreated: user?.passwordCreated,
+        },
       });
     } catch (error) {
       if (error.name === 'ForbiddenError') {

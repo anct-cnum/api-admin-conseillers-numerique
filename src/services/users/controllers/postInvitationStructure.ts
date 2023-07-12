@@ -19,6 +19,7 @@ const { v4: uuidv4 } = require('uuid');
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, structureId } = req.body;
+    let user: IUser | null = null;
     let errorSmtpMailInvit: Error | null = null;
     let messageSuccess: string = '';
     try {
@@ -41,7 +42,7 @@ const postInvitationStructure =
           });
           return;
         }
-        const user: IUser = await app.service(service.users).create({
+        user = await app.service(service.users).create({
           name: email.toLowerCase(),
           roles: ['structure'],
           entity: new DBRef('structures', new ObjectId(structureId), database),
@@ -64,14 +65,6 @@ const postInvitationStructure =
         await envoiEmailInvit(app, req, mailer, user);
         await envoiEmailInformationValidationCoselec(app, mailer, user);
         messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
-      } else if (
-        !oldUser.roles.includes('structure') &&
-        !oldUser.roles.includes('grandReseau')
-      ) {
-        res.status(409).json({
-          message: 'Ce compte est déjà utilisé',
-        });
-        return;
       } else {
         if (oldUser.roles.includes('structure')) {
           res.status(409).json({
@@ -99,7 +92,7 @@ const postInvitationStructure =
               mailSentDate: null,
             });
           }
-          const user = await app
+          user = await app
             .service(service.users)
             .Model.findOneAndUpdate(oldUser._id, query, { new: true });
           if (!oldUser.sub) {
@@ -127,14 +120,19 @@ const postInvitationStructure =
           await envoiEmailInformationValidationCoselec(app, mailer, user);
         } else {
           res.status(409).json({
-            message: 'Ce compte est déjà utilisé',
+            message: 'Ce compte est déjà utilisé !',
           });
           return;
         }
       }
       res.status(200).json({
         message: messageSuccess,
-        account: { _id: 'xxx', name: email.toLowerCase() },
+        account: {
+          _id: user?._id,
+          name: user?.name,
+          roles: user?.roles,
+          passwordCreated: user?.passwordCreated,
+        },
       });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
