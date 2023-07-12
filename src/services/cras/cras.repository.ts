@@ -53,14 +53,15 @@ const getNombreAccompagnementsByStructureId =
       {
         $group: {
           _id: null,
-          individuel: { $sum: '$cra.accompagnement.individuel' },
-          atelier: { $sum: '$cra.accompagnement.atelier' },
-          redirection: { $sum: '$cra.accompagnement.redirection' },
+          nbParticipants: { $sum: '$cra.nbParticipants' },
+          nbParticipantsRecurrents: { $sum: '$cra.nbParticipantsRecurrents' },
         },
       },
       {
         $project: {
-          total: { $add: ['$individuel', '$atelier', '$redirection'] },
+          total: {
+            $subtract: ['$nbParticipants', '$nbParticipantsRecurrents'],
+          },
         },
       },
     ]);
