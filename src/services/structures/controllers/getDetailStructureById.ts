@@ -14,8 +14,8 @@ import {
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
-  getNombreAccompagnementsByArrayConseillerId,
-  getNombreCrasByArrayConseillerId,
+  getNombreAccompagnementsByStructureId,
+  getNombreCrasByStructureId,
 } from '../../cras/cras.repository';
 import {
   getUrlDossierConventionnement,
@@ -180,15 +180,14 @@ const getDetailStructureById =
       );
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
-      const craCount = await getNombreCrasByArrayConseillerId(
+      const craCount = await getNombreCrasByStructureId(
         app,
         req,
-      )(structure[0].conseillers?.map((conseiller) => conseiller._id));
-      const accompagnementsCount =
-        await getNombreAccompagnementsByArrayConseillerId(
-          app,
-          checkAccessCras,
-        )(structure[0].conseillers?.map((conseiller) => conseiller._id));
+      )(structure[0]._id);
+      const accompagnementsCount = await getNombreAccompagnementsByStructureId(
+        app,
+        checkAccessCras,
+      )(structure[0]._id);
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       delete structure[0].conseillers;

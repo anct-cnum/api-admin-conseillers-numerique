@@ -41,12 +41,12 @@ const getNombreCras =
         'conseiller.$id': conseillerId,
       });
 
-const getNombreAccompagnementsByArrayConseillerId =
-  (app: Application, checkAccess) => async (conseillersIds: ObjectId[]) =>
+const getNombreAccompagnementsByStructureId =
+  (app: Application, checkAccess) => async (structureId: ObjectId) =>
     app.service(service.cras).Model.aggregate([
       {
         $match: {
-          'conseiller.$id': { $in: conseillersIds },
+          'structure.$id': { $eq: structureId },
           $and: [checkAccess],
         },
       },
@@ -65,13 +65,13 @@ const getNombreAccompagnementsByArrayConseillerId =
       },
     ]);
 
-const getNombreCrasByArrayConseillerId =
-  (app: Application, req: IRequest) => async (conseillersIds: ObjectId[]) =>
+const getNombreCrasByStructureId =
+  (app: Application, req: IRequest) => async (structureId: ObjectId) =>
     app
       .service(service.cras)
       .Model.accessibleBy(req.ability, action.read)
       .countDocuments({
-        'conseiller.$id': { $in: conseillersIds },
+        'structure.$id': { $eq: structureId },
       });
 
 const getConseillersIdsByTerritoire = async (dateFin, type, idType, app) => {
@@ -132,7 +132,7 @@ export {
   getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
-  getNombreCrasByArrayConseillerId,
-  getNombreAccompagnementsByArrayConseillerId,
+  getNombreCrasByStructureId,
+  getNombreAccompagnementsByStructureId,
   createArrayForFiltreCodePostaux,
 };
