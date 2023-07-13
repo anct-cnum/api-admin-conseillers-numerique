@@ -6,7 +6,7 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { updateEmail } from '../../../schemas/structures.schemas';
 import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
-import { envoiEmailInvit } from '../../../utils/index';
+import { envoiEmailInvit } from '../../../utils/email';
 import mailer from '../../../mailer';
 
 const { v4: uuidv4 } = require('uuid');

@@ -7,14 +7,15 @@ import {
   checkAccessReadRequestStructures,
   formatAdresseStructure,
   formatQpv,
+  formatZrr,
   formatType,
   getConseillersRecruter,
   getConseillersValider,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
-  getNombreAccompagnementsByArrayConseillerId,
-  getNombreCrasByArrayConseillerId,
+  getNombreAccompagnementsByStructureId,
+  getNombreCrasByStructureId,
 } from '../../cras/cras.repository';
 import {
   getUrlDossierConventionnement,
@@ -103,6 +104,7 @@ const getDetailStructureById =
             idPG: 1,
             nom: 1,
             qpvStatut: 1,
+            estZRR: 1,
             statut: 1,
             insee: 1,
             type: 1,
@@ -140,6 +142,7 @@ const getDetailStructureById =
       structure[0].posteValiderCoselecConventionnement =
         coselecConventionnement?.nombreConseillersCoselec;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
+      structure[0].estZRR = formatZrr(structure[0].estZRR);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
@@ -177,15 +180,14 @@ const getDetailStructureById =
       );
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
-      const craCount = await getNombreCrasByArrayConseillerId(
+      const craCount = await getNombreCrasByStructureId(
         app,
         req,
-      )(structure[0].conseillers?.map((conseiller) => conseiller._id));
-      const accompagnementsCount =
-        await getNombreAccompagnementsByArrayConseillerId(
-          app,
-          checkAccessCras,
-        )(structure[0].conseillers?.map((conseiller) => conseiller._id));
+      )(structure[0]._id);
+      const accompagnementsCount = await getNombreAccompagnementsByStructureId(
+        app,
+        checkAccessCras,
+      )(structure[0]._id);
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       delete structure[0].conseillers;

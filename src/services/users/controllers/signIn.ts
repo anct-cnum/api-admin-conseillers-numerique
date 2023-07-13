@@ -53,6 +53,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               userInDB = await app.service('users').Model.findOneAndUpdate(
                 {
                   token: req.query.verificationToken,
+                  name: keycloakUser.email,
                   roles: { $in: allowedRoles },
                 },
                 {
@@ -121,23 +122,6 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               httpOnly: true,
             },
           );
-
-          // A SUPPRIMER LORS DU DEPLOIEMENT DU PARCOURS SA
-          user.roles =
-            user.roles.includes('grandReseau') &&
-            user.roles.includes('structure') &&
-            user.roles.includes('structure_coop')
-              ? user.roles.filter(
-                  (role: string) =>
-                    role !== 'structure' && role !== 'structure_coop',
-                )
-              : user.roles;
-
-          // HOTFIX TEMPORAIRE
-          if (user.roles.includes('structure') && user.roles.length === 1) {
-            return res.status(401).json('Connexion refusée');
-          }
-
           // envoi de l'access token
           return res.status(200).json({ user, accessToken });
         } catch (error) {
