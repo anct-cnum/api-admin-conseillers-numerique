@@ -149,6 +149,7 @@ const getConseillersStatutRecrute =
       departement,
       piecesManquantes,
     } = req.query;
+
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
     const emailValidation = validConseillers.validate({
@@ -187,6 +188,13 @@ const getConseillersStatutRecrute =
         app,
         req,
       );
+
+      /* Ajout des conseillers en rupture ne portant plus le structureId */
+      checkAccessConseiller.$and[0].$or.push({
+        'ruptures.structureId':
+          checkAccessConseiller.$and[0].$or[0].structureId,
+      });
+
       const conseillers = await getConseillersRecruter(
         app,
         checkAccessConseiller,
@@ -205,6 +213,7 @@ const getConseillersStatutRecrute =
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
