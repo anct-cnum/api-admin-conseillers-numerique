@@ -13,7 +13,10 @@ const deleteAccountGrandReseau =
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idUser) });
-      if (getUser?.roles.length > 1 && getUser?.roles.includes('grandReseau')) {
+      if (
+        getUser?.roles?.length > 1 &&
+        getUser?.roles?.includes('grandReseau')
+      ) {
         await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
