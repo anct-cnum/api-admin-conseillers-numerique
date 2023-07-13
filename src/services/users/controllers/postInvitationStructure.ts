@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
+import { ObjectId, DBRef } from 'mongodb';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
@@ -14,11 +15,11 @@ import {
 } from '../../../utils/email';
 
 const { v4: uuidv4 } = require('uuid');
-const { DBRef, ObjectId } = require('mongodb');
 
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, structureId } = req.body;
+    let user: IUser | null = null;
     let errorSmtpMailInvit: Error | null = null;
     let messageSuccess: string = '';
     try {
@@ -29,10 +30,10 @@ const postInvitationStructure =
       }
       const connect = app.get('mongodb');
       const database = connect.substr(connect.lastIndexOf('/') + 1);
+      // Pas d'access control car on controle si l'email n'existe pas déjà en base
       const oldUser = await app
         .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({ name: email.toLowerCase() });
+        .Model.findOne({ name: email.toLowerCase() });
       if (oldUser === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
         if (!canCreate) {
@@ -41,7 +42,7 @@ const postInvitationStructure =
           });
           return;
         }
-        const user: IUser = await app.service(service.users).create({
+        user = await app.service(service.users).create({
           name: email.toLowerCase(),
           roles: ['structure'],
           entity: new DBRef('structures', new ObjectId(structureId), database),
@@ -91,10 +92,9 @@ const postInvitationStructure =
               mailSentDate: null,
             });
           }
-          const user = await app
+          user = await app
             .service(service.users)
-            .Model.accessibleBy(req.ability, action.update)
-            .findOneAndUpdate(oldUser._id, query, { new: true });
+            .Model.findOneAndUpdate(oldUser._id, query, { new: true });
           if (!oldUser.sub) {
             errorSmtpMailInvit = await envoiEmailInvit(app, req, mailer, user);
             messageSuccess = `Le rôle structure a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
@@ -120,12 +120,20 @@ const postInvitationStructure =
           await envoiEmailInformationValidationCoselec(app, mailer, user);
         } else {
           res.status(409).json({
-            message: 'Ce compte est déjà utilisé',
+            message: 'Ce compte est déjà utilisé !',
           });
           return;
         }
       }
-      res.status(200).json(messageSuccess);
+      res.status(200).json({
+        message: messageSuccess,
+        account: {
+          _id: user?._id,
+          name: user?.name,
+          roles: user?.roles,
+          passwordCreated: user?.passwordCreated,
+        },
+      });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
