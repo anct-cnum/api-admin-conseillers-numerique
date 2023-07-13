@@ -80,8 +80,8 @@ export default async function prefetRules(
     },
   });
   can([action.read], ressource.statsConseillersCras, {
-    'conseiller.$id': {
-      $in: conseillersIds,
+    'structure.$id': {
+      $in: structures,
     },
   });
 }
