@@ -11,7 +11,6 @@ const loaded = dbref.install(mongoose);
 export default function (app: Application): Model<any> {
   const modelName = 'users';
   const mongooseClient: Mongoose = app.get('mongooseClient');
-  const { DBRef } = mongoose.SchemaTypes;
   const { Schema } = mongooseClient;
   const schema = new Schema<IUser>(
     {
@@ -25,7 +24,7 @@ export default function (app: Application): Model<any> {
 
       roles: [String],
 
-      entity: { type: DBRef },
+      entity: { type: Schema.Types.Mixed },
 
       token: { type: String },
 
