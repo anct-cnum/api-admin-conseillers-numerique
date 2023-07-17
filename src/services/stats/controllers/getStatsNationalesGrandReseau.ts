@@ -26,9 +26,6 @@ const getStatsNationalesGrandReseau =
       const structureIds = req.query.structureIds
         ? JSON.parse(req.query.structureIds)
         : [];
-      const conseillerIds = req.query.conseillerIds
-        ? JSON.parse(req.query.conseillerIds)
-        : [];
       if (!exportStats) {
         const statsValidation = validStatGrandReseau.validate({
           dateDebut,
@@ -113,12 +110,6 @@ const getStatsNationalesGrandReseau =
       if (structureIds.length > 0) {
         query['structure.$id'] = {
           $in: structureIds.map((id: string) => new ObjectId(id)),
-        };
-      }
-      // Si la requête contient un conseiller, on l'ajoute à la requête
-      if (conseillerIds.length > 0) {
-        query['conseiller.$id'] = {
-          $in: conseillerIds.map((id: string) => new ObjectId(id)),
         };
       }
       // Récupération des données
