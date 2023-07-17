@@ -106,7 +106,7 @@ const getCandidatCV =
           return bufferDecrypt;
         })
         .catch(() => {
-          return new Error('Erreur lors de la récupération du CV');
+          throw new Error('Erreur lors de la récupération du CV');
         });
       if (fileS3 instanceof Error) {
         res.status(500).json({ message: fileS3.message });
