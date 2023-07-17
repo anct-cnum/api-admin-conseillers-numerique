@@ -69,7 +69,7 @@ const getDetailStructureWithConseillers =
           conventionnement: 1,
           demandesCoselec: 1,
           nombreConseillersSouhaites: 1,
-          'insee.forme_juridique.libelle': 1,
+          insee: 1,
           conseillers: '$conseillers',
         },
       },
