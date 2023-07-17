@@ -75,7 +75,7 @@ const getCandidatCV =
         Key: conseiller.cv.file,
       };
       const command = new GetObjectCommand(params);
-      const fileS3 = await client
+      client
         .send(command)
         .then(async (data) => {
           // Dechiffrement du CV (le buffer se trouve dans data.Body)
@@ -86,9 +86,6 @@ const getCandidatCV =
             .digest('base64')
             .substring(0, 32);
           const file = await data.Body.transformToByteArray();
-          if (file.length === 0) {
-            return new Error('Le CV du conseiller est vide');
-          }
           // @ts-ignore: Unreachable code error
           const iv = file.slice(0, 16);
           // @ts-ignore: Unreachable code error
@@ -103,16 +100,12 @@ const getCandidatCV =
             decipher.final(),
           ]);
 
-          return bufferDecrypt;
+          res.send(bufferDecrypt);
         })
-        .catch(() => {
-          return new Error('Erreur lors de la récupération du CV');
+        .catch((error) => {
+          res.status(500).json({ message: 'La récupération du cv a échoué.' });
+          throw new Error(error);
         });
-      if (fileS3 instanceof Error) {
-        res.status(500).json({ message: fileS3.message });
-        return;
-      }
-      res.send(fileS3);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
