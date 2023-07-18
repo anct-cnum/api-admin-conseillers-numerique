@@ -19,8 +19,7 @@ const getStatsNationales =
       });
 
       if (statsValidation.error) {
-        res.status(400).json({ message: statsValidation.error.message });
-        return;
+        return res.status(400).json({ message: statsValidation.error.message });
       }
       const query = {
         'cra.dateAccompagnement': {
@@ -37,8 +36,7 @@ const getStatsNationales =
       return res.status(200).json(donneesStats);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
