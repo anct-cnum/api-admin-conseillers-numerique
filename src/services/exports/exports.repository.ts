@@ -301,8 +301,7 @@ const generateCsvStructure = async (
         }`;
 
         adresse = adresse.replace(/["',]/g, '');
-        // xxx la colonne mot de passe choisi n'est plus pertinente
-        // depuis l'ajout du multi-compte
+
         res.write(
           `${structure.siret};${structure.idPG};${structure.nom};${
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
