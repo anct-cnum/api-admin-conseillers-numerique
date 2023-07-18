@@ -128,8 +128,16 @@ const getDetailStructureById =
             'entity.$id': new ObjectId(idStructure),
           },
         },
-        { $project: { name: 1, roles: 1, passwordCreated: 1 } },
+        { $project: { name: 1, roles: 1, sub: 1 } },
       ]);
+      users.map((user) => {
+        const item = user;
+        if (user?.sub) {
+          item.sub = 'xxxxxxxx';
+        }
+
+        return item;
+      });
       const typeStructure = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );

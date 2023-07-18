@@ -34,7 +34,7 @@ const filterRole = (role: string) => {
 };
 
 const filterNomGestionnaire = (nom: string) => {
-  return nom ? { nom: { $regex: `(^.*${nom}.*$)`, $options: 'i' } } : {};
+  return nom ? { name: { $regex: `(^.*${nom}.*$)`, $options: 'i' } } : {};
 };
 
 export {

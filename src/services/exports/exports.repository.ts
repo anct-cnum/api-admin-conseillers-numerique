@@ -274,6 +274,9 @@ const generateCsvStructure = async (
         const users: IUser[] = await app
           .service(service.users)
           .Model.find({ 'entity.$id': new ObjectId(structure._id) });
+        const userPrincipal = users.find(
+          (user) => user.name === structure?.contact?.email,
+        );
         const coselec = getCoselec(structure);
         let label = 'non renseigné';
         if (
@@ -298,8 +301,7 @@ const generateCsvStructure = async (
         }`;
 
         adresse = adresse.replace(/["',]/g, '');
-        // xxx la colonne mot de passe choisi n'est plus pertinente
-        // depuis l'ajout du multi-compte
+
         res.write(
           `${structure.siret};${structure.idPG};${structure.nom};${
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
@@ -309,11 +311,7 @@ const generateCsvStructure = async (
             structure.contact?.telephone
           };${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
-          };${
-            users !== null && users.length > 0 && users[0].passwordCreated
-              ? 'oui'
-              : 'non'
-          };${countMisesEnRelation};${
+          };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0
           };${structure.statut === 'VALIDATION_COSELEC' ? 'oui' : 'non'};${
             structure.statut === 'VALIDATION_COSELEC'
