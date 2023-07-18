@@ -54,7 +54,7 @@ const getStatsStructure =
         app,
       );
 
-      res.status(200).json(donneesStats);
+      return res.status(200).json(donneesStats);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
