@@ -46,7 +46,9 @@ export default async function grandReseauRules(
     'structure.$id': { $in: structuresIds },
   });
   can([action.read], ressource.statsConseillersCras, {
-    'structure.$id': { $in: structuresIds },
+    'conseiller.$id': {
+      $in: conseillersIds,
+    },
   });
   can([action.read], ressource.statsTerritoires, {
     conseillerIds: {
