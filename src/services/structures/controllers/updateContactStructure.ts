@@ -25,7 +25,7 @@ const updateContactStructure =
     }
 
     try {
-      let structure: IStructures = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
