@@ -33,8 +33,7 @@ const getDetailStructureById =
     const demarcheSimplifiee = app.get('demarche_simplifiee');
     try {
       if (!ObjectId.isValid(idStructure)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
+        return res.status(400).json({ message: 'Id incorrect' });
       }
       const findStructure: IStructures = await app
         .service(service.structures)
@@ -42,8 +41,7 @@ const getDetailStructureById =
         .findOne({ _id: new ObjectId(idStructure) });
 
       if (!findStructure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
-        return;
+        return res.status(404).json({ message: "La structure n'existe pas" });
       }
       const checkAccessStructure = await checkAccessReadRequestStructures(
         app,
@@ -121,8 +119,7 @@ const getDetailStructureById =
         },
       ]);
       if (structure.length === 0) {
-        res.status(404).json({ message: 'Structure non trouvée' });
-        return;
+        return res.status(404).json({ message: 'Structure non trouvée' });
       }
 
       const users = await app.service(service.users).Model.aggregate([
@@ -131,8 +128,16 @@ const getDetailStructureById =
             'entity.$id': new ObjectId(idStructure),
           },
         },
-        { $project: { name: 1, roles: 1, passwordCreated: 1 } },
+        { $project: { name: 1, roles: 1, sub: 1 } },
       ]);
+      users.map((user) => {
+        const item = user;
+        if (user?.sub) {
+          item.sub = 'xxxxxxxx';
+        }
+
+        return item;
+      });
       const typeStructure = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
@@ -193,14 +198,12 @@ const getDetailStructureById =
       delete structure[0].conseillers;
 
       if (structure.length === 0) {
-        res.status(404).json({ message: 'Structure non trouvée' });
-        return;
+        return res.status(404).json({ message: 'Structure non trouvée' });
       }
-      res.status(200).json(structure[0]);
+      return res.status(200).json(structure[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
