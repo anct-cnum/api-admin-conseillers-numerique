@@ -23,7 +23,7 @@ const getUsers = (app: Application) => async (req: IRequest, res: Response) => {
 
       return item;
     });
-    res.status(200).json(hiddenSubUsers);
+    return res.status(200).json(hiddenSubUsers);
   } catch (error) {
     res.status(500).json({ message: error.message });
     throw new Error(error);
