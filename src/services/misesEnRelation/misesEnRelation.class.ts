@@ -12,7 +12,7 @@ import getHistoriqueContrats from './controllers/getHistoriqueContrats';
 import createContrat from './controllers/createContrat';
 import updateContrat from './controllers/updateContrat';
 import getMiseEnRelationConseiller from './controllers/getMiseEnRelationConseiller';
-import createContratRecrutement from './controllers/createContratRecrutement';
+import updateContratRecrutement from './controllers/updateContratRecrutement';
 import validationRecrutementContrat from './controllers/validationRecrutementContrat';
 
 export default class MisesEnRelation extends Service {
@@ -42,11 +42,11 @@ export default class MisesEnRelation extends Service {
       createAbilities(app),
       createContrat(app),
     );
-    app.post(
-      '/recrutement/contrat',
+    app.patch(
+      '/recrutement/contrat/:id',
       authenticateMode(app),
       createAbilities(app),
-      createContratRecrutement(app),
+      updateContratRecrutement(app),
     );
     app.patch(
       '/contrat/:id',

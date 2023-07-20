@@ -7,16 +7,11 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
 import { getCoselec } from '../../../utils';
 
-const createContratRecrutement =
+const updateContratRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
+    const miseEnrelationId = req.params.id;
     const {
-      body: {
-        typeDeContrat,
-        dateDebutDeContrat,
-        dateFinDeContrat,
-        salaire,
-        miseEnrelationId,
-      },
+      body: { typeDeContrat, dateDebutDeContrat, dateFinDeContrat, salaire },
     } = req;
 
     if (!ObjectId.isValid(miseEnrelationId)) {
@@ -121,4 +116,4 @@ const createContratRecrutement =
     }
   };
 
-export default createContratRecrutement;
+export default updateContratRecrutement;
