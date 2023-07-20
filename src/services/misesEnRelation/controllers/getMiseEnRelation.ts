@@ -51,9 +51,12 @@ const getMiseEnRelation =
           {
             $project: {
               statut: 1,
-              dateRecrutement: 1,
               dateRupture: 1,
               motifRupture: 1,
+              dateDebutDeContrat: 1,
+              dateFinDeContrat: 1,
+              salaire: 1,
+              typeDeContrat: 1,
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',
@@ -87,9 +90,12 @@ const getMiseEnRelation =
         miseEnRelation: {
           _id: candidat[0]._id,
           statut: candidat[0].statut,
-          dateRecrutement: candidat[0].dateRecrutement,
           dateRupture: candidat[0].dateRupture,
           motifRupture: candidat[0].motifRupture,
+          dateDebutDeContrat: candidat[0].dateDebutDeContrat,
+          dateFinDeContrat: candidat[0].dateFinDeContrat,
+          salaire: candidat[0].salaire,
+          typeDeContrat: candidat[0].typeDeContrat,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
@@ -101,9 +107,12 @@ const getMiseEnRelation =
       };
       delete candidatFormat.idConseiller;
       delete candidatFormat.statut;
-      delete candidatFormat.dateRecrutement;
       delete candidatFormat.dateRupture;
       delete candidatFormat.motifRupture;
+      delete candidatFormat.dateDebutDeContrat;
+      delete candidatFormat.dateFinDeContrat;
+      delete candidatFormat.salaire;
+      delete candidatFormat.typeDeContrat;
       res.status(200).json(candidatFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

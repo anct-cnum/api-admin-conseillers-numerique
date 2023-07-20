@@ -37,13 +37,6 @@ const updateMiseEnRelation =
         miseEnRelationVerif.statut === 'recrutee' ||
         miseEnRelationVerif.statut === 'finalisee'
       ) {
-        if (!miseEnRelationVerif.dateRecrutement) {
-          res.status(400).json({
-            message:
-              'La date de recrutement doit être obligatoirement renseignée !',
-          });
-          return;
-        }
         const dernierCoselec = getCoselec(structure);
         if (dernierCoselec !== null) {
           // Nombre de candidats déjà recrutés pour cette structure
@@ -74,6 +67,18 @@ const updateMiseEnRelation =
           motifRupture: '',
         };
       }
+      if (
+        req.body.statut === 'interessee' &&
+        miseEnRelationVerif.statut === 'recrutee'
+      ) {
+        remove = {
+          dateDebutDeContrat: '',
+          dateFinDeContrat: '',
+          typeDeContrat: '',
+          salaire: '',
+          emetteurRecrutement: '',
+        };
+      }
       if (req.body.statut === 'nouvelle_rupture') {
         if (req.body.dateRupture === null) {
           res.status(400).json({
@@ -90,12 +95,6 @@ const updateMiseEnRelation =
           return;
         }
         update.emetteurRupture = {
-          email: req.user.name,
-          date: new Date(),
-        };
-      }
-      if (req.body.statut === 'recrutee') {
-        update.emetteurRecrutement = {
           email: req.user.name,
           date: new Date(),
         };

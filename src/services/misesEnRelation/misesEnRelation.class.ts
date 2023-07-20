@@ -12,6 +12,8 @@ import getHistoriqueContrats from './controllers/getHistoriqueContrats';
 import createContrat from './controllers/createContrat';
 import updateContrat from './controllers/updateContrat';
 import getMiseEnRelationConseiller from './controllers/getMiseEnRelationConseiller';
+import createContratRecrutement from './controllers/createContratRecrutement';
+import validationRecrutementContrat from './controllers/validationRecrutementContrat';
 
 export default class MisesEnRelation extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -28,11 +30,23 @@ export default class MisesEnRelation extends Service {
       createAbilities(app),
       validationRenouvellementContrat(app),
     );
+    app.patch(
+      '/contrat/validation-recrutement/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      validationRecrutementContrat(app),
+    );
     app.post(
-      '/contrat',
+      '/renouvellement/contrat',
       authenticateMode(app),
       createAbilities(app),
       createContrat(app),
+    );
+    app.post(
+      '/recrutement/contrat',
+      authenticateMode(app),
+      createAbilities(app),
+      createContratRecrutement(app),
     );
     app.patch(
       '/contrat/:id',

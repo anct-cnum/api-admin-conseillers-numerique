@@ -72,33 +72,27 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
             miseEnrelation?.dateRecrutement,
-          )};${miseEnrelation.conseiller?.prenom};${
-            miseEnrelation.conseiller?.nom
-          };${
+          )};${miseEnrelation.conseiller?.prenom};${miseEnrelation.conseiller
+            ?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.telephone};${
-            miseEnrelation.conseiller?.email
-          };${miseEnrelation.conseiller?.codePostal};${
-            miseEnrelation.conseiller?.nomCommune
-          };${miseEnrelation.conseiller?.codeDepartement};${
+          };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
+            ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
+            .conseiller?.nomCommune};${miseEnrelation.conseiller
+            ?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.structure?.siret};${
-            miseEnrelation.structure?.idPG
-          };${miseEnrelation.structure?.nom};${
-            miseEnrelation.structure?.type
-          };${miseEnrelation.structure?.codePostal};${
-            miseEnrelation.structure?.codeCommune
-          };${miseEnrelation.structure?.codeDepartement};${
-            miseEnrelation.structure?.codeRegion
-          };${miseEnrelation.structure?.contact?.prenom};${
-            miseEnrelation.structure?.contact?.nom
-          };${miseEnrelation.structure?.contact?.telephone};${
-            miseEnrelation.structure?.contact?.email
-          };${miseEnrelation.conseiller?.idPG};${
+          };${miseEnrelation.structure?.siret};${miseEnrelation.structure
+            ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
+            ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
+            .structure?.codeCommune};${miseEnrelation.structure
+            ?.codeDepartement};${miseEnrelation.structure
+            ?.codeRegion};${miseEnrelation.structure?.contact
+            ?.prenom};${miseEnrelation.structure?.contact?.nom};${miseEnrelation
+            .structure?.contact?.telephone};${miseEnrelation.structure?.contact
+            ?.email};${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
@@ -305,9 +299,8 @@ const generateCsvStructure = async (
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
           };${structure.statut};${structure.codePostal};${
             structure.codeCommune
-          };${structure.codeDepartement};${structure.codeRegion};${
-            structure.contact?.telephone
-          };${structure.contact?.email};${
+          };${structure.codeDepartement};${structure.codeRegion};${structure
+            .contact?.telephone};${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${
             users !== null && users.length > 0 && users[0].passwordCreated
