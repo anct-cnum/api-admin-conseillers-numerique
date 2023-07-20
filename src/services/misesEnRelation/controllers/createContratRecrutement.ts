@@ -74,13 +74,17 @@ const createContratRecrutement =
           typeDeContrat,
           dateDebutDeContrat: new Date(dateDebutDeContrat),
           salaire: Number(salaire.replace(',', '.')),
+        },
+      };
+      if (miseEnRelation.statut === 'interessee') {
+        Object.assign(contratUpdated.$set, {
           statut: 'recrutee',
           emetteurRecrutement: {
             email: req.user.name,
             date: new Date(),
           },
-        },
-      };
+        });
+      }
       if (dateFinDeContrat !== null) {
         contratUpdated.$set.dateFinDeContrat = new Date(dateFinDeContrat);
       } else {
