@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ObjectId } from 'mongodb';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 
@@ -48,4 +49,89 @@ const deleteMailbox = (app, req) => async (conseillerId, login) => {
   }
 };
 
-export default deleteMailbox;
+const createMailbox =
+  (app, req) =>
+  async ({
+    conseillerId,
+    login,
+    password,
+  }: {
+    conseillerId: ObjectId;
+    login: string;
+    password: string;
+  }) => {
+    const gandi = app.get('gandi');
+    try {
+      await axios({
+        method: 'post',
+        url: `${gandi.endPoint}/mailboxes/${gandi.domain}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Apikey ${gandi.token}`,
+        },
+        data: {
+          login,
+          mailbox_type: gandi.type,
+          password,
+          aliases: [],
+        },
+      }).catch((error) => {
+        throw new Error(error);
+      });
+      await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          { _id: conseillerId },
+          {
+            $set: {
+              emailCNError: false,
+              emailCN: { address: `${login}@${gandi.domain}` },
+            },
+          },
+        );
+      return true;
+    } catch (e) {
+      await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          { _id: conseillerId },
+          {
+            $set: { emailCNError: true },
+          },
+        );
+      throw new Error(e);
+    }
+  };
+
+const fixHomonymesCreateMailbox = (app, req) => async (nom, prenom) => {
+  const gandi = app.get('gandi');
+  let login = `${prenom}.${nom}`;
+  let conseillerNumber = await app
+    .service(service.conseillers)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'emailCN.address': `${login}@${gandi.domain}`,
+      statut: 'RECRUTE',
+    });
+  if (conseillerNumber > 0) {
+    let indexLoginConseiller = 1;
+    do {
+      login = `${prenom}.${nom}${indexLoginConseiller}`;
+      // eslint-disable-next-line no-await-in-loop
+      conseillerNumber = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({
+          'emailCN.address': `${login}@${gandi.domain}`,
+          statut: 'RECRUTE',
+        });
+      indexLoginConseiller += 1;
+    } while (conseillerNumber !== 0);
+  }
+
+  return login;
+};
+
+export { deleteMailbox, createMailbox, fixHomonymesCreateMailbox };

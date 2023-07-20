@@ -113,7 +113,6 @@ const createContratRecrutement =
       }
 
       res.status(200).json({
-        message: 'Le contrat a bien été enregistré',
         miseEnRelation: miseEnRelationUpdated.value,
       });
     } catch (error) {
