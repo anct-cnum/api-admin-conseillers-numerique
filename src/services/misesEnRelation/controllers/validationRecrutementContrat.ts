@@ -10,7 +10,7 @@ import { getCoselec } from '../../../utils';
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const slugify = require('slugify');
-// const { Pool } = require('pg');
+const { Pool } = require('pg');
 
 const updateConseillersPG =
   (pool) => async (email: string, disponible: boolean) => {
@@ -30,10 +30,9 @@ const updateConseillersPG =
 const validationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
-    // const pool = new Pool();
+    const pool = new Pool();
     const connect = app.get('mongodb');
     const database = connect.substr(connect.lastIndexOf('/') + 1);
-    console.log('database', database);
     try {
       const miseEnRelationVerif = await app
         .service(service.misesEnRelation)
@@ -43,7 +42,6 @@ const validationRecrutementContrat =
         res.status(404).json({ message: 'Mise en relation non trouvée' });
         return;
       }
-      console.log('miseEnRelationVerif', miseEnRelationVerif);
       const countMiseEnrelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -52,7 +50,6 @@ const validationRecrutementContrat =
           statut: { $in: ['recrutee', 'finalisee'] },
         });
       const coselec = getCoselec(miseEnRelationVerif.structureObj);
-      console.log('coselec', coselec);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
       const dateRupture =
         miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
@@ -73,10 +70,10 @@ const validationRecrutementContrat =
         });
         return;
       }
-      // await updateConseillersPG(pool)(
-      //   miseEnRelationVerif.conseillerObj.email,
-      //   false,
-      // );
+      await updateConseillersPG(pool)(
+        miseEnRelationVerif.conseillerObj.email,
+        false,
+      );
       const userAccount = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)

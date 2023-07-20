@@ -85,7 +85,8 @@
   "gandi": {
     "token": "GANDI_TOKEN",
     "endPoint": "GANDI_ENDPOINT",
-    "domain": "GANDI_DOMAIN"
+    "domain": "GANDI_DOMAIN",
+    "type": "GANDI_TYPE"
   },
   "sib_api_key": "SIB_API_KEY"
 }
