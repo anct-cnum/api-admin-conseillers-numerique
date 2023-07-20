@@ -10,19 +10,17 @@ const getStructureById =
     const idStructure = req.params.id;
     try {
       if (!ObjectId.isValid(idStructure)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
+        return res.status(400).json({ message: 'Id incorrect' });
       }
       // Attention : pas d'access control car tout le monde peut voir tous les candidats
       const structure: IStructures = await app
         .service(service.structures)
         .Model.findOne({ _id: new ObjectId(idStructure) });
 
-      res.status(200).json(structure);
+      return res.status(200).json(structure);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
