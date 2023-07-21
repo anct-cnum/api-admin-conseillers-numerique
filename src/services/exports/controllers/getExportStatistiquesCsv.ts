@@ -146,6 +146,7 @@ const getExportStatistiquesCsv =
             dateDebut: dateDebutFormat,
             dateFin: dateFinFormat,
             structureIds,
+            conseillerIds,
             codeRegion,
             numeroDepartement,
             ville,

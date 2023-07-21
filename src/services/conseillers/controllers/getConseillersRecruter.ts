@@ -189,13 +189,6 @@ const getConseillersStatutRecrute =
         req,
       );
 
-      /* Ajout des conseillers en rupture ne portant plus le structureId
-      checkAccessConseiller.$and[0].$or.push({
-        'ruptures.structureId':
-          checkAccessConseiller.$and[0].$or[0].structureId,
-      });
-      */
-
       const conseillers = await getConseillersRecruter(
         app,
         checkAccessConseiller,
