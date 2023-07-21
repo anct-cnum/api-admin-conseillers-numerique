@@ -258,7 +258,7 @@ const filterDateDemandeAndStatutHistorique = (
           StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
         ],
       },
-      'conventionnement.dossierReconventionnement.dateDeValidation': {
+      'conventionnement.dossierReconventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
       },
@@ -267,7 +267,7 @@ const filterDateDemandeAndStatutHistorique = (
   if (typeConvention === 'conventionnement') {
     return {
       'conventionnement.statut': StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-      'conventionnement.dossierConventionnement.dateDeValidation': {
+      'conventionnement.dossierConventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
       },
@@ -311,7 +311,7 @@ const filterDateDemandeAndStatutHistorique = (
             StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
           ],
         },
-        'conventionnement.dossierReconventionnement.dateDeValidation': {
+        'conventionnement.dossierReconventionnement.dateDeCreation': {
           $gte: dateDebut,
           $lte: dateFin,
         },
@@ -319,7 +319,7 @@ const filterDateDemandeAndStatutHistorique = (
       {
         'conventionnement.statut':
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-        'conventionnement.dossierConventionnement.dateDeValidation': {
+        'conventionnement.dossierConventionnement.dateDeCreation': {
           $gte: dateDebut,
           $lte: dateFin,
         },
@@ -423,7 +423,7 @@ const totalParHistoriqueConvention = async (
           StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
         ],
       },
-      'conventionnement.dossierReconventionnement.dateDeValidation': {
+      'conventionnement.dossierReconventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
       },
@@ -433,7 +433,7 @@ const totalParHistoriqueConvention = async (
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
       'conventionnement.statut': StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-      'conventionnement.dossierConventionnement.dateDeValidation': {
+      'conventionnement.dossierConventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
       },
