@@ -50,7 +50,7 @@ const deleteMailbox = (app, req) => async (conseillerId, login) => {
 };
 
 const createMailbox =
-  (app, req) =>
+  (app) =>
   async ({
     conseillerId,
     login,
@@ -78,40 +78,33 @@ const createMailbox =
       }).catch((error) => {
         throw new Error(error);
       });
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          { _id: conseillerId },
-          {
-            $set: {
-              emailCNError: false,
-              emailCN: { address: `${login}@${gandi.domain}` },
-            },
+      await app.service(service.conseillers).Model.updateOne(
+        { _id: conseillerId },
+        {
+          $set: {
+            emailCNError: false,
+            emailCN: { address: `${login}@${gandi.domain}` },
           },
-        );
+        },
+      );
       return true;
     } catch (e) {
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          { _id: conseillerId },
-          {
-            $set: { emailCNError: true },
-          },
-        );
-      throw new Error(e);
+      await app.service(service.conseillers).Model.updateOne(
+        { _id: conseillerId },
+        {
+          $set: { emailCNError: true },
+        },
+      );
+      return new Error(e);
     }
   };
 
-const fixHomonymesCreateMailbox = (app, req) => async (nom, prenom) => {
+const fixHomonymesCreateMailbox = (app) => async (nom, prenom) => {
   const gandi = app.get('gandi');
   let login = `${prenom}.${nom}`;
   let conseillerNumber = await app
     .service(service.conseillers)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
+    .Model.countDocuments({
       'emailCN.address': `${login}@${gandi.domain}`,
       statut: 'RECRUTE',
     });
@@ -122,8 +115,7 @@ const fixHomonymesCreateMailbox = (app, req) => async (nom, prenom) => {
       // eslint-disable-next-line no-await-in-loop
       conseillerNumber = await app
         .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({
+        .Model.countDocuments({
           'emailCN.address': `${login}@${gandi.domain}`,
           statut: 'RECRUTE',
         });

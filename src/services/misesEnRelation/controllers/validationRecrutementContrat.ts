@@ -4,15 +4,11 @@ import { DBRef, ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { createMailbox, fixHomonymesCreateMailbox } from '../../../utils/gandi';
 import { getCoselec } from '../../../utils';
-import mailer from '../../../mailer';
-import creationCompteConseiller from '../../../emails/conseillers/creationCompteConseiller';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-const slugify = require('slugify');
 const { Pool } = require('pg');
 
 const updateConseillersPG =
@@ -283,34 +279,6 @@ const validationRecrutementContrat =
               ),
             },
           });
-      }
-      const nom = slugify(`${conseillerUpdated.value.nom}`, {
-        replacement: '-',
-        lower: true,
-        strict: true,
-      });
-      const prenom = slugify(`${conseillerUpdated.value.prenom}`, {
-        replacement: '-',
-        lower: true,
-        strict: true,
-      });
-      const login = await fixHomonymesCreateMailbox(app, req)(nom, prenom);
-      const password = `${uuidv4()}AZEdsf;+:!`; // Sera choisi par le conseiller via invitation
-      await createMailbox(
-        app,
-        req,
-      )({
-        conseillerId: conseillerUpdated.value._id,
-        login,
-        password,
-      });
-      const mailerInstance = mailer(app);
-      const message = creationCompteConseiller(app, mailerInstance, req);
-      const errorSmtpMail = await message.send(user).catch((errSmtp: Error) => {
-        return errSmtp;
-      });
-      if (errorSmtpMail instanceof Error) {
-        res.status(503).json({ message: errorSmtpMail.message });
       }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {
