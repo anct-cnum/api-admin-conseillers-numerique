@@ -33,7 +33,7 @@ const updateConseillersPG =
 const validationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
-    // const pool = new Pool();
+    const pool = new Pool();
     let user: IUser | null = null;
     const connect = app.get('mongodb');
     const database = connect.substr(connect.lastIndexOf('/') + 1);
@@ -74,10 +74,10 @@ const validationRecrutementContrat =
         });
         return;
       }
-      // await updateConseillersPG(pool)(
-      //   miseEnRelationVerif.conseillerObj.email,
-      //   false,
-      // );
+      await updateConseillersPG(pool)(
+        miseEnRelationVerif.conseillerObj.email,
+        false,
+      );
       const userAccount = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
