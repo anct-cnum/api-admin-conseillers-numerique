@@ -42,7 +42,6 @@ const getMisesEnRelationARenouveller =
           {
             $group: {
               _id: '$conseillerObj',
-              dateRecrutement: { $first: '$dateRecrutement' },
               statut: { $first: '$statut' },
               typeDeContrat: { $first: '$typeDeContrat' },
               reconventionnement: { $first: '$reconventionnement' },
@@ -55,7 +54,6 @@ const getMisesEnRelationARenouveller =
             $project: {
               _id: 0,
               conseiller: '$_id',
-              dateRecrutement: 1,
               statut: 1,
               reconventionnement: 1,
               miseEnRelationId: 1,

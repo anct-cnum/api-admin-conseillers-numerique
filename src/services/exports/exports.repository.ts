@@ -63,7 +63,7 @@ const structureByMisesEnRelation = async (
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date prévisionnelle de recrutement;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
   );
   try {
     await Promise.all(
@@ -71,9 +71,11 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
-            miseEnrelation?.dateRecrutement,
-          )};${miseEnrelation.conseiller?.prenom};${miseEnrelation.conseiller
-            ?.nom};${
+            miseEnrelation?.dateDebutDeContrat,
+          )};${formatDate(
+            miseEnrelation?.dateFinDeContrat,
+          )};${miseEnrelation?.typeDeContrat};${miseEnrelation?.salaire};${miseEnrelation
+            .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
             ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
@@ -547,7 +549,11 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        idType ?? ''
+      } ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(
+        dateFin,
+      )}\n`,
       general,
       statsThemes.map((stat) => stat.trim()).join('\n'),
       statsLieux,
@@ -623,9 +629,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Téléphone professionnel',
       'Email personnelle',
       'Statut',
-      'Date de recrutement',
       'Date de début de contrat',
-      'date de fin de contrat',
+      'Date de fin de contrat',
+      'Type de contrat',
       "Date d'entrée en formation",
       'Date de sortie de formation',
       'Disponibilité',
@@ -652,9 +658,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               miseEnRelation.statut,
               miseEnRelation?.dossierIncompletRupture,
             ),
-            formatDate(miseEnRelation?.dateRecrutement),
             formatDate(miseEnRelation?.dateDebutDeContrat),
             formatDate(miseEnRelation?.dateFinDeContrat),
+            miseEnRelation?.typeDeContrat,
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',

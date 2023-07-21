@@ -11,9 +11,6 @@ const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const filter = { _id: req.params.id };
 
-    if (req.body.dateRecrutement) {
-      req.body.dateRecrutement = new Date(req.body.dateRecrutement);
-    }
     if (req.body.dateRupture) {
       req.body.dateRupture = new Date(req.body.dateRupture);
     }
