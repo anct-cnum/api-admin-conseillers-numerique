@@ -22,11 +22,10 @@ const getCodePostauxConseillerCras =
 
       const listeDefinitive = createArrayForFiltreCodePostaux(listCodePostaux);
 
-      res.status(200).json(listeDefinitive);
+      return res.status(200).json(listeDefinitive);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
