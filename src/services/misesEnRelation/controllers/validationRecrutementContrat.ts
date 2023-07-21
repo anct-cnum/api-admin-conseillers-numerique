@@ -6,6 +6,9 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { createMailbox, fixHomonymesCreateMailbox } from '../../../utils/gandi';
 import { getCoselec } from '../../../utils';
+import mailer from '../../../mailer';
+import creationCompteConseiller from '../../../emails/conseillers/creationCompteConseiller';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
@@ -30,7 +33,8 @@ const updateConseillersPG =
 const validationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
-    const pool = new Pool();
+    // const pool = new Pool();
+    let user: IUser | null = null;
     const connect = app.get('mongodb');
     const database = connect.substr(connect.lastIndexOf('/') + 1);
     try {
@@ -70,10 +74,10 @@ const validationRecrutementContrat =
         });
         return;
       }
-      await updateConseillersPG(pool)(
-        miseEnRelationVerif.conseillerObj.email,
-        false,
-      );
+      // await updateConseillersPG(pool)(
+      //   miseEnRelationVerif.conseillerObj.email,
+      //   false,
+      // );
       const userAccount = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
@@ -81,7 +85,6 @@ const validationRecrutementContrat =
           name: miseEnRelationVerif.conseillerObj.email,
           roles: { $in: ['candidat'] },
         });
-      // const salt = await bcrypt.genSaltSync(10);
       const passwordHash = bcrypt.hashSync(uuidv4(), 10);
       if (userAccount === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
@@ -91,7 +94,7 @@ const validationRecrutementContrat =
           });
           return;
         }
-        const user = await app.service(service.users).create({
+        user = await app.service(service.users).create({
           name: miseEnRelationVerif.conseillerObj.email,
           prenom: miseEnRelationVerif.conseillerObj.prenom,
           nom: miseEnRelationVerif.conseillerObj.nom,
@@ -114,10 +117,10 @@ const validationRecrutementContrat =
           return;
         }
       } else {
-        const user = await app
+        const userUpdated = await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
+          .findOneAndUpdate(
             { name: miseEnRelationVerif.conseillerObj?.email },
             {
               $set: {
@@ -135,13 +138,15 @@ const validationRecrutementContrat =
                 ),
               },
             },
+            { returnOriginal: false, rawResult: true },
           );
-        if (user.modifiedCount === 0) {
+        if (userUpdated.lastErrorObject.n === 0) {
           res.status(400).json({
             message: "L'utilisateur n'a pas été mise à jour",
           });
           return;
         }
+        user = userUpdated.value;
       }
       const conseillerUpdated = await app
         .service(service.conseillers)
@@ -299,6 +304,14 @@ const validationRecrutementContrat =
         login,
         password,
       });
+      const mailerInstance = mailer(app);
+      const message = creationCompteConseiller(app, mailerInstance, req);
+      const errorSmtpMail = await message.send(user).catch((errSmtp: Error) => {
+        return errSmtp;
+      });
+      if (errorSmtpMail instanceof Error) {
+        res.status(503).json({ message: errorSmtpMail.message });
+      }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {
       if (error.name === 'ForbiddenError') {

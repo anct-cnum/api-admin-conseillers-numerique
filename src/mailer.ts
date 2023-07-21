@@ -47,6 +47,9 @@ export default function (app: Application) {
   const getEspaceCandidatUrl = (pathUrl: string) =>
     `${app.get('espace_candidat_hostname')}${pathUrl}`;
 
+  const getEspaceCoopUrl = (pathUrl: string) =>
+    `${app.get('espace_coop_hostname')}${pathUrl}`;
+
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
 
   const initSentry = () => {
@@ -75,6 +78,7 @@ export default function (app: Application) {
     getPixContactMail,
     getPixSupportMail,
     getEspaceCandidatUrl,
+    getEspaceCoopUrl,
   };
   return {
     utils,

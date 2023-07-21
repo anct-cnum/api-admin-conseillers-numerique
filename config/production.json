@@ -2,6 +2,7 @@
   "host": "HOST",
   "dashboard_hostname": "DASHBOARD_HOSTNAME",
   "espace_candidat_hostname": "ESPACE_CANDIDAT_HOSTNAME",
+  "espace_coop_hostname": "ESPACE_COOP_HOSTNAME",
   "port": "PORT",
   "public": "PUBLIC_HOSTNAME",
   "paginate": {
