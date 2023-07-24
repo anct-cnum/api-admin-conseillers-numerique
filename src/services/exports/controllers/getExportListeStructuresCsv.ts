@@ -12,8 +12,7 @@ import {
   filterStatut,
   filterType,
 } from '../../structures/repository/structures.repository';
-import { getConseillersById } from '../../../helpers/commonQueriesFunctions';
-import { getNombreCrasByArrayConseillerId } from '../../cras/cras.repository';
+import { getNombreCrasByStructureId } from '../../cras/cras.repository';
 
 const getExportListeStructuresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -81,16 +80,7 @@ const getExportListeStructuresCsv =
       structures = await Promise.all(
         structures.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          const conseillersIds = await getConseillersById(app)(item._id);
-          if (conseillersIds.length > 0) {
-            item.craCount = await getNombreCrasByArrayConseillerId(
-              app,
-              req,
-            )(conseillersIds);
-          } else {
-            item.craCount = 0;
-          }
-
+          item.craCount = await getNombreCrasByStructureId(app, req)(item._id);
           return item;
         }),
       );

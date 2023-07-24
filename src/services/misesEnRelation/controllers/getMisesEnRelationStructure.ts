@@ -8,12 +8,13 @@ import { action } from '../../../helpers/accessControl/accessList';
 const getMisesEnRelationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const query = await app
-      .service(service.misesEnRelation)
-      .Model.accessibleBy(req.ability, action.read)
-      .getQuery();
 
     try {
+      const query = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .getQuery();
+
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;

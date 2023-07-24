@@ -22,10 +22,16 @@ execute(__filename, async ({ app, logger, exit }) => {
     return;
   }
 
-  // pas de users existants grandReseau à migrer & 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
-  const allowedRoles = ['admin'];
-
+  // pas de users existants grandReseau à migrer & 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
+  const allowedRoles = ['admin', 'structure'];
   if (options.email) {
+    let query = {
+      token: uuidv4(),
+      tokenCreatedAt: new Date(),
+      mailSentDate: null,
+      migrationDashboard: true,
+    };
+
     const user: IUser = await app.service(service.users).Model.findOne({
       name: options.email.toLowerCase(),
       migrationDashboard: { $ne: true }, // utile notamment avec le multi rôle
@@ -38,15 +44,12 @@ execute(__filename, async ({ app, logger, exit }) => {
       logger.warn(`Rôle ${user.roles} de l'utilisateur non autorisé`);
       return;
     }
-    await app.service(service.users).Model.updateOne(
-      { name: options.email.toLowerCase() },
-      {
-        token: uuidv4(),
-        tokenCreatedAt: new Date(),
-        mailSentDate: null,
-        migrationDashboard: true,
-      },
-    );
+    if (user.roles.includes('structure')) {
+      query = { ...query, ...{ mailSentCoselecDate: new Date() } }; // Ne pas envoyer le mail coselec
+    }
+    await app
+      .service(service.users)
+      .Model.updateOne({ name: options.email.toLowerCase() }, query);
     logger.info(`Utilisateur ${options.email} invité au tableau de bord`);
     return;
   }
@@ -77,15 +80,23 @@ execute(__filename, async ({ app, logger, exit }) => {
       // eslint-disable-next-line no-async-promise-executor
       const p = new Promise<void>(async (resolve) => {
         try {
-          await app.service(service.users).Model.updateOne(
-            { name: user.name },
-            {
-              token: uuidv4(),
-              tokenCreatedAt: new Date(),
-              mailSentDate: null,
-              migrationDashboard: true,
-            },
-          );
+          let queryRole = {
+            token: uuidv4(),
+            tokenCreatedAt: new Date(),
+            mailSentDate: null,
+            migrationDashboard: true,
+          };
+
+          if (options.role === 'structure') {
+            queryRole = {
+              ...queryRole,
+              ...{ mailSentCoselecDate: new Date() },
+            }; // Ne pas envoyer le mail coselec
+          }
+
+          await app
+            .service(service.users)
+            .Model.updateOne({ name: user.name }, queryRole);
           logger.info(`Utilisateur ${user.name} invité au tableau de bord`);
           resolve(p);
         } catch (e) {

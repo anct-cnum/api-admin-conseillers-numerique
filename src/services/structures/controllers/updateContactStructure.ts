@@ -6,6 +6,7 @@ import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { updateContact } from '../../../schemas/structures.schemas';
+import getDetailStructureById from './getDetailStructureById';
 
 const { Pool } = require('pg');
 
@@ -24,7 +25,7 @@ const updateContactStructure =
     }
 
     try {
-      let structure: IStructures = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idStructure) });
@@ -50,7 +51,7 @@ const updateContactStructure =
           update.contact.telephone,
         ],
       );
-      structure = await app
+      await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
@@ -79,7 +80,7 @@ const updateContactStructure =
             },
           },
         );
-      res.status(200).json(structure);
+      await getDetailStructureById(app)(req, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

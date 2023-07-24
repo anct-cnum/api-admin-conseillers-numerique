@@ -154,8 +154,8 @@ export default async function hubRules(
     _id: { $in: structuresIds },
   });
   can([action.read], ressource.cras, {
-    'conseiller.$id': {
-      $in: conseillersIds,
+    'structure.$id': {
+      $in: structuresIds,
     },
   });
   can([action.read], ressource.statsConseillersCras, {

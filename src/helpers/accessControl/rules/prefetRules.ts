@@ -5,26 +5,12 @@ import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
 import { getConseillersById } from '../../commonQueriesFunctions';
 
-const getConseillersIds = async (app: Application, user: IUser) => {
+const getConseillersIds = async (
+  app: Application,
+  user: IUser,
+  structures: ObjectId[],
+) => {
   try {
-    let query = {};
-    if (user?.region) {
-      query = {
-        codeRegion: {
-          $in: [`${user?.region}`],
-        },
-      };
-    } else {
-      query = {
-        codeDepartement: {
-          $in: [`${user?.departement}`],
-        },
-      };
-    }
-    const structures: ObjectId[] = await app
-      .service(service.structures)
-      .Model.find(query)
-      .distinct('_id');
     const conseillersIds: ObjectId[] = await getConseillersById(app)(
       structures,
     );
@@ -40,7 +26,25 @@ export default async function prefetRules(
   user: IUser,
   can: any,
 ): Promise<any> {
-  const conseillersIds = await getConseillersIds(app, user);
+  let query = {};
+  if (user?.region) {
+    query = {
+      codeRegion: {
+        $in: [`${user?.region}`],
+      },
+    };
+  } else {
+    query = {
+      codeDepartement: {
+        $in: [`${user?.departement}`],
+      },
+    };
+  }
+  const structures: ObjectId[] = await app
+    .service(service.structures)
+    .Model.find(query)
+    .distinct('_id');
+  const conseillersIds = await getConseillersIds(app, user, structures);
   // Restreindre les permissions : les prefets ne peuvent voir que les structures de leur departement ou région
   can([action.read], ressource.structures, {
     codeDepartement: String(user?.departement),
@@ -71,8 +75,8 @@ export default async function prefetRules(
     _id: user?._id,
   });
   can([action.read], ressource.cras, {
-    'conseiller.$id': {
-      $in: conseillersIds,
+    'structure.$id': {
+      $in: structures,
     },
   });
   can([action.read], ressource.statsConseillersCras, {

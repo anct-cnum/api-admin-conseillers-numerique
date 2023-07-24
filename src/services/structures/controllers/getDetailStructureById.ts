@@ -7,14 +7,15 @@ import {
   checkAccessReadRequestStructures,
   formatAdresseStructure,
   formatQpv,
+  formatZrr,
   formatType,
   getConseillersRecruter,
   getConseillersValider,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
-  getNombreAccompagnementsByArrayConseillerId,
-  getNombreCrasByArrayConseillerId,
+  getNombreAccompagnementsByStructureId,
+  getNombreCrasByStructureId,
 } from '../../cras/cras.repository';
 import {
   getUrlDossierConventionnement,
@@ -32,8 +33,7 @@ const getDetailStructureById =
     const demarcheSimplifiee = app.get('demarche_simplifiee');
     try {
       if (!ObjectId.isValid(idStructure)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
+        return res.status(400).json({ message: 'Id incorrect' });
       }
       const findStructure: IStructures = await app
         .service(service.structures)
@@ -41,8 +41,7 @@ const getDetailStructureById =
         .findOne({ _id: new ObjectId(idStructure) });
 
       if (!findStructure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
-        return;
+        return res.status(404).json({ message: "La structure n'existe pas" });
       }
       const checkAccessStructure = await checkAccessReadRequestStructures(
         app,
@@ -103,6 +102,7 @@ const getDetailStructureById =
             idPG: 1,
             nom: 1,
             qpvStatut: 1,
+            estZRR: 1,
             statut: 1,
             insee: 1,
             type: 1,
@@ -119,8 +119,7 @@ const getDetailStructureById =
         },
       ]);
       if (structure.length === 0) {
-        res.status(404).json({ message: 'Structure non trouvée' });
-        return;
+        return res.status(404).json({ message: 'Structure non trouvée' });
       }
 
       const users = await app.service(service.users).Model.aggregate([
@@ -129,8 +128,16 @@ const getDetailStructureById =
             'entity.$id': new ObjectId(idStructure),
           },
         },
-        { $project: { name: 1, roles: 1, passwordCreated: 1 } },
+        { $project: { name: 1, roles: 1, sub: 1 } },
       ]);
+      users.map((user) => {
+        const item = user;
+        if (user?.sub) {
+          item.sub = 'xxxxxxxx';
+        }
+
+        return item;
+      });
       const typeStructure = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
       );
@@ -140,6 +147,7 @@ const getDetailStructureById =
       structure[0].posteValiderCoselecConventionnement =
         coselecConventionnement?.nombreConseillersCoselec;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
+      structure[0].estZRR = formatZrr(structure[0].estZRR);
       structure[0].type = formatType(structure[0].type);
       structure[0].adresseFormat = formatAdresseStructure(structure[0].insee);
       structure[0].users = users;
@@ -177,28 +185,25 @@ const getDetailStructureById =
       );
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
-      const craCount = await getNombreCrasByArrayConseillerId(
+      const craCount = await getNombreCrasByStructureId(
         app,
         req,
-      )(structure[0].conseillers?.map((conseiller) => conseiller._id));
-      const accompagnementsCount =
-        await getNombreAccompagnementsByArrayConseillerId(
-          app,
-          checkAccessCras,
-        )(structure[0].conseillers?.map((conseiller) => conseiller._id));
+      )(structure[0]._id);
+      const accompagnementsCount = await getNombreAccompagnementsByStructureId(
+        app,
+        checkAccessCras,
+      )(structure[0]._id);
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
       delete structure[0].conseillers;
 
       if (structure.length === 0) {
-        res.status(404).json({ message: 'Structure non trouvée' });
-        return;
+        return res.status(404).json({ message: 'Structure non trouvée' });
       }
-      res.status(200).json(structure[0]);
+      return res.status(200).json(structure[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

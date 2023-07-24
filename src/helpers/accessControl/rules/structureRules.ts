@@ -35,8 +35,8 @@ export default async function structureRules(
   );
 
   can([action.read], ressource.cras, {
-    'conseiller.$id': {
-      $in: conseillersIds,
+    'structure.$id': {
+      $eq: user?.entity.oid,
     },
   });
   can([action.read], ressource.statsConseillersCras, {

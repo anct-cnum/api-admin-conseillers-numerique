@@ -41,37 +41,38 @@ const getNombreCras =
         'conseiller.$id': conseillerId,
       });
 
-const getNombreAccompagnementsByArrayConseillerId =
-  (app: Application, checkAccess) => async (conseillersIds: ObjectId[]) =>
+const getNombreAccompagnementsByStructureId =
+  (app: Application, checkAccess) => async (structureId: ObjectId) =>
     app.service(service.cras).Model.aggregate([
       {
         $match: {
-          'conseiller.$id': { $in: conseillersIds },
+          'structure.$id': { $eq: structureId },
           $and: [checkAccess],
         },
       },
       {
         $group: {
           _id: null,
-          individuel: { $sum: '$cra.accompagnement.individuel' },
-          atelier: { $sum: '$cra.accompagnement.atelier' },
-          redirection: { $sum: '$cra.accompagnement.redirection' },
+          nbParticipants: { $sum: '$cra.nbParticipants' },
+          nbParticipantsRecurrents: { $sum: '$cra.nbParticipantsRecurrents' },
         },
       },
       {
         $project: {
-          total: { $add: ['$individuel', '$atelier', '$redirection'] },
+          total: {
+            $subtract: ['$nbParticipants', '$nbParticipantsRecurrents'],
+          },
         },
       },
     ]);
 
-const getNombreCrasByArrayConseillerId =
-  (app: Application, req: IRequest) => async (conseillersIds: ObjectId[]) =>
+const getNombreCrasByStructureId =
+  (app: Application, req: IRequest) => async (structureId: ObjectId) =>
     app
       .service(service.cras)
       .Model.accessibleBy(req.ability, action.read)
       .countDocuments({
-        'conseiller.$id': { $in: conseillersIds },
+        'structure.$id': { $eq: structureId },
       });
 
 const getConseillersIdsByTerritoire = async (dateFin, type, idType, app) => {
@@ -163,7 +164,7 @@ export {
   getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
-  getNombreCrasByArrayConseillerId,
-  getNombreAccompagnementsByArrayConseillerId,
+  getNombreCrasByStructureId,
+  getNombreAccompagnementsByStructureId,
   createArrayForFiltreCodePostaux,
 };
