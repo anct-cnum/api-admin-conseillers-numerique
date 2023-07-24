@@ -16,8 +16,7 @@ const getMisesEnRelationStructure =
         .getQuery();
 
       if (!ObjectId.isValid(idStructure)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
+        return res.status(400).json({ message: 'Id incorrect' });
       }
       const structure = await app
         .service(service.structures)
@@ -25,8 +24,7 @@ const getMisesEnRelationStructure =
         .findOne();
 
       if (!structure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
-        return;
+        return res.status(404).json({ message: "La structure n'existe pas" });
       }
 
       const misesEnRelation = await app
@@ -97,11 +95,10 @@ const getMisesEnRelationStructure =
             $replaceRoot: { newRoot: '$miseEnRelation' },
           },
         ]);
-      res.status(200).json(misesEnRelation);
+      return res.status(200).json(misesEnRelation);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

@@ -17,8 +17,7 @@ const getMiseEnRelation =
 
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
+        return res.status(400).json({ message: 'Id incorrect' });
       }
       const structure = await app
         .service(service.structures)
@@ -26,8 +25,7 @@ const getMiseEnRelation =
         .findOne();
 
       if (!structure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
-        return;
+        return res.status(404).json({ message: "La structure n'existe pas" });
       }
       // Attention : pas d'access control car tout le monde peut voir tous les candidats
       const candidat = await app
@@ -76,8 +74,7 @@ const getMiseEnRelation =
         ]);
 
       if (candidat.length === 0) {
-        res.status(404).json({ message: 'Candidat non trouvé' });
-        return;
+        return res.status(404).json({ message: 'Candidat non trouvé' });
       }
       const typeStructure = getTypeDossierDemarcheSimplifiee(
         structure?.insee?.unite_legale?.forme_juridique?.libelle,
@@ -104,11 +101,10 @@ const getMiseEnRelation =
       delete candidatFormat.dateRecrutement;
       delete candidatFormat.dateRupture;
       delete candidatFormat.motifRupture;
-      res.status(200).json(candidatFormat);
+      return res.status(200).json(candidatFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
