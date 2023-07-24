@@ -144,16 +144,14 @@ const getStructuresMisesEnRelations =
     try {
       const structureId = req.params.id;
       if (!ObjectId.isValid(structureId)) {
-        res.status(400).json({ message: 'Id incorrect' });
-        return;
+        return res.status(400).json({ message: 'Id incorrect' });
       }
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(structureId) });
       if (structure === null) {
-        res.status(404).json({ message: "La structure n'existe pas" });
-        return;
+        return res.status(404).json({ message: "La structure n'existe pas" });
       }
 
       // User Filters
@@ -173,8 +171,7 @@ const getStructuresMisesEnRelations =
 
       if (emailValidation.error) {
         res.statusMessage = emailValidation.error.message;
-        res.status(400).end();
-        return;
+        return res.status(400).end();
       }
       const items: {
         total: number;
@@ -223,11 +220,10 @@ const getStructuresMisesEnRelations =
         items.coselec = getCoselec(structure);
       }
 
-      res.send(items);
+      return res.send(items);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

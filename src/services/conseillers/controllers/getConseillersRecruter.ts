@@ -168,8 +168,7 @@ const getConseillersStatutRecrute =
 
     if (emailValidation.error) {
       res.statusMessage = emailValidation.error.message;
-      res.status(400).end();
-      return;
+      return res.status(400).end();
     }
     const items: { total: number; data: object; limit: number; skip: number } =
       {
@@ -255,11 +254,10 @@ const getConseillersStatutRecrute =
         items.limit = options.paginate.default;
         items.skip = Number(skip);
       }
-      res.status(200).json(items);
+      return res.status(200).json(items);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
