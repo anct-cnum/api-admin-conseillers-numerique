@@ -8,7 +8,6 @@ if (process.env.NODE_ENV === 'development') {
   mongoose.set('debug', true);
 }
 
-mongoose.set('strictQuery', true);
 export default function (app: Application): void {
   mongoose.connect(app.get('mongodb')).catch((err) => {
     logger.error(err);
