@@ -20,13 +20,10 @@ const validStatConseiller = Joi.object({
     .regex(/^[0-9a-fA-F]{24}$/)
     .error(new Error("L'id du conseiller est invalide")),
   codePostal: Joi.string()
-    .allow(null, '')
+    .allow('', null)
     .error(new Error('Le filtre code postal est invalide')),
-  ville: Joi.string()
-    .allow(null, '')
-    .error(new Error('Le filtre ville est invalide')),
   codeCommune: Joi.string()
-    .allow(null, '')
+    .allow('', null)
     .error(new Error('Le code commune est invalide')),
 });
 
@@ -40,10 +37,12 @@ const validStatStructure = Joi.object({
   idStructure: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .error(new Error("L'id de la structure est invalide")),
-  codePostal: Joi.string().error(
-    new Error('Le filtre code postal est invalide'),
-  ),
-  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
+  codePostal: Joi.string()
+    .allow('', null)
+    .error(new Error('Le filtre code postal est invalide')),
+  codeCommune: Joi.string()
+    .allow('', null)
+    .error(new Error('Le filtre ville est invalide')),
 });
 
 const validStatGrandReseau = Joi.object({
@@ -53,10 +52,12 @@ const validStatGrandReseau = Joi.object({
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
-  codePostal: Joi.string().error(
-    new Error('Le filtre code postal est invalide'),
-  ),
-  ville: Joi.string().error(new Error('Le filtre ville est invalide')),
+  codePostal: Joi.string()
+    .allow('', null)
+    .error(new Error('Le filtre code postal est invalide')),
+  codeCommune: Joi.string()
+    .allow('', null)
+    .error(new Error('Le filtre ville est invalide')),
   codeRegion: Joi.string().error(
     new Error('Le filtre code région est invalide'),
   ),
@@ -72,10 +73,13 @@ const validStatCsv = Joi.object({
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
-  codePostal: Joi.string().error(
-    new Error('Le filtre code postal est invalide'),
-  ),
+  codePostal: Joi.string()
+    .allow('', null)
+    .error(new Error('Le filtre code postal est invalide')),
   ville: Joi.string().error(new Error('Le filtre ville est invalide')),
+  codeCommune: Joi.string()
+    .allow('', null)
+    .error(new Error('Le code commune est invalide')),
   codeRegion: Joi.string().error(
     new Error('Le filtre code région est invalide'),
   ),

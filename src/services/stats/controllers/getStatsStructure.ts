@@ -16,13 +16,13 @@ const getStatsStructure =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const { codePostal, ville } = req.query;
+      const { codePostal, codeCommune } = req.query;
       const statsValidation = validStatStructure.validate({
         dateDebut,
         dateFin,
         idStructure,
         codePostal,
-        ville,
+        codeCommune,
       });
 
       if (statsValidation.error) {
@@ -42,8 +42,8 @@ const getStatsStructure =
       if (codePostal) {
         query['cra.codePostal'] = codePostal;
       }
-      if (ville) {
-        query['cra.nomCommune'] = ville;
+      if (codeCommune !== 'null' && codeCommune !== '') {
+        query['cra.codeCommune'] = codeCommune;
       }
 
       const donneesStats = await getStatsGlobales(

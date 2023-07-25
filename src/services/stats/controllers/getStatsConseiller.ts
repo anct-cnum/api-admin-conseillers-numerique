@@ -14,13 +14,12 @@ const getStatsConseiller =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const { codePostal, ville, codeCommune } = req.query;
+      const { codePostal, codeCommune } = req.query;
       const statsValidation = validStatConseiller.validate({
         dateDebut,
         dateFin,
         idConseiller,
         codePostal,
-        ville,
         codeCommune,
       });
 

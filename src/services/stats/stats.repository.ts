@@ -52,7 +52,12 @@ const getCodesPostauxGrandReseau = async (
     {
       $group: {
         _id: '$cra.codePostal',
-        villes: { $addToSet: '$cra.nomCommune' },
+        villes: {
+          $addToSet: {
+            ville: '$cra.nomCommune',
+            codeCommune: '$cra.codeCommune',
+          },
+        },
       },
     },
     { $sort: { _id: 1, villes: 1 } },
