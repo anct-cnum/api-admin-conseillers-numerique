@@ -201,6 +201,7 @@ const getConseillersStatutRecrute =
         departement as string,
         rupture as string,
       );
+
       const conseillerRecruter = conseillers.filter(
         (conseiller) => conseiller.statut === 'RECRUTE',
       );
