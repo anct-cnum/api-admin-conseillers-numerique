@@ -99,62 +99,46 @@ const getCodesPostauxStatistiquesCras =
       },
       {
         $group: {
-          _id: {
-            ville: '$cra.nomCommune',
-            codePostal: '$cra.codePostal',
-            codeCommune: '$cra.codeCommune',
+          _id: '$cra.codePostal',
+          villes: { $addToSet: '$cra.nomCommune' },
+          codeCommune: {
+            $addToSet: {
+              ville: '$cra.nomCommune',
+              codeCommune: '$cra.codeCommune',
+            },
           },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          villes: '$villes',
+          codeCommune: '$codeCommune',
         },
       },
     ]);
 
 const createArrayForFiltreCodePostaux = (
   listCodePostaux: Array<{
-    _id: { ville: string; codePostal: string; codeCommune: string[] };
+    id: string;
+    villes: string[];
+    codeCommune: Array<{ ville: string; codeCommune: string[] }>;
   }>,
 ) => {
-  const listeDefinitive: Array<{
-    id: string;
-    codeCommune: string[];
-    villes: Array<{ ville: string; codeCommune: string[] }>;
-  }> = [];
-  listCodePostaux.forEach((paire) => {
-    if (
-      listeDefinitive.findIndex((item) => item.id === paire._id.codePostal) > -1
-    ) {
-      listeDefinitive
-        .find((item) => item.id === paire._id.codePostal)
-        .villes.push({
-          ville: paire._id.ville,
-          codeCommune: paire._id.codeCommune,
-        });
-    } else {
-      listeDefinitive.push({
-        id: paire._id.codePostal,
-        villes: [
-          { ville: paire._id.ville, codeCommune: paire._id.codeCommune },
-        ],
-        codeCommune: [],
-      });
-    }
+  const liste = listCodePostaux.map((e) => {
+    const removeDoublon = [
+      ...new Map(
+        e.codeCommune.map((item) => [item.codeCommune, item]),
+      ).values(),
+    ];
+    return {
+      ...e,
+      villes: removeDoublon.map((i) => i.ville),
+      codeCommune: removeDoublon,
+    };
   });
-
-  const notDoublonListeDefinitive = listeDefinitive.map((e) => ({
-    ...e,
-    villes: [
-      ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
-    ]
-      .filter((i) => i.codeCommune)
-      .map((i) => i.ville),
-    codeCommune: [
-      ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
-    ],
-  }));
-
-  const liste = notDoublonListeDefinitive.sort(
-    (a, b) => parseInt(a.id, 10) - parseInt(b.id, 10),
-  );
-
   return liste;
 };
 

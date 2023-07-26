@@ -60,7 +60,7 @@ const getCodesPostauxGrandReseau = async (
         },
       },
     },
-    { $sort: { _id: 1, villes: 1 } },
+    { $sort: { _id: 1 } },
     {
       $project: {
         _id: 0,
