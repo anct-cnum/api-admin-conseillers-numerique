@@ -47,7 +47,7 @@ const getCodesPostauxGrandReseau = async (
     .Model.accessibleBy(ability, read)
     .getQuery();
 
-  return app.service(service.cras).Model.aggregate([
+  const listeCodePostaux = await app.service(service.cras).Model.aggregate([
     { $match: { ...codesPostauxQuery, $and: [queryAccess] } },
     {
       $group: {
@@ -69,6 +69,17 @@ const getCodesPostauxGrandReseau = async (
       },
     },
   ]);
+  const liste = listeCodePostaux.map((e) => {
+    const removeDoublon = [
+      ...new Map(e.villes.map((item) => [item.codeCommune, item])).values(),
+    ];
+    return {
+      ...e,
+      villes: removeDoublon,
+      codeCommune: removeDoublon,
+    };
+  });
+  return liste;
 };
 
 const getStructures = async (
