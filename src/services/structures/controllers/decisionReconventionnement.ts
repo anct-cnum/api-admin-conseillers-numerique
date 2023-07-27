@@ -29,7 +29,6 @@ const decisionReconventionnement =
           {
             _id: new ObjectId(idStructure),
             statut: 'VALIDATION_COSELEC',
-            'conventionnement.dossierReconventionnement.statut': 'accepte',
           },
           {
             $set: {
@@ -50,8 +49,6 @@ const decisionReconventionnement =
           {
             'structure.$id': new ObjectId(idStructure),
             'structureObj.statut': 'VALIDATION_COSELEC',
-            'structureObj.conventionnement.dossierReconventionnement.statut':
-              'accepte',
           },
           {
             $set: {

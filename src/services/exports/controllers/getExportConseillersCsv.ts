@@ -31,12 +31,23 @@ const getConseillersRecruter =
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
+        $addFields: {
+          nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+        },
+      },
+      {
+        $addFields: {
+          prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+        },
+      },
+      { $addFields: { idPGStr: { $toString: '$idPG' } } },
+      {
         $match: {
+          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           $and: [checkAccess],
         },
       },
