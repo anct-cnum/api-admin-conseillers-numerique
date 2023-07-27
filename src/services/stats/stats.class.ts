@@ -22,6 +22,7 @@ import {
   getStatsTerritoireCra,
   getStatsNationalesGrandReseau,
 } from './controllers';
+import getStatsTerritoiresPrefet from './controllers/getStatsTerritoiresPrefet';
 
 interface Data {}
 
@@ -71,6 +72,12 @@ export class Stats implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getStatsTerritoires(app, options),
+    );
+    app.get(
+      '/stats/prefet/territoires',
+      authenticateMode(app),
+      createAbilities(app),
+      getStatsTerritoiresPrefet(app, options),
     );
     app.get(
       '/stats/territoire',
