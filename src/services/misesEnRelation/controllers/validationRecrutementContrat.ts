@@ -6,6 +6,7 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+import { countConseillersRecrutees } from '../misesEnRelation.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
@@ -29,6 +30,10 @@ const updateConseillersPG =
 const validationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
+    if (!ObjectId.isValid(idMiseEnRelation)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
     const pool = new Pool();
     let user: IUser | null = null;
     const connect = app.get('mongodb');
@@ -42,15 +47,34 @@ const validationRecrutementContrat =
         res.status(404).json({ message: 'Mise en relation non trouvée' });
         return;
       }
-      const countMiseEnrelation = await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments({
-          'structure.$id': miseEnRelationVerif.structureObj._id,
-          statut: { $in: ['recrutee', 'finalisee'] },
+      if (
+        !miseEnRelationVerif?.dateDebutDeContrat ||
+        !miseEnRelationVerif?.typeDeContrat ||
+        !miseEnRelationVerif?.salaire
+      ) {
+        res.status(400).json({
+          message: "Action non autorisée : le contrat n'est pas renseigné",
         });
+        return;
+      }
+      if (
+        miseEnRelationVerif?.typeDeContrat !== 'CDI' &&
+        !miseEnRelationVerif?.dateFinDeContrat
+      ) {
+        res.status(400).json({
+          message: "Action non autorisée : le contrat n'est pas renseigné",
+        });
+        return;
+      }
+      const misesEnRelationRecrutees = await countConseillersRecrutees(
+        app,
+        req,
+        miseEnRelationVerif.structure.oid,
+      );
       const coselec = getCoselec(miseEnRelationVerif.structureObj);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
+      console.log('nombreConseillersCoselec', nombreConseillersCoselec);
+      console.log('misesEnRelationRecrutees', misesEnRelationRecrutees.length);
       const dateRupture =
         miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
       if (
@@ -63,7 +87,7 @@ const validationRecrutementContrat =
         });
         return;
       }
-      if (countMiseEnrelation > nombreConseillersCoselec) {
+      if (misesEnRelationRecrutees.length >= nombreConseillersCoselec) {
         res.status(400).json({
           message:
             'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
@@ -274,7 +298,7 @@ const validationRecrutementContrat =
             $set: {
               structure: new DBRef(
                 'structures',
-                miseEnRelationUpdated?.value.structure.oid,
+                miseEnRelationUpdated?.value?.structure?.oid,
                 database,
               ),
             },

@@ -6,6 +6,7 @@ import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
+import { countConseillersRecrutees } from '../misesEnRelation.repository';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -37,14 +38,11 @@ const updateMiseEnRelation =
         const dernierCoselec = getCoselec(structure);
         if (dernierCoselec !== null) {
           // Nombre de candidats déjà recrutés pour cette structure
-          const misesEnRelationRecrutees = await app
-            .service(service.misesEnRelation)
-            .Model.accessibleBy(req.ability, action.read)
-            .find({
-              query: {
-                statut: { $in: ['recrutee', 'finalisee'] },
-              },
-            });
+          const misesEnRelationRecrutees = await countConseillersRecrutees(
+            app,
+            req,
+            miseEnRelationVerif.structure.oid,
+          );
           if (
             misesEnRelationRecrutees.length >=
             dernierCoselec.nombreConseillersCoselec

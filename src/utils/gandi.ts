@@ -78,12 +78,26 @@ const createMailbox =
       }).catch((error) => {
         throw new Error(error);
       });
-      await app.service(service.conseillers).Model.updateOne(
+      const conseiller = await app.service(service.conseillers).Model.updateOne(
         { _id: conseillerId },
         {
           $set: {
             emailCNError: false,
             emailCN: { address: `${login}@${gandi.domain}` },
+          },
+        },
+      );
+      if (conseiller.modifiedCount === 0) {
+        throw new Error('Conseiller non trouvé');
+      }
+      await app.service(service.misesEnRelation).Model.updateMany(
+        {
+          'conseiller.$id': conseillerId,
+        },
+        {
+          $set: {
+            'conseillerObj.emailCNError': false,
+            'conseillerObj.emailCN': { address: `${login}@${gandi.domain}` },
           },
         },
       );

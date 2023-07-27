@@ -72,9 +72,9 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
             miseEnrelation?.dateDebutDeContrat,
-          )};${formatDate(
-            miseEnrelation?.dateFinDeContrat,
-          )};${miseEnrelation?.typeDeContrat};${miseEnrelation?.salaire};${miseEnrelation
+          )};${formatDate(miseEnrelation?.dateFinDeContrat)};${
+            miseEnrelation?.typeDeContrat ?? 'Non renseigné'
+          };${miseEnrelation?.salaire ?? 'Non renseigné'};${miseEnrelation
             .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
@@ -660,7 +660,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             ),
             formatDate(miseEnRelation?.dateDebutDeContrat),
             formatDate(miseEnRelation?.dateFinDeContrat),
-            miseEnRelation?.typeDeContrat,
+            miseEnRelation?.typeDeContrat ?? 'Non renseigné',
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',

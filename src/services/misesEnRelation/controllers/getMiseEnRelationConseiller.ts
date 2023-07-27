@@ -90,7 +90,6 @@ const getMiseEnRelationConseiller =
         miseEnRelation: {
           _id: candidat[0]._id,
           statut: candidat[0].statut,
-          dateRecrutement: candidat[0].dateRecrutement,
           dateRupture: candidat[0].dateRupture,
           motifRupture: candidat[0].motifRupture,
           dateDebutDeContrat: candidat[0].dateDebutDeContrat,

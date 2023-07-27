@@ -6,13 +6,13 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
 import { getCoselec } from '../../../utils';
+import { countConseillersRecrutees } from '../misesEnRelation.repository';
 
 const updateContratRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const miseEnrelationId = req.params.id;
-    const {
-      body: { typeDeContrat, dateDebutDeContrat, dateFinDeContrat, salaire },
-    } = req;
+    const { typeDeContrat, dateDebutDeContrat, dateFinDeContrat, salaire } =
+      req.body;
 
     if (!ObjectId.isValid(miseEnrelationId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -38,23 +38,18 @@ const updateContratRecrutement =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-      const structure = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne();
-      const dernierCoselec = getCoselec(structure);
+      const dernierCoselec = getCoselec(miseEnRelation.structureObj);
       if (dernierCoselec !== null) {
         // Nombre de candidats déjà recrutés pour cette structure
-        const misesEnRelationRecrutees = await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.read)
-          .find({
-            query: {
-              statut: { $in: ['recrutee', 'finalisee'] },
-            },
-          });
+        const misesEnRelationRecrutees = await countConseillersRecrutees(
+          app,
+          req,
+          miseEnRelation.structure.oid,
+        );
+        const countMisesEnRelationRecruteesFutur =
+          misesEnRelationRecrutees.length + 1; // prendre en compte celui qui va être recruté dans le quota
         if (
-          misesEnRelationRecrutees.length >=
+          countMisesEnRelationRecruteesFutur >=
           dernierCoselec.nombreConseillersCoselec
         ) {
           res.status(400).json({
