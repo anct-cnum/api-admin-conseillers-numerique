@@ -73,8 +73,6 @@ const validationRecrutementContrat =
       );
       const coselec = getCoselec(miseEnRelationVerif.structureObj);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
-      console.log('nombreConseillersCoselec', nombreConseillersCoselec);
-      console.log('misesEnRelationRecrutees', misesEnRelationRecrutees.length);
       const dateRupture =
         miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
       if (
