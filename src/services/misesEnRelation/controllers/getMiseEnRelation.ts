@@ -111,7 +111,7 @@ const getMiseEnRelation =
       delete candidatFormat.salaire;
       delete candidatFormat.typeDeContrat;
 
-      res.status(200).json(candidatFormat);
+      return res.status(200).json(candidatFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         return res.status(403).json({ message: 'Accès refusé' });
