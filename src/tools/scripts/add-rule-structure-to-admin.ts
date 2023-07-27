@@ -18,9 +18,6 @@ program.parse(process.argv);
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
 
-  const connect = app.get('mongodb');
-  const database = connect.substr(connect.lastIndexOf('/') + 1);
-
   if (
     !options.email ||
     !options.structureId ||
@@ -60,6 +57,8 @@ execute(__filename, async ({ app, logger, exit }) => {
     return;
   }
 
+  const connect = app.get('mongodb');
+  const database = connect.substr(connect.lastIndexOf('/') + 1);
   const queryUpd = {
     $push: {
       roles: 'structure',
