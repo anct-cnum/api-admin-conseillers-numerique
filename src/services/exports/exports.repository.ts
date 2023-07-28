@@ -658,7 +658,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             ),
             formatDate(miseEnRelation?.dateDebutDeContrat),
             formatDate(miseEnRelation?.dateFinDeContrat),
-            miseEnRelation?.typeDeContrat ?? 'Non renseigné',
+            miseEnRelation?.typeDeContrat ?? 'Non renseignée',
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',

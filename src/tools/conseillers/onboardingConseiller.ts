@@ -11,7 +11,7 @@ import { createMailbox, fixHomonymesCreateMailbox } from '../../utils/gandi';
 const { v4: uuidv4 } = require('uuid');
 const slugify = require('slugify');
 
-execute(__filename, async ({ app, logger, exit, mailer, delay }) => {
+execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
   const conseillers = await app.service(service.conseillers).Model.find({
     $or: [{ emailCN: { $exists: false } }, { emailCNError: true }],
     statut: 'RECRUTE',
@@ -62,6 +62,9 @@ execute(__filename, async ({ app, logger, exit, mailer, delay }) => {
       }
     } else {
       logger.error(
+        `Le conseiller ${conseiller.nom} ${conseiller.prenom} n'a pas de compte`,
+      );
+      Sentry.captureException(
         `Le conseiller ${conseiller.nom} ${conseiller.prenom} n'a pas de compte`,
       );
     }
