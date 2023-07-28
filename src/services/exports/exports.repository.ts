@@ -307,8 +307,9 @@ const generateCsvStructure = async (
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
           };${structure.statut};${structure.codePostal};${
             structure.codeCommune
-          };${structure.codeDepartement};${structure.codeRegion};${structure
-            .contact?.telephone};${structure.contact?.email};${
+          };${structure.codeDepartement};${structure.codeRegion};${
+            structure.contact?.telephone
+          };${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0
