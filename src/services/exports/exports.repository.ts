@@ -71,30 +71,34 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
-            miseEnrelation?.dateDebutDeContrat,
-          )};${formatDate(miseEnrelation?.dateFinDeContrat)};${
-            miseEnrelation?.typeDeContrat ?? 'Non renseigné'
-          };${miseEnrelation?.salaire ?? 'Non renseigné'};${miseEnrelation
-            .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
+            miseEnrelation?.dateRecrutement,
+          )};${miseEnrelation.conseiller?.prenom};${
+            miseEnrelation.conseiller?.nom
+          };${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
-            ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
-            .conseiller?.nomCommune};${miseEnrelation.conseiller
-            ?.codeDepartement};${
+          };${miseEnrelation.conseiller?.telephone};${
+            miseEnrelation.conseiller?.email
+          };${miseEnrelation.conseiller?.codePostal};${
+            miseEnrelation.conseiller?.nomCommune
+          };${miseEnrelation.conseiller?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.structure?.siret};${miseEnrelation.structure
-            ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
-            ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
-            .structure?.codeCommune};${miseEnrelation.structure
-            ?.codeDepartement};${miseEnrelation.structure
-            ?.codeRegion};${miseEnrelation.structure?.contact
-            ?.prenom};${miseEnrelation.structure?.contact?.nom};${miseEnrelation
-            .structure?.contact?.telephone};${miseEnrelation.structure?.contact
-            ?.email};${miseEnrelation.conseiller?.idPG};${
+          };${miseEnrelation.structure?.siret};${
+            miseEnrelation.structure?.idPG
+          };${miseEnrelation.structure?.nom};${
+            miseEnrelation.structure?.type
+          };${miseEnrelation.structure?.codePostal};${
+            miseEnrelation.structure?.codeCommune
+          };${miseEnrelation.structure?.codeDepartement};${
+            miseEnrelation.structure?.codeRegion
+          };${miseEnrelation.structure?.contact?.prenom};${
+            miseEnrelation.structure?.contact?.nom
+          };${miseEnrelation.structure?.contact?.telephone};${
+            miseEnrelation.structure?.contact?.email
+          };${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
