@@ -25,6 +25,7 @@ import {
   getExportHistoriqueDossiersConventionCsv,
   getExportHistoriqueContratsCsv,
 } from './controllers';
+import getExportTerritoiresPrefetCsv from './controllers/getExportTerritoirePrefetCsv';
 
 interface Data {}
 
@@ -99,6 +100,12 @@ export class Exports implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getExportTerritoiresCsv(app),
+    );
+    app.get(
+      '/exports/prefet/territoires-csv',
+      authenticateMode(app),
+      createAbilities(app),
+      getExportTerritoiresPrefetCsv(app),
     );
     app.get(
       '/exports/conseillers-csv',

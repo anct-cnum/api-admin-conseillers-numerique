@@ -72,33 +72,27 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
             miseEnrelation?.dateRecrutement,
-          )};${miseEnrelation.conseiller?.prenom};${
-            miseEnrelation.conseiller?.nom
-          };${
+          )};${miseEnrelation.conseiller?.prenom};${miseEnrelation.conseiller
+            ?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.telephone};${
-            miseEnrelation.conseiller?.email
-          };${miseEnrelation.conseiller?.codePostal};${
-            miseEnrelation.conseiller?.nomCommune
-          };${miseEnrelation.conseiller?.codeDepartement};${
+          };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
+            ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
+            .conseiller?.nomCommune};${miseEnrelation.conseiller
+            ?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.structure?.siret};${
-            miseEnrelation.structure?.idPG
-          };${miseEnrelation.structure?.nom};${
-            miseEnrelation.structure?.type
-          };${miseEnrelation.structure?.codePostal};${
-            miseEnrelation.structure?.codeCommune
-          };${miseEnrelation.structure?.codeDepartement};${
-            miseEnrelation.structure?.codeRegion
-          };${miseEnrelation.structure?.contact?.prenom};${
-            miseEnrelation.structure?.contact?.nom
-          };${miseEnrelation.structure?.contact?.telephone};${
-            miseEnrelation.structure?.contact?.email
-          };${miseEnrelation.conseiller?.idPG};${
+          };${miseEnrelation.structure?.siret};${miseEnrelation.structure
+            ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
+            ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
+            .structure?.codeCommune};${miseEnrelation.structure
+            ?.codeDepartement};${miseEnrelation.structure
+            ?.codeRegion};${miseEnrelation.structure?.contact
+            ?.prenom};${miseEnrelation.structure?.contact?.nom};${miseEnrelation
+            .structure?.contact?.telephone};${miseEnrelation.structure?.contact
+            ?.email};${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
@@ -307,9 +301,8 @@ const generateCsvStructure = async (
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
           };${structure.statut};${structure.codePostal};${
             structure.codeCommune
-          };${structure.codeDepartement};${structure.codeRegion};${
-            structure.contact?.telephone
-          };${structure.contact?.email};${
+          };${structure.codeDepartement};${structure.codeRegion};${structure
+            .contact?.telephone};${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0
@@ -552,7 +545,11 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        idType ?? ''
+      } ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(
+        dateFin,
+      )}\n`,
       general,
       statsThemes.map((stat) => stat.trim()).join('\n'),
       statsLieux,
@@ -601,6 +598,42 @@ const generateCsvTerritoires = async (
             statsTerritoire.cnfsActives,
             statsTerritoire.cnfsInactives,
             statsTerritoire.tauxActivation,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
+const generateCsvTerritoiresPrefet = async (
+  statsTerritoires,
+  territoire,
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Code',
+      'Nom',
+      'Personnes accompagnées',
+      'Postes validés',
+      'Conseillers recrutés',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...statsTerritoires.map((statsTerritoire) =>
+          [
+            ...codeAndNomTerritoire(territoire, statsTerritoire),
+            statsTerritoire.personnesAccompagnees -
+              statsTerritoire.personnesRecurrentes,
+            statsTerritoire.nombreConseillersCoselec,
+            statsTerritoire.conseillersRecruter,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -862,4 +895,5 @@ export {
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,
   generateCsvHistoriqueContrats,
+  generateCsvTerritoiresPrefet,
 };

@@ -3,36 +3,18 @@ import { Response } from 'express';
 import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { validTerritoiresPrefet } from '../../../schemas/territoires.schemas';
+import { generateCsvTerritoiresPrefet } from '../exports.repository';
+import { validExportTerritoires } from '../../../schemas/territoires.schemas';
 import {
   checkAccessRequestStatsTerritoires,
   countPersonnesAccompagnees,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
-import { getNombreCraWithAccessControl } from '../stats.repository';
-
-const getDepartement =
-  (app: Application, checkRoleAccessStatsTerritoires) =>
-  async (date: string, ordre: string) =>
-    app.service(service.statsTerritoires).Model.aggregate([
-      { $match: { date, $and: [checkRoleAccessStatsTerritoires] } },
-      {
-        $project: {
-          _id: 0,
-          codeDepartement: 1,
-          nomDepartement: 1,
-          nombreConseillersCoselec: 1,
-          cnfsActives: 1,
-          cnfsInactives: 1,
-          conseillerIds: 1,
-        },
-      },
-      { $sort: ordre },
-    ]);
+import { getNombreCraWithAccessControl } from '../../stats/stats.repository';
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
-  async (date: string, ordre: string) =>
+  async (date: string, nomOrdre: string, ordre: string) =>
     app.service(service.statsTerritoires).Model.aggregate([
       { $match: { date, $and: [checkRoleAccessStatsTerritoires] } },
       {
@@ -70,18 +52,37 @@ const getRegion =
           },
         },
       },
-      { $sort: ordre },
+      { $sort: { [nomOrdre]: parseInt(ordre, 10) } },
     ]);
 
-const getStatsTerritoires =
-  (app: Application, options) => async (req: IRequest, res: Response) => {
+const getDepartement =
+  (app: Application, checkRoleAccessStatsTerritoires) =>
+  async (date: string, ordre: string, nomOrdre: string) =>
+    app.service(service.statsTerritoires).Model.aggregate([
+      { $match: { date, $and: [checkRoleAccessStatsTerritoires] } },
+      {
+        $project: {
+          _id: 0,
+          codeDepartement: 1,
+          nomDepartement: 1,
+          nombreConseillersCoselec: 1,
+          cnfsActives: 1,
+          cnfsInactives: 1,
+          conseillerIds: 1,
+        },
+      },
+      { $sort: { [nomOrdre]: parseInt(ordre, 10) } },
+    ]);
+
+const getExportTerritoiresPrefetCsv =
+  (app: Application) => async (req: IRequest, res: Response) => {
     const { territoire, nomOrdre, ordre } = req.query;
-    const dateFin: Date = new Date(req.query.dateFin);
-    const dateDebut: Date = new Date(req.query.dateDebut);
+    const dateFin: Date = new Date(req.query.dateFin as string);
+    const dateDebut: Date = new Date(req.query.dateDebut as string);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
     const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
-    const statsValidation = validTerritoiresPrefet.validate({
+    const emailValidation = validExportTerritoires.validate({
       territoire,
       nomOrdre,
       ordre,
@@ -89,35 +90,26 @@ const getStatsTerritoires =
       dateFin,
     });
 
-    if (statsValidation.error) {
-      res.statusMessage = statsValidation.error.message;
+    if (emailValidation.error) {
+      res.statusMessage = emailValidation.error.message;
       res.status(400).end();
       return;
     }
-    const items: { total: number; data: object; limit: number; skip: number } =
-      {
-        total: 0,
-        data: undefined,
-        limit: 0,
-        skip: 0,
-      };
-    const ordreColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
+    let statsTerritoires;
     try {
-      let statsTerritoires: any[];
       const checkRoleAccessStatsTerritoires =
         await checkAccessRequestStatsTerritoires(app, req);
       if (territoire === 'codeDepartement') {
         statsTerritoires = await getDepartement(
           app,
           checkRoleAccessStatsTerritoires,
-        )(dateFinFormat, ordreColonne);
+        )(dateFinFormat, String(ordre), String(nomOrdre));
       } else if (territoire === 'codeRegion') {
         statsTerritoires = await getRegion(
           app,
           checkRoleAccessStatsTerritoires,
-        )(dateFinFormat, ordreColonne);
+        )(dateFinFormat, String(nomOrdre), String(ordre));
       }
-
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
           const item = { ...ligneStats };
@@ -152,9 +144,7 @@ const getStatsTerritoires =
           return item;
         }),
       );
-      items.data = statsTerritoires;
-      items.limit = options.paginate.default;
-      res.send({ items });
+      generateCsvTerritoiresPrefet(statsTerritoires, territoire, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
@@ -165,4 +155,4 @@ const getStatsTerritoires =
     }
   };
 
-export default getStatsTerritoires;
+export default getExportTerritoiresPrefetCsv;
