@@ -71,9 +71,11 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
-            miseEnrelation?.dateRecrutement,
-          )};${miseEnrelation.conseiller?.prenom};${miseEnrelation.conseiller
-            ?.nom};${
+            miseEnrelation?.dateDebutDeContrat,
+          )};${formatDate(miseEnrelation?.dateFinDeContrat)};${
+            miseEnrelation?.typeDeContrat ?? 'Non renseigné'
+          };${miseEnrelation?.salaire ?? 'Non renseigné'};${miseEnrelation
+            .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
             ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
