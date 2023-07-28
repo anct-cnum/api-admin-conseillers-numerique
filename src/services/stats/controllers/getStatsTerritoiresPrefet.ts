@@ -74,7 +74,7 @@ const getRegion =
     ]);
 
 const getStatsTerritoires =
-  (app: Application, options) => async (req: IRequest, res: Response) => {
+  (app: Application) => async (req: IRequest, res: Response) => {
     const { territoire, nomOrdre, ordre } = req.query;
     const dateFin: Date = new Date(req.query.dateFin);
     const dateDebut: Date = new Date(req.query.dateDebut);
@@ -94,16 +94,9 @@ const getStatsTerritoires =
       res.status(400).end();
       return;
     }
-    const items: { total: number; data: object; limit: number; skip: number } =
-      {
-        total: 0,
-        data: undefined,
-        limit: 0,
-        skip: 0,
-      };
     const ordreColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
     try {
-      let statsTerritoires: any[];
+      let statsTerritoires: any[] = [];
       const checkRoleAccessStatsTerritoires =
         await checkAccessRequestStatsTerritoires(app, req);
       if (territoire === 'codeDepartement') {
@@ -152,9 +145,7 @@ const getStatsTerritoires =
           return item;
         }),
       );
-      items.data = statsTerritoires;
-      items.limit = options.paginate.default;
-      res.send({ items });
+      res.status(200).json(statsTerritoires);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

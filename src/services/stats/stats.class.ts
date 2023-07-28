@@ -77,7 +77,7 @@ export class Stats implements ServiceMethods<Data> {
       '/stats/prefet/territoires',
       authenticateMode(app),
       createAbilities(app),
-      getStatsTerritoiresPrefet(app, options),
+      getStatsTerritoiresPrefet(app),
     );
     app.get(
       '/stats/territoire',
