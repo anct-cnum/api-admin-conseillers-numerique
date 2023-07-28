@@ -149,6 +149,7 @@ const getConseillersStatutRecrute =
       departement,
       piecesManquantes,
     } = req.query;
+
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
     const emailValidation = validConseillers.validate({
@@ -186,6 +187,7 @@ const getConseillersStatutRecrute =
         app,
         req,
       );
+
       const conseillers = await getConseillersRecruter(
         app,
         checkAccessConseiller,
@@ -198,12 +200,14 @@ const getConseillersStatutRecrute =
         departement as string,
         rupture as string,
       );
+
       const conseillerRecruter = conseillers.filter(
         (conseiller) => conseiller.statut === 'RECRUTE',
       );
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
