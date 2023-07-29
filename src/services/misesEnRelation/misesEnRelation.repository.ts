@@ -36,6 +36,47 @@ const filterNomConseiller = (nom: string) => {
   return {};
 };
 
+const filterNomConseillerOrStructure = (nom: string) => {
+  const inputSearchBar = nom?.trim();
+  if (inputSearchBar) {
+    return {
+      $or: [
+        {
+          nomPrenomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          prenomNomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          idPGConseillerStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          'structureObj.nom': {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          idPGStructureStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+      ],
+    };
+  }
+  return {};
+};
+
 const filterDepartement = (departement: string) => {
   if (departement === '978') {
     return { 'conseillerObj.codeCom': departement };
@@ -215,6 +256,7 @@ const totalContrat = async (app: Application, checkAccess) => {
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
+  filterNomConseillerOrStructure,
   filterDepartement,
   filterRegion,
   filterPix,

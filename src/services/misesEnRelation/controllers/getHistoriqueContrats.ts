@@ -5,7 +5,7 @@ import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
   filterDepartement,
-  filterNomConseiller,
+  filterNomConseillerOrStructure,
   filterRegion,
   filterStatutContratHistorique,
   totalHistoriqueContrat,
@@ -35,11 +35,14 @@ const getTotalMisesEnRelations =
           },
         },
       },
-      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
+        $addFields: { idPGConseillerStr: { $toString: '$conseillerObj.idPG' } },
+      },
+      { $addFields: { idPGStructureStr: { $toString: '$structureObj.idPG' } } },
       {
         $match: {
           ...filterStatutContratHistorique(statut),
-          ...filterNomConseiller(searchByNomConseiller),
+          ...filterNomConseillerOrStructure(searchByNomConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],
@@ -77,7 +80,10 @@ const getMisesEnRelations =
           },
         },
       },
-      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
+        $addFields: { idPGConseillerStr: { $toString: '$conseillerObj.idPG' } },
+      },
+      { $addFields: { idPGStructureStr: { $toString: '$structureObj.idPG' } } },
       {
         $match: {
           $and: [
@@ -105,7 +111,7 @@ const getMisesEnRelations =
                 },
               ],
             },
-            filterNomConseiller(searchByNomConseiller),
+            filterNomConseillerOrStructure(searchByNomConseiller),
           ],
           ...filterStatutContratHistorique(statut),
           ...filterRegion(region),

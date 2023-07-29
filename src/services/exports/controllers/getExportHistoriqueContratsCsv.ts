@@ -7,10 +7,10 @@ import { generateCsvHistoriqueContrats } from '../exports.repository';
 import {
   checkAccessReadRequestMisesEnRelation,
   filterDepartement,
+  filterNomConseillerOrStructure,
   filterRegion,
   filterStatutContratHistorique,
 } from '../../misesEnRelation/misesEnRelation.repository';
-import { filterNomConseiller } from '../../conseillers/conseillers.repository';
 
 const getExportHistoriqueContratsCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -63,7 +63,16 @@ const getExportHistoriqueContratsCsv =
               },
             },
           },
-          { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+          {
+            $addFields: {
+              idPGConseillerStr: { $toString: '$conseillerObj.idPG' },
+            },
+          },
+          {
+            $addFields: {
+              idPGStructureStr: { $toString: '$structureObj.idPG' },
+            },
+          },
           {
             $match: {
               $and: [
@@ -96,7 +105,7 @@ const getExportHistoriqueContratsCsv =
                     },
                   ],
                 },
-                filterNomConseiller(searchByNomConseiller),
+                filterNomConseillerOrStructure(searchByNomConseiller),
               ],
               ...filterStatutContratHistorique(statut),
               ...filterRegion(region),
