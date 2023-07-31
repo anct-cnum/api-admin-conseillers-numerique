@@ -13,6 +13,8 @@ import {
   checkAccessReadRequestStructures,
   filterSortColonne,
 } from '../repository/structures.repository';
+import { action } from '../../../helpers/accessControl/accessList';
+import { getCoselec } from '../../../utils';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -74,6 +76,8 @@ const getStructuresAvecFiltre =
           _id: 1,
           idPG: 1,
           nom: 1,
+          statut: 1,
+          coselec: 1,
           siret: 1,
           'contact.prenom': 1,
           'contact.nom': 1,
@@ -144,6 +148,26 @@ const getStructures =
         skip as string,
         options.paginate.default,
       );
+      const promises = [];
+      structures.forEach((structure) => {
+        promises.push(
+          app
+            .service(service.misesEnRelation)
+            .Model.accessibleBy(req.ability, action.read)
+            .countDocuments({
+              'structure.$id': structure._id,
+              statut: { $in: ['recrutee', 'finalisee'] },
+            })
+            .then((countMiseEnRelation) => {
+              const coselec = getCoselec(structure);
+              Object.assign(structure, {
+                conseillersRecruter: countMiseEnRelation,
+                posteValiderCoselec: coselec?.nombreConseillersCoselec ?? 0,
+              });
+            }),
+        );
+      });
+      await Promise.all(promises);
       if (structures.length > 0) {
         const totalStructures = await getTotalStructures(app, checkAccess)(
           dateDebut,
