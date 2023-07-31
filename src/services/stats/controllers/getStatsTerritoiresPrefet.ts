@@ -9,7 +9,7 @@ import {
   countPersonnesAccompagnees,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
-import { getNombreCraWithAccessControl } from '../stats.repository';
+import { getNombreCra } from '../stats.repository';
 
 const getDepartement =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -73,14 +73,11 @@ const getRegion =
       { $sort: ordre },
     ]);
 
-const getStatsTerritoires =
+const getStatsTerritoiresPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { territoire, nomOrdre, ordre } = req.query;
     const dateFin: Date = new Date(req.query.dateFin);
     const dateDebut: Date = new Date(req.query.dateDebut);
-    dateDebut.setUTCHours(0, 0, 0, 0);
-    dateFin.setUTCHours(23, 59, 59, 59);
-    const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
     const statsValidation = validTerritoiresPrefet.validate({
       territoire,
       nomOrdre,
@@ -88,12 +85,14 @@ const getStatsTerritoires =
       dateDebut,
       dateFin,
     });
-
     if (statsValidation.error) {
       res.statusMessage = statsValidation.error.message;
       res.status(400).end();
       return;
     }
+    dateDebut.setUTCHours(0, 0, 0, 0);
+    dateFin.setUTCHours(23, 59, 59, 59);
+    const dateFinFormat = dayjs(dateFin).format('DD/MM/YYYY');
     const ordreColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
     try {
       let statsTerritoires: any[] = [];
@@ -136,10 +135,7 @@ const getStatsTerritoires =
               req,
               query,
             );
-            item.CRAEnregistres = await getNombreCraWithAccessControl(
-              app,
-              req,
-            )(query);
+            item.CRAEnregistres = await getNombreCra(query, app);
           }
 
           return item;
@@ -156,4 +152,4 @@ const getStatsTerritoires =
     }
   };
 
-export default getStatsTerritoires;
+export default getStatsTerritoiresPrefet;

@@ -1,11 +1,7 @@
 import dayjs from 'dayjs';
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import {
-  ICodesPostauxQuery,
-  IRequest,
-} from '../../ts/interfaces/global.interfaces';
-import { action } from '../../helpers/accessControl/accessList';
+import { ICodesPostauxQuery } from '../../ts/interfaces/global.interfaces';
 
 const labelsCorrespondance = require('../../../datas/themesCorrespondances.json');
 
@@ -39,13 +35,6 @@ const sortByValueThenName = (a, b) => {
 
 const getNombreCra = async (query, app) =>
   app.service(service.cras).Model.countDocuments(query);
-
-const getNombreCraWithAccessControl =
-  (app: Application, req: IRequest) => async (query: object) =>
-    app
-      .service(service.cras)
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments(query);
 
 const getCodesPostauxGrandReseau = async (
   codesPostauxQuery: ICodesPostauxQuery,
@@ -839,5 +828,4 @@ export {
   getStructures,
   getConseillers,
   getStatsTempsAccompagnement,
-  getNombreCraWithAccessControl,
 };

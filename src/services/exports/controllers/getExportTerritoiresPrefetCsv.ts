@@ -10,7 +10,7 @@ import {
   countPersonnesAccompagnees,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
-import { getNombreCraWithAccessControl } from '../../stats/stats.repository';
+import { getNombreCra } from '../../stats/stats.repository';
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -135,10 +135,7 @@ const getExportTerritoiresPrefetCsv =
               req,
               query,
             );
-            item.CRAEnregistres = await getNombreCraWithAccessControl(
-              app,
-              req,
-            )(query);
+            item.CRAEnregistres = await getNombreCra(query, app);
           }
 
           return item;

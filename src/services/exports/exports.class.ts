@@ -24,8 +24,8 @@ import {
   getExportConseillersCsv,
   getExportHistoriqueDossiersConventionCsv,
   getExportHistoriqueContratsCsv,
+  getExportTerritoiresPrefetCsv,
 } from './controllers';
-import getExportTerritoiresPrefetCsv from './controllers/getExportTerritoirePrefetCsv';
 
 interface Data {}
 

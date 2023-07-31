@@ -21,8 +21,8 @@ import {
   getStatsConseiller,
   getStatsTerritoireCra,
   getStatsNationalesGrandReseau,
+  getStatsTerritoiresPrefet,
 } from './controllers';
-import getStatsTerritoiresPrefet from './controllers/getStatsTerritoiresPrefet';
 
 interface Data {}
 
