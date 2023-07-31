@@ -8,6 +8,7 @@ import {
   filterNomConseiller,
   filterRegion,
   filterStatutContrat,
+  filtrePiecesManquantes,
   totalContrat,
 } from '../misesEnRelation.repository';
 import { validContrat } from '../../../schemas/contrat.schemas';
@@ -19,6 +20,7 @@ const getTotalMisesEnRelations =
     searchByNomConseiller: string,
     region: string,
     departement: string,
+    statutDossierRupture: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -42,6 +44,7 @@ const getTotalMisesEnRelations =
           ...filterNomConseiller(searchByNomConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
+          ...filtrePiecesManquantes(statutDossierRupture),
           $and: [checkAccess],
         },
       },
@@ -58,6 +61,7 @@ const getMisesEnRelations =
     searchByNomConseiller: string,
     region: string,
     departement: string,
+    statutDossierRupture: string,
     ordre: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -83,6 +87,7 @@ const getMisesEnRelations =
           ...filterNomConseiller(searchByNomConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
+          ...filtrePiecesManquantes(statutDossierRupture),
         },
       },
       {
@@ -160,6 +165,7 @@ const getContrats =
       searchByNomConseiller,
       departement,
       region,
+      statutDossierRupture,
     } = req.query;
     try {
       const contratValidation = validContrat.validate({
@@ -170,6 +176,7 @@ const getContrats =
         searchByNomConseiller,
         departement,
         region,
+        statutDossierRupture,
       });
       if (contratValidation.error) {
         res.status(400).json({ message: contratValidation.error.message });
@@ -206,6 +213,7 @@ const getContrats =
         searchByNomConseiller,
         region,
         departement,
+        statutDossierRupture,
         ordre,
       );
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
@@ -213,6 +221,7 @@ const getContrats =
         searchByNomConseiller,
         region,
         departement,
+        statutDossierRupture,
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalContrat(app, checkAccess);

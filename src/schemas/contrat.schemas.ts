@@ -14,6 +14,9 @@ const validContrat = Joi.object({
     new Error('Le filtre département est invalide'),
   ),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
+  statutDossierRupture: Joi.string().error(
+    new Error('Le filtre statut dossier rupture est invalide'),
+  ),
 });
 
 const validCreationContrat = Joi.object({
