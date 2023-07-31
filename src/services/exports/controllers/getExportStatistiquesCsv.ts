@@ -17,6 +17,7 @@ const getExportStatistiquesCsv =
     const {
       codePostal,
       ville,
+      codeCommune,
       codeRegion,
       prenom,
       numeroDepartement,
@@ -35,6 +36,7 @@ const getExportStatistiquesCsv =
       dateFin,
       codePostal,
       ville,
+      codeCommune,
       codeRegion,
       numeroDepartement,
       nom,
@@ -79,8 +81,8 @@ const getExportStatistiquesCsv =
           if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville) {
-            query['cra.nomCommune'] = ville;
+          if (codeCommune !== 'null' && codeCommune !== '') {
+            query['cra.codeCommune'] = codeCommune;
           }
           statistiques = await getStatsGlobales(
             query,
@@ -107,8 +109,8 @@ const getExportStatistiquesCsv =
           if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville) {
-            query['cra.nomCommune'] = ville;
+          if (codeCommune !== 'null' && codeCommune !== '') {
+            query['cra.codeCommune'] = codeCommune;
           }
           statistiques = await getStatsGlobales(
             query,
@@ -149,7 +151,8 @@ const getExportStatistiquesCsv =
             conseillerIds,
             codeRegion,
             numeroDepartement,
-            ville,
+            codeCommune,
+            codePostal,
           };
           statistiques = await getStatsNationalesGrandReseau(app, true)(
             req,
@@ -167,6 +170,7 @@ const getExportStatistiquesCsv =
         type,
         idType,
         codePostal,
+        ville,
         nom,
         prenom,
         res,
