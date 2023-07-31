@@ -25,7 +25,9 @@ export default async function structureRules(
   can([action.read, action.update], ressource.conseillers, {
     structureId: user?.entity.oid,
   });
-
+  can([action.read, action.update], ressource.conseillers, {
+    'ruptures.structureId': user?.entity.oid,
+  });
   can(
     [action.read, action.create, action.update, action.delete],
     ressource.users,

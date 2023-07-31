@@ -731,6 +731,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
       'Type',
       'Zone rurale',
       'Nombre de CRA total cumulés',
+      'Candidats recrutés',
     ];
     res.write(
       [
@@ -751,6 +752,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
             structure.type,
             formatQpv(structure?.qpvStatut),
             structure.craCount,
+            `${structure.conseillersRecruter}/${structure.posteValiderCoselec}`,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

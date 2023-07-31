@@ -113,7 +113,12 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               { new: true },
             )
             .select({ password: 0, refreshToken: 0 });
-
+          if (user.roles.includes('structure')) {
+            const structure = await app
+              .service('structures')
+              .Model.findOne({ _id: user.entity.oid }, { _id: 0, nom: 1 });
+            user._doc.nomStructure = structure.nom;
+          }
           // envoi du refresh token dans un cookie
           res.cookie(
             app.get('inclusion_connect').refresh_token_key,
@@ -123,7 +128,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             },
           );
           // envoi de l'access token
-          return res.status(200).json({ user, accessToken });
+          return res.status(200).json({ user: user._doc, accessToken });
         } catch (error) {
           return res.status(500).json(error.message);
         }

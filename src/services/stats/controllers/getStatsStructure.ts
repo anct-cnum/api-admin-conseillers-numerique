@@ -5,7 +5,6 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 
 import getStatsGlobales from './getStatsGlobales';
-import { getConseillersIdsByStructure } from '../../cras/cras.repository';
 import { validStatStructure } from '../../../schemas/stats.schemas';
 
 const getStatsStructure =
@@ -28,16 +27,12 @@ const getStatsStructure =
       if (statsValidation.error) {
         return res.status(400).json({ message: statsValidation.error.message });
       }
-      const conseillerIds = await getConseillersIdsByStructure(
-        new ObjectId(idStructure),
-        app,
-      );
       const query = {
         'cra.dateAccompagnement': {
           $gte: dateDebut,
           $lte: dateFin,
         },
-        'conseiller.$id': { $in: conseillerIds },
+        'structure.$id': new ObjectId(idStructure),
       };
       if (codePostal) {
         query['cra.codePostal'] = codePostal;
