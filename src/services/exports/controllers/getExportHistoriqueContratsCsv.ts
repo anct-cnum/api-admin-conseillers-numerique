@@ -14,14 +14,7 @@ import {
 
 const getExportHistoriqueContratsCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const {
-      statut,
-      nomOrdre,
-      ordre,
-      searchByNomConseiller,
-      region,
-      departement,
-    } = req.query;
+    const { statut, nomOrdre, ordre, search, region, departement } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -34,7 +27,7 @@ const getExportHistoriqueContratsCsv =
           dateFin,
           nomOrdre,
           ordre,
-          searchByNomConseiller,
+          search,
           region,
           departement,
         },
@@ -105,7 +98,7 @@ const getExportHistoriqueContratsCsv =
                     },
                   ],
                 },
-                filterNomConseillerOrStructure(searchByNomConseiller),
+                filterNomConseillerOrStructure(search),
               ],
               ...filterStatutContratHistorique(statut),
               ...filterRegion(region),

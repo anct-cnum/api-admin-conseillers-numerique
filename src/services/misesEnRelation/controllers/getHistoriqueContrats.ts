@@ -14,12 +14,7 @@ import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (
-    statut: string,
-    searchByNomConseiller: string,
-    region: string,
-    departement: string,
-  ) =>
+  async (statut: string, search: string, region: string, departement: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $addFields: {
@@ -42,7 +37,7 @@ const getTotalMisesEnRelations =
       {
         $match: {
           ...filterStatutContratHistorique(statut),
-          ...filterNomConseillerOrStructure(searchByNomConseiller),
+          ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],
@@ -60,7 +55,7 @@ const getMisesEnRelations =
     statut: string,
     dateDebut: Date,
     dateFin: Date,
-    searchByNomConseiller: string,
+    search: string,
     region: string,
     departement: string,
     ordre: string,
@@ -111,7 +106,7 @@ const getMisesEnRelations =
                 },
               ],
             },
-            filterNomConseillerOrStructure(searchByNomConseiller),
+            filterNomConseillerOrStructure(search),
           ],
           ...filterStatutContratHistorique(statut),
           ...filterRegion(region),
@@ -211,15 +206,8 @@ const getMisesEnRelations =
 
 const getHistoriqueContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const {
-      page,
-      statut,
-      nomOrdre,
-      ordre,
-      searchByNomConseiller,
-      region,
-      departement,
-    } = req.query;
+    const { page, statut, nomOrdre, ordre, search, region, departement } =
+      req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -232,7 +220,7 @@ const getHistoriqueContrats =
         dateFin,
         nomOrdre,
         ordre,
-        searchByNomConseiller,
+        search,
         region,
         departement,
       });
@@ -272,7 +260,7 @@ const getHistoriqueContrats =
         statut,
         dateDebut,
         dateFin,
-        searchByNomConseiller,
+        search,
         region,
         departement,
         ordre,
@@ -289,7 +277,7 @@ const getHistoriqueContrats =
       });
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
         statut,
-        searchByNomConseiller,
+        search,
         region,
         departement,
       );
