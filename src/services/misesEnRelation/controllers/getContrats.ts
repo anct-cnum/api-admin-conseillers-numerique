@@ -5,7 +5,7 @@ import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
   filterDepartement,
-  filterNomConseiller,
+  filterNomConseillerOrStructure,
   filterRegion,
   filterStatutContrat,
   totalContrat,
@@ -14,12 +14,7 @@ import { validContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (
-    statut: string,
-    searchByNomConseiller: string,
-    region: string,
-    departement: string,
-  ) =>
+  async (statut: string, search: string, region: string, departement: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $addFields: {
@@ -35,11 +30,14 @@ const getTotalMisesEnRelations =
           },
         },
       },
-      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
+        $addFields: { idPGConseillerStr: { $toString: '$conseillerObj.idPG' } },
+      },
+      { $addFields: { idPGStructureStr: { $toString: '$structureObj.idPG' } } },
       {
         $match: {
           ...filterStatutContrat(statut),
-          ...filterNomConseiller(searchByNomConseiller),
+          ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],
@@ -55,7 +53,7 @@ const getMisesEnRelations =
     skip: string,
     limit: number,
     statut: string,
-    searchByNomConseiller: string,
+    search: string,
     region: string,
     departement: string,
     ordre: string,
@@ -75,12 +73,15 @@ const getMisesEnRelations =
           },
         },
       },
-      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
+        $addFields: { idPGConseillerStr: { $toString: '$conseillerObj.idPG' } },
+      },
+      { $addFields: { idPGStructureStr: { $toString: '$structureObj.idPG' } } },
       {
         $match: {
           $and: [checkAccess],
           ...filterStatutContrat(statut),
-          ...filterNomConseiller(searchByNomConseiller),
+          ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
         },
@@ -152,22 +153,15 @@ const getMisesEnRelations =
 
 const getContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const {
-      page,
-      statut,
-      nomOrdre,
-      ordre,
-      searchByNomConseiller,
-      departement,
-      region,
-    } = req.query;
+    const { page, statut, nomOrdre, ordre, search, departement, region } =
+      req.query;
     try {
       const contratValidation = validContrat.validate({
         page,
         statut,
         nomOrdre,
         ordre,
-        searchByNomConseiller,
+        search,
         departement,
         region,
       });
@@ -203,14 +197,14 @@ const getContrats =
         page,
         options.paginate.default,
         statut,
-        searchByNomConseiller,
+        search,
         region,
         departement,
         ordre,
       );
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
         statut,
-        searchByNomConseiller,
+        search,
         region,
         departement,
       );
