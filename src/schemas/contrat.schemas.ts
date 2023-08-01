@@ -7,7 +7,7 @@ const validContrat = Joi.object({
   nomOrdre: Joi.string()
     .required()
     .error(new Error('Le nom du tri est invalide')),
-  searchByNomConseiller: Joi.string().error(
+  search: Joi.string().error(
     new Error('La recherche par nom de la conseiller est invalide'),
   ),
   departement: Joi.string().error(
@@ -46,7 +46,7 @@ const validHistoriqueContrat = Joi.object({
   nomOrdre: Joi.string()
     .required()
     .error(new Error('Le nom du tri est invalide')),
-  searchByNomConseiller: Joi.string().error(
+  search: Joi.string().error(
     new Error('La recherche par nom de la conseiller est invalide'),
   ),
   departement: Joi.string().error(

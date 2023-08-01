@@ -5,10 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from '../../stats/controllers/getStatsGlobales';
 import { generateCsvStatistiques } from '../exports.repository';
-import {
-  getConseillersIdsByStructure,
-  getConseillersIdsByTerritoire,
-} from '../../cras/cras.repository';
+import { getConseillersIdsByTerritoire } from '../../cras/cras.repository';
 import service from '../../../helpers/services';
 import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 import { validStatCsv } from '../../../schemas/stats.schemas';
@@ -20,6 +17,7 @@ const getExportStatistiquesCsv =
     const {
       codePostal,
       ville,
+      codeCommune,
       codeRegion,
       prenom,
       numeroDepartement,
@@ -38,6 +36,7 @@ const getExportStatistiquesCsv =
       dateFin,
       codePostal,
       ville,
+      codeCommune,
       codeRegion,
       numeroDepartement,
       nom,
@@ -72,19 +71,18 @@ const getExportStatistiquesCsv =
           break;
         case 'structure':
           idStructure = new ObjectId(String(idType));
-          conseillerIds = await getConseillersIdsByStructure(idStructure, app);
           query = {
             'cra.dateAccompagnement': {
               $gte: dateDebutFormat,
               $lte: dateFinFormat,
             },
-            'conseiller.$id': { $in: conseillerIds },
+            'structure.$id': idStructure,
           };
           if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville) {
-            query['cra.nomCommune'] = ville;
+          if (codeCommune !== 'null' && codeCommune !== '') {
+            query['cra.codeCommune'] = codeCommune;
           }
           statistiques = await getStatsGlobales(
             query,
@@ -111,8 +109,8 @@ const getExportStatistiquesCsv =
           if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (ville) {
-            query['cra.nomCommune'] = ville;
+          if (codeCommune !== 'null' && codeCommune !== '') {
+            query['cra.codeCommune'] = codeCommune;
           }
           statistiques = await getStatsGlobales(
             query,
@@ -153,7 +151,8 @@ const getExportStatistiquesCsv =
             conseillerIds,
             codeRegion,
             numeroDepartement,
-            ville,
+            codeCommune,
+            codePostal,
           };
           statistiques = await getStatsNationalesGrandReseau(app, true)(
             req,
@@ -171,6 +170,7 @@ const getExportStatistiquesCsv =
         type,
         idType,
         codePostal,
+        ville,
         nom,
         prenom,
         res,

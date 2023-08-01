@@ -13,6 +13,8 @@ import {
   filterType,
 } from '../../structures/repository/structures.repository';
 import { getNombreCrasByStructureId } from '../../cras/cras.repository';
+import { getCoselec } from '../../../utils';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getExportListeStructuresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -65,6 +67,8 @@ const getExportListeStructuresCsv =
             createdAt: 1,
             codePostal: 1,
             type: 1,
+            coselec: 1,
+            statut: 1,
             qpvStatut: 1,
             insee: 1,
             'contact.prenom': 1,
@@ -81,6 +85,16 @@ const getExportListeStructuresCsv =
         structures.map(async (ligneStats) => {
           const item = { ...ligneStats };
           item.craCount = await getNombreCrasByStructureId(app, req)(item._id);
+          item.conseillersRecruter = await app
+            .service(service.misesEnRelation)
+            .Model.accessibleBy(req.ability, action.read)
+            .countDocuments({
+              'structure.$id': item._id,
+              statut: { $in: ['recrutee', 'finalisee'] },
+            });
+          item.posteValiderCoselec =
+            getCoselec(item)?.nombreConseillersCoselec ?? 0;
+
           return item;
         }),
       );

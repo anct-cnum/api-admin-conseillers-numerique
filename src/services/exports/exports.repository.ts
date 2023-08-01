@@ -405,6 +405,7 @@ const generateCsvStatistiques = async (
   type,
   idType,
   codePostal,
+  ville,
   nom,
   prenom,
   res: Response,
@@ -552,7 +553,7 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${ville ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
       general,
       statsThemes.map((stat) => stat.trim()).join('\n'),
       statsLieux,
@@ -695,6 +696,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
       'Type',
       'Zone rurale',
       'Nombre de CRA total cumulés',
+      'Candidats recrutés',
     ];
     res.write(
       [
@@ -715,6 +717,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
             structure.type,
             formatQpv(structure?.qpvStatut),
             structure.craCount,
+            `${structure.conseillersRecruter}/${structure.posteValiderCoselec}`,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
