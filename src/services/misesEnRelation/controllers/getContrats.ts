@@ -5,7 +5,7 @@ import service from '../../../helpers/services';
 import {
   checkAccessReadRequestMisesEnRelation,
   filterDepartement,
-  filterNomConseiller,
+  filterNomConseillerOrStructure,
   filterRegion,
   filterStatutContrat,
   filtrePiecesManquantes,
@@ -17,7 +17,7 @@ const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
   async (
     statut: string,
-    searchByNomConseiller: string,
+    search: string,
     region: string,
     departement: string,
     statutDossierRupture: string,
@@ -37,11 +37,14 @@ const getTotalMisesEnRelations =
           },
         },
       },
-      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
+        $addFields: { idPGConseillerStr: { $toString: '$conseillerObj.idPG' } },
+      },
+      { $addFields: { idPGStructureStr: { $toString: '$structureObj.idPG' } } },
       {
         $match: {
           ...filterStatutContrat(statut),
-          ...filterNomConseiller(searchByNomConseiller),
+          ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
           ...filtrePiecesManquantes(statutDossierRupture),
@@ -58,7 +61,7 @@ const getMisesEnRelations =
     skip: string,
     limit: number,
     statut: string,
-    searchByNomConseiller: string,
+    search: string,
     region: string,
     departement: string,
     statutDossierRupture: string,
@@ -79,12 +82,15 @@ const getMisesEnRelations =
           },
         },
       },
-      { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+      {
+        $addFields: { idPGConseillerStr: { $toString: '$conseillerObj.idPG' } },
+      },
+      { $addFields: { idPGStructureStr: { $toString: '$structureObj.idPG' } } },
       {
         $match: {
           $and: [checkAccess],
           ...filterStatutContrat(statut),
-          ...filterNomConseiller(searchByNomConseiller),
+          ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
           ...filtrePiecesManquantes(statutDossierRupture),
@@ -162,7 +168,7 @@ const getContrats =
       statut,
       nomOrdre,
       ordre,
-      searchByNomConseiller,
+      search,
       departement,
       region,
       statutDossierRupture,
@@ -173,7 +179,7 @@ const getContrats =
         statut,
         nomOrdre,
         ordre,
-        searchByNomConseiller,
+        search,
         departement,
         region,
         statutDossierRupture,
@@ -210,7 +216,7 @@ const getContrats =
         page,
         options.paginate.default,
         statut,
-        searchByNomConseiller,
+        search,
         region,
         departement,
         statutDossierRupture,
@@ -218,7 +224,7 @@ const getContrats =
       );
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
         statut,
-        searchByNomConseiller,
+        search,
         region,
         departement,
         statutDossierRupture,

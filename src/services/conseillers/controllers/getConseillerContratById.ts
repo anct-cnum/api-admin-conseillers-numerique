@@ -154,7 +154,7 @@ const getConseillerContratById =
           _id: new ObjectId(conseiller[0].contrat?.structureObj?._id),
         });
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.entreprise?.forme_juridique,
+        structure?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       if (typeDossierDs === null) {
         res.status(500).json({

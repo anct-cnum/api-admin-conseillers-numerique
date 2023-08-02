@@ -51,7 +51,7 @@ const getCandidatContratById =
           _id: conseillerFormat.miseEnRelation?.structureObj?._id,
         });
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.entreprise?.forme_juridique,
+        structure?.insee?.unite_legale?.forme_juridique?.libelle,
       );
       if (typeDossierDs === null) {
         res.status(404).json({

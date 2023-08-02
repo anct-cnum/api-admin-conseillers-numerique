@@ -22,7 +22,8 @@ const getStatsNationalesGrandReseau =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const { codePostal, ville, codeRegion, numeroDepartement } = req.query;
+      const { codePostal, codeCommune, codeRegion, numeroDepartement } =
+        req.query;
       const structureIds = req.query.structureIds
         ? JSON.parse(req.query.structureIds)
         : [];
@@ -34,7 +35,7 @@ const getStatsNationalesGrandReseau =
           dateDebut,
           dateFin,
           codePostal,
-          ville,
+          codeCommune,
           codeRegion,
           numeroDepartement,
         });
@@ -104,10 +105,11 @@ const getStatsNationalesGrandReseau =
           'cra.codePostal': query['cra.codePostal'],
         };
       }
-      // Si la requête contient une ville, on l'ajoute à la requête avec le code postal associé
-      if (ville && codePostal) {
+      if (codePostal) {
         query['cra.codePostal'] = codePostal;
-        query['cra.nomCommune'] = ville;
+      }
+      if (codeCommune !== '' && codeCommune !== 'null') {
+        query['cra.codeCommune'] = codeCommune;
       }
       // Si la requête contient une structure, on l'ajoute à la requête
       if (structureIds.length > 0) {

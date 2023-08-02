@@ -7,21 +7,14 @@ import { generateCsvHistoriqueContrats } from '../exports.repository';
 import {
   checkAccessReadRequestMisesEnRelation,
   filterDepartement,
+  filterNomConseillerOrStructure,
   filterRegion,
   filterStatutContratHistorique,
 } from '../../misesEnRelation/misesEnRelation.repository';
-import { filterNomConseiller } from '../../conseillers/conseillers.repository';
 
 const getExportHistoriqueContratsCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const {
-      statut,
-      nomOrdre,
-      ordre,
-      searchByNomConseiller,
-      region,
-      departement,
-    } = req.query;
+    const { statut, nomOrdre, ordre, search, region, departement } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -34,7 +27,7 @@ const getExportHistoriqueContratsCsv =
           dateFin,
           nomOrdre,
           ordre,
-          searchByNomConseiller,
+          search,
           region,
           departement,
         },
@@ -63,7 +56,16 @@ const getExportHistoriqueContratsCsv =
               },
             },
           },
-          { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
+          {
+            $addFields: {
+              idPGConseillerStr: { $toString: '$conseillerObj.idPG' },
+            },
+          },
+          {
+            $addFields: {
+              idPGStructureStr: { $toString: '$structureObj.idPG' },
+            },
+          },
           {
             $match: {
               $and: [
@@ -96,7 +98,7 @@ const getExportHistoriqueContratsCsv =
                     },
                   ],
                 },
-                filterNomConseiller(searchByNomConseiller),
+                filterNomConseillerOrStructure(search),
               ],
               ...filterStatutContratHistorique(statut),
               ...filterRegion(region),
