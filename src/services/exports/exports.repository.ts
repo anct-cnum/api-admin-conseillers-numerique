@@ -122,36 +122,37 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
 };
 
 const generateCsvCandidatByStructure = async (
-  misesEnRelations: IMisesEnRelation[],
+  misesEnRelations,
   res: Response,
-  app: Application,
 ) => {
-  const promises = [];
-  res.write(
-    'Nom;Prénom;Email;Code postal;Formation CCP1;Expérience;Test PIX;CV\n',
-  );
   try {
-    for (const miseEnrelation of misesEnRelations) {
-      promises.push(
-        new Promise<void>((resolve) => {
-          conseillerByMisesEnRelation(miseEnrelation.conseiller.oid, app).then(
-            (conseiller) => {
-              res.write(
-                `${conseiller.nom};${conseiller.prenom};${conseiller.email};${
-                  conseiller.codePostal
-                };${checkIfCcp1(conseiller.statut)};${
-                  conseiller.aUneExperienceMedNum ? 'oui' : 'non'
-                };${conseiller.pix === undefined ? 'non' : 'oui'};${
-                  conseiller.cv === undefined ? 'non' : 'oui'
-                }\n`,
-              );
-              resolve();
-            },
-          );
-        }),
-      );
-    }
-    await Promise.all(promises);
+    const fileHeaders = [
+      'Nom',
+      'Prénom',
+      'Email',
+      'Code postal',
+      'Formation CCP1',
+      'Expérience',
+      'Test PIX',
+      'CV',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...misesEnRelations.map((miseEnrelation) =>
+          [
+            miseEnrelation.conseillerObj?.nom,
+            miseEnrelation.conseillerObj?.prenom,
+            miseEnrelation.conseillerObj?.email,
+            miseEnrelation.conseillerObj?.codePostal,
+            checkIfCcp1(miseEnrelation.conseillerObj?.statut),
+            miseEnrelation.conseillerObj?.aUneExperienceMedNum ? 'oui' : 'non',
+            miseEnrelation.conseillerObj?.pix === undefined ? 'non' : 'oui',
+            miseEnrelation.conseillerObj?.cv === undefined ? 'non' : 'oui',
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
     res.end();
   } catch (error) {
     res.status(500).json({
