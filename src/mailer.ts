@@ -2,13 +2,13 @@ import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import { Application } from './declarations';
 
+const path = require('path');
+const { promisify } = require('util');
 const lodash = require('lodash');
 const { htmlToText } = require('nodemailer-html-to-text');
 const nodemailer = require('nodemailer');
-const path = require('path');
 const mjml = require('mjml');
 const ejs = require('ejs');
-const { promisify } = require('util');
 const { dayjs } = require('dayjs');
 const Joi = require('joi');
 
