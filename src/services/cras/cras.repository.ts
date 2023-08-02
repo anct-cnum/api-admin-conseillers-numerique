@@ -93,38 +93,53 @@ const getCodesPostauxStatistiquesCras =
       {
         $match: {
           'conseiller.$id': { $in: conseillersId },
+          'cra.codeCommune': { $ne: null },
           $and: [checkAccess],
         },
       },
       {
         $group: {
-          _id: { ville: '$cra.nomCommune', codePostal: '$cra.codePostal' },
+          _id: '$cra.codePostal',
+          villes: { $addToSet: '$cra.nomCommune' },
+          codeCommune: {
+            $addToSet: {
+              ville: '$cra.nomCommune',
+              codeCommune: '$cra.codeCommune',
+            },
+          },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          villes: '$villes',
+          codeCommune: '$codeCommune',
         },
       },
     ]);
 
 const createArrayForFiltreCodePostaux = (
-  listCodePostaux: Array<{ _id: { ville: string; codePostal: string } }>,
+  listCodePostaux: Array<{
+    id: string;
+    villes: string[];
+    codeCommune: Array<{ ville: string; codeCommune: string[] }>;
+  }>,
 ) => {
-  const listeDefinitive: Array<{ id: string; codePostal: string[] }> = [];
-  listCodePostaux.forEach((paire) => {
-    if (
-      listeDefinitive.findIndex((item) => item.id === paire._id.codePostal) > -1
-    ) {
-      listeDefinitive
-        .find((item) => item.id === paire._id.codePostal)
-        .codePostal.push(`${paire._id.codePostal} - ${paire._id.ville}`);
-    } else {
-      listeDefinitive.push({
-        id: paire._id.codePostal,
-        codePostal: [`${paire._id.codePostal} - ${paire._id.ville}`],
-      });
-    }
+  const liste = listCodePostaux.map((e) => {
+    const removeDoublon = [
+      ...new Map(
+        e.codeCommune.map((item) => [item.codeCommune, item]),
+      ).values(),
+    ];
+    return {
+      ...e,
+      villes: removeDoublon.map((i) => i.ville),
+      codeCommune: removeDoublon,
+    };
   });
-
-  listeDefinitive.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
-
-  return listeDefinitive;
+  return liste;
 };
 
 export {
