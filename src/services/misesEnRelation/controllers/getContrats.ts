@@ -8,13 +8,20 @@ import {
   filterNomConseillerOrStructure,
   filterRegion,
   filterStatutContrat,
+  filtrePiecesManquantes,
   totalContrat,
 } from '../misesEnRelation.repository';
 import { validContrat } from '../../../schemas/contrat.schemas';
 
 const getTotalMisesEnRelations =
   (app: Application, checkAccess) =>
-  async (statut: string, search: string, region: string, departement: string) =>
+  async (
+    statut: string,
+    search: string,
+    region: string,
+    departement: string,
+    statutDossierRupture: string,
+  ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $addFields: {
@@ -40,6 +47,7 @@ const getTotalMisesEnRelations =
           ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
+          ...filtrePiecesManquantes(statutDossierRupture),
           $and: [checkAccess],
         },
       },
@@ -56,6 +64,7 @@ const getMisesEnRelations =
     search: string,
     region: string,
     departement: string,
+    statutDossierRupture: string,
     ordre: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -84,6 +93,7 @@ const getMisesEnRelations =
           ...filterNomConseillerOrStructure(search),
           ...filterRegion(region),
           ...filterDepartement(departement),
+          ...filtrePiecesManquantes(statutDossierRupture),
         },
       },
       {
@@ -153,8 +163,16 @@ const getMisesEnRelations =
 
 const getContrats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { page, statut, nomOrdre, ordre, search, departement, region } =
-      req.query;
+    const {
+      page,
+      statut,
+      nomOrdre,
+      ordre,
+      search,
+      departement,
+      region,
+      statutDossierRupture,
+    } = req.query;
     try {
       const contratValidation = validContrat.validate({
         page,
@@ -164,6 +182,7 @@ const getContrats =
         search,
         departement,
         region,
+        statutDossierRupture,
       });
       if (contratValidation.error) {
         res.status(400).json({ message: contratValidation.error.message });
@@ -200,6 +219,7 @@ const getContrats =
         search,
         region,
         departement,
+        statutDossierRupture,
         ordre,
       );
       const totalContrats = await getTotalMisesEnRelations(app, checkAccess)(
@@ -207,6 +227,7 @@ const getContrats =
         search,
         region,
         departement,
+        statutDossierRupture,
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalContrat(app, checkAccess);
