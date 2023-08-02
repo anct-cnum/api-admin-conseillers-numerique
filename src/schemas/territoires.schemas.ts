@@ -19,6 +19,22 @@ const validTerritoires = Joi.object({
   ordre: Joi.number().required().error(new Error('Le tri est invalide')),
 });
 
+const validTerritoiresPrefet = Joi.object({
+  territoire: Joi.string()
+    .required()
+    .error(new Error('Le type de territoire est invalide')),
+  dateDebut: Joi.date()
+    .required()
+    .error(new Error('La date de début est invalide')),
+  dateFin: Joi.date()
+    .required()
+    .error(new Error('La date de fin est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+});
+
 const validExportTerritoires = Joi.object({
   territoire: Joi.string()
     .required()
@@ -67,4 +83,5 @@ export {
   validTerritoireDetails,
   validTerritoireCra,
   validExportTerritoires,
+  validTerritoiresPrefet,
 };

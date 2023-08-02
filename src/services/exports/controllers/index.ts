@@ -13,6 +13,7 @@ import getExportListeGestionnairesCsv from './getExportListeGestionnairesCsv';
 import getExportConseillersCsv from './getExportConseillersCsv';
 import getExportHistoriqueDossiersConventionCsv from './getExportHistoriqueDossiersConventionCsv';
 import getExportHistoriqueContratsCsv from './getExportHistoriqueContratsCsv';
+import getExportTerritoiresPrefetCsv from './getExportTerritoiresPrefetCsv';
 
 export {
   getExportCandidatsByStructureCsv,
@@ -30,4 +31,5 @@ export {
   getExportConseillersCsv,
   getExportHistoriqueDossiersConventionCsv,
   getExportHistoriqueContratsCsv,
+  getExportTerritoiresPrefetCsv,
 };
