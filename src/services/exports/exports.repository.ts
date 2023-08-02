@@ -124,7 +124,6 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
 const generateCsvCandidatByStructure = async (
   misesEnRelations,
   res: Response,
-  app: Application,
 ) => {
   try {
     const fileHeaders = [

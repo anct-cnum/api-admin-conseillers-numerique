@@ -39,7 +39,7 @@ const getExportCandidatsByStructureCsv =
             allowDiskUse: true,
           },
         );
-      generateCsvCandidatByStructure(misesEnRelation, res, app);
+      generateCsvCandidatByStructure(misesEnRelation, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
