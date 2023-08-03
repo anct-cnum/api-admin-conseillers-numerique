@@ -9,12 +9,10 @@ import {
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
-import initSentry from '../../../utils/sentry';
 
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    const Sentry = initSentry(app);
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -161,7 +159,7 @@ const getConseillerById =
         return;
       }
       res.status(500).json({ message: error.message });
-      Sentry.captureException(error);
+      throw new Error(error);
     }
   };
 
