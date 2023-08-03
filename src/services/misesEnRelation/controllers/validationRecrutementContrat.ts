@@ -243,6 +243,7 @@ const validationRecrutementContrat =
           statut: {
             $in: [
               'finalisee_non_disponible',
+              'non_disponible',
               'nouvelle',
               'nonInteressee',
               'interessee',
@@ -275,7 +276,7 @@ const validationRecrutementContrat =
           'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
           'conseillerObj.email': conseillerUpdated.value?.email,
           statut: {
-            $nin: ['finalisee_rupture', 'terminee', 'renouvellement_intiee'],
+            $nin: ['finalisee_rupture', 'terminee', 'renouvellement_initiee'],
           },
         });
       const query = conseillerUpdated.value?.ruptures
