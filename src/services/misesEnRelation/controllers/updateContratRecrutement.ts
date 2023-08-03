@@ -49,7 +49,7 @@ const updateContratRecrutement =
         const countMisesEnRelationRecruteesFutur =
           misesEnRelationRecrutees.length + 1; // prendre en compte celui qui va être recruté dans le quota
         if (
-          countMisesEnRelationRecruteesFutur >=
+          countMisesEnRelationRecruteesFutur >
           dernierCoselec.nombreConseillersCoselec
         ) {
           res.status(400).json({

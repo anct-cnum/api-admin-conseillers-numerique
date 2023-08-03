@@ -1,6 +1,7 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
+import bcrypt from 'bcrypt';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
@@ -9,7 +10,6 @@ import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 
 const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
 
 const updateConseillersPG =
@@ -45,6 +45,20 @@ const validationRecrutementContrat =
         .findOne({ _id: new ObjectId(idMiseEnRelation), statut: 'recrutee' });
       if (!miseEnRelationVerif) {
         res.status(404).json({ message: 'Mise en relation non trouvée' });
+        return;
+      }
+      const conseillerVerif = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: miseEnRelationVerif.conseillerObj._id,
+          statut: 'RECRUTE',
+        });
+      if (conseillerVerif) {
+        res.status(400).json({
+          message:
+            'Action non autorisée : le conseiller est déjà recruté par une autre structure',
+        });
         return;
       }
       if (
@@ -85,7 +99,7 @@ const validationRecrutementContrat =
         });
         return;
       }
-      if (misesEnRelationRecrutees.length >= nombreConseillersCoselec) {
+      if (misesEnRelationRecrutees.length > nombreConseillersCoselec) {
         res.status(400).json({
           message:
             'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
@@ -224,20 +238,17 @@ const validationRecrutementContrat =
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'conseillerObj._id': conseillerUpdated.value._id,
-            statut: {
-              $in: ['nouvelle', 'interessee', 'nonInteressee', 'recrutee'],
-            },
+        .deleteMany({
+          'conseillerObj._id': conseillerUpdated.value._id,
+          statut: {
+            $in: [
+              'finalisee_non_disponible',
+              'nouvelle',
+              'nonInteressee',
+              'interessee',
+            ],
           },
-          {
-            $set: {
-              statut: 'finalisee_non_disponible',
-              conseillerObj: conseillerUpdated.value,
-            },
-          },
-        );
+        });
       await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
@@ -260,23 +271,13 @@ const validationRecrutementContrat =
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
-            'conseillerObj.email': conseillerUpdated.value?.email,
-            statut: { $ne: 'finalisee_rupture' },
+        .deleteMany({
+          'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
+          'conseillerObj.email': conseillerUpdated.value?.email,
+          statut: {
+            $nin: ['finalisee_rupture', 'terminee', 'renouvellement_intiee'],
           },
-          {
-            $set: {
-              statut: 'finalisee_non_disponible',
-              'conseillerObj.disponible': false,
-              'conseillerObj.userCreated': false,
-            },
-            $unset: {
-              'conseillerObj.inactivite': '',
-            },
-          },
-        );
+        });
       const query = conseillerUpdated.value?.ruptures
         ? { $gt: dateRupture }
         : { $gte: miseEnRelationUpdated.value?.dateDebutDeContrat };
