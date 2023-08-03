@@ -161,6 +161,16 @@ const filterStatutContrat = (statut: string) => {
   };
 };
 
+const filtrePiecesManquantes = (piecesManquantes: string) => {
+  if (piecesManquantes === 'true') {
+    return { dossierIncompletRupture: true };
+  }
+  if (piecesManquantes === 'false') {
+    return { dossierIncompletRupture: { $exists: false } };
+  }
+  return {};
+};
+
 const filterStatutContratHistorique = (statut: string) => {
   if (statut !== 'toutes' && statut !== 'renouvelee') {
     return { statut: { $eq: statut } };
@@ -283,4 +293,5 @@ export {
   totalHistoriqueContrat,
   totalContrat,
   countConseillersRecrutees,
+  filtrePiecesManquantes,
 };

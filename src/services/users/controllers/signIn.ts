@@ -44,7 +44,10 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         try {
           userInDB = await app
             .service('users')
-            .Model.findOne({ sub: keycloakUser.sub })
+            .Model.findOne({
+              sub: keycloakUser.sub,
+              roles: { $in: allowedRoles },
+            })
             .select({ password: 0, refreshToken: 0 });
 
           // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
@@ -70,6 +73,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                   name: keycloakUser.email,
                   sub: { $exists: false },
                   token: { $ne: null },
+                  roles: { $in: allowedRoles },
                 },
                 {
                   sub: keycloakUser.sub,
