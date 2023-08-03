@@ -8,16 +8,17 @@ import { IUser } from '../ts/interfaces/db.interfaces';
 const authenticateMode =
   (app: Application) =>
   async (req: IRequest, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === 'development') {
-      authenticate('jwt')(req, res, () => {
-        const { user } = req;
-        req.user = user;
-        next();
-      });
-    } else {
-      const accessToken = req.headers?.authorization?.split(' ')[1];
-      if (!accessToken) res.status(401).json('Accès refusé');
-      try {
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        authenticate('jwt')(req, res, () => {
+          const { user } = req;
+          req.user = user;
+          next();
+        });
+      } else {
+        const accessToken = req.headers?.authorization?.split(' ')[1];
+        if (!accessToken) res.status(401).json('Accès refusé');
+
         jwt.verify(
           accessToken,
           app.get('inclusion_connect').access_token_secret,
@@ -37,13 +38,13 @@ const authenticateMode =
             } else {
               req.user = userDecoded;
             }
+            next();
           },
         );
-      } catch (error) {
-        res.statusMessage = 'Accès refusé';
-        res.status(403).end();
       }
-      next();
+    } catch (error) {
+      res.statusMessage = 'Accès refusé';
+      res.status(403).end();
     }
   };
 
