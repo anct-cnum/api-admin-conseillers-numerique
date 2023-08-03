@@ -276,7 +276,13 @@ const validationRecrutementContrat =
           'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
           'conseillerObj.email': conseillerUpdated.value?.email,
           statut: {
-            $nin: ['finalisee_rupture', 'terminee', 'renouvellement_initiee'],
+            $in: [
+              'finalisee_non_disponible',
+              'non_disponible',
+              'nouvelle',
+              'nonInteressee',
+              'interessee',
+            ],
           },
         });
       const query = conseillerUpdated.value?.ruptures
