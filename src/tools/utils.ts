@@ -65,6 +65,12 @@ const execute = async (name: string, job: any) => {
     }, 1000);
   };
 
+  const delay = (milliseconds: number): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(), milliseconds);
+    });
+  };
+
   const mailer = createMailer(app);
 
   const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
@@ -82,6 +88,7 @@ const execute = async (name: string, job: any) => {
     feathers: f,
     logger,
     exit,
+    delay,
     mailer,
     app,
     Sentry,

@@ -6,14 +6,12 @@ import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
+import { countConseillersRecrutees } from '../misesEnRelation.repository';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const filter = { _id: req.params.id };
 
-    if (req.body.dateRecrutement) {
-      req.body.dateRecrutement = new Date(req.body.dateRecrutement);
-    }
     if (req.body.dateRupture) {
       req.body.dateRupture = new Date(req.body.dateRupture);
     }
@@ -37,24 +35,14 @@ const updateMiseEnRelation =
         miseEnRelationVerif.statut === 'recrutee' ||
         miseEnRelationVerif.statut === 'finalisee'
       ) {
-        if (!miseEnRelationVerif.dateRecrutement) {
-          res.status(400).json({
-            message:
-              'La date de recrutement doit être obligatoirement renseignée !',
-          });
-          return;
-        }
         const dernierCoselec = getCoselec(structure);
         if (dernierCoselec !== null) {
           // Nombre de candidats déjà recrutés pour cette structure
-          const misesEnRelationRecrutees = await app
-            .service(service.misesEnRelation)
-            .Model.accessibleBy(req.ability, action.read)
-            .find({
-              query: {
-                statut: { $in: ['recrutee', 'finalisee'] },
-              },
-            });
+          const misesEnRelationRecrutees = await countConseillersRecrutees(
+            app,
+            req,
+            miseEnRelationVerif.structure.oid,
+          );
           if (
             misesEnRelationRecrutees.length >=
             dernierCoselec.nombreConseillersCoselec
@@ -74,6 +62,18 @@ const updateMiseEnRelation =
           motifRupture: '',
         };
       }
+      if (
+        req.body.statut === 'interessee' &&
+        miseEnRelationVerif.statut === 'recrutee'
+      ) {
+        remove = {
+          dateDebutDeContrat: '',
+          dateFinDeContrat: '',
+          typeDeContrat: '',
+          salaire: '',
+          emetteurRecrutement: '',
+        };
+      }
       if (req.body.statut === 'nouvelle_rupture') {
         if (req.body.dateRupture === null) {
           res.status(400).json({
@@ -90,12 +90,6 @@ const updateMiseEnRelation =
           return;
         }
         update.emetteurRupture = {
-          email: req.user.name,
-          date: new Date(),
-        };
-      }
-      if (req.body.statut === 'recrutee') {
-        update.emetteurRecrutement = {
           email: req.user.name,
           date: new Date(),
         };

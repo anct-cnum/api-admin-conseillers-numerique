@@ -2,6 +2,7 @@
   "host": "localhost",
   "dashboard_hostname": "http://localhost:3000",
   "espace_candidat_hostname": "ESPACE_CANDIDAT_HOSTNAME",
+  "espace_coop_hostname": "ESPACE_COOP_HOSTNAME",
   "port": 8080,
   "public": "https://www.conseiller-numerique.gouv.fr",
   "paginate": {
@@ -85,7 +86,8 @@
   "gandi": {
     "token": "GANDI_TOKEN",
     "endPoint": "GANDI_ENDPOINT",
-    "domain": "GANDI_DOMAIN"
+    "domain": "GANDI_DOMAIN",
+    "type": "GANDI_TYPE"
   },
   "sib_api_key": "SIB_API_KEY"
 }
