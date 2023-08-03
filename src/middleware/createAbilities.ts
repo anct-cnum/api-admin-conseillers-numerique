@@ -1,5 +1,5 @@
 import { Application } from '@feathersjs/express';
-import { AbilityBuilder, Ability } from '@casl/ability';
+import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 import { Response } from 'express';
 import { IUser } from '../ts/interfaces/db.interfaces';
 import { Roles } from '../ts/types';
@@ -17,7 +17,7 @@ import {
 } from '../helpers/accessControl/rules';
 
 async function defineAbilitiesFor(app: Application, user: IUser, role: Roles) {
-  const { can, build } = new AbilityBuilder(Ability);
+  const { can, build } = new AbilityBuilder(createMongoAbility);
 
   switch (role) {
     case 'admin':
