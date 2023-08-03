@@ -94,7 +94,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             ip: req.feathers.ip,
             connexionError: true,
           });
-          return res.status(401).json('Connexion refusée');
+          return res.status(404).json("Message à venir pour l'email inconnu");
         }
         try {
           // création de l'access token et du refresh token
