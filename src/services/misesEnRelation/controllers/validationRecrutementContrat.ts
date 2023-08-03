@@ -159,7 +159,7 @@ const validationRecrutementContrat =
                 prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
                 nom: miseEnRelationVerif.conseillerObj?.nom,
                 password: passwordHash,
-                roles: Array('conseillers'),
+                roles: Array('conseiller'),
                 token: uuidv4(),
                 mailSentDate: null,
                 passwordCreated: false,
