@@ -22,7 +22,7 @@ execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
   for (const conseiller of conseillers) {
     const user = await app.service(service.users).Model.findOne({
       'entity.$id': conseiller._id,
-      role: { $in: ['conseiller'] },
+      roles: { $in: ['conseiller'] },
     });
     if (user) {
       const nom = slugify(`${conseiller.nom}`, {
