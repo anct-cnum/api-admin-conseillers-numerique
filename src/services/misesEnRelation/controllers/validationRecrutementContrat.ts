@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
+import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
@@ -17,14 +18,19 @@ const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
 
 const updateConseillersPG =
-  (pool) => async (email: string, disponible: boolean) => {
+  (pool) => async (email: string, disponible: boolean, datePG: string) => {
     try {
       await pool.query(
         `
       UPDATE djapp_coach
-      SET disponible = $2
+      SET (
+        disponible,
+        updated
+      )
+      =
+      ($2,$3)
       WHERE LOWER(email) = LOWER($1)`,
-        [email, disponible],
+        [email, disponible, datePG],
       );
     } catch (error) {
       throw new Error(error);
@@ -121,9 +127,12 @@ const validationRecrutementContrat =
         });
         return;
       }
+      const updatedAt = new Date();
+      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
       await updateConseillersPG(pool)(
         miseEnRelationVerif.conseillerObj.email,
         false,
+        datePG,
       );
       const userAccount = await app
         .service(service.users)
@@ -204,6 +213,7 @@ const validationRecrutementContrat =
             $set: {
               statut: 'RECRUTE',
               disponible: false,
+              updatedAt,
               userCreated: true,
               estRecrute: true,
               datePrisePoste: null,
@@ -277,23 +287,6 @@ const validationRecrutementContrat =
             },
           },
         );
-
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.delete)
-        .deleteMany({
-          'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
-          'conseillerObj.email': conseillerUpdated.value?.email,
-          statut: {
-            $in: [
-              'finalisee_non_disponible',
-              'non_disponible',
-              'nouvelle',
-              'nonInteressee',
-              'interessee',
-            ],
-          },
-        });
       const query = conseillerUpdated.value?.ruptures
         ? { $gt: dateRupture }
         : { $gte: miseEnRelationUpdated.value?.dateDebutDeContrat };

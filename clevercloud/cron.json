@@ -1,4 +1,5 @@
 [
   "0 4 * * * $ROOT/src/tools/jobs/conventionnement.sh",
-  "*/15 * * * * $ROOT/src/tools/jobs/onboardingConseiller.sh"
+  "*/15 * * * * $ROOT/src/tools/jobs/onboardingConseiller.sh",
+  "0 2 * * * $ROOT/src/tools/jobs/deleteMiseEnRelationConseiller.sh"
 ]
