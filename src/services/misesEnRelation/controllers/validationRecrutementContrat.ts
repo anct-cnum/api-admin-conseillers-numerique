@@ -2,25 +2,35 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
+import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
 
 const updateConseillersPG =
-  (pool) => async (email: string, disponible: boolean) => {
+  (pool) => async (email: string, disponible: boolean, datePG: string) => {
     try {
       await pool.query(
         `
       UPDATE djapp_coach
-      SET disponible = $2
+      SET (
+        disponible,
+        updated
+      )
+      =
+      ($2,$3)
       WHERE LOWER(email) = LOWER($1)`,
-        [email, disponible],
+        [email, disponible, datePG],
       );
     } catch (error) {
       throw new Error(error);
@@ -80,12 +90,23 @@ const validationRecrutementContrat =
         });
         return;
       }
+      const structure = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: miseEnRelationVerif.structureObj._id,
+          statut: 'VALIDATION_COSELEC',
+        });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
       const misesEnRelationRecrutees = await countConseillersRecrutees(
         app,
         req,
         miseEnRelationVerif.structure.oid,
       );
-      const coselec = getCoselec(miseEnRelationVerif.structureObj);
+      const coselec = getCoselec(structure);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
       const dateRupture =
         miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
@@ -106,9 +127,12 @@ const validationRecrutementContrat =
         });
         return;
       }
+      const updatedAt = new Date();
+      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
       await updateConseillersPG(pool)(
         miseEnRelationVerif.conseillerObj.email,
         false,
+        datePG,
       );
       const userAccount = await app
         .service(service.users)
@@ -189,6 +213,7 @@ const validationRecrutementContrat =
             $set: {
               statut: 'RECRUTE',
               disponible: false,
+              updatedAt,
               userCreated: true,
               estRecrute: true,
               datePrisePoste: null,
@@ -214,6 +239,20 @@ const validationRecrutementContrat =
         });
         return;
       }
+      const objectMiseEnRelationUpdated = {
+        $set: {
+          statut: 'finalisee',
+          conseillerObj: conseillerUpdated.value,
+        },
+      };
+      if (
+        miseEnRelationVerif?.structureObj.conventionnement.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        Object.assign(objectMiseEnRelationUpdated.$set, {
+          phaseConventionnement: PhaseConventionnement.PHASE_2,
+        });
+      }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -221,12 +260,7 @@ const validationRecrutementContrat =
           {
             _id: new ObjectId(idMiseEnRelation),
           },
-          {
-            $set: {
-              statut: 'finalisee',
-              conseillerObj: conseillerUpdated.value,
-            },
-          },
+          objectMiseEnRelationUpdated,
           { returnOriginal: false, rawResult: true },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {
@@ -235,21 +269,6 @@ const validationRecrutementContrat =
         });
         return;
       }
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .deleteMany({
-          'conseillerObj._id': conseillerUpdated.value._id,
-          statut: {
-            $in: [
-              'finalisee_non_disponible',
-              'non_disponible',
-              'nouvelle',
-              'nonInteressee',
-              'interessee',
-            ],
-          },
-        });
       await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
@@ -268,23 +287,6 @@ const validationRecrutementContrat =
             },
           },
         );
-
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .deleteMany({
-          'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
-          'conseillerObj.email': conseillerUpdated.value?.email,
-          statut: {
-            $in: [
-              'finalisee_non_disponible',
-              'non_disponible',
-              'nouvelle',
-              'nonInteressee',
-              'interessee',
-            ],
-          },
-        });
       const query = conseillerUpdated.value?.ruptures
         ? { $gt: dateRupture }
         : { $gte: miseEnRelationUpdated.value?.dateDebutDeContrat };

@@ -38,7 +38,18 @@ const updateContratRecrutement =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-      const dernierCoselec = getCoselec(miseEnRelation.structureObj);
+      const structure = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: miseEnRelation.structureObj._id,
+          statut: 'VALIDATION_COSELEC',
+        });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
+      const dernierCoselec = getCoselec(structure);
       if (dernierCoselec !== null) {
         // Nombre de candidats déjà recrutés pour cette structure
         const misesEnRelationRecrutees = await countConseillersRecrutees(

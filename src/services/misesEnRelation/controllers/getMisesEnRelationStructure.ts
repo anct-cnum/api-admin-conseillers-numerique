@@ -77,6 +77,7 @@ const getMisesEnRelationStructure =
               miseEnRelationReconventionnement: 1,
               banniereValidationRenouvellement: 1,
               createdAt: 1,
+              phaseConventionnement: 1,
             },
           },
           {
