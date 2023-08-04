@@ -260,21 +260,6 @@ const validationRecrutementContrat =
         return;
       }
       await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .deleteMany({
-          'conseillerObj._id': conseillerUpdated.value._id,
-          statut: {
-            $in: [
-              'finalisee_non_disponible',
-              'non_disponible',
-              'nouvelle',
-              'nonInteressee',
-              'interessee',
-            ],
-          },
-        });
-      await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
@@ -295,7 +280,7 @@ const validationRecrutementContrat =
 
       await app
         .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
+        .Model.accessibleBy(req.ability, action.delete)
         .deleteMany({
           'conseillerObj.idPG': { $ne: conseillerUpdated.value?.idPG },
           'conseillerObj.email': conseillerUpdated.value?.email,
