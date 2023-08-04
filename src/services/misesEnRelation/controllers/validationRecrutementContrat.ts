@@ -8,6 +8,10 @@ import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -80,12 +84,23 @@ const validationRecrutementContrat =
         });
         return;
       }
+      const structure = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: miseEnRelationVerif.structureObj._id,
+          statut: 'VALIDATION_COSELEC',
+        });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
       const misesEnRelationRecrutees = await countConseillersRecrutees(
         app,
         req,
         miseEnRelationVerif.structure.oid,
       );
-      const coselec = getCoselec(miseEnRelationVerif.structureObj);
+      const coselec = getCoselec(structure);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
       const dateRupture =
         miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
@@ -214,6 +229,20 @@ const validationRecrutementContrat =
         });
         return;
       }
+      const objectMiseEnRelationUpdated = {
+        $set: {
+          statut: 'finalisee',
+          conseillerObj: conseillerUpdated.value,
+        },
+      };
+      if (
+        miseEnRelationVerif?.structureObj.conventionnement.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      ) {
+        Object.assign(objectMiseEnRelationUpdated.$set, {
+          phaseConventionnement: PhaseConventionnement.PHASE_2,
+        });
+      }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -221,12 +250,7 @@ const validationRecrutementContrat =
           {
             _id: new ObjectId(idMiseEnRelation),
           },
-          {
-            $set: {
-              statut: 'finalisee',
-              conseillerObj: conseillerUpdated.value,
-            },
-          },
+          objectMiseEnRelationUpdated,
           { returnOriginal: false, rawResult: true },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {
