@@ -25,18 +25,6 @@ execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
       roles: { $in: ['conseiller'] },
     });
     if (user) {
-      await app.service(service.misesEnRelation).Model.deleteMany({
-        'conseiller.$id': conseiller._id,
-        statut: {
-          $in: [
-            'finalisee_non_disponible',
-            'non_disponible',
-            'nouvelle',
-            'nonInteressee',
-            'interessee',
-          ],
-        },
-      });
       const nom = slugify(`${conseiller.nom}`, {
         replacement: '-',
         lower: true,
