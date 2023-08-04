@@ -57,8 +57,11 @@ const updateContratRecrutement =
           req,
           miseEnRelation.structure.oid,
         );
-        const countMisesEnRelationRecruteesFutur =
-          misesEnRelationRecrutees.length + 1; // prendre en compte celui qui va être recruté dans le quota
+        let countMisesEnRelationRecruteesFutur =
+          misesEnRelationRecrutees.length;
+        if (miseEnRelation.statut === 'interessee') {
+          countMisesEnRelationRecruteesFutur += 1; // prendre en compte celui qui va être recruté dans le quota
+        }
         if (
           countMisesEnRelationRecruteesFutur >
           dernierCoselec.nombreConseillersCoselec
