@@ -44,7 +44,7 @@ const updateMiseEnRelation =
             miseEnRelationVerif.structure.oid,
           );
           if (
-            misesEnRelationRecrutees.length >=
+            misesEnRelationRecrutees.length >
             dernierCoselec.nombreConseillersCoselec
           ) {
             res.status(400).json({
