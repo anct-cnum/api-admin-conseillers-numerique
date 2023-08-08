@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/demarcheSimplifiee/conventionnement.ts
+// Lancement de ce script : ts-node src/tools/demarchesSimplifiees/conventionnement.ts
 
 import { GraphQLClient } from 'graphql-request';
 import execute from '../utils';
