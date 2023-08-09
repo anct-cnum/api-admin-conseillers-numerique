@@ -13,7 +13,7 @@ const validDemandesCoordinateur = Joi.object({
   ),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
   avisPrefet: Joi.string().error(
-    new Error("Le filtre de l'avis prefet est invalide"),
+    new Error("Le filtre sur l'avis du préfet est invalide"),
   ),
 });
 
