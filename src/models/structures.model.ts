@@ -77,6 +77,7 @@ export default function (app: Application): Model<any> {
         statut: { type: String },
         dossierReconventionnement: { type: Object },
         dossierConventionnement: { type: Object },
+        motif: { type: String },
       },
     },
     { strict: false },

@@ -394,6 +394,49 @@ const generateCsvRupture = async (
   }
 };
 
+const generateCsvStructureNonInteresser = async (
+  structures: IStructures[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom',
+      'Prénom',
+      'Fonction',
+      'Email',
+      'Téléphone',
+      'Siret',
+      'Motif',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...structures.map((structure) =>
+          [
+            structure.idPG,
+            structure.nom,
+            structure.contact?.nom,
+            structure.contact?.prenom,
+            structure.contact?.fonction,
+            structure.contact?.email,
+            structure.contact?.telephone,
+            structure.siret,
+            structure.conventionnement.motif,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
 const generateCsvStatistiques = async (
   statistiques,
   dateDebut,
@@ -549,7 +592,11 @@ const generateCsvStatistiques = async (
 
     const buildExportStatistiquesCsvFileContent = [
       // eslint-disable-next-line prettier/prettier
-      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${ville ?? ''} ${idType ?? ''} ${formatDateWithoutGetTime(dateDebut)}-${formatDateWithoutGetTime(dateFin)}\n`,
+      `Statistiques ${type} ${nom ?? ''} ${prenom ?? ''} ${codePostal ?? ''} ${
+        ville ?? ''
+      } ${idType ?? ''} ${formatDateWithoutGetTime(
+        dateDebut,
+      )}-${formatDateWithoutGetTime(dateFin)}\n`,
       general,
       statsThemes.map((stat) => stat.trim()).join('\n'),
       statsLieux,
@@ -900,4 +947,5 @@ export {
   generateCsvHistoriqueDossiersConvention,
   generateCsvHistoriqueContrats,
   generateCsvTerritoiresPrefet,
+  generateCsvStructureNonInteresser,
 };

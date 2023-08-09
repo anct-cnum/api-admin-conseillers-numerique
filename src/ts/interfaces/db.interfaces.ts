@@ -319,6 +319,7 @@ export interface IStructures {
   reseau: Reseau;
   conventionnement: {
     statut: string;
+    motif: string;
     dossierReconventionnement: {
       numero: number;
       dateDeCreation: Date;
