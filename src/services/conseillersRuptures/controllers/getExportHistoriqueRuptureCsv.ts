@@ -91,7 +91,8 @@ const getExportHistoriqueRuptureCsv =
           },
           {
             $unwind: {
-              path: '$miseEnRelation', // Obligatoire ici
+              path: '$miseEnRelation',
+              preserveNullAndEmptyArrays: true,
             },
           },
           {
