@@ -9,30 +9,45 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
+const csvCellSeparator = ';';
+const csvLineSeparator = '\n';
+
 const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
-  res.write(
-    'Id CnFS;Nom CnFS;Prénom CnFS;Email CnFS;Id Structure;Nom Structure;Date de rupture du contrat;Motif de rupture;Commentaire\n',
-  );
+  const fileHeaders = [
+    'Nom',
+    'Prénom',
+    'Email',
+    'Id CNFS',
+    'Nom de la structure',
+    'Id Structure',
+    'Date de début de contrat',
+    'Date de fin de contrat',
+    'Type de contrat',
+    'Date de rupture',
+    'Motif de rupture',
+    'Commentaire'
+  ];
   try {
-    await Promise.all(
-      ruptures.map(async (rupture) => {
-        res.write(
-          `${
-            rupture.conseiller?.idPG ??
-            rupture.conseillerSupprime?.conseiller?.idPG
-          };${rupture.conseiller?.nom ?? 'Anonyme'};${
-            rupture.conseiller?.prenom ?? 'Anonyme'
-          };${rupture.conseiller?.email ?? 'Anonyme'};${
-            rupture.structure?.idPG
-          };${rupture.structure?.nom?.replace(/["',]/g, ' ')};${formatDate(rupture.dateRupture)};${
-            rupture.motifRupture
-          };${
-            rupture.conseillerSupprime?.conseiller?.idPG
-              ? "Ce conseiller s'est désinscrit totalement du dispositif"
-              : ''
-          }\n`,
-        );
-      }),
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...ruptures.map((rupture) =>
+          [
+            rupture.conseiller?.nom ?? 'Anonyme',
+            rupture.conseiller?.prenom ?? 'Anonyme',
+            rupture.conseiller?.email ?? 'Anonyme',
+            rupture.conseiller?.idPG,
+            rupture.structure?.nom?.replace(/["',]/g, ' '),
+            rupture.structure?.idPG,
+            formatDate(rupture?.miseEnRelation?.dateDebutDeContrat),
+            formatDate(rupture?.miseEnRelation?.dateFinDeContrat),
+            rupture?.miseEnRelation?.typeDeContrat ?? 'Non renseigné',
+            formatDate(rupture?.dateRupture),
+            rupture?.motifRupture ?? 'Non renseigné',
+            rupture.conseillerSupprime?.conseiller?.idPG ? "Ce conseiller s'est désinscrit totalement du dispositif" : ''
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
     );
     res.end();
   } catch (error) {

@@ -63,6 +63,38 @@ const getExportHistoriqueRuptureCsv =
             },
           },
           {
+            $lookup: {
+              from: 'misesEnRelation',
+              let: {
+                idStructure: '$structureId',
+                idConseiller: '$conseillerId',
+              },
+              as: 'miseEnRelation',
+              pipeline: [
+                {
+                  $match: {
+                    $and: [
+                      {
+                        $expr: { $eq: ['$$idStructure', '$structureObj._id'] },
+                      },
+                      {
+                        $expr: {
+                          $eq: ['$$idConseiller', '$conseillerObj._id'],
+                        },
+                      },
+                      { $expr: { $eq: ['$statut', 'finalisee_rupture'] } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $unwind: {
+              path: '$miseEnRelation', // Obligatoire ici
+            },
+          },
+          {
             $project: {
               _id: 0,
               dateRupture: 1,
@@ -74,6 +106,9 @@ const getExportHistoriqueRuptureCsv =
               'conseiller.email': 1,
               'structure.idPG': 1,
               'structure.nom': 1,
+              'miseEnRelation.dateDebutDeContrat': 1,
+              'miseEnRelation.dateFinDeContrat': 1,
+              'miseEnRelation.typeDeContrat': 1,
             },
           },
         ]);

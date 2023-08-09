@@ -15,7 +15,7 @@ const getExportRupturesCsv =
         .Model.accessibleBy(req.ability, action.read)
         .find({ statut: { $eq: 'nouvelle_rupture' } });
 
-      generateCsvRupture(miseEnRelations, res, app);
+      generateCsvRupture(miseEnRelations, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

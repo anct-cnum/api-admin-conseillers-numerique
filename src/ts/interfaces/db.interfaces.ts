@@ -80,9 +80,9 @@ export interface IMisesEnRelation {
 
   statut: string;
 
-  conseillerObj: object;
+  conseillerObj: IConseillers;
 
-  structureObj: object;
+  structureObj: IStructures;
 
   dateRecrutement: Date;
 
@@ -97,6 +97,14 @@ export interface IMisesEnRelation {
   dossierIncompletRupture: boolean | undefined;
 
   reconventionnement: boolean | undefined;
+
+  dateDebutDeContrat: Date | undefined;
+
+  dateFinDeContrat: Date | undefined;
+
+  typeDeContrat: string | undefined;
+
+  salaire: number | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
