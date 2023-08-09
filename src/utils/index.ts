@@ -85,6 +85,9 @@ const getCoselecConventionnement = (structure) => {
   return getLastCoselec(structure);
 };
 
+const getTimestampByDate = (date?: Date) =>
+  date != null ? new Date(date).getTime() : 0;
+
 const deleteUser = async (app: Application, req: IRequest, email: string) => {
   await app
     .service(service.users)
@@ -125,4 +128,5 @@ export {
   deleteUser,
   deleteRoleUser,
   formatDateGMT,
+  getTimestampByDate,
 };
