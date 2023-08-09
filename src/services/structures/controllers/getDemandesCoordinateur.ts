@@ -26,26 +26,31 @@ const totalParStatutDemandesCoordinateur = async (
   app: Application,
   checkAccess,
 ) => {
-  const countAvenant = await app.service(service.structures).Model.aggregate([
-    {
-      $match: {
-        $and: [checkAccess],
+  const countDemandesCoordinateur = await app
+    .service(service.structures)
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
+        },
       },
-    },
-    { $unwind: '$demandesCoordinateur' },
-    {
-      $group: {
-        _id: '$demandesCoordinateur.statut',
-        count: { $sum: 1 },
+      { $unwind: '$demandesCoordinateur' },
+      {
+        $group: {
+          _id: '$demandesCoordinateur.statut',
+          count: { $sum: 1 },
+        },
       },
-    },
-  ]);
+    ]);
   const totalDemandesCoordinateurEnCours =
-    countAvenant.find((element) => element._id === 'en_cours')?.count ?? 0;
+    countDemandesCoordinateur.find((element) => element._id === 'en_cours')
+      ?.count ?? 0;
   const totalDemandesCoordinateurValider =
-    countAvenant.find((element) => element._id === 'validee')?.count ?? 0;
+    countDemandesCoordinateur.find((element) => element._id === 'validee')
+      ?.count ?? 0;
   const totalDemandesCoordinateurRefuser =
-    countAvenant.find((element) => element._id === 'refusee')?.count ?? 0;
+    countDemandesCoordinateur.find((element) => element._id === 'refusee')
+      ?.count ?? 0;
   const total =
     totalDemandesCoordinateurEnCours +
     totalDemandesCoordinateurValider +

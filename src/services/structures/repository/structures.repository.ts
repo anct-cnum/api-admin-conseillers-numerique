@@ -160,14 +160,14 @@ const filterAvisPrefet = (avisPrefet) => {
 };
 
 const filterStatutAndAvisPrefetDemandesCoordinateur = (
-  typeConvention: string,
+  statutDemande: string,
   avisPrefet: string,
 ) => {
-  if (typeConvention !== 'toutes') {
+  if (statutDemande !== 'toutes') {
     return {
       demandesCoordinateur: {
         $elemMatch: {
-          statut: { $eq: typeConvention },
+          statut: { $eq: statutDemande },
           ...filterAvisPrefet(avisPrefet),
         },
       },
