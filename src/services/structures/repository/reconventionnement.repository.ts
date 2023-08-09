@@ -15,7 +15,7 @@ import { getCoselecConventionnement, getTimestampByDate } from '../../../utils';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
-const queryGetDemarcheReconventionnement = () => gql`
+const queryGetDemarcheDemarcheSimplifiee = () => gql`
   query getDemarche($demarcheNumber: Int!, $after: String) {
     demarche(number: $demarcheNumber) {
       id
@@ -85,7 +85,7 @@ const queryGetDemarcheReconventionnement = () => gql`
   }
 `;
 
-const queryGetDossierReconventionnement = gql`
+const queryGetDossierDemarcheSimplifiee = () => gql`
   query getDossier($dossierNumber: Int!) {
     dossier(number: $dossierNumber) {
       ...DossierFragment
@@ -651,8 +651,8 @@ const sortHistoriqueDossierConventionnement = (
 };
 
 export {
-  queryGetDemarcheReconventionnement,
-  queryGetDossierReconventionnement,
+  queryGetDemarcheDemarcheSimplifiee,
+  queryGetDossierDemarcheSimplifiee,
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierReconventionnement,
   getUrlDossierConventionnement,

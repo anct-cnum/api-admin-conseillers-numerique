@@ -7,7 +7,7 @@ import { GraphQLClient } from 'graphql-request';
 import { ObjectId } from 'mongodb';
 import execute from '../utils';
 import service from '../../helpers/services';
-import { queryGetDemarcheReconventionnement } from '../../services/structures/repository/reconventionnement.repository';
+import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/reconventionnement.repository';
 import { IDossierDS } from '../../ts/interfaces/global.interfaces';
 
 const requestGraphQLForGetDemarcheDS = (
@@ -15,7 +15,7 @@ const requestGraphQLForGetDemarcheDS = (
   cursor: string,
 ): Promise<any> =>
   graphQLClient
-    .request(queryGetDemarcheReconventionnement(), {
+    .request(queryGetDemarcheDemarcheSimplifiee(), {
       demarcheNumber: 79487,
       after: cursor,
     })
