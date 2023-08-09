@@ -19,6 +19,7 @@ import {
   closeBanner,
   updateAvenantAjoutPoste,
   updateAvenantRenduPoste,
+  getDetailDemandeCoordinateur,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -86,6 +87,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getStructuresMisesEnRelationsStats(app),
+    );
+    app.get(
+      '/demandes/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      getDetailDemandeCoordinateur(app),
     );
     app.get(
       '/conventions/',

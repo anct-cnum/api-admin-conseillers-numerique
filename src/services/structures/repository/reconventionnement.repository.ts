@@ -85,7 +85,7 @@ const queryGetDemarcheReconventionnement = () => gql`
   }
 `;
 
-const queryGetDossierReconventionnement = gql`
+const queryGetDossierDemarcheSimplifiee = () => gql`
   query getDossier($dossierNumber: Int!) {
     dossier(number: $dossierNumber) {
       ...DossierFragment
@@ -655,7 +655,7 @@ const sortHistoriqueDossierConventionnement = (
 
 export {
   queryGetDemarcheReconventionnement,
-  queryGetDossierReconventionnement,
+  queryGetDossierDemarcheSimplifiee,
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierReconventionnement,
   getUrlDossierConventionnement,
