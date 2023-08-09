@@ -67,7 +67,8 @@ const getDetailDemandeCoordinateur =
         });
         return;
       }
-      const champsFormulaire = dossier?.dossier?.champs
+      // les champs à ne pas afficher
+      const champsFormulaire = dossier?.dossier?.champs // à modifier quand le formulaire DS sera publié
         ?.slice(5)
         ?.filter(
           (champ) =>
