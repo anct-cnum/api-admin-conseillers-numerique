@@ -16,7 +16,7 @@ const requestGraphQLForGetDemarcheDS = (
 ): Promise<any> =>
   graphQLClient
     .request(queryGetDemarcheDemarcheSimplifiee(), {
-      demarcheNumber: 79487,
+      demarcheNumber: 79487, // à modifier quand le formulaire DS sera publié
       after: cursor,
     })
     .catch(() => {
@@ -59,7 +59,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       item.dateDerniereModification = dateDerniereModification;
       item.statut = state;
       item.idPG = parseInt(
-        champs.find((champ: any) => champ.id === 'Q2hhbXAtMzI3MTEzNw==')
+        champs.find((champ: any) => champ.id === 'Q2hhbXAtMzI3MTEzNw==') // à modifier quand le formulaire DS sera publié
           ?.integerNumber,
         10,
       );
