@@ -197,7 +197,6 @@ const getExportHistoriqueDossiersConventionCsv =
                 item.codeRegion = structure.codeRegion;
                 item.statutStructure = structure.statut;
                 item.statutDemande = formatStatutDemande(avenant.statut);
-                // console.log('misesEnRelation', misesEnRelation);
                 item.nbContratsValides =
                   misesEnRelation.find(
                     (miseEnRelation) => miseEnRelation._id === 'finalisee',
@@ -236,7 +235,7 @@ const getExportHistoriqueDossiersConventionCsv =
             )(structure._id);
             const coselec = getCoselec(item);
             if (
-              item?.conventionnement?.statut ===
+              item.conventionnement.statut ===
               StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
             ) {
               item.dateSorted =
@@ -244,9 +243,9 @@ const getExportHistoriqueDossiersConventionCsv =
               item.statut = 'Conventionnement';
             }
             if (
-              item?.conventionnement?.statut ===
+              item.conventionnement.statut ===
                 StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
-              item?.conventionnement?.statut ===
+              item.conventionnement.statut ===
                 StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ
             ) {
               item.dateSorted =
