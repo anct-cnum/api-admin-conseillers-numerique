@@ -858,9 +858,18 @@ const generateCsvHistoriqueDossiersConvention = async (
     const fileHeaders = [
       'Id de la structure',
       'Nom de la structure',
+      'Type de la structure',
+      'Région',
+      'Département',
+      'Statut',
+      'Nombre de postes attribués',
       'Date de la demande',
-      'Nombre de postes',
       'Type de la demande',
+      'Nombre de CNFS souhaités',
+      'Nombre de contrat validés',
+      'Nombre de postes renouvelés',
+      'Date de fin du premier contrat',
+      'État de la demande',
     ];
 
     res.write(
@@ -868,11 +877,20 @@ const generateCsvHistoriqueDossiersConvention = async (
         fileHeaders.join(csvCellSeparator),
         ...structures.map((structure) =>
           [
-            structure?._id,
+            structure?.idPG,
             structure?.nom,
-            formatDate(structure?.dateDeCreation),
+            structure?.type === 'PRIVATE' ? 'privée' : 'publique',
+            structure?.codeRegion,
+            structure?.codeDepartement,
+            structure?.statutStructure,
             structure?.nbPostesAttribuees ?? 'Non renseigné',
+            formatDate(structure?.dateSorted),
             structure?.statut,
+            structure?.nbPostesSouhaites ?? '',
+            structure?.nbContratsValides ?? 'Non renseigné',
+            structure?.nbContratsRenouveles ?? 'Non renseigné',
+            formatDate(structure?.dateFinPremierContrat),
+            structure?.statutDemande,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

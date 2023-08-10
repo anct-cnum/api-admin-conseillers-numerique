@@ -14,12 +14,12 @@ const csvLineSeparator = '\n';
 
 const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
   const fileHeaders = [
+    'Id CNFS',
     'Nom',
     'Prénom',
     'Email',
-    'Id CNFS',
-    'Nom de la structure',
     'Id Structure',
+    'Nom de la structure',
     'Date de début de contrat',
     'Date de fin de contrat',
     'Type de contrat',
@@ -33,12 +33,12 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
         fileHeaders.join(csvCellSeparator),
         ...ruptures.map((rupture) =>
           [
+            rupture.conseiller?.idPG,
             rupture.conseiller?.nom ?? 'Anonyme',
             rupture.conseiller?.prenom ?? 'Anonyme',
             rupture.conseiller?.email ?? 'Anonyme',
-            rupture.conseiller?.idPG,
-            rupture.structure?.nom?.replace(/["',]/g, ' '),
             rupture.structure?.idPG,
+            rupture.structure?.nom?.replace(/["',]/g, ' '),
             formatDate(rupture?.miseEnRelation?.dateDebutDeContrat),
             formatDate(rupture?.miseEnRelation?.dateFinDeContrat),
             rupture?.miseEnRelation?.typeDeContrat ?? 'Non renseigné',
