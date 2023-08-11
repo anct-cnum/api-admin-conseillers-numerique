@@ -2,20 +2,23 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { generateCsvRupture } from '../exports.repository';
+import { generateCsvStructureNonInteresser } from '../exports.repository';
 import { action } from '../../../helpers/accessControl/accessList';
-import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
+import { StatutConventionnement } from '../../../ts/enum';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
-const getExportRupturesCsv =
+const getExportStructureNonInteresserCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let miseEnRelations: IMisesEnRelation[];
     try {
-      miseEnRelations = await app
-        .service(service.misesEnRelation)
+      const structures: IStructures[] = await app
+        .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .find({ statut: { $eq: 'nouvelle_rupture' } });
-
-      generateCsvRupture(miseEnRelations, res);
+        .find({
+          'conventionnement.statut': {
+            $eq: StatutConventionnement.NON_INTERESSÉ,
+          },
+        });
+      generateCsvStructureNonInteresser(structures, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
@@ -26,4 +29,4 @@ const getExportRupturesCsv =
     }
   };
 
-export default getExportRupturesCsv;
+export default getExportStructureNonInteresserCsv;
