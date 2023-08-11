@@ -15,6 +15,7 @@ import closeBanner from './closeBanner';
 import createAvenant from './createAvenant';
 import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
 import updateAvenantRenduPoste from './updateAvenantRenduPoste';
+import getDemandesCoordinateur from './getDemandesCoordinateur';
 
 export {
   getStructures,
@@ -34,4 +35,5 @@ export {
   createAvenant,
   updateAvenantAjoutPoste,
   updateAvenantRenduPoste,
+  getDemandesCoordinateur,
 };

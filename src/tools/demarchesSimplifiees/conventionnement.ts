@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/demarcheSimplifiee/conventionnement.ts
+// Lancement de ce script : ts-node src/tools/demarchesSimplifiees/conventionnement.ts
 
 import { GraphQLClient } from 'graphql-request';
 import execute from '../utils';
@@ -10,7 +10,7 @@ import {
   TypeDossierReconventionnement,
   StatutConventionnement,
 } from '../../ts/enum';
-import { queryGetDemarcheReconventionnement } from '../../services/structures/repository/reconventionnement.repository';
+import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/reconventionnement.repository';
 import { IDossierDS } from '../../ts/interfaces/global.interfaces';
 
 const categoriesCorrespondances = require('../../../datas/categorieFormCorrespondances.json');
@@ -25,7 +25,7 @@ const requestGraphQLForGetDemarcheDS = (
   cursor: string,
 ): Promise<any> =>
   graphQLClient
-    .request(queryGetDemarcheReconventionnement(), {
+    .request(queryGetDemarcheDemarcheSimplifiee(), {
       demarcheNumber: getDemarcheNumber(type),
       after: cursor,
     })

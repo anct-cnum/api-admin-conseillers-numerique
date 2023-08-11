@@ -7,7 +7,7 @@ import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
-import { queryGetDossierReconventionnement } from '../../services/structures/repository/reconventionnement.repository';
+import { queryGetDossierDemarcheSimplifiee } from '../../services/structures/repository/reconventionnement.repository';
 import { StatutConventionnement } from '../../ts/enum';
 
 program.option('-c, --csv <path>', 'CSV file path');
@@ -24,7 +24,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
   const structures = await readCSV(options.csv);
   for (const structure of structures) {
     const dossier: any | Error = await graphQLClient
-      .request(queryGetDossierReconventionnement, {
+      .request(queryGetDossierDemarcheSimplifiee(), {
         dossierNumber: parseInt(structure.NUMERO, 10),
       })
       .catch(() => {
