@@ -11,11 +11,11 @@ import {
   IRequest,
 } from '../../../ts/interfaces/global.interfaces';
 import { checkAccessReadRequestStructures } from './structures.repository';
-import { getCoselecConventionnement } from '../../../utils';
+import { getCoselecConventionnement, getTimestampByDate } from '../../../utils';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
-const queryGetDemarcheReconventionnement = () => gql`
+const queryGetDemarcheDemarcheSimplifiee = () => gql`
   query getDemarche($demarcheNumber: Int!, $after: String) {
     demarche(number: $demarcheNumber) {
       id
@@ -482,9 +482,6 @@ const totalParHistoriqueConvention = async (
   };
 };
 
-const getTimestampByDate = (date?: Date) =>
-  date != null ? new Date(date).getTime() : 0;
-
 const sortArrayConventionnement = (structures, ordre) =>
   structures.sort((a, b) => {
     if (getTimestampByDate(a.dateSorted) < getTimestampByDate(b.dateSorted)) {
@@ -654,7 +651,7 @@ const sortHistoriqueDossierConventionnement = (
 };
 
 export {
-  queryGetDemarcheReconventionnement,
+  queryGetDemarcheDemarcheSimplifiee,
   queryGetDossierDemarcheSimplifiee,
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierReconventionnement,
