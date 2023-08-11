@@ -15,6 +15,7 @@ import closeBanner from './closeBanner';
 import createAvenant from './createAvenant';
 import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
 import updateAvenantRenduPoste from './updateAvenantRenduPoste';
+import getDetailDemandeCoordinateur from './getDetailDemandeCoordinateur';
 import getDemandesCoordinateur from './getDemandesCoordinateur';
 
 export {
@@ -35,5 +36,6 @@ export {
   createAvenant,
   updateAvenantAjoutPoste,
   updateAvenantRenduPoste,
+  getDetailDemandeCoordinateur,
   getDemandesCoordinateur,
 };
