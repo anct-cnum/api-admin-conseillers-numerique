@@ -185,7 +185,6 @@ const getExportHistoriqueDossiersConventionCsv =
               const avenantsFormat = avenants.map((avenant) => {
                 const item = { ...avenant };
                 item.idPG = structure.idPG;
-                item.statut = structure.statut;
                 item.nom = structure.nom;
                 item.nbPostesSouhaites = avenant.nombreDePostesRendus;
                 item.nbPostesAttribuees =

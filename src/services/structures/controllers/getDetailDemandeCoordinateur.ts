@@ -80,6 +80,12 @@ const getDetailDemandeCoordinateur =
       const structureFormat = structure.toObject();
       structureFormat.questionnaire = [];
       champsFormulaire.forEach((champ) => {
+        if (champ?.checked === false) {
+          Object.assign(champ, { stringValue: 'Non' });
+        }
+        if (champ?.checked === true) {
+          Object.assign(champ, { stringValue: 'Oui' });
+        }
         structureFormat.questionnaire.push({
           question: champ.label,
           reponse: champ.stringValue,
