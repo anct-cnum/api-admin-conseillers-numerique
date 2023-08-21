@@ -910,14 +910,18 @@ const generateCsvHistoriqueContrats = async (
 ) => {
   try {
     const fileHeaders = [
+      'Id du conseiller',
+      'Nom du conseiller',
+      'Prénom du conseiller',
+      'Email du conseiller',
       'Id de la structure',
       'Nom de la structure',
-      'Nom du candidat',
       'Date de la demande',
       'Type de la demande',
       'Date de début de contrat',
       'Date de fin de contrat',
       'Type de contrat',
+      'Motif de rupture',
     ];
 
     res.write(
@@ -925,14 +929,18 @@ const generateCsvHistoriqueContrats = async (
         fileHeaders.join(csvCellSeparator),
         ...contrats.map((contrat) =>
           [
+            contrat?.conseillerObj?.idPG,
+            contrat?.conseillerObj?.nom,
+            contrat?.conseillerObj?.prenom,
+            contrat?.conseillerObj?.email,
             contrat?.structureObj?.idPG,
             contrat?.structureObj?.nom,
-            `${contrat?.conseillerObj?.prenom} ${contrat?.conseillerObj?.nom}`,
             formatDate(contrat?.dateDeLaDemande),
             contrat?.statut ?? 'Non renseigné',
             formatDate(contrat?.dateDebutDeContrat),
             formatDate(contrat?.dateFinDeContrat),
             contrat?.typeDeContrat ?? 'Non renseigné',
+            contrat?.motifRupture ?? 'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
