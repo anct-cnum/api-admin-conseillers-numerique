@@ -126,6 +126,7 @@ const getConseillerById =
               nom: 1,
               email: 1,
               codeCommune: 1,
+              codePostal: 1,
               nomCommune: 1,
               telephonePro: 1,
               mattermost: 1,
