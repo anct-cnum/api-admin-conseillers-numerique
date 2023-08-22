@@ -185,6 +185,33 @@ const filterIsRuptureMisesEnRelation = (
   }
 };
 
+const filterIsRuptureMisesEnRelationStructure = (
+  rupture: string,
+  conseillerIdsRecruter: ObjectId[],
+  piecesManquantes: boolean,
+) => {
+  switch (rupture) {
+    case 'nouvelle_rupture':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerIdsRecruter },
+        ...filtrePiecesManquantes(piecesManquantes),
+      };
+    case 'contrat':
+      return {
+        statut: { $eq: 'finalisee' },
+        'conseiller.$id': { $in: conseillerIdsRecruter },
+      };
+    default:
+      return {
+        $and: [
+          { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
+          { 'conseiller.$id': { $in: conseillerIdsRecruter } },
+        ],
+      };
+  }
+};
+
 const filterIsRuptureConseiller = (
   rupture: string,
   dateDebut: Date,
@@ -196,7 +223,6 @@ const filterIsRuptureConseiller = (
     default: // contrat / nouvelle_rupture / finalisee_rupture
       return {
         $or: [
-          { statut: { $eq: 'RUPTURE' } },
           {
             statut: { $eq: 'RECRUTE' },
             datePrisePoste: { $gte: dateDebut, $lte: dateFin },
@@ -221,4 +247,5 @@ export {
   filterDiplome,
   filterPix,
   filterCCP1,
+  filterIsRuptureMisesEnRelationStructure,
 };

@@ -4,20 +4,33 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
 import {
-  getConseillersIdsByStructure,
+  getConseillersIdsRecruterByStructure,
   getCodesPostauxStatistiquesCras,
   checkAccessRequestCras,
   createArrayForFiltreCodePostaux,
+  getConseillersIdsRuptureByStructure,
 } from '../cras.repository';
+import { checkAccessReadRequestConseillersRuptures } from '../../conseillersRuptures/conseillersRuptures.repository';
 
 const getCodePostauxStructureCras =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
       const idStructure = new ObjectId(req.query.id);
 
-      const conseillersIds = await getConseillersIdsByStructure(
-        idStructure,
+      const conseillersIdsRecruter = await getConseillersIdsRecruterByStructure(
         app,
+        req,
+        idStructure,
+      );
+      const checkAccessConseillerRupture =
+        await checkAccessReadRequestConseillersRuptures(app, req);
+      const conseillersIdsRupture = await getConseillersIdsRuptureByStructure(
+        app,
+        checkAccessConseillerRupture,
+        idStructure,
+      );
+      const conseillersIds = conseillersIdsRecruter.concat(
+        conseillersIdsRupture.map((conseillerRupture) => conseillerRupture._id),
       );
       const checkAccess = checkAccessRequestCras(app, req);
       const listCodePostaux = await getCodesPostauxStatistiquesCras(
