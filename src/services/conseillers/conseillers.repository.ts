@@ -223,6 +223,7 @@ const filterIsRuptureConseiller = (
     default: // contrat / nouvelle_rupture / finalisee_rupture
       return {
         $or: [
+          { statut: { $eq: 'RUPTURE' } },
           {
             statut: { $eq: 'RECRUTE' },
             datePrisePoste: { $gte: dateDebut, $lte: dateFin },
