@@ -94,6 +94,8 @@ const archiverLaSuppression =
               prenom,
               emailPro,
               telephonePro,
+              mailProAModifier,
+              cv,
               ...conseiller
             } = profilFormat;
             const objAnonyme = {
