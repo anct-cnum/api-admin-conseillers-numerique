@@ -40,10 +40,7 @@ export default function (app: Application): Model<any> {
 
       codePostal: { type: String },
 
-      location: {
-        type: { type: String },
-        coordinates: { type: String },
-      },
+      location: { type: Object },
 
       nomCommune: { type: String },
 
@@ -66,14 +63,7 @@ export default function (app: Application): Model<any> {
 
       userCreated: { type: Boolean },
 
-      pix: {
-        partage: { type: Boolean },
-        datePartage: { type: Date },
-        palier: { type: Number },
-        competence1: { type: Boolean },
-        competence2: { type: Boolean },
-        competence3: { type: Boolean },
-      },
+      pix: { type: Object },
 
       sondageToken: { type: String },
 
@@ -89,19 +79,10 @@ export default function (app: Application): Model<any> {
         required: false,
       },
 
-      mattermost: {
-        error: { type: Boolean },
-        login: {
-          type: String,
-        },
-        id: { type: String },
-        errorResetPassword: { type: Boolean },
-        errorPatchLogin: { type: Boolean },
-      },
-      emailCN: {
-        address: String,
-        deleteMailboxCNError: { type: Boolean },
-      },
+      mattermost: { type: Object },
+
+      emailCN: { type: Object },
+
       emailCNError: { type: Boolean },
 
       resetPasswordCNError: { type: Boolean },
@@ -112,17 +93,13 @@ export default function (app: Application): Model<any> {
 
       dateFinFormation: { type: Date },
 
-      dateDeNaissance: { type: String },
+      dateDeNaissance: { type: Date },
 
       sexe: { type: String },
 
-      historique: [Object],
+      historique: { type: [Object], default: undefined },
 
-      cv: {
-        file: { type: String },
-        extension: { type: String },
-        date: { type: Date },
-      },
+      cv: { type: Object },
 
       telephonePro: { type: Number },
 
@@ -138,7 +115,7 @@ export default function (app: Application): Model<any> {
 
       estCoordinateur: { type: Boolean },
 
-      groupeCRAHistorique: [Object],
+      groupeCRAHistorique: { type: [Object], default: undefined },
 
       inactivite: { type: Boolean },
     },

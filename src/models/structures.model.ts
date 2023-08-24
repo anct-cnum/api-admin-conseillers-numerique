@@ -34,10 +34,7 @@ export default function (app: Application): Model<any> {
 
       codePostal: { type: String },
 
-      location: {
-        type: String,
-        coordinates: Array,
-      },
+      location: { type: Object },
 
       nomCommune: { type: String },
 
@@ -73,12 +70,7 @@ export default function (app: Application): Model<any> {
 
       contact: { type: Object },
 
-      conventionnement: {
-        statut: { type: String },
-        dossierReconventionnement: { type: Object },
-        dossierConventionnement: { type: Object },
-        motif: { type: String },
-      },
+      conventionnement: { type: Object },
     },
     { strict: false },
   );

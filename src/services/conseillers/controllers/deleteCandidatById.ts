@@ -85,7 +85,7 @@ const archiverLaSuppression = (app) => async (tableauCandidat, user, motif) => {
     await Promise.all(
       tableauCandidat.map(async (profil) => {
         try {
-          // eslint-disable-next-line no-unused-vars
+          const profilFormat = profil.toObject();
           const {
             email,
             telephone,
@@ -94,7 +94,7 @@ const archiverLaSuppression = (app) => async (tableauCandidat, user, motif) => {
             emailPro,
             telephonePro,
             ...conseiller
-          } = profil;
+          } = profilFormat;
           const objAnonyme = {
             deletedAt: new Date(),
             motif,

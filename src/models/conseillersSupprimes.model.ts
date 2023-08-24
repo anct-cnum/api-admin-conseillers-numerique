@@ -18,7 +18,7 @@ export default function (app: Application): Model<any> {
       actionUser: { type: Object },
       deletedAt: { type: Date },
     },
-    { strict: false, collection: 'conseillersSupprimes' },
+    { strict: false, collection: 'conseillersSupprimes', versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

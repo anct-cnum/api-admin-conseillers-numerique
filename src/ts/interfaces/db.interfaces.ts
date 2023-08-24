@@ -145,7 +145,7 @@ export interface IConseillers {
 
   location: {
     type: string;
-    coordinates: string;
+    coordinates: number[];
   };
 
   nomCommune: string;
@@ -197,11 +197,11 @@ export interface IConseillers {
 
   dateFinFormation: Date;
 
-  dateDeNaissance: string;
+  dateDeNaissance: Date;
 
   sexe: string;
 
-  historique: object[];
+  historique?: object[];
 
   cv: {
     file: string;
@@ -223,7 +223,7 @@ export interface IConseillers {
 
   estCoordinateur: boolean;
 
-  groupeCRAHistorique: object[];
+  groupeCRAHistorique?: object[];
 
   listeSubordonnes: {
     type: string;
@@ -232,7 +232,7 @@ export interface IConseillers {
 
   unsubscribeExtras: object;
 
-  pix: {
+  pix?: {
     partage: boolean;
 
     datePartage: Date;
@@ -273,8 +273,8 @@ export interface IStructures {
   codePostal: string;
 
   location: {
-    structure: string;
-    coordinates: string;
+    type: string;
+    coordinates: number[];
   };
 
   nomCommune: string;
@@ -511,6 +511,7 @@ export interface ICras {
     organisme: string | null;
   };
   conseiller: typeof DBRef;
+  structure: typeof DBRef;
   createdAt: Date;
 }
 
