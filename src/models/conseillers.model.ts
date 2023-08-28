@@ -97,6 +97,8 @@ export default function (app: Application): Model<any> {
 
       sexe: { type: String },
 
+      certificationPixFormation: { type: Boolean },
+
       historique: { type: [Object], default: undefined },
 
       cv: { type: Object },
@@ -111,11 +113,25 @@ export default function (app: Application): Model<any> {
 
       tokenChangementMailPro: { type: String },
 
+      codeDepartementStructure: { type: String },
+
+      codeRegionStructure: { type: String },
+
       tokenChangementMailProCreatedAt: { type: Date },
 
       estCoordinateur: { type: Boolean },
 
+      listeSubordonnes: { type: Object },
+
+      coordinateurs: { type: [Object], default: undefined },
+
+      hasPermanence: { type: Boolean },
+
       groupeCRAHistorique: { type: [Object], default: undefined },
+
+      ruptures: { type: [Object], default: undefined },
+
+      supHierarchique: { type: Object },
 
       inactivite: { type: Boolean },
     },

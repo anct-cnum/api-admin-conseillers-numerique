@@ -154,7 +154,11 @@ export interface IConseillers {
 
   codeDepartement: string;
 
+  codeDepartementStructure: string;
+
   codeRegion: string;
+
+  codeRegionStructure: string;
 
   emailConfirmedAt: Date;
 
@@ -191,6 +195,14 @@ export interface IConseillers {
 
   resetPasswordCNError: boolean;
 
+  supHierarchique: {
+    nom: string;
+    prenom: string;
+    numeroTelephone: string;
+    email: string;
+    fonction: string;
+  };
+
   statut: string;
 
   datePrisePoste: Date;
@@ -213,6 +225,8 @@ export interface IConseillers {
 
   emailPro: string;
 
+  certificationPixFormation: boolean;
+
   groupeCRA: number;
 
   mailProAModifier: string;
@@ -221,9 +235,15 @@ export interface IConseillers {
 
   tokenChangementMailProCreatedAt: Date;
 
+  hasPermanence: boolean;
+
   estCoordinateur: boolean;
 
+  coordinateurs?: object[];
+
   groupeCRAHistorique?: object[];
+
+  ruptures?: object[];
 
   listeSubordonnes: {
     type: string;
