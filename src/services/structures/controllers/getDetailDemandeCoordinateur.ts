@@ -86,6 +86,9 @@ const getDetailDemandeCoordinateur =
         if (champ?.checked === true) {
           Object.assign(champ, { stringValue: 'Oui' });
         }
+        if (champ?.stringValue === '') {
+          Object.assign(champ, { stringValue: 'Sans réponse' });
+        }
         structureFormat.questionnaire.push({
           question: champ.label,
           reponse: champ.stringValue,
