@@ -347,7 +347,7 @@ const generateCsvStructure = async (
   }
 };
 
-const generateCsvRupture = async (
+const generateCsvDemandesRuptures = async (
   misesEnRelations: IMisesEnRelation[],
   res: Response,
 ) => {
@@ -394,7 +394,7 @@ const generateCsvRupture = async (
   }
 };
 
-const generateCsvStructureNonInteresser = async (
+const generateCsvStructureNonInteresserReconventionnement = async (
   structures: IStructures[],
   res: Response,
 ) => {
@@ -422,8 +422,8 @@ const generateCsvStructureNonInteresser = async (
             structure.contact?.fonction,
             structure.contact?.email,
             structure.contact?.telephone,
-            structure.siret,
-            structure.conventionnement.motif,
+            structure?.siret,
+            structure?.conventionnement?.motif,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -959,7 +959,7 @@ export {
   generateCsvCandidatByStructure,
   generateCsvConseillersWithoutCRA,
   generateCsvStructure,
-  generateCsvRupture,
+  generateCsvDemandesRuptures,
   generateCsvConseillersHub,
   generateCsvStatistiques,
   generateCsvTerritoires,
@@ -969,5 +969,5 @@ export {
   generateCsvHistoriqueDossiersConvention,
   generateCsvHistoriqueContrats,
   generateCsvTerritoiresPrefet,
-  generateCsvStructureNonInteresser,
+  generateCsvStructureNonInteresserReconventionnement,
 };

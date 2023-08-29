@@ -2,11 +2,11 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { generateCsvRupture } from '../exports.repository';
+import { generateCsvDemandesRuptures } from '../exports.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 
-const getExportRupturesCsv =
+const getExportDemandesRupturesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     let miseEnRelations: IMisesEnRelation[];
     try {
@@ -15,7 +15,7 @@ const getExportRupturesCsv =
         .Model.accessibleBy(req.ability, action.read)
         .find({ statut: { $eq: 'nouvelle_rupture' } });
 
-      generateCsvRupture(miseEnRelations, res);
+      generateCsvDemandesRuptures(miseEnRelations, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
@@ -26,4 +26,4 @@ const getExportRupturesCsv =
     }
   };
 
-export default getExportRupturesCsv;
+export default getExportDemandesRupturesCsv;
