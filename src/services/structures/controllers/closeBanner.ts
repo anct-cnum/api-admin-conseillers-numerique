@@ -93,8 +93,7 @@ const closeBanner =
             },
           );
 
-        const structure = await getDetailStructureById(app)(req, res);
-        res.status(200).json(structure);
+        await getDetailStructureById(app)(req, res);
       }
     } catch (error) {
       if (error.name === 'ForbiddenError') {
