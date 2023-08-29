@@ -7,7 +7,6 @@ import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
   filterNomConseiller,
-  filterNomStructure,
   filterRegion,
   formatStatutMisesEnRelation,
   filterDepartement,
@@ -16,25 +15,25 @@ import {
 import { checkAccessReadRequestConseillersRuptures } from '../../conseillersRuptures/conseillersRuptures.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getNombreCras } from '../../cras/cras.repository';
-import { validExportConseillers } from '../../../schemas/conseillers.schemas';
+import { validConseillersStructure } from '../../../schemas/conseillers.schemas';
 
 const getMisesEnRelationRecruter =
   (app: Application, checkAccess) =>
   async (
     rupture: string,
-    searchByStructure: string,
     conseillerIds: ObjectId[],
+    conseillerIdsRupture: ObjectId[],
     piecesManquantes: boolean,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterNomStructure(searchByStructure),
           $and: [
             checkAccess,
             filterIsRuptureMisesEnRelationStructure(
               rupture,
               conseillerIds,
+              conseillerIdsRupture,
               piecesManquantes,
             ),
           ],
@@ -191,7 +190,6 @@ const getConseillersStatutRecruteStructure =
       coordinateur,
       rupture,
       searchByConseiller,
-      searchByStructure,
       region,
       departement,
       piecesManquantes,
@@ -199,7 +197,7 @@ const getConseillersStatutRecruteStructure =
 
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
-    const validConseillers = validExportConseillers.validate({
+    const validConseillers = validConseillersStructure.validate({
       dateDebut,
       dateFin,
       ordre,
@@ -207,7 +205,6 @@ const getConseillersStatutRecruteStructure =
       coordinateur,
       rupture,
       searchByConseiller,
-      searchByStructure,
       region,
       departement,
       piecesManquantes,
@@ -227,6 +224,7 @@ const getConseillersStatutRecruteStructure =
     try {
       let misesEnRelation: any[] = [];
       let conseillersRuptures: any[] = [];
+      let conseillersRecruter: any[] = [];
       const checkAccessConseiller = await checkAccessReadRequestConseillers(
         app,
         req,
@@ -235,46 +233,17 @@ const getConseillersStatutRecruteStructure =
         await checkAccessReadRequestConseillersRuptures(app, req);
       const checkAccesMisesEnRelation =
         await checkAccessReadRequestMisesEnRelation(app, req);
-      const conseillers = await getConseillersRecruter(
-        app,
-        checkAccessConseiller,
-      )(
-        dateDebut,
-        dateFin,
-        coordinateur as string,
-        searchByConseiller as string,
-        region as string,
-        departement as string,
-      );
       if (rupture !== 'finalisee_rupture') {
-        misesEnRelation = await getMisesEnRelationRecruter(
+        conseillersRecruter = await getConseillersRecruter(
           app,
-          checkAccesMisesEnRelation,
+          checkAccessConseiller,
         )(
-          rupture as string,
-          searchByStructure as string,
-          conseillers.map((conseiller) => conseiller._id),
-          piecesManquantes,
-        );
-
-        misesEnRelation = await Promise.all(
-          misesEnRelation.map(async (ligneStats) => {
-            const item = { ...ligneStats };
-            item.rupture = formatStatutMisesEnRelation(
-              item.statut,
-              item?.dossierIncompletRupture,
-            );
-            item.idPG = item.conseillerObj?.idPG;
-            item._id = item.conseillerObj?._id;
-            item.nom = item.conseillerObj?.nom;
-            item.prenom = item.conseillerObj?.prenom;
-            item.address = item.conseillerObj?.emailCN?.address;
-            item.estCoordinateur = item.conseillerObj?.estCoordinateur;
-            item.nomStructure = item.structureObj?.nom;
-            item.craCount = await getNombreCras(app, req)(item._id);
-
-            return item;
-          }),
+          dateDebut,
+          dateFin,
+          coordinateur as string,
+          searchByConseiller as string,
+          region as string,
+          departement as string,
         );
       }
       if (rupture === 'finalisee_rupture' || !rupture) {
@@ -295,14 +264,57 @@ const getConseillersStatutRecruteStructure =
             item.rupture = 'Sans mission';
             if (!item.nom && !item.prenom) {
               item.statut = 'SUPPRIMER';
+            } else {
+              item.statut = 'RUPTURE';
             }
-            item.craCount = await getNombreCras(app, req)(item._id);
 
             return item;
           }),
         );
       }
-      misesEnRelation = misesEnRelation.concat(conseillersRuptures);
+      const conseillersEnRupture = conseillersRuptures.filter(
+        (conseiller) => conseiller.statut === 'RUPTURE',
+      );
+      const conseillersSupprimer = await Promise.all(
+        await conseillersRuptures
+          .filter((conseiller) => conseiller.statut === 'SUPPRIMER')
+          .map(async (conseiller) => {
+            const item = { ...conseiller };
+            item.craCount = await getNombreCras(app, req)(item._id);
+
+            return item;
+          }),
+      );
+      misesEnRelation = await getMisesEnRelationRecruter(
+        app,
+        checkAccesMisesEnRelation,
+      )(
+        rupture as string,
+        conseillersRecruter.map((conseiller) => conseiller._id),
+        conseillersEnRupture.map((conseiller) => conseiller._id),
+        piecesManquantes,
+      );
+
+      misesEnRelation = await Promise.all(
+        misesEnRelation.map(async (ligneStats) => {
+          const item = { ...ligneStats };
+          item.rupture = formatStatutMisesEnRelation(
+            item.statut,
+            item?.dossierIncompletRupture,
+          );
+          item.idPG = item.conseillerObj?.idPG;
+          item._id = item.conseillerObj?._id;
+          item.nom = item.conseillerObj?.nom;
+          item.prenom = item.conseillerObj?.prenom;
+          item.address = item.conseillerObj?.emailCN?.address;
+          item.estCoordinateur = item.conseillerObj?.estCoordinateur;
+          item.nomStructure = item.structureObj?.nom;
+          item.craCount = await getNombreCras(app, req)(item._id);
+
+          return item;
+        }),
+      );
+      misesEnRelation = misesEnRelation.concat(conseillersSupprimer);
       switch (nomOrdre) {
         case 'nom':
           misesEnRelation = misesEnRelation.sort((a, b) => {

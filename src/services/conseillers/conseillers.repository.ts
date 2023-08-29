@@ -188,9 +188,15 @@ const filterIsRuptureMisesEnRelation = (
 const filterIsRuptureMisesEnRelationStructure = (
   rupture: string,
   conseillerIdsRecruter: ObjectId[],
+  conseillerIdsRupture: ObjectId[],
   piecesManquantes: boolean,
 ) => {
   switch (rupture) {
+    case 'finalisee_rupture':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerIdsRupture },
+      };
     case 'nouvelle_rupture':
       return {
         statut: { $eq: rupture },
@@ -204,9 +210,19 @@ const filterIsRuptureMisesEnRelationStructure = (
       };
     default:
       return {
-        $and: [
-          { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
-          { 'conseiller.$id': { $in: conseillerIdsRecruter } },
+        $or: [
+          {
+            $and: [
+              { statut: { $eq: 'finalisee_rupture' } },
+              { 'conseiller.$id': { $in: conseillerIdsRupture } },
+            ],
+          },
+          {
+            $and: [
+              { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
+              { 'conseiller.$id': { $in: conseillerIdsRecruter } },
+            ],
+          },
         ],
       };
   }

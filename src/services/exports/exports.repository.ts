@@ -719,13 +719,13 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
         fileHeaders.join(csvCellSeparator),
         ...misesEnRelation.map((miseEnRelation) =>
           [
-            miseEnRelation.conseillerObj.idPG,
-            miseEnRelation.structureObj._id,
-            miseEnRelation.structureObj.idPG,
-            miseEnRelation.structureObj.nom,
-            miseEnRelation.structureObj.codePostal,
-            miseEnRelation.conseillerObj.nom,
-            miseEnRelation.conseillerObj.prenom,
+            miseEnRelation.conseillerObj?.idPG,
+            miseEnRelation.structureObj?._id,
+            miseEnRelation.structureObj?.idPG,
+            miseEnRelation.structureObj?.nom,
+            miseEnRelation.structureObj?.codePostal,
+            miseEnRelation.conseillerObj?.nom,
+            miseEnRelation.conseillerObj?.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
               'compte COOP non créé',
             miseEnRelation.conseillerObj?.telephonePro,

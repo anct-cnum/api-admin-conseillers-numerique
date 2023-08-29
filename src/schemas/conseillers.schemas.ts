@@ -31,6 +31,33 @@ const validConseillers = Joi.object({
   ),
 });
 
+const validConseillersStructure = Joi.object({
+  dateDebut: Joi.date()
+    .required()
+    .error(new Error('La date de début est invalide')),
+  dateFin: Joi.date()
+    .required()
+    .error(new Error('La date de fin est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Nom du sort est invalide')),
+  searchByConseiller: Joi.string().error(
+    new Error('La recherche par conseiller est invalide'),
+  ),
+  coordinateur: Joi.string().error(
+    new Error('Le filtre coordinateur est invalide'),
+  ),
+  rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
+  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  departement: Joi.string().error(
+    new Error('Le filtre département est invalide'),
+  ),
+  piecesManquantes: Joi.string().error(
+    new Error('Le filtre pièces manquantes est invalide'),
+  ),
+});
+
 const validExportConseillers = Joi.object({
   dateDebut: Joi.date()
     .required()
@@ -92,4 +119,5 @@ export {
   validExportConseillers,
   validCandidats,
   validCandidatsStructure,
+  validConseillersStructure,
 };

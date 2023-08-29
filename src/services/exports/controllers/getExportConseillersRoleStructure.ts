@@ -3,17 +3,13 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { validExportConseillers } from '../../../schemas/conseillers.schemas';
+import { validConseillersStructure } from '../../../schemas/conseillers.schemas';
 import {
   filterIsCoordinateur,
   filterNomConseiller,
   filterRegion,
-  filterNomStructure,
-  filterIsRuptureConseiller,
-  filterIsRuptureMisesEnRelation,
   checkAccessReadRequestConseillers,
   filterDepartement,
-  formatStatutMisesEnRelation,
   filterIsRuptureMisesEnRelationStructure,
 } from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
@@ -34,10 +30,9 @@ const getMisesEnRelationRecruter =
         $match: {
           $and: [
             checkAccess,
-            filterIsRuptureMisesEnRelation(
+            filterIsRuptureMisesEnRelationStructure(
               rupture,
               conseillerIds,
-              
               conseillerIdsRuptures,
               piecesManquantes,
             ),
@@ -167,6 +162,7 @@ const getConseillersRuptures =
           prenom: '$mergedObject.prenom',
           datePrisePoste: '$mergedObject.datePrisePoste',
           estCoordinateur: '$mergedObject.estCoordinateur',
+          dateFinFormation: '$mergedObject.dateFinFormation',
           codeRegion: '$mergedObject.codeRegion',
           codeDepartement: '$mergedObject.codeDepartement',
           statut: '$mergedObject.statut',
@@ -208,14 +204,14 @@ const getExportConseillersRoleStructureCsv =
       coordinateur,
       rupture,
       searchByConseiller,
-      searchByStructure,
       region,
       departement,
       piecesManquantes,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
-    const emailValidation = validExportConseillers.validate({
+
+    const emailValidation = validConseillersStructure.validate({
       dateDebut,
       dateFin,
       ordre,
@@ -223,7 +219,6 @@ const getExportConseillersRoleStructureCsv =
       coordinateur,
       rupture,
       searchByConseiller,
-      searchByStructure,
       region,
       departement,
       piecesManquantes,
@@ -274,31 +269,50 @@ const getExportConseillersRoleStructureCsv =
         conseillersRuptures = await Promise.all(
           conseillersRuptures.map(async (ligneStats) => {
             const item = { ...ligneStats };
-            item.rupture = 'Sans mission';
             if (!item.nom && !item.prenom) {
               item.statut = 'SUPPRIMER';
+            } else {
+              item.statut = 'RUPTURE';
             }
-            item.craCount = await getNombreCras(app, req)(item._id);
 
             return item;
           }),
         );
       }
-      misesEnRelation = misesEnRelation.concat(conseillersRuptures);
+      const conseillersEnRupture = conseillersRuptures.filter(
+        (conseiller) => conseiller.statut === 'RUPTURE',
+      );
+      const conseillersSupprimer = conseillersRuptures
+        .filter((conseiller) => conseiller.statut === 'SUPPRIMER')
+        .map((conseiller) => {
+          const item = { ...conseiller };
+          item.conseillerObj = {
+            _id: conseiller._id,
+            idPG: conseiller.idPG,
+            datePrisePoste: conseiller?.datePrisePoste,
+            dateFinFormation: conseiller?.dateFinFormation,
+            estCoordinateur: conseiller?.estCoordinateur,
+          };
+          item.statut = 'finalisee_rupture';
+          return item;
+        });
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
       )(
         rupture as string,
         conseillersRecruter.map((conseiller) => conseiller._id),
-        conseillersRuptures.map((conseiller) => conseiller._id),
+        conseillersEnRupture.map((conseiller) => conseiller._id),
         piecesManquantes,
       );
-
+      misesEnRelation = misesEnRelation.concat(conseillersSupprimer);
       misesEnRelation = await Promise.all(
         misesEnRelation.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          item.craCount = await getNombreCras(app, req)(item._id);
+          item.craCount = await getNombreCras(
+            app,
+            req,
+          )(item.conseillerObj?._id);
 
           return item;
         }),
