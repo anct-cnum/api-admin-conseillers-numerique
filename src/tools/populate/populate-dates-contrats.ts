@@ -24,7 +24,10 @@ execute(__filename, async ({ app, logger, exit }) => {
     app.service(service.misesEnRelation).Model.findOne({
       'structureObj.idPG': idStructure,
       'conseillerObj.idPG': idConseiller,
-      statut: { $in: ['finalisee', 'nouvelle_rupture', 'finalisee_rupture'] },
+      statut: {
+        $in: ['finalisee', 'nouvelle_rupture', 'finalisee_rupture', 'terminee'],
+      },
+      phaseConventionnement: { $exists: false },
     });
 
   const options = program.opts();
