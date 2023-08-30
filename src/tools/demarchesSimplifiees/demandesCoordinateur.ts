@@ -88,11 +88,25 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
         }
         const match = {
           idPG: dossier.idPG,
-          statut: 'VALIDATION_COSELEC',
+          $or: [
+            {
+              statut: 'VALIDATION_COSELEC',
+            },
+            {
+              coordinateurCandidature: true,
+            },
+          ],
         };
         const matchMiseEnRelation = {
           'structure.$id': structure._id,
-          'structureObj.statut': 'VALIDATION_COSELEC',
+          $or: [
+            {
+              'structureObj.statut': 'VALIDATION_COSELEC',
+            },
+            {
+              'structureObj.coordinateurCandidature': true,
+            },
+          ],
         };
         const demandeCoordinateurObject = {};
         const demandeCoordinateurMiseEnRelationObject = {};
