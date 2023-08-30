@@ -5,6 +5,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from './getStatsGlobales';
 import { validStatConseiller } from '../../../schemas/stats.schemas';
+import service from '../../../helpers/services';
+import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 
 const getStatsConseillerParcoursRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -22,9 +24,30 @@ const getStatsConseillerParcoursRecrutement =
         codePostal,
         codeCommune,
       });
-
       if (statsValidation.error) {
         res.status(400).json({ message: statsValidation.error.message });
+        return;
+      }
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      const conseiller: IConseillers = await app
+        .service(service.conseillers)
+        .Model.findOne({
+          _id: new ObjectId(idConseiller),
+          disponible: true,
+        });
+      if (!conseiller) {
+        res.status(404).json({ message: "Le conseiller n'existe pas" });
+        return;
+      }
+      const structure = await app.service(service.structures).Model.findOne({
+        _id: new ObjectId(req.user.entity.oid),
+        statut: 'VALIDATION_COSELEC',
+      });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
       const query = {
@@ -32,7 +55,7 @@ const getStatsConseillerParcoursRecrutement =
           $gte: dateDebut,
           $lte: dateFin,
         },
-        'conseiller.$id': { $eq: new ObjectId(idConseiller) },
+        'conseiller.$id': { $eq: conseiller._id },
       };
 
       if (codePostal) {
