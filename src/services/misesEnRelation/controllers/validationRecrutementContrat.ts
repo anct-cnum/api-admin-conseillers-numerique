@@ -270,6 +270,20 @@ const validationRecrutementContrat =
         return;
       }
       await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            statut: ['finalisee_rupture', 'terminee', 'nouvelle_rupture'],
+            'conseiller.$id': conseillerUpdated.value?._id,
+          },
+          {
+            $set: {
+              conseillerObj: conseillerUpdated.value,
+            },
+          },
+        );
+      await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
