@@ -2,12 +2,12 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { generateCsvStructureNonInteresser } from '../exports.repository';
+import { generateCsvStructureNonInteresserReconventionnement } from '../exports.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
-const getExportStructureNonInteresserCsv =
+const getExportStructureNonInteresserReconventionnementCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
       const structures: IStructures[] = await app
@@ -18,7 +18,7 @@ const getExportStructureNonInteresserCsv =
             $eq: StatutConventionnement.NON_INTERESSÉ,
           },
         });
-      generateCsvStructureNonInteresser(structures, res);
+      generateCsvStructureNonInteresserReconventionnement(structures, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
@@ -29,4 +29,4 @@ const getExportStructureNonInteresserCsv =
     }
   };
 
-export default getExportStructureNonInteresserCsv;
+export default getExportStructureNonInteresserReconventionnementCsv;

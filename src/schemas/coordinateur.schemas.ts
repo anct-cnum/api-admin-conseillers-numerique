@@ -7,7 +7,9 @@ const validDemandesCoordinateur = Joi.object({
   nomOrdre: Joi.string()
     .required()
     .error(new Error('Le nom du tri est invalide')),
-  search: Joi.string().error(new Error('La recherche par nom est invalide')),
+  search: Joi.string().error(
+    new Error('La recherche par structure est invalide'),
+  ),
   departement: Joi.string().error(
     new Error('Le filtre département est invalide'),
   ),
