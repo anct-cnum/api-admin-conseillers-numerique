@@ -149,6 +149,40 @@ const getConseillersRecruter = (conseillers) => {
   };
 };
 
+const filterAvisPrefet = (avisPrefet) => {
+  if (avisPrefet === undefined) {
+    return {};
+  }
+  if (avisPrefet === 'sans-avis') {
+    return { avisPrefet: { $exists: false } };
+  }
+  return { avisPrefet: { $eq: avisPrefet } };
+};
+
+const filterStatutAndAvisPrefetDemandesCoordinateur = (
+  statutDemande: string,
+  avisPrefet: string,
+) => {
+  if (statutDemande !== 'toutes') {
+    return {
+      demandesCoordinateur: {
+        $elemMatch: {
+          statut: { $eq: statutDemande },
+          ...filterAvisPrefet(avisPrefet),
+        },
+      },
+    };
+  }
+  return {
+    demandesCoordinateur: {
+      $elemMatch: {
+        statut: { $in: ['en_cours', 'refusee', 'validee'] },
+        ...filterAvisPrefet(avisPrefet),
+      },
+    },
+  };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -166,4 +200,5 @@ export {
   getNameStructure,
   getConseillersValider,
   getConseillersRecruter,
+  filterStatutAndAvisPrefetDemandesCoordinateur,
 };

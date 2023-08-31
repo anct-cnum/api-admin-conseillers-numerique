@@ -13,7 +13,7 @@ import {
   getExportCandidatsValideStructureCsv,
   getExportConseillersWithoutCRACsv,
   getExportJeRecruteCsv,
-  getExportRupturesCsv,
+  getExportDemandesRupturesCsv,
   getExportStructuresCsv,
   getExportEmbauchesCsv,
   getExportConseillersHubCsv,
@@ -25,6 +25,7 @@ import {
   getExportHistoriqueDossiersConventionCsv,
   getExportHistoriqueContratsCsv,
   getExportTerritoiresPrefetCsv,
+  getExportStructureNonInteresserReconventionnementCsv,
 } from './controllers';
 
 interface Data {}
@@ -78,10 +79,10 @@ export class Exports implements ServiceMethods<Data> {
       getExportStructuresCsv(app),
     );
     app.get(
-      '/exports/ruptures-csv',
+      '/exports/demandes-ruptures-csv',
       authenticateMode(app),
       createAbilities(app),
-      getExportRupturesCsv(app),
+      getExportDemandesRupturesCsv(app),
     );
     app.get(
       '/exports/cnfs-hub-csv',
@@ -136,6 +137,12 @@ export class Exports implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getExportHistoriqueContratsCsv(app),
+    );
+    app.get(
+      '/exports/structure-non-interesser-reconventionnement-csv',
+      authenticateMode(app),
+      createAbilities(app),
+      getExportStructureNonInteresserReconventionnementCsv(app),
     );
   }
 

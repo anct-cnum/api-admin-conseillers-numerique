@@ -1,4 +1,5 @@
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -263,6 +264,19 @@ const totalContrat = async (app: Application, checkAccess) => {
   };
 };
 
+const countConseillersRecrutees = async (
+  app: Application,
+  req: IRequest,
+  structureId: ObjectId,
+): Promise<Array<object>> =>
+  app
+    .service(service.misesEnRelation)
+    .Model.accessibleBy(req.ability, action.read)
+    .find({
+      'structure.$id': structureId,
+      statut: { $in: ['recrutee', 'finalisee'] },
+    });
+
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
@@ -278,5 +292,6 @@ export {
   filterStatutContratHistorique,
   totalHistoriqueContrat,
   totalContrat,
+  countConseillersRecrutees,
   filtrePiecesManquantes,
 };

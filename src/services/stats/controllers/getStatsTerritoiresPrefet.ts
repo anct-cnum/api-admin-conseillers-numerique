@@ -111,7 +111,7 @@ const getStatsTerritoiresPrefet =
       }
 
       statsTerritoires = await Promise.all(
-        statsTerritoires.map(async (ligneStats) => {
+        statsTerritoires?.map(async (ligneStats) => {
           const item = { ...ligneStats };
           item.personnesAccompagnees = 0;
           item.CRAEnregistres = 0;

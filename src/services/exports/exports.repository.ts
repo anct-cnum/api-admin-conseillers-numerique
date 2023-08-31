@@ -51,19 +51,9 @@ const formatDateWithoutGetTime = (date: Date) => {
 const checkIfCcp1 = (statut) =>
   statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
 
-const conseillerByMisesEnRelation = async (
-  idConseiller: ObjectId,
-  app: Application,
-) => app.service(service.conseillers).Model.findOne({ _id: idConseiller });
-
-const structureByMisesEnRelation = async (
-  idStructure: ObjectId,
-  app: Application,
-) => app.service(service.structures).Model.findOne({ _id: idStructure });
-
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date prévisionnelle de recrutement;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
   );
   try {
     await Promise.all(
@@ -71,34 +61,30 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
           `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
-            miseEnrelation?.dateRecrutement,
-          )};${miseEnrelation.conseiller?.prenom};${
-            miseEnrelation.conseiller?.nom
-          };${
+            miseEnrelation?.dateDebutDeContrat,
+          )};${formatDate(miseEnrelation?.dateFinDeContrat)};${
+            miseEnrelation?.typeDeContrat ?? 'Non renseigné'
+          };${miseEnrelation?.salaire ?? 'Non renseigné'};${miseEnrelation
+            .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.telephone};${
-            miseEnrelation.conseiller?.email
-          };${miseEnrelation.conseiller?.codePostal};${
-            miseEnrelation.conseiller?.nomCommune
-          };${miseEnrelation.conseiller?.codeDepartement};${
+          };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
+            ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
+            .conseiller?.nomCommune};${miseEnrelation.conseiller
+            ?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.structure?.siret};${
-            miseEnrelation.structure?.idPG
-          };${miseEnrelation.structure?.nom};${
-            miseEnrelation.structure?.type
-          };${miseEnrelation.structure?.codePostal};${
-            miseEnrelation.structure?.codeCommune
-          };${miseEnrelation.structure?.codeDepartement};${
-            miseEnrelation.structure?.codeRegion
-          };${miseEnrelation.structure?.contact?.prenom};${
-            miseEnrelation.structure?.contact?.nom
-          };${miseEnrelation.structure?.contact?.telephone};${
-            miseEnrelation.structure?.contact?.email
-          };${miseEnrelation.conseiller?.idPG};${
+          };${miseEnrelation.structure?.siret};${miseEnrelation.structure
+            ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
+            ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
+            .structure?.codeCommune};${miseEnrelation.structure
+            ?.codeDepartement};${miseEnrelation.structure
+            ?.codeRegion};${miseEnrelation.structure?.contact
+            ?.prenom};${miseEnrelation.structure?.contact?.nom};${miseEnrelation
+            .structure?.contact?.telephone};${miseEnrelation.structure?.contact
+            ?.email};${miseEnrelation.conseiller?.idPG};${
             coselec !== null ? coselec?.numero : ''
           };${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
@@ -308,9 +294,8 @@ const generateCsvStructure = async (
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
           };${structure.statut};${structure.codePostal};${
             structure.codeCommune
-          };${structure.codeDepartement};${structure.codeRegion};${
-            structure.contact?.telephone
-          };${structure.contact?.email};${
+          };${structure.codeDepartement};${structure.codeRegion};${structure
+            .contact?.telephone};${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0
@@ -362,33 +347,86 @@ const generateCsvStructure = async (
   }
 };
 
-const generateCsvRupture = async (
+const generateCsvDemandesRuptures = async (
   misesEnRelations: IMisesEnRelation[],
   res: Response,
-  app: Application,
 ) => {
-  res.write(
-    'Prénom;Nom;Email;Id CNFS;Nom Structure;Id Structure;Date rupture;Motif de rupture\n',
-  );
+  const fileHeaders = [
+    'Nom',
+    'Prénom',
+    'Email',
+    'Id CNFS',
+    'Nom de la structure',
+    'Id Structure',
+    'Date de début de contrat',
+    'Date de fin de contrat',
+    'Type de contrat',
+    'Date de rupture',
+    'Motif de rupture',
+  ];
   try {
-    await Promise.all(
-      misesEnRelations.map(async (miseEnrelation) => {
-        const conseiller: IConseillers = await conseillerByMisesEnRelation(
-          miseEnrelation.conseiller.oid,
-          app,
-        );
-        const structure: IStructures = await structureByMisesEnRelation(
-          miseEnrelation.structure.oid,
-          app,
-        );
-        res.write(
-          `${conseiller.prenom};${conseiller.nom};${conseiller.email};${
-            conseiller.idPG
-          };${structure.nom};${structure.idPG};${formatDate(
-            miseEnrelation.dateRupture,
-          )};${miseEnrelation.motifRupture}\n`,
-        );
-      }),
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...misesEnRelations.map((miseEnrelation) =>
+          [
+            miseEnrelation.conseillerObj?.nom,
+            miseEnrelation.conseillerObj?.prenom,
+            miseEnrelation.conseillerObj?.email,
+            miseEnrelation.conseillerObj?.idPG,
+            miseEnrelation.structureObj?.nom,
+            miseEnrelation.structureObj?.idPG,
+            formatDate(miseEnrelation?.dateDebutDeContrat),
+            formatDate(miseEnrelation?.dateFinDeContrat),
+            miseEnrelation?.typeDeContrat ?? 'Non renseigné',
+            formatDate(miseEnrelation?.dateRupture),
+            miseEnrelation?.motifRupture ?? 'Non renseigné',
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
+const generateCsvStructureNonInteresserReconventionnement = async (
+  structures: IStructures[],
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Nom',
+      'Prénom',
+      'Fonction',
+      'Email',
+      'Téléphone',
+      'Siret',
+      'Motif',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...structures.map((structure) =>
+          [
+            structure.idPG,
+            structure.nom,
+            structure.contact?.nom,
+            structure.contact?.prenom,
+            structure.contact?.fonction,
+            structure.contact?.email,
+            structure.contact?.telephone,
+            structure?.siret,
+            structure?.conventionnement?.motif,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
     );
     res.end();
   } catch (error) {
@@ -666,9 +704,10 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Téléphone professionnel',
       'Email personnelle',
       'Statut',
-      'Date de recrutement',
       'Date de début de contrat',
-      'date de fin de contrat',
+      'Date de fin de contrat',
+      'Type de contrat',
+      'Salaire',
       "Date d'entrée en formation",
       'Date de sortie de formation',
       'Disponibilité',
@@ -695,9 +734,10 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               miseEnRelation.statut,
               miseEnRelation?.dossierIncompletRupture,
             ),
-            formatDate(miseEnRelation?.dateRecrutement),
             formatDate(miseEnRelation?.dateDebutDeContrat),
             formatDate(miseEnRelation?.dateFinDeContrat),
+            miseEnRelation?.typeDeContrat ?? 'Non renseigné',
+            miseEnRelation?.salaire ?? 'Non renseigné',
             formatDate(miseEnRelation.conseillerObj?.datePrisePoste),
             formatDate(miseEnRelation.conseillerObj?.dateFinFormation),
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
@@ -818,9 +858,18 @@ const generateCsvHistoriqueDossiersConvention = async (
     const fileHeaders = [
       'Id de la structure',
       'Nom de la structure',
+      'Type de la structure',
+      'Région',
+      'Département',
+      'Statut',
+      'Nombre de postes attribués',
       'Date de la demande',
-      'Nombre de postes',
       'Type de la demande',
+      'Nombre de CNFS souhaités',
+      'Nombre de contrat validés',
+      'Nombre de postes renouvelés',
+      'Date de fin du premier contrat',
+      'État de la demande',
     ];
 
     res.write(
@@ -828,11 +877,20 @@ const generateCsvHistoriqueDossiersConvention = async (
         fileHeaders.join(csvCellSeparator),
         ...structures.map((structure) =>
           [
-            structure?._id,
+            structure?.idPG,
             structure?.nom,
-            formatDate(structure?.dateDeCreation),
+            structure?.type === 'PRIVATE' ? 'privée' : 'publique',
+            structure?.codeRegion,
+            structure?.codeDepartement,
+            structure?.statutStructure,
             structure?.nbPostesAttribuees ?? 'Non renseigné',
+            formatDate(structure?.dateSorted),
             structure?.statut,
+            structure?.nbPostesSouhaites ?? '',
+            structure?.nbContratsValides ?? 'Non renseigné',
+            structure?.nbContratsRenouveles ?? 'Non renseigné',
+            formatDate(structure?.dateFinPremierContrat),
+            structure?.statutDemande,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -852,14 +910,18 @@ const generateCsvHistoriqueContrats = async (
 ) => {
   try {
     const fileHeaders = [
+      'Id du conseiller',
+      'Nom du conseiller',
+      'Prénom du conseiller',
+      'Email du conseiller',
       'Id de la structure',
       'Nom de la structure',
-      'Nom du candidat',
       'Date de la demande',
       'Type de la demande',
+      'Date de début de contrat',
+      'Date de fin de contrat',
       'Type de contrat',
-      'Début de contrat',
-      'Fin de contrat',
+      'Motif de rupture',
     ];
 
     res.write(
@@ -867,14 +929,18 @@ const generateCsvHistoriqueContrats = async (
         fileHeaders.join(csvCellSeparator),
         ...contrats.map((contrat) =>
           [
+            contrat?.conseillerObj?.idPG,
+            contrat?.conseillerObj?.nom,
+            contrat?.conseillerObj?.prenom,
+            contrat?.conseillerObj?.email,
             contrat?.structureObj?.idPG,
             contrat?.structureObj?.nom,
-            `${contrat?.conseillerObj?.prenom} ${contrat?.conseillerObj?.nom}`,
             formatDate(contrat?.dateDeLaDemande),
             contrat?.statut ?? 'Non renseigné',
-            contrat?.typeDeContrat ?? 'Non renseigné',
             formatDate(contrat?.dateDebutDeContrat),
             formatDate(contrat?.dateFinDeContrat),
+            contrat?.typeDeContrat ?? 'Non renseigné',
+            contrat?.motifRupture ?? 'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -893,7 +959,7 @@ export {
   generateCsvCandidatByStructure,
   generateCsvConseillersWithoutCRA,
   generateCsvStructure,
-  generateCsvRupture,
+  generateCsvDemandesRuptures,
   generateCsvConseillersHub,
   generateCsvStatistiques,
   generateCsvTerritoires,
@@ -903,4 +969,5 @@ export {
   generateCsvHistoriqueDossiersConvention,
   generateCsvHistoriqueContrats,
   generateCsvTerritoiresPrefet,
+  generateCsvStructureNonInteresserReconventionnement,
 };

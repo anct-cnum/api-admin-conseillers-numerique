@@ -11,7 +11,7 @@ import {
 import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
-import deleteMailbox from '../../../utils/gandi';
+import { deleteMailbox } from '../../../utils/gandi';
 import deleteAccount from '../../../utils/mattermost';
 import {
   conseillerRupturePix,

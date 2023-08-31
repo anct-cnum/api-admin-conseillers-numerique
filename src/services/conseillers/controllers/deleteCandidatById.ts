@@ -80,38 +80,43 @@ const verificationCandidaturesRecrutee =
     }
   };
 
-const archiverLaSuppression = (app) => async (tableauCandidat, user, motif) => {
-  try {
-    await Promise.all(
-      tableauCandidat.map(async (profil) => {
-        try {
-          // eslint-disable-next-line no-unused-vars
-          const {
-            email,
-            telephone,
-            nom,
-            prenom,
-            emailPro,
-            telephonePro,
-            ...conseiller
-          } = profil;
-          const objAnonyme = {
-            deletedAt: new Date(),
-            motif,
-            conseiller,
-            role: 'admin',
-            userId: user._id,
-          };
-          await app.service(service.conseillersSupprimes).create(objAnonyme);
-        } catch (error) {
-          throw new Error(error);
-        }
-      }),
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
+const archiverLaSuppression =
+  (app) => async (tableauCandidat, user, role, motif) => {
+    try {
+      await Promise.all(
+        tableauCandidat.map(async (profil) => {
+          try {
+            const profilFormat = profil.toObject();
+            const {
+              email,
+              telephone,
+              nom,
+              prenom,
+              emailPro,
+              telephonePro,
+              mailProAModifier,
+              cv,
+              ...conseiller
+            } = profilFormat;
+            const objAnonyme = {
+              deletedAt: new Date(),
+              motif,
+              conseiller,
+              actionUser: {
+                role,
+                userId: user._id,
+              },
+            };
+            await app.service(service.conseillersSupprimes).create(objAnonyme);
+          } catch (error) {
+            throw new Error(error);
+          }
+        }),
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
 
 const suppressionTotalCandidat =
   (app, req, pool) => async (tableauCandidat) => {
@@ -232,7 +237,12 @@ const deleteCandidatById =
         });
         return;
       }
-      await archiverLaSuppression(app)(tableauCandidat, req.user, motif);
+      await archiverLaSuppression(app)(
+        tableauCandidat,
+        req.user,
+        req.query.role,
+        motif,
+      );
       await suppressionTotalCandidat(app, req, pool)(tableauCandidat);
       if (cv?.file && motif !== 'doublon') {
         await suppressionCv(cv, app);

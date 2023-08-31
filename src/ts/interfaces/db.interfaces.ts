@@ -80,9 +80,9 @@ export interface IMisesEnRelation {
 
   statut: string;
 
-  conseillerObj: object;
+  conseillerObj: IConseillers;
 
-  structureObj: object;
+  structureObj: IStructures;
 
   dateRecrutement: Date;
 
@@ -97,6 +97,14 @@ export interface IMisesEnRelation {
   dossierIncompletRupture: boolean | undefined;
 
   reconventionnement: boolean | undefined;
+
+  dateDebutDeContrat: Date | undefined;
+
+  dateFinDeContrat: Date | undefined;
+
+  typeDeContrat: string | undefined;
+
+  salaire: number | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -137,7 +145,7 @@ export interface IConseillers {
 
   location: {
     type: string;
-    coordinates: string;
+    coordinates: number[];
   };
 
   nomCommune: string;
@@ -146,7 +154,11 @@ export interface IConseillers {
 
   codeDepartement: string;
 
+  codeDepartementStructure: string;
+
   codeRegion: string;
+
+  codeRegionStructure: string;
 
   emailConfirmedAt: Date;
 
@@ -183,17 +195,25 @@ export interface IConseillers {
 
   resetPasswordCNError: boolean;
 
+  supHierarchique: {
+    nom: string;
+    prenom: string;
+    numeroTelephone: string;
+    email: string;
+    fonction: string;
+  };
+
   statut: string;
 
   datePrisePoste: Date;
 
   dateFinFormation: Date;
 
-  dateDeNaissance: string;
+  dateDeNaissance: Date;
 
   sexe: string;
 
-  historique: object[];
+  historique?: object[];
 
   cv: {
     file: string;
@@ -205,6 +225,8 @@ export interface IConseillers {
 
   emailPro: string;
 
+  certificationPixFormation: boolean;
+
   groupeCRA: number;
 
   mailProAModifier: string;
@@ -213,9 +235,15 @@ export interface IConseillers {
 
   tokenChangementMailProCreatedAt: Date;
 
+  hasPermanence: boolean;
+
   estCoordinateur: boolean;
 
-  groupeCRAHistorique: object[];
+  coordinateurs?: object[];
+
+  groupeCRAHistorique?: object[];
+
+  ruptures?: object[];
 
   listeSubordonnes: {
     type: string;
@@ -224,7 +252,7 @@ export interface IConseillers {
 
   unsubscribeExtras: object;
 
-  pix: {
+  pix?: {
     partage: boolean;
 
     datePartage: Date;
@@ -265,8 +293,8 @@ export interface IStructures {
   codePostal: string;
 
   location: {
-    structure: string;
-    coordinates: string;
+    type: string;
+    coordinates: number[];
   };
 
   nomCommune: string;
@@ -319,6 +347,7 @@ export interface IStructures {
   reseau: Reseau;
   conventionnement: {
     statut: string;
+    motif: string;
     dossierReconventionnement: {
       numero: number;
       dateDeCreation: Date;
@@ -502,6 +531,7 @@ export interface ICras {
     organisme: string | null;
   };
   conseiller: typeof DBRef;
+  structure: typeof DBRef;
   createdAt: Date;
 }
 
@@ -515,8 +545,8 @@ export interface ConseillersSupprimes {
 
 export interface ConseillersRuptures {
   _id: ObjectId;
-  conseillerId: ObjectId;
-  structureId: ObjectId;
+  conseillerId: Types.ObjectId;
+  structureId: Types.ObjectId;
   dateRupture: Date;
   motifRupture: string;
 }

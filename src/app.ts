@@ -1,3 +1,4 @@
+import path from 'path';
 import compress from 'compression';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -9,7 +10,6 @@ import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import cookieParser from 'cookie-parser';
 import favicon from 'serve-favicon';
-import path from 'path';
 import logger from './logger';
 import services from './services';
 import appHooks from './app.hooks';

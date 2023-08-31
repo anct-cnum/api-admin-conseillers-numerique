@@ -31,6 +31,14 @@ export default function (app: Application): Model<any> {
       structureObj: { type: Object },
 
       reconventionnement: { type: Boolean },
+
+      dateDebutDeContrat: { type: Date },
+
+      dateFinDeContrat: { type: Date },
+
+      typeDeContrat: { type: String },
+
+      salaire: { type: Number },
     },
     {
       strict: false,

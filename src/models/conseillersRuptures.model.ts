@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { Model, Mongoose } from 'mongoose';
 import { Application } from '../declarations';
 import { ConseillersRuptures } from '../ts/interfaces/db.interfaces';
@@ -14,8 +13,8 @@ export default function (app: Application): Model<any> {
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const schema = new mongooseClient.Schema<ConseillersRuptures>(
     {
-      conseillerId: { type: ObjectId },
-      structureId: { type: ObjectId },
+      conseillerId: { type: 'ObjectId' },
+      structureId: { type: 'ObjectId' },
       dateRupture: { type: Date },
       motifRupture: { type: String },
     },

@@ -2,13 +2,13 @@ import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import { Application } from './declarations';
 
+const path = require('path');
+const { promisify } = require('util');
 const lodash = require('lodash');
 const { htmlToText } = require('nodemailer-html-to-text');
 const nodemailer = require('nodemailer');
-const path = require('path');
 const mjml = require('mjml');
 const ejs = require('ejs');
-const { promisify } = require('util');
 const { dayjs } = require('dayjs');
 const Joi = require('joi');
 
@@ -47,6 +47,9 @@ export default function (app: Application) {
   const getEspaceCandidatUrl = (pathUrl: string) =>
     `${app.get('espace_candidat_hostname')}${pathUrl}`;
 
+  const getEspaceCoopUrl = (pathUrl: string) =>
+    `${app.get('espace_coop_hostname')}${pathUrl}`;
+
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
 
   const initSentry = () => {
@@ -75,6 +78,7 @@ export default function (app: Application) {
     getPixContactMail,
     getPixSupportMail,
     getEspaceCandidatUrl,
+    getEspaceCoopUrl,
   };
   return {
     utils,
