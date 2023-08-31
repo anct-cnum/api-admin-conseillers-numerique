@@ -28,10 +28,7 @@ export default function (app: Application): Model<any> {
 
       siteWeb: { type: String },
 
-      location: {
-        type: String,
-        coordinates: Array,
-      },
+      location: { type: Object },
 
       horaires: [Object],
 

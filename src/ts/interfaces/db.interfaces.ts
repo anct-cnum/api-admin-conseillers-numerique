@@ -145,7 +145,7 @@ export interface IConseillers {
 
   location: {
     type: string;
-    coordinates: string;
+    coordinates: number[];
   };
 
   nomCommune: string;
@@ -154,7 +154,11 @@ export interface IConseillers {
 
   codeDepartement: string;
 
+  codeDepartementStructure: string;
+
   codeRegion: string;
+
+  codeRegionStructure: string;
 
   emailConfirmedAt: Date;
 
@@ -191,17 +195,25 @@ export interface IConseillers {
 
   resetPasswordCNError: boolean;
 
+  supHierarchique: {
+    nom: string;
+    prenom: string;
+    numeroTelephone: string;
+    email: string;
+    fonction: string;
+  };
+
   statut: string;
 
   datePrisePoste: Date;
 
   dateFinFormation: Date;
 
-  dateDeNaissance: string;
+  dateDeNaissance: Date;
 
   sexe: string;
 
-  historique: object[];
+  historique?: object[];
 
   cv: {
     file: string;
@@ -213,6 +225,8 @@ export interface IConseillers {
 
   emailPro: string;
 
+  certificationPixFormation: boolean;
+
   groupeCRA: number;
 
   mailProAModifier: string;
@@ -221,9 +235,15 @@ export interface IConseillers {
 
   tokenChangementMailProCreatedAt: Date;
 
+  hasPermanence: boolean;
+
   estCoordinateur: boolean;
 
-  groupeCRAHistorique: object[];
+  coordinateurs?: object[];
+
+  groupeCRAHistorique?: object[];
+
+  ruptures?: object[];
 
   listeSubordonnes: {
     type: string;
@@ -232,7 +252,7 @@ export interface IConseillers {
 
   unsubscribeExtras: object;
 
-  pix: {
+  pix?: {
     partage: boolean;
 
     datePartage: Date;
@@ -273,8 +293,8 @@ export interface IStructures {
   codePostal: string;
 
   location: {
-    structure: string;
-    coordinates: string;
+    type: string;
+    coordinates: number[];
   };
 
   nomCommune: string;
@@ -511,6 +531,7 @@ export interface ICras {
     organisme: string | null;
   };
   conseiller: typeof DBRef;
+  structure: typeof DBRef;
   createdAt: Date;
 }
 
