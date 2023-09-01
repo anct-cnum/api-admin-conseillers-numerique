@@ -364,6 +364,7 @@ export interface IStructures {
     };
   };
   demandesCoselec: IDemandesCoselec[];
+  demandesCoordinateur: IDemandesCoordinateur[];
 }
 
 interface IDemandesCoselec {
@@ -378,6 +379,18 @@ interface IDemandesCoselec {
   };
   banniereValidationAvenant: boolean;
 }
+
+interface IDemandesCoordinateur {
+  id: ObjectId;
+  statut: string;
+  avisPrefet?: string;
+  dossier: {
+    numero: number;
+    dateDeCreation: Date;
+    dateDerniereModification: Date;
+  };
+}
+
 interface Iinsee {
   siret: string;
   siege_social: boolean;

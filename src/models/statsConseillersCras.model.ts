@@ -6,33 +6,19 @@ import { IStatsConseillersCras } from '../ts/interfaces/db.interfaces';
 export default function (app: Application): Model<any> {
   const modelName = 'statsConseillersCras';
   const mongooseClient: Mongoose = app.get('mongooseClient');
-  const schema = new mongooseClient.Schema<IStatsConseillersCras>(
+  const { Schema } = mongooseClient;
+  const anneeSchema = new Schema({
+    mois: Number,
+    totalCras: Number,
+  });
+
+  const schema = new Schema<IStatsConseillersCras>(
     {
       conseiller: [ObjectId],
-      2021: [
-        {
-          mois: { type: Number },
-          totalCras: { type: Number },
-        },
-      ],
-      2022: [
-        {
-          mois: { type: Number },
-          totalCras: { type: Number },
-        },
-      ],
-      2023: [
-        {
-          mois: { type: Number },
-          totalCras: { type: Number },
-        },
-      ],
-      2024: [
-        {
-          mois: { type: Number },
-          totalCras: { type: Number },
-        },
-      ],
+      2021: { type: [anneeSchema], default: undefined },
+      2022: { type: [anneeSchema], default: undefined },
+      2023: { type: [anneeSchema], default: undefined },
+      2024: { type: [anneeSchema], default: undefined },
     },
     { strict: false, collection: 'stats_conseillers_cras' },
   );

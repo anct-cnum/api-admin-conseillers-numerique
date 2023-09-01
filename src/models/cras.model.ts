@@ -11,10 +11,60 @@ const loaded = dbref.install(mongoose);
 export default function (app: Application): Model<any> {
   const modelName = 'cras';
   const mongooseClient: Mongoose = app.get('mongooseClient');
+  const { Schema } = mongooseClient;
   const { DBRef } = mongoose.SchemaTypes;
-  const schema = new mongooseClient.Schema<ICras>(
+
+  const ageSchema = new Schema(
     {
-      cra: { type: Object },
+      moins12ans: Number,
+      de12a18ans: Number,
+      de18a35ans: Number,
+      de35a60ans: Number,
+      plus60ans: Number,
+    },
+    { _id: false },
+  );
+
+  const statutSchema = new Schema(
+    {
+      etudiant: Number,
+      sansEmploi: Number,
+      enEmploi: Number,
+      retraite: Number,
+      heterogene: Number,
+    },
+    { _id: false },
+  );
+
+  const accompagnementSchema = new Schema(
+    {
+      individuel: Number,
+      atelier: Number,
+      redirection: Number,
+    },
+    { _id: false },
+  );
+
+  const craSchema = new Schema(
+    {
+      canal: String,
+      activite: String,
+      nbParticipants: Number,
+      age: { type: ageSchema },
+      statut: { type: statutSchema },
+      themes: { type: [String] },
+      duree: String,
+      accompagnement: { type: accompagnementSchema },
+      codePostal: String,
+      nomCommune: String,
+      dateAccompagnement: Date,
+      organisme: { type: String, default: null },
+    },
+    { _id: false },
+  );
+  const schema = new Schema<ICras>(
+    {
+      cra: { type: craSchema },
 
       conseiller: { type: DBRef },
 
