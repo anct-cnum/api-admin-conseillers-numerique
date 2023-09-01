@@ -119,7 +119,7 @@ const getCandidatsStructureAvecFiltre =
 
 const getCandidatsStructure =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const structureId = req.params.id;
+    const structureId = req.user?.entity?.oid;
     if (!ObjectId.isValid(structureId)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
