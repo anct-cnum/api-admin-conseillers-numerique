@@ -189,7 +189,8 @@ const filterStatutContratHistorique = (statut: string) => {
 };
 
 const totalHistoriqueContrat = async (app: Application, checkAccess) => {
-  const contrat = await app.service(service.misesEnRelation).Model.aggregate([
+  let contrat: any = [];
+  contrat = await app.service(service.misesEnRelation).Model.aggregate([
     {
       $match: {
         $and: [checkAccess],
@@ -224,8 +225,18 @@ const totalHistoriqueContrat = async (app: Application, checkAccess) => {
     }
     return item;
   });
-  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
+  contrat = contrat.reduce((acc, obj) => {
+    const existingObj = acc.find((item) => item.statut === obj.statut);
 
+    if (existingObj) {
+      existingObj.count += obj.count;
+    } else {
+      acc.push({ ...obj });
+    }
+
+    return acc;
+  }, []);
+  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
   return {
     contrat,
     total,
