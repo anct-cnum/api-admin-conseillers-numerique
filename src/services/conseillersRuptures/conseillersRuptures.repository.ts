@@ -1,16 +1,30 @@
 /* eslint-disable prettier/prettier */
 import dayjs from 'dayjs';
 import { Response } from 'express';
+import { Application } from '@feathersjs/express';
+import { formatDateGMT } from '../../utils';
+import { IRequest } from '../../ts/interfaces/global.interfaces';
+import service from '../../helpers/services';
+import { action } from '../../helpers/accessControl/accessList';
 
 const formatDate = (date: Date) => {
   if (date !== undefined && date !== null) {
-    return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+    return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
 };
 
 const csvCellSeparator = ';';
 const csvLineSeparator = '\n';
+
+const checkAccessReadRequestConseillersRuptures = async (
+  app: Application,
+  req: IRequest,
+) =>
+  app
+    .service(service.conseillersRuptures)
+    .Model.accessibleBy(req.ability, action.read)
+    .getQuery();
 
 const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
   const fileHeaders = [
@@ -25,7 +39,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
     'Type de contrat',
     'Date de rupture',
     'Motif de rupture',
-    'Commentaire'
+    'Commentaire',
   ];
   try {
     res.write(
@@ -44,7 +58,9 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
             rupture?.miseEnRelation?.typeDeContrat ?? 'Non renseigné',
             formatDate(rupture?.dateRupture),
             rupture?.motifRupture ?? 'Non renseigné',
-            rupture.conseillerSupprime?.conseiller?.idPG ? "Ce conseiller s'est désinscrit totalement du dispositif" : ''
+            rupture.conseillerSupprime?.conseiller?.idPG
+              ? "Ce conseiller s'est désinscrit totalement du dispositif"
+              : '',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -58,5 +74,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
   }
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { generateCsvHistoriqueRuptures };
+export {
+  generateCsvHistoriqueRuptures,
+  checkAccessReadRequestConseillersRuptures,
+};

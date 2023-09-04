@@ -11,26 +11,76 @@ const checkAccessRequestCras = async (app: Application, req: IRequest) =>
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const getConseillersIdsByStructure = async (
-  idStructure: ObjectId,
+const getConseillersIdsRecruterByStructure = async (
   app: Application,
+  req: IRequest,
+  idStructure: ObjectId,
 ) => {
-  const miseEnRelations = await app.service(service.misesEnRelation).Model.find(
-    {
-      'structure.$id': idStructure,
-      statut: { $in: ['finalisee', 'finalisee_rupture', 'nouvelle_rupture'] },
-    },
-    {
-      'conseillerObj._id': 1,
-      _id: 0,
-    },
-  );
+  const miseEnRelations = await app
+    .service(service.misesEnRelation)
+    .Model.accessibleBy(req.ability, action.read)
+    .find(
+      {
+        'structure.$id': idStructure,
+        statut: { $in: ['finalisee', 'nouvelle_rupture'] },
+      },
+      {
+        'conseillerObj._id': 1,
+        _id: 0,
+      },
+    );
   const conseillerIds = [];
   miseEnRelations.forEach((miseEnRelation) => {
     conseillerIds.push(miseEnRelation?.conseillerObj._id);
   });
   return conseillerIds;
 };
+
+const getConseillersIdsRuptureByStructure = async (
+  app: Application,
+  checkAccessConseillerRupture,
+  idStructure: ObjectId,
+) =>
+  app.service(service.conseillersRuptures).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccessConseillerRupture],
+        structureId: idStructure,
+      },
+    },
+    {
+      $lookup: {
+        localField: 'conseillerId',
+        from: 'conseillers',
+        foreignField: '_id',
+        as: 'conseiller',
+      },
+    },
+    {
+      $lookup: {
+        localField: 'conseillerId',
+        from: 'conseillersSupprimes',
+        foreignField: 'conseiller._id',
+        as: 'conseillerSupprime',
+      },
+    },
+    {
+      $addFields: {
+        mergedObject: {
+          $mergeObjects: [
+            {},
+            { $arrayElemAt: ['$conseiller', 0] },
+            { $arrayElemAt: ['$conseillerSupprime.conseiller', 0] },
+          ],
+        },
+      },
+    },
+    {
+      $project: {
+        _id: '$mergedObject._id',
+      },
+    },
+  ]);
 
 const getNombreCras =
   (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
@@ -144,7 +194,8 @@ const createArrayForFiltreCodePostaux = (
 
 export {
   checkAccessRequestCras,
-  getConseillersIdsByStructure,
+  getConseillersIdsRecruterByStructure,
+  getConseillersIdsRuptureByStructure,
   getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
