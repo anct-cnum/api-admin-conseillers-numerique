@@ -19,7 +19,7 @@ const getStructuresMisesEnRelationsStats =
                   'non_disponible',
                   'finalisee_non_disponible',
                   'terminee',
-                  'renouvellement_intiee',
+                  'renouvellement_initiee',
                 ],
               },
             },
