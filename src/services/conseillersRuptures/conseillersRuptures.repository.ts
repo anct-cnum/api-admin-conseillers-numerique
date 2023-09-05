@@ -61,6 +61,5 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
   }
 };
 
-export {
-  generateCsvHistoriqueRuptures,
-};
+// eslint-disable-next-line import/prefer-default-export
+export { generateCsvHistoriqueRuptures };
