@@ -12,9 +12,9 @@ const getStatsConseillerParcoursRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
       const idConseiller = String(req.query?.idConseiller);
-      const dateDebut = new Date(req.query.dateDebut);
+      const dateDebut = new Date(req.query?.dateDebut);
       dateDebut.setUTCHours(0, 0, 0, 0);
-      const dateFin = new Date(req.query.dateFin);
+      const dateFin = new Date(req.query?.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
       const { codePostal, codeCommune } = req.query;
       const statsValidation = validStatConseiller.validate({
@@ -39,11 +39,13 @@ const getStatsConseillerParcoursRecrutement =
           disponible: true,
         });
       if (!conseiller) {
-        res.status(404).json({ message: "Le conseiller n'existe pas" });
+        res.status(404).json({
+          message: "Le conseiller n'existe pas ou il est non disponible",
+        });
         return;
       }
       const structure = await app.service(service.structures).Model.findOne({
-        _id: new ObjectId(req.user.entity.oid),
+        _id: new ObjectId(req.user?.entity?.oid),
         statut: 'VALIDATION_COSELEC',
       });
       if (!structure) {
