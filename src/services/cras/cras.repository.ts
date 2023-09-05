@@ -38,49 +38,27 @@ const getConseillersIdsRecruterByStructure = async (
 
 const getConseillersIdsRuptureByStructure = async (
   app: Application,
-  checkAccessConseillerRupture,
+  req: IRequest,
   idStructure: ObjectId,
-) =>
-  app.service(service.conseillersRuptures).Model.aggregate([
-    {
-      $match: {
-        $and: [checkAccessConseillerRupture],
+) => {
+  const conseillersRuptures = await app
+    .service(service.conseillersRuptures)
+    .Model.accessibleBy(req.ability, action.read)
+    .find(
+      {
         structureId: idStructure,
       },
-    },
-    {
-      $lookup: {
-        localField: 'conseillerId',
-        from: 'conseillers',
-        foreignField: '_id',
-        as: 'conseiller',
+      {
+        conseillerId: 1,
+        _id: 0,
       },
-    },
-    {
-      $lookup: {
-        localField: 'conseillerId',
-        from: 'conseillersSupprimes',
-        foreignField: 'conseiller._id',
-        as: 'conseillerSupprime',
-      },
-    },
-    {
-      $addFields: {
-        mergedObject: {
-          $mergeObjects: [
-            {},
-            { $arrayElemAt: ['$conseiller', 0] },
-            { $arrayElemAt: ['$conseillerSupprime.conseiller', 0] },
-          ],
-        },
-      },
-    },
-    {
-      $project: {
-        _id: '$mergedObject._id',
-      },
-    },
-  ]);
+    );
+  const conseillerIds = [];
+  conseillersRuptures.forEach((conseillerRupture) => {
+    conseillerIds.push(conseillerRupture?.conseillerId);
+  });
+  return conseillerIds;
+};
 
 const getNombreCras =
   (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>

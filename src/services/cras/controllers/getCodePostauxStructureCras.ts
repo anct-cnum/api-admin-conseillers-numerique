@@ -10,7 +10,6 @@ import {
   createArrayForFiltreCodePostaux,
   getConseillersIdsRuptureByStructure,
 } from '../cras.repository';
-import { checkAccessReadRequestConseillersRuptures } from '../../conseillersRuptures/conseillersRuptures.repository';
 
 const getCodePostauxStructureCras =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -22,15 +21,13 @@ const getCodePostauxStructureCras =
         req,
         idStructure,
       );
-      const checkAccessConseillerRupture =
-        await checkAccessReadRequestConseillersRuptures(app, req);
       const conseillersIdsRupture = await getConseillersIdsRuptureByStructure(
         app,
-        checkAccessConseillerRupture,
+        req,
         idStructure,
       );
       const conseillersIds = conseillersIdsRecruter.concat(
-        conseillersIdsRupture.map((conseillerRupture) => conseillerRupture._id),
+        conseillersIdsRupture,
       );
       const checkAccess = checkAccessRequestCras(app, req);
       const listCodePostaux = await getCodesPostauxStatistiquesCras(
