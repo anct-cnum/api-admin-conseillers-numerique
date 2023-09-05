@@ -192,22 +192,6 @@ const updateConseillerRupture =
           },
           { returnOriginal: false },
         );
-      // Mise à jour des autres mises en relation en candidature nouvelle
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'conseiller.$id': conseiller._id,
-            statut: 'finalisee_non_disponible',
-          },
-          {
-            $set: {
-              statut: 'nouvelle',
-              conseillerObj: conseillerUpdated,
-            },
-          },
-        );
 
       // Modification des doublons potentiels
       await app
@@ -221,22 +205,6 @@ const updateConseillerRupture =
           {
             $set: {
               disponible: true,
-            },
-          },
-        );
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'conseiller.$id': { $ne: conseiller._id },
-            statut: 'finalisee_non_disponible',
-            'conseillerObj.email': conseiller.email,
-          },
-          {
-            $set: {
-              statut: 'nouvelle',
-              'conseillerObj.disponible': true,
             },
           },
         );

@@ -140,12 +140,7 @@ const filterStatut = (statut: string) => {
   }
   return {
     statut: {
-      $nin: [
-        'finalisee_non_disponible',
-        'non_disponible',
-        'renouvellement_initiee',
-        'terminee',
-      ],
+      $nin: ['renouvellement_initiee', 'terminee'],
     },
   };
 };
