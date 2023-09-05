@@ -7,10 +7,13 @@ export default function (app: Application): Model<any> {
   const modelName = 'statsConseillersCras';
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const anneeSchema = new Schema({
-    mois: Number,
-    totalCras: Number,
-  });
+  const anneeSchema = new Schema(
+    {
+      mois: Number,
+      totalCras: Number,
+    },
+    { _id: false, strict: false },
+  );
 
   const schema = new Schema<IStatsConseillersCras>(
     {

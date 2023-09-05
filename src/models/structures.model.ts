@@ -21,7 +21,7 @@ export default function (app: Application): Model<any> {
       email: String,
       telephone: String,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const conventionnementSchema = new Schema(
@@ -31,7 +31,7 @@ export default function (app: Application): Model<any> {
       dossierReconventionnement: Object,
       motif: String,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const demandeCoselecSchema = new Schema(
@@ -47,7 +47,7 @@ export default function (app: Application): Model<any> {
       nombreDePostesAccordes: Number,
       nombreDePostesRendus: Number,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const demandeCoordinateurSchema = new Schema(
@@ -57,7 +57,7 @@ export default function (app: Application): Model<any> {
       avisPrefet: String,
       statut: String,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const schema = new Schema<IStructures>(

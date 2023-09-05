@@ -22,7 +22,7 @@ export default function (app: Application): Model<any> {
       de35a60ans: Number,
       plus60ans: Number,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const statutSchema = new Schema(
@@ -33,7 +33,7 @@ export default function (app: Application): Model<any> {
       retraite: Number,
       heterogene: Number,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const accompagnementSchema = new Schema(
@@ -42,7 +42,7 @@ export default function (app: Application): Model<any> {
       atelier: Number,
       redirection: Number,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const craSchema = new Schema(
@@ -60,7 +60,7 @@ export default function (app: Application): Model<any> {
       dateAccompagnement: Date,
       organisme: { type: String, default: null },
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
   const schema = new Schema<ICras>(
     {

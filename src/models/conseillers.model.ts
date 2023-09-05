@@ -16,7 +16,7 @@ export default function (app: Application): Model<any> {
       competence2: Boolean,
       competence3: Boolean,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const cvSchema = new Schema(
@@ -25,7 +25,7 @@ export default function (app: Application): Model<any> {
       extension: String,
       date: Date,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const mattermostSchema = new Schema(
@@ -36,7 +36,7 @@ export default function (app: Application): Model<any> {
       hubJoined: Boolean,
       errorResetPassword: Boolean,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const supHierarchiqueSchema = new Schema(
@@ -47,7 +47,7 @@ export default function (app: Application): Model<any> {
       numeroTelephone: String,
       fonction: String,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const locationSchema = new Schema(
@@ -55,7 +55,7 @@ export default function (app: Application): Model<any> {
       type: String,
       coordinates: [Number],
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const groupeCRAHistoriqueSchema = new Schema(
@@ -64,7 +64,7 @@ export default function (app: Application): Model<any> {
       dateDeChangement: Date,
       nbJourDansGroupe: Number,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const coordinateurSchema = new Schema(
@@ -73,7 +73,7 @@ export default function (app: Application): Model<any> {
       nom: String,
       prenom: String,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const ruptureSchema = new Schema(
@@ -82,7 +82,7 @@ export default function (app: Application): Model<any> {
       dateRupture: Date,
       motifRupture: String,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const historiqueSchema = new Schema(
@@ -90,7 +90,7 @@ export default function (app: Application): Model<any> {
       data: Object,
       date: Date,
     },
-    { _id: false },
+    { _id: false, strict: false },
   );
 
   const schema = new Schema<IConseillers>(
