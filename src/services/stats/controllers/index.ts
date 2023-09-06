@@ -7,6 +7,7 @@ import getStatsTerritoireCra from './getStatsTerritoireCra';
 import getStatsConseiller from './getStatsConseiller';
 import getStatsNationalesGrandReseau from './getStatsNationalesGrandReseau';
 import getStatsTerritoiresPrefet from './getStatsTerritoiresPrefet';
+import getStatsConseillerParcoursRecrutement from './getStatsConseillerParcoursRecrutement';
 
 export {
   getStatsNationales,
@@ -15,6 +16,7 @@ export {
   getStatsTerritoireCra,
   getStatsStructure,
   getStatsConseiller,
+  getStatsConseillerParcoursRecrutement,
   getDatasStructures,
   getStatsNationalesGrandReseau,
   getStatsTerritoiresPrefet,
