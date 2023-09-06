@@ -31,7 +31,7 @@ export default class Conseillers extends Service {
       getCandidats(app, options),
     );
     app.get(
-      '/candidats/structure/:id',
+      '/candidats/structure',
       authenticateMode(app),
       createAbilities(app),
       getCandidatsStructure(app, options),
