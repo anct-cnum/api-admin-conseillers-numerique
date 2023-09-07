@@ -48,30 +48,38 @@ execute(__filename, async ({ app, logger, exit }) => {
             `${structure.idPG};${structure.nom};${structure?.contact?.telephone};${structure?.contact?.email};${misesEnRelation.length};${coselec?.nombreConseillersCoselec}\n`,
           );
           if (fixQuota) {
-            const misesEnRelationUpdated = misesEnRelation.filter(
-              (miseEnRelation) => miseEnRelation.statut === 'recrutee',
-            );
-            await app.service(service.misesEnRelation).Model.updateMany(
-              {
-                _id: {
-                  $in: misesEnRelationUpdated.map(
-                    (miseEnRelation) => miseEnRelation._id,
-                  ),
+            const quota =
+              coselec.nombreConseillersCoselec - misesEnRelation.length;
+            const misesEnRelationUpdated = misesEnRelation
+              .filter((miseEnRelation) => miseEnRelation.statut === 'recrutee')
+              .slice(quota);
+            if (misesEnRelationUpdated.length === 0) {
+              logger.warn(
+                `Structure ${structure.nom} [${structure.idPG}] a des conseillers finalisee supplémentaires`,
+              );
+            } else {
+              await app.service(service.misesEnRelation).Model.updateMany(
+                {
+                  _id: {
+                    $in: misesEnRelationUpdated.map(
+                      (miseEnRelation) => miseEnRelation._id,
+                    ),
+                  },
                 },
-              },
-              {
-                $set: {
-                  statut: 'interessee',
+                {
+                  $set: {
+                    statut: 'interessee',
+                  },
+                  $unset: {
+                    emetteurRecrutement: '',
+                    dateRecrutement: '',
+                    typeDeContrat: '',
+                    dateDebutDeContrat: '',
+                    dateFinDeContrat: '',
+                  },
                 },
-                $unset: {
-                  emetteurRecrutement: '',
-                  dateRecrutement: '',
-                  typeDeContrat: '',
-                  dateDebutDeContrat: '',
-                  dateFinDeContrat: '',
-                },
-              },
-            );
+              );
+            }
           }
         }
         resolve(p);
@@ -79,7 +87,6 @@ execute(__filename, async ({ app, logger, exit }) => {
       promises.push(p);
     });
     await Promise.allSettled(promises);
-    exit(0, 'Migration terminée');
   } catch (e) {
     logger.error(e);
   }
