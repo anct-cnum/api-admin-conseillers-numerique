@@ -81,7 +81,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       });
       promises.push(p);
     });
-    await Promise.all(promises);
+    await Promise.allSettled(promises);
     exit(0, 'Migration terminée');
   } catch (e) {
     logger.error(e);
