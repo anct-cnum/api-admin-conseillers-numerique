@@ -156,12 +156,25 @@ const getDetailStructureById =
         typeStructure?.type,
         demarcheSimplifiee,
       );
-      structure[0].urlDossierReconventionnement =
-        getUrlDossierReconventionnement(
+      if (structure[0]?.conventionnement?.dossierConventionnement) {
+        structure[0].urlDossierConventionnement = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
+      } else {
+        structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
           structure[0].idPG,
           typeStructure?.type,
           demarcheSimplifiee,
         );
+      }
+      if (structure[0]?.conventionnement?.dossierReconventionnement) {
+        structure[0].urlDossierReconventionnement = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}`;
+      } else {
+        structure[0].urlDossierReconventionnement =
+          getUrlDossierReconventionnement(
+            structure[0].idPG,
+            typeStructure?.type,
+            demarcheSimplifiee,
+          );
+      }
       if (
         structure[0]?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
