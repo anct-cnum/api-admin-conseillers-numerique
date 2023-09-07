@@ -32,7 +32,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     );
     await structures.forEach(async (structure) => {
       // eslint-disable-next-line no-async-promise-executor
-      const p = new Promise<void>(async (resolve, reject) => {
+      const p = new Promise<void>(async (resolve) => {
         const coselec = getCoselec(structure);
         const misesEnRelation = await app
           .service(service.misesEnRelation)
@@ -40,9 +40,6 @@ execute(__filename, async ({ app, logger, exit }) => {
             'structure.$id': structure._id,
             statut: { $in: ['recrutee', 'finalisee'] },
           });
-        if (!misesEnRelation) {
-          reject();
-        }
         if (
           coselec?.nombreConseillersCoselec < misesEnRelation.length &&
           coselec?.nombreConseillersCoselec > 0
