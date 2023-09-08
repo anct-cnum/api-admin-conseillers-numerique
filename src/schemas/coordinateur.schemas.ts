@@ -19,4 +19,12 @@ const validDemandesCoordinateur = Joi.object({
   ),
 });
 
-export default validDemandesCoordinateur;
+const demandeCoordinateurAvisPrefet = Joi.object({
+  idDemandeCoordinateur: Joi.string()
+    .required()
+    .error(new Error("L'id de la demande est invalide")),
+  avisPrefet: Joi.string().required().error(new Error('L avis est invalide')),
+  commentaire: Joi.string().error(new Error('Le commentaire est invalide')),
+});
+
+export { validDemandesCoordinateur, demandeCoordinateurAvisPrefet };

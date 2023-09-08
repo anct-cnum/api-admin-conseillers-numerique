@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import validDemandesCoordinateur from '../../../schemas/coordinateur.schemas';
+import { validDemandesCoordinateur } from '../../../schemas/coordinateur.schemas';
 import {
   checkAccessReadRequestStructures,
   filterSearchBar,
