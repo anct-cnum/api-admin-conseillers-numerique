@@ -18,6 +18,14 @@ const updateEmailStructure =
     const idUser = req.user?._id;
     const pool = new Pool();
 
+    if (!idStructure || idStructure === 'undefined') {
+      res.status(400).json({
+        message:
+          'Une erreur est survenue, veuillez recharger la page puis réessayez',
+      });
+      return;
+    }
+
     const { email } = req.body;
     const emailValidation = updateEmail.validate(email);
 
