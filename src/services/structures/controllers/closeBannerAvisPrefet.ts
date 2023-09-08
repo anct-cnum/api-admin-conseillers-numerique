@@ -35,28 +35,25 @@ const closeBannerAvisPrefet =
         res.status(400).json({ message: "La bannière n'a pas pu être fermée" });
         return;
       }
-      // await app
-      //   .service(service.misesEnRelation)
-      //   .Model.accessibleBy(req.ability, action.update)
-      //   .updateMany(
-      //     {
-      //       'structure.$id': new ObjectId(idStructure),
-      //       'structureObj.statut': 'VALIDATION_COSELEC',
-      //       'structureObj.demandesCoordinateur': {
-      //         $elemMatch: {
-      //           id: { $eq: new ObjectId(idDemandeCoordinateur) },
-      //         },
-      //       },
-      //     },
-      //     {
-      //       $set: {
-      //         'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
-      //         'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-      //           true,
-      //         'structureObj.demandesCoordinateur.$.commentaire': commentaire,
-      //       },
-      //     },
-      //   );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structureObj.statut': 'VALIDATION_COSELEC',
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+              },
+            },
+          },
+          {
+            $set: {
+              'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
+                false,
+            },
+          },
+        );
       res.status(200).json({ idDemandeCoordinateur });
     } catch (error) {
       if (error.name === 'ForbiddenError') {

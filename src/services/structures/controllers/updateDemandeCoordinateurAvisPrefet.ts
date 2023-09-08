@@ -50,28 +50,28 @@ const updateDemandeCoordinateurAvisPrefet =
         res.status(400).json({ message: 'Avis préfet non enregistré' });
         return;
       }
-      // await app
-      //   .service(service.misesEnRelation)
-      //   .Model.accessibleBy(req.ability, action.update)
-      //   .updateMany(
-      //     {
-      //       'structure.$id': new ObjectId(idStructure),
-      //       'structureObj.statut': 'VALIDATION_COSELEC',
-      //       'structureObj.demandesCoordinateur': {
-      //         $elemMatch: {
-      //           id: { $eq: new ObjectId(idDemandeCoordinateur) },
-      //         },
-      //       },
-      //     },
-      //     {
-      //       $set: {
-      //         'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
-      //         'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-      //           true,
-      //         'structureObj.demandesCoordinateur.$.commentaire': commentaire,
-      //       },
-      //     },
-      //   );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': new ObjectId(idStructure),
+            'structureObj.statut': 'VALIDATION_COSELEC',
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+              },
+            },
+          },
+          {
+            $set: {
+              'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
+              'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
+                true,
+              'structureObj.demandesCoordinateur.$.commentaire': commentaire,
+            },
+          },
+        );
       res.status(200).json({ success: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
