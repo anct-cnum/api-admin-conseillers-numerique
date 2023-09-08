@@ -170,6 +170,14 @@ const updateConseillerRupture =
           },
         );
 
+      await app
+        .service(service.cras)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          { 'conseiller.$id': conseiller._id },
+          { $unset: { permanence: '' } },
+        );
+
       const miseEnRelationUpdated: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
