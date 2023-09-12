@@ -69,7 +69,7 @@ const conseillerRecruteReinscription =
           {
             $set: {
               'conseillerObj.userCreated': false,
-              updatedAt,
+              'conseillerObj.updatedAt': updatedAt,
             },
           },
         );
@@ -193,7 +193,6 @@ const updateConseillerRupture =
           {
             $set: {
               statut: 'finalisee_rupture',
-              updatedAt,
               dateRupture: new Date(dateFinDeContrat),
               conseillerObj: conseillerUpdated,
               validateurRupture: { email: req.user?.name, date: new Date() },
