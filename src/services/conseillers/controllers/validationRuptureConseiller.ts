@@ -57,7 +57,6 @@ const conseillerRecruteReinscription =
           {
             $set: {
               userCreated: false,
-              updatedAt,
             },
           },
         );
