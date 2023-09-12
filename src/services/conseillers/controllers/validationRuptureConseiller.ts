@@ -1,6 +1,7 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
+import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   IConseillers,
@@ -21,14 +22,19 @@ import {
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 
-const updateConseillersPG = (pool) => async (email, disponible) => {
+const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
   try {
     await pool.query(
       `
       UPDATE djapp_coach
-      SET disponible = $2
+      SET (
+        disponible,
+        updated
+      )
+      =
+      ($2,$3)
       WHERE LOWER(email) = LOWER($1)`,
-      [email, disponible],
+      [email, disponible, datePG],
     );
   } catch (error) {
     throw new Error(error);
@@ -36,7 +42,8 @@ const updateConseillersPG = (pool) => async (email, disponible) => {
 };
 
 const conseillerRecruteReinscription =
-  (app, req) => async (idUser: ObjectId, idConseiller: ObjectId) => {
+  (app, req) =>
+  async (idUser: ObjectId, idConseiller: ObjectId, updatedAt: Date) => {
     try {
       await app
         .service(service.users)
@@ -50,6 +57,7 @@ const conseillerRecruteReinscription =
           {
             $set: {
               userCreated: false,
+              updatedAt,
             },
           },
         );
@@ -61,6 +69,7 @@ const conseillerRecruteReinscription =
           {
             $set: {
               'conseillerObj.userCreated': false,
+              updatedAt,
             },
           },
         );
@@ -75,6 +84,7 @@ const updateConseillerRupture =
     conseiller: IConseillers,
     miseEnRelation: IMisesEnRelation,
     dateFinDeContrat: Date,
+    updatedAt: Date,
   ) => {
     try {
       const objAnonyme = {
@@ -95,6 +105,7 @@ const updateConseillerRupture =
             $set: {
               disponible: true,
               statut: 'RUPTURE',
+              updatedAt,
             },
             $push: {
               ruptures: {
@@ -182,6 +193,7 @@ const updateConseillerRupture =
           {
             $set: {
               statut: 'finalisee_rupture',
+              updatedAt,
               dateRupture: new Date(dateFinDeContrat),
               conseillerObj: conseillerUpdated,
               validateurRupture: { email: req.user?.name, date: new Date() },
@@ -205,6 +217,7 @@ const updateConseillerRupture =
           {
             $set: {
               disponible: true,
+              updatedAt,
             },
           },
         );
@@ -294,11 +307,14 @@ const validationRuptureConseiller =
         });
         return;
       }
-      await updateConseillersPG(pool)(conseiller.email, true);
+      const updatedAt = new Date();
+      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
+      await updateConseillersPG(pool)(conseiller.email, true, datePG);
       const miseEnRelationUpdated = await updateConseillerRupture(app, req)(
         conseiller,
         miseEnRelation,
         dateFinDeContrat,
+        updatedAt,
       );
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
@@ -312,6 +328,7 @@ const validationRuptureConseiller =
         await conseillerRecruteReinscription(app, req)(
           userCoop._id,
           conseiller._id,
+          updatedAt,
         );
       }
       // Suppression compte Gandi
