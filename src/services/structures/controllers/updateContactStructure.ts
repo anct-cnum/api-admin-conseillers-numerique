@@ -17,7 +17,7 @@ const updateContactStructure =
     const update = { contact: req.body.contact };
     const pool = new Pool();
 
-    if (!idStructure || idStructure === 'undefined') {
+    if (!ObjectId.isValid(idStructure)) {
       res.status(400).json({
         message:
           'Une erreur est survenue, veuillez recharger la page puis réessayez',
