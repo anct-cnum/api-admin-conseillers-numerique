@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
+// ts-node src/tools/scripts/conseillerRecruterPhase2.ts -c XXX -s XXX -p X
+
 import { program } from 'commander';
 import { ObjectId } from 'mongodb';
 import execute from '../utils';
 import service from '../../helpers/services';
-import { PhaseConventionnement } from '../../ts/enum';
+import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 
 program.option('-c, --conseillerId <conseillerId>', 'id conseiller');
 program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-p, --phase <phase>', 'phase 1 ou 2');
 program.parse(process.argv);
-
-// ts-node src/tools/scripts/conseillerRecruterPhase2.ts -c XXX -s XXX -p X
 
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
@@ -31,7 +31,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   if (options.phase === '2') {
     queryUpdate = {
       $set: {
-        phaseConventionnement: PhaseConventionnement[`PHASE_${options.phase}`],
+        phaseConventionnement: PhaseConventionnement.PHASE_2,
       },
     };
   } else if (options.phase === '1') {
@@ -51,9 +51,12 @@ execute(__filename, async ({ app, logger, exit }) => {
   const structure = await app
     .service(service.structures)
     .Model.findOne({ _id: structureId });
-  if (structure?.conventionnement?.statut !== 'RECONVENTIONNEMENT_VALIDÉ') {
+  if (
+    structure?.conventionnement?.statut !==
+    StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+  ) {
     logger.error(
-      `La structure ${structure?.nom} a un statut : ${structure?.conventionnement?.statut}. Le statut doit etre égale à RECONVENTIONNEMENT_VALIDÉ`,
+      `La structure ${structure?.nom} a un statut : ${structure?.conventionnement?.statut}. Le statut doit etre égale à ${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}`,
     );
     return;
   }
