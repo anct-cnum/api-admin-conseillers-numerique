@@ -17,6 +17,13 @@ const updateContactStructure =
     const update = { contact: req.body.contact };
     const pool = new Pool();
 
+    if (!ObjectId.isValid(idStructure)) {
+      res.status(400).json({
+        message:
+          'Une erreur est survenue, veuillez recharger la page puis réessayez',
+      });
+      return;
+    }
     const contactValidation = updateContact.validate(update.contact);
 
     if (contactValidation.error) {
