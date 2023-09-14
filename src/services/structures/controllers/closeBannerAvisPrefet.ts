@@ -7,9 +7,13 @@ import service from '../../../helpers/services';
 
 const closeBannerAvisPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const idDemandeCoordinateur = req.params.id;
+    const idStructure = req.params.id;
+    const { idDemandeCoordinateur } = req.body;
     try {
-      if (!ObjectId.isValid(idDemandeCoordinateur)) {
+      if (
+        !ObjectId.isValid(idStructure) ||
+        !ObjectId.isValid(idDemandeCoordinateur)
+      ) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
@@ -18,6 +22,7 @@ const closeBannerAvisPrefet =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
+            _id: new ObjectId(idStructure),
             demandesCoordinateur: {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
@@ -42,6 +47,7 @@ const closeBannerAvisPrefet =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
+            'structure.$id': new ObjectId(idStructure),
             'structureObj.statut': 'VALIDATION_COSELEC',
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
@@ -56,7 +62,7 @@ const closeBannerAvisPrefet =
             },
           },
         );
-      res.status(200).json({ idDemandeCoordinateur });
+      res.status(200).json(idDemandeCoordinateur);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

@@ -20,6 +20,26 @@ const updateDemandeCoordinateurAvisPrefet =
       res.status(400).json({ message: avisPrefetValidation.error.message });
       return;
     }
+    const updatedDemandeCoordinateur = {
+      $set: {
+        'demandesCoordinateur.$.avisPrefet': avisPrefet,
+        'demandesCoordinateur.$.banniereValidationAvisPrefet': true,
+      },
+    };
+    const updatedDemandeCoordinateurMiseEnRelation = {
+      $set: {
+        'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
+        'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
+          true,
+      },
+    };
+    if (commentaire.length > 0) {
+      updatedDemandeCoordinateur.$set['demandesCoordinateur.$.commentaire'] =
+        commentaire;
+      updatedDemandeCoordinateurMiseEnRelation.$set[
+        'structureObj.demandesCoordinateur.$.commentaire'
+      ] = commentaire;
+    }
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -38,13 +58,7 @@ const updateDemandeCoordinateurAvisPrefet =
             },
             statut: 'VALIDATION_COSELEC',
           },
-          {
-            $set: {
-              'demandesCoordinateur.$.avisPrefet': avisPrefet,
-              'demandesCoordinateur.$.banniereValidationAvisPrefet': true,
-              'demandesCoordinateur.$.commentaire': commentaire,
-            },
-          },
+          updatedDemandeCoordinateur,
         );
       if (structure.modifiedCount === 0) {
         res
@@ -65,14 +79,7 @@ const updateDemandeCoordinateurAvisPrefet =
               },
             },
           },
-          {
-            $set: {
-              'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
-              'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-                true,
-              'structureObj.demandesCoordinateur.$.commentaire': commentaire,
-            },
-          },
+          updatedDemandeCoordinateurMiseEnRelation,
         );
       res.status(200).json({ success: true });
     } catch (error) {
