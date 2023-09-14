@@ -58,6 +58,8 @@ const getMiseEnRelation =
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',
+              sexe: '$conseiller.sexe',
+              dateDeNaissance: '$conseiller.dateDeNaissance',
               email: '$conseiller.email',
               telephone: '$conseiller.telephone',
               nomCommune: '$conseiller.nomCommune',

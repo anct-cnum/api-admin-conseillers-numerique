@@ -142,14 +142,10 @@ const getMisesEnRelation =
 const getStructuresMisesEnRelations =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     try {
-      const structureId = req.params.id;
-      if (!ObjectId.isValid(structureId)) {
-        return res.status(400).json({ message: 'Id incorrect' });
-      }
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ _id: new ObjectId(structureId) });
+        .findOne();
       if (structure === null) {
         return res.status(404).json({ message: "La structure n'existe pas" });
       }

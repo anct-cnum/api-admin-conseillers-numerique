@@ -6,6 +6,93 @@ export default function (app: Application): Model<any> {
   const modelName = 'conseillers';
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const { Schema } = mongooseClient;
+
+  const pixSchema = new Schema(
+    {
+      partage: Boolean,
+      datePartage: Date,
+      palier: Number,
+      competence1: Boolean,
+      competence2: Boolean,
+      competence3: Boolean,
+    },
+    { _id: false, strict: false },
+  );
+
+  const cvSchema = new Schema(
+    {
+      file: String,
+      extension: String,
+      date: Date,
+    },
+    { _id: false, strict: false },
+  );
+
+  const mattermostSchema = new Schema(
+    {
+      error: Boolean,
+      id: String,
+      login: String,
+      hubJoined: Boolean,
+      errorResetPassword: Boolean,
+    },
+    { _id: false, strict: false },
+  );
+
+  const supHierarchiqueSchema = new Schema(
+    {
+      email: String,
+      nom: String,
+      prenom: String,
+      numeroTelephone: String,
+      fonction: String,
+    },
+    { _id: false, strict: false },
+  );
+
+  const locationSchema = new Schema(
+    {
+      type: String,
+      coordinates: [Number],
+    },
+    { _id: false, strict: false },
+  );
+
+  const groupeCRAHistoriqueSchema = new Schema(
+    {
+      numero: Number,
+      dateDeChangement: Date,
+      nbJourDansGroupe: Number,
+    },
+    { _id: false, strict: false },
+  );
+
+  const coordinateurSchema = new Schema(
+    {
+      id: { type: 'ObjectId' },
+      nom: String,
+      prenom: String,
+    },
+    { _id: false, strict: false },
+  );
+
+  const ruptureSchema = new Schema(
+    {
+      structureId: { type: 'ObjectId' },
+      dateRupture: Date,
+      motifRupture: String,
+    },
+    { _id: false, strict: false },
+  );
+
+  const historiqueSchema = new Schema(
+    {
+      data: Object,
+      date: Date,
+    },
+    { _id: false, strict: false },
+  );
+
   const schema = new Schema<IConseillers>(
     {
       idPG: { type: Number, required: true },
@@ -40,7 +127,7 @@ export default function (app: Application): Model<any> {
 
       codePostal: { type: String },
 
-      location: { type: Object },
+      location: { type: locationSchema },
 
       nomCommune: { type: String },
 
@@ -63,7 +150,7 @@ export default function (app: Application): Model<any> {
 
       userCreated: { type: Boolean },
 
-      pix: { type: Object },
+      pix: { type: pixSchema },
 
       sondageToken: { type: String },
 
@@ -79,7 +166,7 @@ export default function (app: Application): Model<any> {
         required: false,
       },
 
-      mattermost: { type: Object },
+      mattermost: { type: mattermostSchema },
 
       emailCN: { type: Object },
 
@@ -99,9 +186,9 @@ export default function (app: Application): Model<any> {
 
       certificationPixFormation: { type: Boolean },
 
-      historique: { type: [Object], default: undefined },
+      historique: { type: [historiqueSchema], default: undefined },
 
-      cv: { type: Object },
+      cv: { type: cvSchema },
 
       telephonePro: { type: Number },
 
@@ -123,15 +210,18 @@ export default function (app: Application): Model<any> {
 
       listeSubordonnes: { type: Object },
 
-      coordinateurs: { type: [Object], default: undefined },
+      coordinateurs: { type: [coordinateurSchema], default: undefined },
 
       hasPermanence: { type: Boolean },
 
-      groupeCRAHistorique: { type: [Object], default: undefined },
+      groupeCRAHistorique: {
+        type: [groupeCRAHistoriqueSchema],
+        default: undefined,
+      },
 
-      ruptures: { type: [Object], default: undefined },
+      ruptures: { type: [ruptureSchema], default: undefined },
 
-      supHierarchique: { type: Object },
+      supHierarchique: { type: supHierarchiqueSchema },
 
       inactivite: { type: Boolean },
     },

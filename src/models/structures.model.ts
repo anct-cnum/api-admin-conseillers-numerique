@@ -12,6 +12,54 @@ export default function (app: Application): Model<any> {
   const modelName = 'structures';
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const { Schema } = mongooseClient;
+
+  const contactSchema = new Schema(
+    {
+      prenom: String,
+      nom: String,
+      fonction: String,
+      email: String,
+      telephone: String,
+    },
+    { _id: false, strict: false },
+  );
+
+  const conventionnementSchema = new Schema(
+    {
+      statut: String,
+      dossierConventionnement: Object,
+      dossierReconventionnement: Object,
+      motif: String,
+    },
+    { _id: false, strict: false },
+  );
+
+  const demandeCoselecSchema = new Schema(
+    {
+      id: { type: 'ObjectId' },
+      nombreDePostesSouhaites: Number,
+      motif: String,
+      emetteurAvenant: Object,
+      type: String,
+      statut: String,
+      banniereValidationAvenant: Boolean,
+      phaseConventionnement: String,
+      nombreDePostesAccordes: Number,
+      nombreDePostesRendus: Number,
+    },
+    { _id: false, strict: false },
+  );
+
+  const demandeCoordinateurSchema = new Schema(
+    {
+      id: { type: 'ObjectId' },
+      dossier: Object,
+      avisPrefet: String,
+      statut: String,
+    },
+    { _id: false, strict: false },
+  );
+
   const schema = new Schema<IStructures>(
     {
       idPG: { type: Number },
@@ -68,9 +116,16 @@ export default function (app: Application): Model<any> {
 
       reseau: { type: String },
 
-      contact: { type: Object },
+      contact: { type: contactSchema },
 
-      conventionnement: { type: Object },
+      conventionnement: { type: conventionnementSchema },
+
+      demandesCoselec: { type: [demandeCoselecSchema], default: undefined },
+
+      demandesCoordinateur: {
+        type: [demandeCoordinateurSchema],
+        default: undefined,
+      },
     },
     { strict: false },
   );

@@ -22,6 +22,7 @@ import {
   getStatsTerritoireCra,
   getStatsNationalesGrandReseau,
   getStatsTerritoiresPrefet,
+  getStatsConseillerParcoursRecrutement,
 } from './controllers';
 
 interface Data {}
@@ -60,6 +61,12 @@ export class Stats implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getStatsConseiller(app),
+    );
+    app.get(
+      '/stats/recrutement/conseiller/cras',
+      authenticateMode(app),
+      createAbilities(app),
+      getStatsConseillerParcoursRecrutement(app),
     );
     app.get(
       '/stats/datas/structures',

@@ -1,88 +1,52 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
-import { NotFound, Forbidden } from '@feathersjs/errors';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
+import { checkAccessReadRequestMisesEnRelation } from '../misesEnRelation.repository';
 
 const getStructuresMisesEnRelationsStats =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      // verify user role
-      const userId = req.user._id;
-      const user = await app
-        .service(service.users)
-        .Model.findOne({ _id: new ObjectId(userId) });
-      const rolesUserAllowed = user?.roles.filter((role: string) =>
-        ['admin', 'structure', 'prefet'].includes(role),
-      );
-      if (rolesUserAllowed.length < 1) {
-        res.status(403).send(
-          new Forbidden('User not authorized', {
-            userId: user,
-          }).toJSON(),
-        );
-        return;
-      }
-
-      let structureId = null;
-      try {
-        structureId = new ObjectId(req.params.id);
-      } catch (e) {
-        res.status(404).send(
-          new NotFound('Structure not found', {
-            id: req.params.id,
-          }).toJSON(),
-        );
-        return;
-      }
-
+      const checkAccess = await checkAccessReadRequestMisesEnRelation(app, req);
       const statsDisponibles = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
           {
             $match: {
-              'structure.$id': structureId,
-              _id: { $ne: 'non_disponible' },
+              $and: [checkAccess],
+              statut: {
+                $nin: [
+                  'non_disponible',
+                  'finalisee_non_disponible',
+                  'terminee',
+                  'renouvellement_initiee',
+                ],
+              },
             },
           },
           { $group: { _id: '$statut', count: { $sum: 1 } } },
-          { $sort: { _id: 1 } },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: '$count' },
+              stats: { $push: { statut: '$_id', count: '$count' } },
+            },
+          },
+          {
+            $addFields: {
+              stats: {
+                $concatArrays: [
+                  [{ statut: 'toutes', count: '$total' }],
+                  '$stats',
+                ],
+              },
+            },
+          },
         ]);
-
-      /* ajout des candidats dont le recrutement est finalisé dans détails structure */
-      const misesEnRelationFinalise = await app
-        .service(service.misesEnRelation)
-        .Model.find({ statut: 'finalisee', 'structure.$id': structureId });
-      const candidatsFinalise = misesEnRelationFinalise.map((item: any) => {
-        return item.conseillerObj;
-      });
-
-      /* ajout des candidats dont le recrutement est validé dans détails structure */
-      const misesEnRelationValide = await app
-        .service(service.misesEnRelation)
-        .Model.find({ statut: 'recrutee', 'structure.$id': structureId });
-      const candidatsValide = misesEnRelationValide.map((item: any) => {
-        return item.conseillerObj;
-      });
-      /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["item"] }] */
-      res.send(
-        statsDisponibles.map((item: any) => {
-          item.statut = item._id;
-          if (item.statut === 'recrutee') {
-            item.candidats = candidatsValide;
-          }
-          if (item.statut === 'finalisee') {
-            item.candidats = candidatsFinalise;
-          }
-          delete item._id;
-          return item;
-        }),
-      );
+      return res.status(200).json(statsDisponibles[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        res.status(403).json({ message: 'Accès refusé' });
-        return;
+        return res.status(403).json({ message: 'Accès refusé' });
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);

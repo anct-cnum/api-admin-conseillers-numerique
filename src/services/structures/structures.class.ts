@@ -78,13 +78,13 @@ export default class Structures extends Service {
       preSelectionnerCandidat(app),
     );
     app.get(
-      '/structures/:id/misesEnRelation',
+      '/structures/misesEnRelation',
       authenticateMode(app),
       createAbilities(app),
       getStructuresMisesEnRelations(app, options),
     );
     app.get(
-      '/structures/:id/misesEnRelation/stats',
+      '/structures/misesEnRelation/stats',
       authenticateMode(app),
       createAbilities(app),
       getStructuresMisesEnRelationsStats(app),

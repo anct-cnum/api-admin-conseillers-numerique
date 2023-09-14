@@ -28,13 +28,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       .Model.deleteMany({
         'conseiller.$id': conseiller._id,
         statut: {
-          $in: [
-            'finalisee_non_disponible',
-            'non_disponible',
-            'nouvelle',
-            'nonInteressee',
-            'interessee',
-          ],
+          $in: ['nouvelle', 'nonInteressee', 'interessee'],
         },
       });
     countDeleteMiseEnRelation += deleteMiseEnRelation.deletedCount;
@@ -44,13 +38,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         'conseiller.$id': { $ne: conseiller._id },
         'conseillerObj.email': conseiller.email,
         statut: {
-          $in: [
-            'finalisee_non_disponible',
-            'non_disponible',
-            'nouvelle',
-            'nonInteressee',
-            'interessee',
-          ],
+          $in: ['nouvelle', 'nonInteressee', 'interessee'],
         },
       });
     countDeleteDoublonConseillers += deleteDoublon.deletedCount;
