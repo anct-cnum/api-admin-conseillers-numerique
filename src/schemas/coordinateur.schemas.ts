@@ -24,7 +24,10 @@ const demandeCoordinateurAvisPrefet = Joi.object({
     .required()
     .error(new Error("L'id de la demande est invalide")),
   avisPrefet: Joi.string().required().error(new Error('L avis est invalide')),
-  commentaire: Joi.string().error(new Error('Le commentaire est invalide')),
+  commentaire: Joi.string()
+    .max(250)
+    .allow('', null)
+    .error(new Error('Le commentaire est invalide')),
 });
 
 export { validDemandesCoordinateur, demandeCoordinateurAvisPrefet };

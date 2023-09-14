@@ -47,7 +47,9 @@ const updateDemandeCoordinateurAvisPrefet =
           },
         );
       if (structure.modifiedCount === 0) {
-        res.status(400).json({ message: 'Avis préfet non enregistré' });
+        res
+          .status(404)
+          .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
       await app

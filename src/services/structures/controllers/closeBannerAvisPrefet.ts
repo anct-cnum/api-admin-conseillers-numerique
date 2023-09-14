@@ -32,7 +32,9 @@ const closeBannerAvisPrefet =
           },
         );
       if (structure.modifiedCount === 0) {
-        res.status(400).json({ message: "La bannière n'a pas pu être fermée" });
+        res
+          .status(404)
+          .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
       await app
