@@ -11,23 +11,51 @@ const checkAccessRequestCras = async (app: Application, req: IRequest) =>
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const getConseillersIdsByStructure = async (
-  idStructure: ObjectId,
+const getConseillersIdsRecruterByStructure = async (
   app: Application,
+  req: IRequest,
+  idStructure: ObjectId,
 ) => {
-  const miseEnRelations = await app.service(service.misesEnRelation).Model.find(
-    {
-      'structure.$id': idStructure,
-      statut: { $in: ['finalisee', 'finalisee_rupture', 'nouvelle_rupture'] },
-    },
-    {
-      'conseillerObj._id': 1,
-      _id: 0,
-    },
-  );
+  const miseEnRelations = await app
+    .service(service.misesEnRelation)
+    .Model.accessibleBy(req.ability, action.read)
+    .find(
+      {
+        'structure.$id': idStructure,
+        statut: { $in: ['finalisee', 'nouvelle_rupture'] },
+      },
+      {
+        'conseillerObj._id': 1,
+        _id: 0,
+      },
+    );
   const conseillerIds = [];
   miseEnRelations.forEach((miseEnRelation) => {
     conseillerIds.push(miseEnRelation?.conseillerObj._id);
+  });
+  return conseillerIds;
+};
+
+const getConseillersIdsRuptureByStructure = async (
+  app: Application,
+  req: IRequest,
+  idStructure: ObjectId,
+) => {
+  const conseillersRuptures = await app
+    .service(service.conseillersRuptures)
+    .Model.accessibleBy(req.ability, action.read)
+    .find(
+      {
+        structureId: idStructure,
+      },
+      {
+        conseillerId: 1,
+        _id: 0,
+      },
+    );
+  const conseillerIds = [];
+  conseillersRuptures.forEach((conseillerRupture) => {
+    conseillerIds.push(conseillerRupture?.conseillerId);
   });
   return conseillerIds;
 };
@@ -144,7 +172,8 @@ const createArrayForFiltreCodePostaux = (
 
 export {
   checkAccessRequestCras,
-  getConseillersIdsByStructure,
+  getConseillersIdsRecruterByStructure,
+  getConseillersIdsRuptureByStructure,
   getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
