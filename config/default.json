@@ -53,6 +53,7 @@
     "refresh_token_duration": "1d"
   },
   "demarche_simplifiee": {
+    "numero_demarche_recrutement_coordinateur": "DEMARCHE_SIMPLIFIEE_NUMERO_DEMARCHE_RECRUTEMENT_COORDINATEUR",
     "token_api": "DEMARCHE_SIMPLIFIEE_TOKEN_API",
     "url_entreprise_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE_RECONVENTIONNEMENT",
     "url_association_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION_RECONVENTIONNEMENT",

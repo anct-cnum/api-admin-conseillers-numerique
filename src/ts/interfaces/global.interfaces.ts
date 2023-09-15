@@ -82,4 +82,5 @@ export interface IConfigurationDemarcheSimplifiee {
   url_structure_publique_conventionnement: string;
   token_api: string;
   endpoint: string;
+  numero_demarche_recrutement_coordinateur: string;
 }
