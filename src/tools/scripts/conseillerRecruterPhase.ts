@@ -34,6 +34,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       $set: {
         phaseConventionnement: PhaseConventionnement.PHASE_2,
       },
+      $unset: {
+        reconventionnement: '',
+        miseEnRelationReconventionnement: '',
+      },
     };
   } else if (options.phase === '1') {
     queryUpdate = {
