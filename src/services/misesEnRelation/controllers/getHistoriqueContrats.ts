@@ -116,6 +116,7 @@ const getMisesEnRelations =
       {
         $project: {
           emetteurRupture: 1,
+          dateRupture: 1,
           createdAt: 1,
           emetteurRenouvellement: 1,
           emetteurRecrutement: 1,
