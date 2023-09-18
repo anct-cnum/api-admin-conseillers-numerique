@@ -17,6 +17,8 @@ import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
 import updateAvenantRenduPoste from './updateAvenantRenduPoste';
 import getDetailDemandeCoordinateur from './getDetailDemandeCoordinateur';
 import getDemandesCoordinateur from './getDemandesCoordinateur';
+import updateDemandeCoordinateurAvisPrefet from './updateDemandeCoordinateurAvisPrefet';
+import closeBannerAvisPrefet from './closeBannerAvisPrefet';
 
 export {
   getStructures,
@@ -38,4 +40,6 @@ export {
   updateAvenantRenduPoste,
   getDetailDemandeCoordinateur,
   getDemandesCoordinateur,
+  updateDemandeCoordinateurAvisPrefet,
+  closeBannerAvisPrefet,
 };

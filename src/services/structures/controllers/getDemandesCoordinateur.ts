@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import validDemandesCoordinateur from '../../../schemas/coordinateur.schemas';
+import { validDemandesCoordinateur } from '../../../schemas/coordinateur.schemas';
 import {
   checkAccessReadRequestStructures,
   filterSearchBar,
@@ -176,7 +176,7 @@ const getDemandesCoordinateur =
         const demandesCoordinateur = structureFormat.demandesCoordinateur.map(
           (demande) => {
             const item = demande;
-            item.nom = structure.nom;
+            item.nomStructure = structure.nom;
             item.codePostal = structure.codePostal;
             item.idPG = structure.idPG;
             item.idStructure = structure._id;
