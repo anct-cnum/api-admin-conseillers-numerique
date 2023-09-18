@@ -74,8 +74,7 @@ const getDetailDemandeCoordinateur =
           (champ) =>
             champ.id !== 'Q2hhbXAtMzQ4MzAzOQ==' &&
             champ.id !== 'Q2hhbXAtMzI3MTQ1MA==' &&
-            champ.id !== 'Q2hhbXAtMzI3MTQ0OQ==' &&
-            champ.id !== 'Q2hhbXAtMzI3MTQxNQ==',
+            champ.id !== 'Q2hhbXAtMzI3MTQ0OQ==',
         );
       const structureFormat = structure.toObject();
       structureFormat.questionnaire = [];
@@ -92,6 +91,7 @@ const getDetailDemandeCoordinateur =
         structureFormat.questionnaire.push({
           question: champ.label,
           reponse: champ.stringValue,
+          files: champ?.files,
         });
       });
       res.status(200).json(structureFormat);
