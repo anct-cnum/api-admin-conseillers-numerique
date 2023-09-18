@@ -21,6 +21,7 @@ const formatStatutMisesEnRelation = (
   switch (statut) {
     case 'nouvelle_rupture':
       return dossierIncompletRupture ? 'Pièces manquantes' : 'Rupture en cours';
+    case 'terminee':
     case 'finalisee_rupture':
       return 'Sans mission';
     case 'finalisee':
@@ -155,8 +156,21 @@ const filterIsRuptureMisesEnRelation = (
       };
     case 'finalisee_rupture':
       return {
-        statut: { $eq: rupture },
-        'conseiller.$id': { $in: conseillerIdsRupture },
+        $or: [
+          {
+            $and: [
+              { statut: { $eq: 'finalisee_rupture' } },
+              { 'conseiller.$id': { $in: conseillerIdsRupture } },
+            ],
+          },
+          {
+            $and: [
+              { statut: { $eq: 'terminee' } },
+              { miseEnRelationReconventionnement: { $exists: false } },
+              { 'conseiller.$id': { $in: conseillerIdsRecruter } },
+            ],
+          },
+        ],
       };
     case 'contrat':
       return {
@@ -168,9 +182,20 @@ const filterIsRuptureMisesEnRelation = (
       return {
         $or: [
           {
-            $and: [
-              { statut: { $eq: 'finalisee_rupture' } },
-              { 'conseiller.$id': { $in: conseillerIdsRupture } },
+            $or: [
+              {
+                $and: [
+                  { statut: { $eq: 'finalisee_rupture' } },
+                  { 'conseiller.$id': { $in: conseillerIdsRupture } },
+                ],
+              },
+              {
+                $and: [
+                  { statut: { $eq: 'terminee' } },
+                  { miseEnRelationReconventionnement: { $exists: false } },
+                  { 'conseiller.$id': { $in: conseillerIdsRecruter } },
+                ],
+              },
             ],
           },
           {

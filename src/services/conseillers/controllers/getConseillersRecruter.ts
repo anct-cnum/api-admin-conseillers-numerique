@@ -8,7 +8,6 @@ import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
   filterIsRuptureMisesEnRelation,
-  filterIsRuptureConseiller,
   filterNomConseiller,
   filterNomStructure,
   filterRegion,
@@ -55,7 +54,6 @@ const getConseillersRecruter =
     searchByConseiller: string,
     region: string,
     departement: string,
-    rupture: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
@@ -71,7 +69,14 @@ const getConseillersRecruter =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
+          $or: [
+            { statut: { $eq: 'RUPTURE' } },
+            {
+              statut: { $eq: 'RECRUTE' },
+              datePrisePoste: { $gte: dateDebut, $lte: dateFin },
+            },
+            { statut: { $eq: 'RECRUTE' }, datePrisePoste: null },
+          ],
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomConseiller(searchByConseiller),
           ...filterRegion(region),
@@ -198,9 +203,7 @@ const getConseillersStatutRecrute =
         searchByConseiller as string,
         region as string,
         departement as string,
-        rupture as string,
       );
-
       const conseillerRecruter = conseillers.filter(
         (conseiller) => conseiller.statut === 'RECRUTE',
       );
