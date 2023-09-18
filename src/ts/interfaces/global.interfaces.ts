@@ -74,8 +74,8 @@ export interface IDossierDS {
 }
 
 export interface IConfigurationDemarcheSimplifiee {
-  token_api: string;
   endpoint: string;
+  token_api: string;
   url_association_reconventionnement: string;
   url_entreprise_reconventionnement: string;
   url_structure_publique_reconventionnement: string;
