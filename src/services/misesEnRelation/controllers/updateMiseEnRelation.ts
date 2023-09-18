@@ -89,6 +89,7 @@ const updateMiseEnRelation =
           });
           return;
         }
+        update.dossierIncompletRupture = true;
         update.emetteurRupture = {
           email: req.user.name,
           date: new Date(),

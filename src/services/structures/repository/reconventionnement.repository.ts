@@ -515,14 +515,30 @@ const formatAvenantForDossierConventionnement = (structures) =>
       return avenantEnCours;
     });
 
-const formatAvenantForHistoriqueDossierConventionnement = (structures) =>
+const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
   structures
     .filter((structure) => structure?.demandesCoselec?.length > 0)
     .map((structure) => {
-      const avenants = structure.demandesCoselec.filter(
-        (demande) =>
-          demande.statut === 'validee' || demande.statut === 'refusee',
-      );
+      let avenants = [];
+      if (type === 'avenantAjoutPoste') {
+        avenants = structure.demandesCoselec.filter(
+          (demande) =>
+            (demande.statut === 'validee' || demande.statut === 'refusee') &&
+            demande.type === 'ajout',
+        );
+      }
+      if (type === 'avenantRenduPoste') {
+        avenants = structure.demandesCoselec.filter(
+          (demande) =>
+            demande.statut === 'validee' && demande.type === 'retrait',
+        );
+      }
+      if (type === 'toutes') {
+        avenants = structure.demandesCoselec.filter(
+          (demande) =>
+            demande.statut === 'validee' || demande.statut === 'refusee',
+        );
+      }
       if (!avenants) {
         return [];
       }
@@ -623,7 +639,10 @@ const sortHistoriqueDossierConventionnement = (
   let conventionnement: any = [];
   let reconventionnement: any = [];
   if (type.includes('avenant') || type === 'toutes') {
-    avenantSort = formatAvenantForHistoriqueDossierConventionnement(structures);
+    avenantSort = formatAvenantForHistoriqueDossierConventionnement(
+      structures,
+      type,
+    );
     avenantSort = avenantSort.flat(1);
   }
   if (type === 'reconventionnement' || type === 'toutes') {
