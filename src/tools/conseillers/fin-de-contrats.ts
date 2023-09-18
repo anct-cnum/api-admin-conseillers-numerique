@@ -32,6 +32,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         {
           $set: {
             statut: 'terminee',
+            motifRupture: 'nonReconductionCDD',
           },
         },
       );

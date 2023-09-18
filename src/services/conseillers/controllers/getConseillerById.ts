@@ -74,6 +74,20 @@ const getConseillerById =
                             { $eq: ['finalisee', '$statut'] },
                             { $eq: ['nouvelle_rupture', '$statut'] },
                             { $eq: ['finalisee_rupture', '$statut'] },
+                            {
+                              $and: [
+                                { $eq: ['terminee', '$statut'] },
+                                {
+                                  $eq: [
+                                    {
+                                      $type:
+                                        '$miseEnRelationReconventionnement',
+                                    },
+                                    'missing',
+                                  ],
+                                },
+                              ],
+                            },
                           ],
                         },
                       },
