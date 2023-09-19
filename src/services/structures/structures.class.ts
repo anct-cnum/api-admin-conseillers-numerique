@@ -21,6 +21,8 @@ import {
   updateAvenantRenduPoste,
   getDetailDemandeCoordinateur,
   getDemandesCoordinateur,
+  updateDemandeCoordinateurAvisPrefet,
+  closeBannerAvisPrefet,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -100,6 +102,18 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getDetailDemandeCoordinateur(app),
+    );
+    app.patch(
+      '/avis/prefet/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDemandeCoordinateurAvisPrefet(app),
+    );
+    app.patch(
+      '/banner/prefet/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerAvisPrefet(app),
     );
     app.get(
       '/conventions/',

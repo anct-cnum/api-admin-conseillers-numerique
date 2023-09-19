@@ -46,10 +46,10 @@ export default async function prefetRules(
     .distinct('_id');
   const conseillersIds = await getConseillersIds(app, user, structures);
   // Restreindre les permissions : les prefets ne peuvent voir que les structures de leur departement ou région
-  can([action.read], ressource.structures, {
+  can([action.read, action.update], ressource.structures, {
     codeDepartement: String(user?.departement),
   });
-  can([action.read], ressource.structures, {
+  can([action.read, action.update], ressource.structures, {
     codeRegion: String(user?.region),
   });
   // Restreindre les permissions : les prefets ne peuvent voir que les conseillers de leur departement ou région
@@ -59,10 +59,10 @@ export default async function prefetRules(
     },
   });
   // Restreindre les permissions : les prefets ne peuvent voir que les misesEnRelation de leur departement ou région
-  can([action.read], ressource.misesEnRelation, {
+  can([action.read, action.update], ressource.misesEnRelation, {
     'structureObj.codeDepartement': String(user?.departement),
   });
-  can([action.read], ressource.misesEnRelation, {
+  can([action.read, action.update], ressource.misesEnRelation, {
     'structureObj.codeRegion': String(user?.region),
   });
   can([action.read], ressource.statsTerritoires, {
