@@ -25,6 +25,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         {
           'structure.$id': structure._id,
           statut: 'finalisee',
+          typeDeContrat: { $ne: 'CDI' },
           dateFinDeContrat: {
             $lte: new Date(),
           },
