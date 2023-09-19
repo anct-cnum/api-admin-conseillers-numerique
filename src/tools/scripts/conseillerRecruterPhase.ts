@@ -36,7 +36,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
       $unset: {
         reconventionnement: '',
-        miseEnRelationReconventionnement: '',
+        miseEnRelationConventionnement: '',
       },
     };
   } else if (options.phase === '1') {
