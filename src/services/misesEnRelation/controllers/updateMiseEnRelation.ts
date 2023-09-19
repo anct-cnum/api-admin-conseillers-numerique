@@ -60,6 +60,7 @@ const updateMiseEnRelation =
           emetteurRupture: '',
           dateRupture: '',
           motifRupture: '',
+          dossierIncompletRupture: '',
         };
       }
       if (
