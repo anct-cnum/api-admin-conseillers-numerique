@@ -60,6 +60,7 @@ const updateMiseEnRelation =
           emetteurRupture: '',
           dateRupture: '',
           motifRupture: '',
+          dossierIncompletRupture: '',
         };
       }
       if (
@@ -89,6 +90,7 @@ const updateMiseEnRelation =
           });
           return;
         }
+        update.dossierIncompletRupture = true;
         update.emetteurRupture = {
           email: req.user.name,
           date: new Date(),
