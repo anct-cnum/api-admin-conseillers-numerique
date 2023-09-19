@@ -164,7 +164,7 @@ const getConseillerContratById =
         return;
       }
       if (
-        conseiller[0].contrat.phaseConventionnement ===
+        conseiller[0].contrat?.phaseConventionnement ===
         PhaseConventionnement.PHASE_2
       ) {
         conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
