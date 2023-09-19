@@ -89,7 +89,7 @@ const getDetailDemandeCoordinateur =
           Object.assign(champ, { stringValue: 'Sans réponse' });
         }
         structureFormat.questionnaire.push({
-          question: champ.label,
+          enoncer: champ.label,
           reponse: champ.stringValue,
           files: champ?.files,
         });
