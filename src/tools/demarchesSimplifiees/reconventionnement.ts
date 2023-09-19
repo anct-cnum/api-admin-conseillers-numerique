@@ -267,6 +267,9 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                 dateDerniereModification: new Date(
                   dossier.dateDerniereModification,
                 ),
+                nbPostesAttribuees:
+                  structure?.conventionnement?.dossierReconventionnement
+                    ?.nbPostesAttribuees ?? dossier.nbPostesAttribuees,
               },
             },
           );
@@ -313,6 +316,9 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                 dateDerniereModification: new Date(
                   dossier.dateDerniereModification,
                 ),
+                nbPostesAttribuees:
+                  structure?.conventionnement?.dossierReconventionnement
+                    ?.nbPostesAttribuees ?? dossier.nbPostesAttribuees,
               },
             },
           );

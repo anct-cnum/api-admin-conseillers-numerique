@@ -6,7 +6,7 @@ import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
 import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
 import { action } from '../../../helpers/accessControl/accessList';
-import { StatutConventionnement } from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
 
 const getConseillerContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -76,6 +76,7 @@ const getConseillerContratById =
                     emetteurRupture: 1,
                     emetteurRenouvellement: 1,
                     salaire: 1,
+                    phaseConventionnement: 1,
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
                     'structureObj._id': 1,
@@ -163,8 +164,8 @@ const getConseillerContratById =
         return;
       }
       if (
-        structure?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+        conseiller[0].contrat.phaseConventionnement ===
+        PhaseConventionnement.PHASE_2
       ) {
         conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
       } else {
