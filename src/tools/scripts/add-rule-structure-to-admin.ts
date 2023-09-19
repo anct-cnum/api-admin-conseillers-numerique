@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Lancement de ce script : ts-node src/tools/migration/add-rule-structure-to-admin.ts <options>
+// Lancement de ce script : ts-node src/tools/scripts/add-rule-structure-to-admin.ts <options>
 
 import { program } from 'commander';
 import { ObjectId, DBRef } from 'mongodb';
