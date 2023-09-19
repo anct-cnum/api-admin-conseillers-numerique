@@ -48,7 +48,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     );
     logger.info(
-      `Modification éffectuée pour la structure ${structureId} en statut ${options.statut}`,
+      `Modification effectuée pour la structure ${structureId} en statut ${options.statut}`,
     );
   } else {
     logger.info(`Structure non trouvée.`);

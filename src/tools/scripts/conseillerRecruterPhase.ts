@@ -61,7 +61,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
   ) {
     logger.error(
-      `La structure ${structure?.nom} a un statut : ${structure?.conventionnement?.statut}. Le statut doit etre égale à ${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}`,
+      `La structure ${structure?.nom} a un statut : ${structure?.conventionnement?.statut}. Le statut doit etre égal à ${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}`,
     );
     return;
   }
