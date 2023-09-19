@@ -116,6 +116,7 @@ const getMisesEnRelations =
       {
         $project: {
           emetteurRupture: 1,
+          dateRupture: 1,
           createdAt: 1,
           emetteurRenouvellement: 1,
           emetteurRecrutement: 1,
@@ -292,7 +293,7 @@ const getHistoriqueContrats =
           )?.count ?? 0,
         renouvellementDeContrat:
           totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'renouvelee', // statut à définir pour le renouvellement de contrat
+            (totalParStatut) => totalParStatut.statut === 'renouvelee',
           )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(

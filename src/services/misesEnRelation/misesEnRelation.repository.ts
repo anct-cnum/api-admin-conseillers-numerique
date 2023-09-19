@@ -140,12 +140,7 @@ const filterStatut = (statut: string) => {
   }
   return {
     statut: {
-      $nin: [
-        'finalisee_non_disponible',
-        'non_disponible',
-        'renouvellement_initiee',
-        'terminee',
-      ],
+      $nin: ['renouvellement_initiee', 'terminee'],
     },
   };
 };
@@ -172,13 +167,21 @@ const filtrePiecesManquantes = (piecesManquantes: string) => {
 };
 
 const filterStatutContratHistorique = (statut: string) => {
-  if (statut !== 'toutes' && statut !== 'renouvelee') {
-    return { statut: { $eq: statut } };
-  }
   if (statut === 'renouvelee') {
     return {
       statut: 'finalisee',
       miseEnRelationConventionnement: { $exists: true },
+    };
+  }
+  if (statut === 'finalisee') {
+    return {
+      statut: 'finalisee',
+      miseEnRelationConventionnement: { $exists: false },
+    };
+  }
+  if (statut === 'finalisee_rupture') {
+    return {
+      statut: 'finalisee_rupture',
     };
   }
   return {

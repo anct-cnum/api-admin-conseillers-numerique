@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 import dayjs from 'dayjs';
 import { Response } from 'express';
+import { formatDateGMT } from '../../utils';
 
 const formatDate = (date: Date) => {
   if (date !== undefined && date !== null) {
-    return dayjs(new Date(date.getTime() + 120 * 60000)).format('DD/MM/YYYY');
+    return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
 };
@@ -25,7 +26,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
     'Type de contrat',
     'Date de rupture',
     'Motif de rupture',
-    'Commentaire'
+    'Commentaire',
   ];
   try {
     res.write(
@@ -44,7 +45,9 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
             rupture?.miseEnRelation?.typeDeContrat ?? 'Non renseigné',
             formatDate(rupture?.dateRupture),
             rupture?.motifRupture ?? 'Non renseigné',
-            rupture.conseillerSupprime?.conseiller?.idPG ? "Ce conseiller s'est désinscrit totalement du dispositif" : ''
+            rupture.conseillerSupprime?.conseiller?.idPG
+              ? "Ce conseiller s'est désinscrit totalement du dispositif"
+              : '',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
