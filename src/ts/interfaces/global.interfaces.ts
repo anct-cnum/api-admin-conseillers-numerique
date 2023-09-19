@@ -74,12 +74,13 @@ export interface IDossierDS {
 }
 
 export interface IConfigurationDemarcheSimplifiee {
+  endpoint: string;
+  token_api: string;
   url_association_reconventionnement: string;
   url_entreprise_reconventionnement: string;
   url_structure_publique_reconventionnement: string;
   url_association_conventionnement: string;
   url_entreprise_conventionnement: string;
   url_structure_publique_conventionnement: string;
-  token_api: string;
-  endpoint: string;
+  numero_demarche_recrutement_coordinateur: string;
 }
