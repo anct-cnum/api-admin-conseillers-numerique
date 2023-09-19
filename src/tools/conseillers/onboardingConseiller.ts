@@ -13,7 +13,7 @@ const slugify = require('slugify');
 
 execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
   const conseillers = await app.service(service.conseillers).Model.find({
-    $or: [{ emailCN: { $exists: false } }, { emailCNError: true }],
+    $or: [{ 'emailCN.address': { $exists: false } }, { emailCNError: true }],
     statut: 'RECRUTE',
   });
   if (conseillers.length === 0) {
