@@ -72,7 +72,6 @@ const getDetailDemandeCoordinateur =
         ?.slice(5)
         ?.filter(
           (champ) =>
-            champ.id !== 'Q2hhbXAtMzQ4MzAzOQ==' &&
             champ.id !== 'Q2hhbXAtMzI3MTQ1MA==' &&
             champ.id !== 'Q2hhbXAtMzI3MTQ0OQ==' &&
             champ.id !== 'Q2hhbXAtMzI3MTM1OQ==',
