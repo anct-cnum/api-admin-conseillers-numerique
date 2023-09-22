@@ -88,11 +88,25 @@ const getDetailDemandeCoordinateur =
         if (champ?.stringValue === '') {
           Object.assign(champ, { stringValue: 'Sans réponse' });
         }
-        structureFormat.questionnaire.push({
-          enoncer: champ.label,
-          reponse: champ.stringValue,
-          files: champ?.files,
-        });
+        if (champ?.primaryValue && champ?.secondaryValue) {
+          structureFormat.questionnaire.push({
+            enoncer: champ.label,
+            reponse: champ.primaryValue,
+            files: champ?.files,
+          });
+          structureFormat.questionnaire.push({
+            enoncer:
+              'Opérez vous déjà une action de coordination sur les actions de médiation numérique de votre territoire ?',
+            reponse: champ.secondaryValue,
+            files: champ?.files,
+          });
+        } else {
+          structureFormat.questionnaire.push({
+            enoncer: champ.label,
+            reponse: champ.stringValue,
+            files: champ?.files,
+          });
+        }
       });
       res.status(200).json(structureFormat);
     } catch (error) {
