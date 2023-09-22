@@ -5,10 +5,10 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
-const closeBannerAvisPrefet =
+const closeBannerParcoursCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { idDemandeCoordinateur } = req.body;
+    const { idDemandeCoordinateur, typeBanner } = req.body;
     try {
       if (
         !ObjectId.isValid(idStructure) ||
@@ -16,6 +16,40 @@ const closeBannerAvisPrefet =
       ) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
+      }
+      let objectUpdated = {};
+      let objectUpdatedMiseEnRelation = {};
+      switch (typeBanner) {
+        case 'banniereInformationAvis':
+          objectUpdated = {
+            'demandesCoordinateur.$.banniereInformationAvis': false,
+          };
+          objectUpdatedMiseEnRelation = {
+            'structureObj.demandesCoordinateur.$.banniereInformationAvis':
+              false,
+          };
+          break;
+        case 'banniereValidationAvisPrefet':
+          objectUpdated = {
+            'demandesCoordinateur.$.banniereValidationAvisPrefet': false,
+          };
+          objectUpdatedMiseEnRelation = {
+            'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
+              false,
+          };
+          break;
+        case 'banniereValidationAvisAdmin':
+          objectUpdated = {
+            'demandesCoordinateur.$.banniereValidationAvisAdmin': false,
+          };
+          objectUpdatedMiseEnRelation = {
+            'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin':
+              false,
+          };
+          break;
+        default:
+          res.status(400).json({ message: 'Type de bannière incorrect' });
+          return;
       }
       const structure = await app
         .service(service.structures)
@@ -31,9 +65,7 @@ const closeBannerAvisPrefet =
             statut: 'VALIDATION_COSELEC',
           },
           {
-            $set: {
-              'demandesCoordinateur.$.banniereValidationAvisPrefet': false,
-            },
+            $set: objectUpdated,
           },
         );
       if (structure.modifiedCount === 0) {
@@ -56,10 +88,7 @@ const closeBannerAvisPrefet =
             },
           },
           {
-            $set: {
-              'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-                false,
-            },
+            $set: objectUpdatedMiseEnRelation,
           },
         );
       res.status(200).json(idDemandeCoordinateur);
@@ -73,4 +102,4 @@ const closeBannerAvisPrefet =
     }
   };
 
-export default closeBannerAvisPrefet;
+export default closeBannerParcoursCoordinateur;
