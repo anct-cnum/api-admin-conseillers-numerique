@@ -42,7 +42,14 @@ const updateDemandeCoordinateurRefusAvisAdmin =
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            statut: 'VALIDATION_COSELEC',
+            $or: [
+              {
+                statut: 'VALIDATION_COSELEC',
+              },
+              {
+                coordinateurCandidature: true,
+              },
+            ],
           },
           updatedDemandeCoordinateur,
         );
@@ -58,7 +65,14 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         .updateMany(
           {
             'structure.$id': new ObjectId(idStructure),
-            'structureObj.statut': 'VALIDATION_COSELEC',
+            $or: [
+              {
+                'structureObj.statut': 'VALIDATION_COSELEC',
+              },
+              {
+                'structureObj.coordinateurCandidature': true,
+              },
+            ],
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
