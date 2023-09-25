@@ -88,7 +88,7 @@ const getDetailDemandeCoordinateur =
         if (champ?.stringValue === '') {
           Object.assign(champ, { stringValue: 'Sans réponse' });
         }
-        if (champ?.primaryValue && champ?.secondaryValue) {
+        if (champ?.id === 'Q2hhbXAtMzI3MTQxOA==') {
           structureFormat.questionnaire.push({
             enoncer: champ.label,
             reponse: champ.primaryValue,
