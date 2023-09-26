@@ -10,6 +10,7 @@ import {
   informationValidationCoselec,
   invitationActiveCompte,
 } from '../../emails';
+import informationValidationCoselecCoordinateur from '../../emails/structures/informationValidationCoselecCoordinateur';
 
 program.option('-r, --role <role>', 'Role');
 program.option('-l, --limit <limit>', 'Limite');
@@ -18,6 +19,10 @@ program.parse(process.argv);
 execute(__filename, async ({ app, mailer, logger, exit }) => {
   const promises: Promise<void>[] = [];
   let messageInformationCoselec: null | {
+    render: (user: IUser) => Promise<any>;
+    send: (user: IUser) => Promise<any>;
+  } = null;
+  let messageInformationCoselecCoordinateur: null | {
     render: (user: IUser) => Promise<any>;
     send: (user: IUser) => Promise<any>;
   } = null;
@@ -40,6 +45,8 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
   const messageInvitation = invitationActiveCompte(app, mailer);
   if (options.role === 'structure') {
     messageInformationCoselec = informationValidationCoselec(app, mailer);
+    messageInformationCoselecCoordinateur =
+      informationValidationCoselecCoordinateur(app, mailer);
   }
 
   const users: IUser[] = await app
@@ -62,16 +69,14 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve) => {
       try {
-        if (messageInformationCoselec) {
+        if (
+          messageInformationCoselec ||
+          messageInformationCoselecCoordinateur
+        ) {
           const structure = await app
             .service(service.structures)
             .Model.findOne({
               _id: user.entity.oid,
-              demandesCoordinateur: {
-                $elemMatch: {
-                  statut: { $eq: 'validee' },
-                },
-              },
             });
           if (structure.statut !== 'VALIDATION_COSELEC') {
             logger.warn(
@@ -81,14 +86,14 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
             return;
           }
           const demandeCoordinateurValider =
-            structure.demandesCoordinateur.find(
+            structure?.demandesCoordinateur?.find(
               (demande) => demande.statut === 'validee',
             );
-          if (!user.mailSentCoselecDate) {
+          if (!user.mailSentCoselecDate && !demandeCoordinateurValider) {
             await messageInformationCoselec.send(user);
           }
           if (demandeCoordinateurValider) {
-            await messageInformationCoselec.send(user);
+            await messageInformationCoselecCoordinateur.send(user);
           }
         }
         await messageInvitation.send(user);
