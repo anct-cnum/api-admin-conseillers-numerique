@@ -139,7 +139,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: new ObjectId(idStructure),
+            _id: structure._id,
             demandesCoordinateur: {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
@@ -160,7 +160,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            'structure.$id': new ObjectId(idStructure),
+            'structure.$id': structure._id,
             'structureObj.statut': 'VALIDATION_COSELEC',
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
