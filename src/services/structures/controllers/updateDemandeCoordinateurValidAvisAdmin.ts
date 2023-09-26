@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { GraphQLClient } from 'graphql-request';
+import dayjs from 'dayjs';
 import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
@@ -12,9 +13,26 @@ import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnem
 import { getCoselec } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
+const { Pool } = require('pg');
+
+const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
+  try {
+    await pool.query(
+      `
+      UPDATE djapp_hostorganization
+      SET (updated) = $2
+      WHERE id = $1`,
+      [idPG, datePG],
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const updateDemandeCoordinateurValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const pool = new Pool();
     const { idDemandeCoordinateur } = req.body;
     if (
       !ObjectId.isValid(idStructure) ||
@@ -23,8 +41,11 @@ const updateDemandeCoordinateurValidAvisAdmin =
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
+    const updatedAt = new Date();
+    const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
     const updatedDemandeCoordinateur = {
       $set: {
+        updatedAt,
         'demandesCoordinateur.$.statut': 'validee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'demandesCoordinateur.$.banniereInformationAvis': true,
@@ -32,6 +53,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
+        'structureObj.updatedAt': updatedAt,
         'structureObj.demandesCoordinateur.$.statut': 'validee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'structureObj.demandesCoordinateur.$.banniereInformationAvis': true,
@@ -94,11 +116,12 @@ const updateDemandeCoordinateurValidAvisAdmin =
         champsFormulaire.length > 0 &&
         champsFormulaire[0].stringValue === 'Non'
       ) {
-        const nombreConseillers = Number(coselec.nombreConseillersCoselec) + 1;
+        const nombreConseillersCoselec = coselec.nombreConseillersCoselec ?? 0;
+        const nombreConseillersValider = Number(nombreConseillersCoselec) + 1;
         Object.assign(updatedDemandeCoordinateur, {
           $push: {
             coselec: {
-              nombreConseillersCoselec: nombreConseillers,
+              nombreConseillersCoselec: nombreConseillersValider,
               avisCoselec: 'POSITIF',
               insertedAt: new Date(),
             },
@@ -130,6 +153,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
+      await updateStructurePG(pool)(structure.idPG, datePG);
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)

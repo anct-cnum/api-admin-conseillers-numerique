@@ -65,7 +65,14 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
         if (messageInformationCoselec) {
           const structure = await app
             .service(service.structures)
-            .Model.findOne({ _id: user.entity.oid });
+            .Model.findOne({
+              _id: user.entity.oid,
+              demandesCoordinateur: {
+                $elemMatch: {
+                  statut: { $eq: 'validee' },
+                },
+              },
+            });
           if (structure.statut !== 'VALIDATION_COSELEC') {
             logger.warn(
               `Invitation NON envoyée pour ${user.name} : structure en statut ${structure.statut}`,
@@ -73,7 +80,14 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
             resolve(p);
             return;
           }
+          const demandeCoordinateurValider =
+            structure.demandesCoordinateur.find(
+              (demande) => demande.statut === 'validee',
+            );
           if (!user.mailSentCoselecDate) {
+            await messageInformationCoselec.send(user);
+          }
+          if (demandeCoordinateurValider) {
             await messageInformationCoselec.send(user);
           }
         }
