@@ -80,9 +80,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
         });
       if (!structure) {
-        res.status(404).json({
-          message: "La structure n'existe pas",
-        });
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
       const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
