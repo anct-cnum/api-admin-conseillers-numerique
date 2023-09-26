@@ -33,6 +33,32 @@ const updateDemandeCoordinateurRefusAvisAdmin =
     try {
       const structure = await app
         .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: new ObjectId(idStructure),
+          $or: [
+            {
+              statut: 'VALIDATION_COSELEC',
+            },
+            {
+              coordinateurCandidature: true,
+            },
+          ],
+        });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
+      if (structure.statut === 'CREEE') {
+        Object.assign(updatedDemandeCoordinateur.$set, {
+          statut: 'REFUS_COORDINATEUR',
+        });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          'structureObj.statut': 'REFUS_COORDINATEUR',
+        });
+      }
+      const structureUpdated = await app
+        .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
@@ -53,7 +79,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           },
           updatedDemandeCoordinateur,
         );
-      if (structure.modifiedCount === 0) {
+      if (structureUpdated.modifiedCount === 0) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
