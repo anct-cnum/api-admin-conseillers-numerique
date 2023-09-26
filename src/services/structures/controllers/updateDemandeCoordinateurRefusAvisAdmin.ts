@@ -62,20 +62,12 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: new ObjectId(idStructure),
+            _id: structure._id,
             demandesCoordinateur: {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            $or: [
-              {
-                statut: 'VALIDATION_COSELEC',
-              },
-              {
-                coordinateurCandidature: true,
-              },
-            ],
           },
           updatedDemandeCoordinateur,
         );
@@ -90,15 +82,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            'structure.$id': new ObjectId(idStructure),
-            $or: [
-              {
-                'structureObj.statut': 'VALIDATION_COSELEC',
-              },
-              {
-                'structureObj.coordinateurCandidature': true,
-              },
-            ],
+            'structure.$id': structure._id,
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
