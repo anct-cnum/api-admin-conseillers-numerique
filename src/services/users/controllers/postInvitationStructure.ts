@@ -13,12 +13,25 @@ import {
   envoiEmailInvit,
   envoiEmailMultiRole,
 } from '../../../utils/email';
+import { StatutsStructuresInactives } from '../../../ts/enum';
 
 const { v4: uuidv4 } = require('uuid');
 
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { email, structureId } = req.body;
+
+    const structure = await app
+      .service(service.structures)
+      .accessibleBy(req.ability, action.read)
+      .findOne({ _id: new ObjectId(structureId) });
+
+    if (StatutsStructuresInactives.includes(structure.statut)) {
+      res.status(403).json({
+        message: `Accès refusé, la structure ${structure.idPG} est inactive`,
+      });
+      return;
+    }
     let user: IUser | null = null;
     let errorSmtpMailInvit: Error | null = null;
     let messageSuccess: string = '';
