@@ -24,6 +24,7 @@ const updateDemandeCoordinateurAvisPrefet =
       $set: {
         'demandesCoordinateur.$.avisPrefet': avisPrefet,
         'demandesCoordinateur.$.banniereValidationAvisPrefet': true,
+        'demandesCoordinateur.$.commentaire': commentaire,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
@@ -31,15 +32,9 @@ const updateDemandeCoordinateurAvisPrefet =
         'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
         'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
           true,
+        'structureObj.demandesCoordinateur.$.commentaire': commentaire,
       },
     };
-    if (commentaire.length > 0) {
-      updatedDemandeCoordinateur.$set['demandesCoordinateur.$.commentaire'] =
-        commentaire;
-      updatedDemandeCoordinateurMiseEnRelation.$set[
-        'structureObj.demandesCoordinateur.$.commentaire'
-      ] = commentaire;
-    }
     try {
       if (!ObjectId.isValid(idStructure)) {
         res.status(400).json({ message: 'Id incorrect' });
