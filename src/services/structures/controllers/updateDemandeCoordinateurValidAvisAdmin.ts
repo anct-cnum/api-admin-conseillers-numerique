@@ -171,7 +171,6 @@ const updateDemandeCoordinateurValidAvisAdmin =
         .updateMany(
           {
             'structure.$id': structure._id,
-            'structureObj.statut': 'VALIDATION_COSELEC',
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
