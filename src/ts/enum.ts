@@ -19,18 +19,13 @@ enum PhaseConventionnement {
   PHASE_2 = '2',
 }
 
-const StatutsStructuresInactives = [
-  'EXAMEN_COMPLEMENTAIRE_COSELEC',
-  'REFUS_COSELEC',
-  'ABANDON',
-  'ANNULEE',
-  'DOUBLON',
-  'NEGATIF',
+const StatutsStructuresActives = [
+  'VALIDATION_COSELEC',
 ];
 
 export {
   TypeDossierReconventionnement,
   StatutConventionnement,
   PhaseConventionnement,
-  StatutsStructuresInactives,
+  StatutsStructuresActives,
 };

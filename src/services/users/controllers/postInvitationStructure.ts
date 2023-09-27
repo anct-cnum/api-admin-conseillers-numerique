@@ -13,7 +13,7 @@ import {
   envoiEmailInvit,
   envoiEmailMultiRole,
 } from '../../../utils/email';
-import { StatutsStructuresInactives } from '../../../ts/enum';
+import { StatutsStructuresActives } from '../../../ts/enum';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -26,7 +26,7 @@ const postInvitationStructure =
       .accessibleBy(req.ability, action.read)
       .findOne({ _id: new ObjectId(structureId) });
 
-    if (StatutsStructuresInactives.includes(structure.statut)) {
+    if (!StatutsStructuresActives.includes(structure.statut)) {
       res.status(403).json({
         message: `Accès refusé, la structure ${structure.idPG} est inactive`,
       });
