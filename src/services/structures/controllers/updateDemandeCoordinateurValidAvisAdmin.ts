@@ -41,11 +41,8 @@ const updateDemandeCoordinateurValidAvisAdmin =
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
-    const updatedAt = new Date();
-    const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
     const updatedDemandeCoordinateur = {
       $set: {
-        updatedAt,
         'demandesCoordinateur.$.statut': 'validee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'demandesCoordinateur.$.banniereInformationAvis': true,
@@ -53,7 +50,6 @@ const updateDemandeCoordinateurValidAvisAdmin =
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
-        'structureObj.updatedAt': updatedAt,
         'structureObj.demandesCoordinateur.$.statut': 'validee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'structureObj.demandesCoordinateur.$.banniereInformationAvis': true,
@@ -126,11 +122,28 @@ const updateDemandeCoordinateurValidAvisAdmin =
             },
           },
         });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          $push: {
+            'structureObj.coselec': {
+              nombreConseillersCoselec: nombreConseillersValider,
+              avisCoselec: 'POSITIF',
+              insertedAt: new Date(),
+            },
+          },
+        });
       }
       if (structure.statut === 'CREEE') {
+        const updatedAt = new Date();
+        const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
         Object.assign(updatedDemandeCoordinateur.$set, {
           statut: 'VALIDATION_COSELEC',
+          updatedAt,
         });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          'structureObj.statut': 'VALIDATION_COSELEC',
+          'structureObj.updatedAt': updatedAt,
+        });
+        await updateStructurePG(pool)(structure.idPG, datePG);
       }
       const structureUpdated = await app
         .service(service.structures)
@@ -152,7 +165,6 @@ const updateDemandeCoordinateurValidAvisAdmin =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      await updateStructurePG(pool)(structure.idPG, datePG);
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
