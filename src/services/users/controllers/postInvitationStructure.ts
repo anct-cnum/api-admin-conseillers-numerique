@@ -23,7 +23,7 @@ const postInvitationStructure =
 
     const structure = await app
       .service(service.structures)
-      .accessibleBy(req.ability, action.read)
+     .Model.accessibleBy(req.ability, action.read)
       .findOne({ _id: new ObjectId(structureId) });
 
     if (!StatutsStructuresActives.includes(structure.statut)) {
