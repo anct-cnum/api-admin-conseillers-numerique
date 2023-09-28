@@ -19,11 +19,8 @@ enum PhaseConventionnement {
   PHASE_2 = '2',
 }
 
-const StatutsStructuresActives = ['VALIDATION_COSELEC'];
-
 export {
   TypeDossierReconventionnement,
   StatutConventionnement,
   PhaseConventionnement,
-  StatutsStructuresActives,
 };

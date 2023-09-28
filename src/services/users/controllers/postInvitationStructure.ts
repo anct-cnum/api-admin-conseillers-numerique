@@ -13,7 +13,6 @@ import {
   envoiEmailInvit,
   envoiEmailMultiRole,
 } from '../../../utils/email';
-import { StatutsStructuresActives } from '../../../ts/enum';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -23,10 +22,10 @@ const postInvitationStructure =
 
     const structure = await app
       .service(service.structures)
-     .Model.accessibleBy(req.ability, action.read)
+      .Model.accessibleBy(req.ability, action.read)
       .findOne({ _id: new ObjectId(structureId) });
 
-    if (!StatutsStructuresActives.includes(structure.statut)) {
+    if (structure.statut !== 'VALIDATION_COSELEC') {
       res.status(403).json({
         message: `Accès refusé, la structure ${structure.idPG} est inactive`,
       });
