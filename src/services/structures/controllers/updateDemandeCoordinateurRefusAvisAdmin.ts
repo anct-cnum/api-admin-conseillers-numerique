@@ -20,33 +20,60 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'refusee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'demandesCoordinateur.$.banniereInformationAvis': true,
+        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'refusee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvis': true,
+        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
+          true,
       },
     };
     try {
       const structure = await app
         .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: new ObjectId(idStructure),
+          $or: [
+            {
+              statut: 'VALIDATION_COSELEC',
+            },
+            {
+              coordinateurCandidature: true,
+              statut: 'CREEE',
+            },
+          ],
+        });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
+      if (structure.statut === 'CREEE') {
+        Object.assign(updatedDemandeCoordinateur.$set, {
+          statut: 'REFUS_COORDINATEUR',
+        });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          'structureObj.statut': 'REFUS_COORDINATEUR',
+        });
+      }
+      const structureUpdated = await app
+        .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: new ObjectId(idStructure),
+            _id: structure._id,
             demandesCoordinateur: {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            statut: 'VALIDATION_COSELEC',
           },
           updatedDemandeCoordinateur,
         );
-      if (structure.modifiedCount === 0) {
+      if (structureUpdated.modifiedCount === 0) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
@@ -57,8 +84,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            'structure.$id': new ObjectId(idStructure),
-            'structureObj.statut': 'VALIDATION_COSELEC',
+            'structure.$id': structure._id,
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },

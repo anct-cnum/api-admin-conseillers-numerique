@@ -34,8 +34,8 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     return;
   }
 
-  // 'structure', 'prefet', 'hub_coop', 'coordinateur_coop' en standbye
-  const allowedRoles = ['admin', 'grandReseau', 'structure'];
+  // 'hub_coop', 'coordinateur_coop' en standbye
+  const allowedRoles = ['admin', 'grandReseau', 'structure', 'prefet'];
 
   if (allowedRoles.includes(options.role) === false) {
     logger.warn(`Rôle ${options.role} non autorisé`);

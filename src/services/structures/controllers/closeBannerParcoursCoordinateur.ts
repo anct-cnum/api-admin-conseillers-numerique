@@ -20,12 +20,12 @@ const closeBannerParcoursCoordinateur =
       let objectUpdated = {};
       let objectUpdatedMiseEnRelation = {};
       switch (typeBanner) {
-        case 'banniereInformationAvis':
+        case 'banniereInformationAvisStructure':
           objectUpdated = {
-            'demandesCoordinateur.$.banniereInformationAvis': false,
+            'demandesCoordinateur.$.banniereInformationAvisStructure': false,
           };
           objectUpdatedMiseEnRelation = {
-            'structureObj.demandesCoordinateur.$.banniereInformationAvis':
+            'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
               false,
           };
           break;
@@ -62,7 +62,15 @@ const closeBannerParcoursCoordinateur =
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            statut: 'VALIDATION_COSELEC',
+            $or: [
+              {
+                statut: 'VALIDATION_COSELEC',
+              },
+              {
+                coordinateurCandidature: true,
+                statut: 'CREEE',
+              },
+            ],
           },
           {
             $set: objectUpdated,
@@ -80,12 +88,20 @@ const closeBannerParcoursCoordinateur =
         .updateMany(
           {
             'structure.$id': new ObjectId(idStructure),
-            'structureObj.statut': 'VALIDATION_COSELEC',
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
+            $or: [
+              {
+                'structureObj.statut': 'VALIDATION_COSELEC',
+              },
+              {
+                'structureObj.coordinateurCandidature': true,
+                'structureObj.statut': 'CREEE',
+              },
+            ],
           },
           {
             $set: objectUpdatedMiseEnRelation,
