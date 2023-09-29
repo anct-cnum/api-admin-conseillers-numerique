@@ -20,14 +20,15 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'refusee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'demandesCoordinateur.$.banniereInformationAvis': true,
+        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'refusee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvis': true,
+        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
+          true,
       },
     };
     try {
