@@ -51,7 +51,15 @@ const updateDemandeCoordinateurAvisPrefet =
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            statut: 'VALIDATION_COSELEC',
+            $or: [
+              {
+                statut: 'VALIDATION_COSELEC',
+              },
+              {
+                coordinateurCandidature: true,
+                statut: 'CREEE',
+              },
+            ],
           },
           updatedDemandeCoordinateur,
         );
@@ -67,12 +75,20 @@ const updateDemandeCoordinateurAvisPrefet =
         .updateMany(
           {
             'structure.$id': new ObjectId(idStructure),
-            'structureObj.statut': 'VALIDATION_COSELEC',
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
+            $or: [
+              {
+                'structureObj.statut': 'VALIDATION_COSELEC',
+              },
+              {
+                'structureObj.coordinateurCandidature': true,
+                'structureObj.statut': 'CREEE',
+              },
+            ],
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
