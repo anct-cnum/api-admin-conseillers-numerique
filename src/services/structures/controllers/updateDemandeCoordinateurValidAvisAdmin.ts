@@ -45,14 +45,15 @@ const updateDemandeCoordinateurValidAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'validee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'demandesCoordinateur.$.banniereInformationAvis': true,
+        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'validee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvis': true,
+        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
+          true,
       },
     };
     try {
@@ -67,6 +68,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             },
             {
               coordinateurCandidature: true,
+              statut: 'CREEE',
             },
           ],
           demandesCoordinateur: {
