@@ -93,7 +93,8 @@ const closeBanner =
             },
           );
 
-        await getDetailStructureById(app)(req, res);
+        // eslint-disable-next-line consistent-return
+        return await getDetailStructureById(app)(req, res);
       }
     } catch (error) {
       if (error.name === 'ForbiddenError') {
