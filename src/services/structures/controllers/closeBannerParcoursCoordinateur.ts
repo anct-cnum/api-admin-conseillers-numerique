@@ -20,12 +20,12 @@ const closeBannerParcoursCoordinateur =
       let objectUpdated = {};
       let objectUpdatedMiseEnRelation = {};
       switch (typeBanner) {
-        case 'banniereInformationAvis':
+        case 'banniereInformationAvisStructure':
           objectUpdated = {
-            'demandesCoordinateur.$.banniereInformationAvis': false,
+            'demandesCoordinateur.$.banniereInformationAvisStructure': false,
           };
           objectUpdatedMiseEnRelation = {
-            'structureObj.demandesCoordinateur.$.banniereInformationAvis':
+            'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
               false,
           };
           break;

@@ -42,6 +42,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
             },
             {
               coordinateurCandidature: true,
+              statut: 'CREEE',
             },
           ],
         });
