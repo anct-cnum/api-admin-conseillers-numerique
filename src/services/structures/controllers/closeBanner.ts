@@ -38,8 +38,6 @@ const closeBanner =
         }
 
         req.params.id = req?.user?.entity?.oid;
-        const structure = await getDetailStructureById(app)(req, res);
-        res.status(200).json(structure);
       }
       // s'il s'agit d'un avenant de contrat
       else {
@@ -92,10 +90,8 @@ const closeBanner =
               arrayFilters: [{ 'elem.statut': 'validee' }],
             },
           );
-
-        // eslint-disable-next-line consistent-return
-        return await getDetailStructureById(app)(req, res);
       }
+      await getDetailStructureById(app)(req, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
