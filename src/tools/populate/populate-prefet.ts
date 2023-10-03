@@ -11,6 +11,8 @@ import { IUser } from '../../ts/interfaces/db.interfaces';
 import { invitationActiveCompte } from '../../emails';
 
 const { v4: uuidv4 } = require('uuid');
+const regions = require('../../../datas/imports/code_region.json');
+const departements = require('../../../datas/imports/departements-region.json');
 
 program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
@@ -20,6 +22,15 @@ const readCSV = async (filePath: any) => {
   const prefets = await CSVToJSON({ delimiter: 'auto' }).fromFile(filePath); // CSV en entrée avec colonnes Mail, Type & Code
   return prefets;
 };
+
+const matchRegion = (code: string) =>
+  regions.some((region: { code: string; nom: string }) => region.code === code);
+
+const matchDepartement = (code: string) =>
+  departements.some(
+    (departement: { num_dep: string; dep_name: string; region_name: string }) =>
+      departement.num_dep === code,
+  );
 
 execute(__filename, async ({ app, logger, mailer, exit }) => {
   const messageInvitation = invitationActiveCompte(app, mailer);
@@ -35,15 +46,16 @@ execute(__filename, async ({ app, logger, mailer, exit }) => {
       });
       if (user === null) {
         const localite = {};
-        if (prefet.Type === 'Département') {
-          Object.assign(localite, { departement: String(prefet.Code) });
+        const code = String(prefet.Code).padStart(2, '0');
+        if (prefet.Type === 'Département' && matchDepartement(code)) {
+          Object.assign(localite, { departement: code });
         }
-        if (prefet.Type === 'Région') {
-          Object.assign(localite, { region: String(prefet.Code) });
+        if (prefet.Type === 'Région' && matchRegion(code)) {
+          Object.assign(localite, { region: code });
         }
         if (Object.keys(localite).length === 0) {
           logger.warn(
-            `Type de localité incorrect pour le préfet ${prefet.Mail}`,
+            `La localité est incorrect pour le préfet ${prefet.Mail}`,
           );
           reject();
         } else {
