@@ -68,7 +68,7 @@ const closeBannerParcoursCoordinateur =
               },
               {
                 coordinateurCandidature: true,
-                statut: 'CREEE',
+                statut: { $in: ['CREEE', 'REFUS_COORDINATEUR'] },
               },
             ],
           },
