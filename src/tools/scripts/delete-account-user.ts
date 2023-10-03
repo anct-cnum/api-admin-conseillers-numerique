@@ -10,6 +10,7 @@ import service from '../../helpers/services';
 import { IUser } from '../../ts/interfaces/db.interfaces';
 
 program.option('-c, --csv <path>', 'CSV file path');
+program.option('-r, --role <role>', 'role');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
@@ -20,6 +21,11 @@ const readCSV = async (filePath: any) => {
 
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
+  const allowedRoles = ['admin', 'grandReseau', 'prefet'];
+  if (!allowedRoles.includes(options.role)) {
+    logger.error('Le role doit être admin, grandReseau ou prefet');
+    exit();
+  }
   const users = await readCSV(options.csv);
   const promises: Promise<void>[] = [];
 
@@ -28,6 +34,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     const p = new Promise<void>(async (resolve, reject) => {
       const user: IUser = await app.service(service.users).Model.findOne({
         name: userCsv.Mail.toLowerCase(),
+        roles: { $in: [options.role] },
       });
       if (user !== null) {
         await app.service(service.users).Model.deleteOne({
