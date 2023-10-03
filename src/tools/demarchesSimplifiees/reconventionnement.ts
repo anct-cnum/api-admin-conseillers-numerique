@@ -240,7 +240,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                 {
                   'conventionnement.dossierReconventionnement.dateDerniereModification':
                     {
-                      $gt: new Date(dossier.dateDerniereModification),
+                      $lt: new Date(dossier.dateDerniereModification),
                     },
                 },
                 {
@@ -289,7 +289,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                 {
                   'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
                     {
-                      $gt: new Date(dossier.dateDerniereModification),
+                      $lt: new Date(dossier.dateDerniereModification),
                     },
                 },
                 {
