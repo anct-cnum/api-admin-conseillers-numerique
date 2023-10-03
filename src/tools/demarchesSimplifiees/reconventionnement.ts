@@ -230,11 +230,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               idPG: dossier.idPG,
               statut: 'VALIDATION_COSELEC',
               'conventionnement.statut': {
-                $nin: [
-                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-                  StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-                  StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-                ],
+                $ne: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
               },
               $or: [
                 {
@@ -248,6 +244,11 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                     {
                       $exists: false,
                     },
+                },
+                {
+                  'conventionnement.dossierReconventionnement.numero': {
+                    $exists: false,
+                  },
                 },
               ],
             },
@@ -279,11 +280,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               'structure.$id': structure._id,
               'structureObj.statut': 'VALIDATION_COSELEC',
               'structureObj.conventionnement.statut': {
-                $nin: [
-                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-                  StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-                  StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-                ],
+                $ne: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
               },
               $or: [
                 {
@@ -294,6 +291,12 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                 },
                 {
                   'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
+                    {
+                      $exists: false,
+                    },
+                },
+                {
+                  'structureObj.conventionnement.dossierReconventionnement.numero':
                     {
                       $exists: false,
                     },
