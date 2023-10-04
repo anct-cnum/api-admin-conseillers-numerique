@@ -27,11 +27,11 @@ export default function (app: Application, mailer) {
           { _id: user._id },
           {
             $set: {
-              mailSentCoselecDate: new Date(),
+              mailSentCoselecCoordinateurDate: new Date(),
             },
             $unset: {
-              mailErrorSentCoselec: '',
-              mailErrorDetailSentCoselec: '',
+              mailErrorSentCoselecCoordinateur: '',
+              mailErrorDetailSentCoselecCoordinateur: '',
             },
           },
         );
@@ -40,8 +40,8 @@ export default function (app: Application, mailer) {
         await app.service(service.users).Model.updateOne(
           { _id: user._id },
           {
-            mailErrorSentCoselec: 'smtpError',
-            mailErrorDetailSentCoselec: err.message,
+            mailErrorSentCoselecCoordinateur: 'smtpError',
+            mailErrorDetailSentCoselecCoordinateur: err.message,
           },
         );
         throw err;
@@ -51,7 +51,7 @@ export default function (app: Application, mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Réponse à candidature : recrutement de Coordinateur Conseiller numérique France Services',
+            'Réponse à candidature : recrutement de Coordinateur Conseiller numérique',
           body: await render(user),
         })
         .then(onSuccess)

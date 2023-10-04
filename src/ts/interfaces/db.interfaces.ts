@@ -53,6 +53,12 @@ export interface IUser {
 
   mailErrorDetailSentCoselec?: string;
 
+  mailSentCoselecCoordinateurDate?: Date;
+
+  mailErrorSentCoselecCoordinateur?: string;
+
+  mailErrorDetailSentCoselecCoordinateur?: string;
+
   tokenCreatedAt?: Date;
 
   lastLogin?: Date;

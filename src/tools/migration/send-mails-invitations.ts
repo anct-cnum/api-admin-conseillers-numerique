@@ -57,7 +57,13 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       migrationDashboard: true, // Nécessaire pour inviter que les users autorisés & migrés
       token: { $ne: null },
     })
-    .select({ name: 1, token: 1, entity: 1, mailSentCoselecDate: 1 })
+    .select({
+      name: 1,
+      token: 1,
+      entity: 1,
+      mailSentCoselecDate: 1,
+      mailSentCoselecCoordinateurDate: 1,
+    })
     .limit(limit);
 
   if (users.length === 0) {
@@ -92,7 +98,10 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           if (!user.mailSentCoselecDate && !demandeCoordinateurValider) {
             await messageInformationCoselec.send(user);
           }
-          if (demandeCoordinateurValider) {
+          if (
+            !user.mailSentCoselecCoordinateurDate &&
+            demandeCoordinateurValider
+          ) {
             await messageInformationCoselecCoordinateur.send(user);
           }
         }
