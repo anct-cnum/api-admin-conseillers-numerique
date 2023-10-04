@@ -190,12 +190,6 @@ const getUrlDossierConventionnement = (
 };
 
 const filterStatut = (typeConvention: string) => {
-  if (typeConvention === 'reconventionnement') {
-    return {
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-    };
-  }
   if (typeConvention === 'conventionnement') {
     return {
       'conventionnement.statut':
@@ -227,10 +221,7 @@ const filterStatut = (typeConvention: string) => {
     $or: [
       {
         'conventionnement.statut': {
-          $in: [
-            StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-            StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-          ],
+          $eq: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
         },
       },
       {
@@ -361,13 +352,6 @@ const filterDateDemandeAndStatutHistorique = (
 };
 
 const totalParConvention = async (app: Application, req: IRequest) => {
-  const reconventionnement = await app
-    .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-    });
   const conventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
@@ -401,14 +385,10 @@ const totalParConvention = async (app: Application, req: IRequest) => {
   const totalAvenantRenduPoste =
     countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
-    conventionnement +
-    reconventionnement +
-    totalAvenantAjoutPoste +
-    totalAvenantRenduPoste;
+    conventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
 
   return {
     conventionnement,
-    reconventionnement,
     avenantAjoutPoste: totalAvenantAjoutPoste,
     avenantRenduPoste: totalAvenantRenduPoste,
     total,
@@ -610,19 +590,8 @@ const sortDossierConventionnement = (
 ) => {
   let avenantSort: any = [];
   let conventionnement: any = [];
-  let reconventionnement: any = [];
   if (type.includes('avenant') || type === 'toutes') {
     avenantSort = formatAvenantForDossierConventionnement(structures);
-  }
-  if (type === 'reconventionnement' || type === 'toutes') {
-    const regex = new RegExp(
-      `${StatutConventionnement.RECONVENTIONNEMENT_EN_COURS}$`,
-      'i',
-    );
-    reconventionnement = formatReconventionnementForDossierConventionnement(
-      structures,
-      regex,
-    );
   }
   if (type === 'conventionnement' || type === 'toutes') {
     conventionnement = formatConventionnementForDossierConventionnement(
@@ -630,10 +599,7 @@ const sortDossierConventionnement = (
       StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
     );
   }
-  const structureFormat = avenantSort.concat(
-    reconventionnement,
-    conventionnement,
-  );
+  const structureFormat = avenantSort.concat(conventionnement);
 
   return sortArrayConventionnement(structureFormat, ordre);
 };

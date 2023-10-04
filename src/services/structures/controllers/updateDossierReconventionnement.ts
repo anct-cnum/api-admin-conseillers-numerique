@@ -37,8 +37,8 @@ const updateDossierReconventionnement =
       case 'enregistrer':
         statut = StatutConventionnement.RECONVENTIONNEMENT_INITIÉ;
         break;
-      case 'envoyer':
-        statut = StatutConventionnement.RECONVENTIONNEMENT_EN_COURS;
+      case 'valider':
+        statut = StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ;
         break;
       case 'annuler':
         statut = StatutConventionnement.NON_INTERESSÉ;
@@ -52,7 +52,7 @@ const updateDossierReconventionnement =
       // On modifie le statut de la structure en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
       if (
         statut === StatutConventionnement.RECONVENTIONNEMENT_INITIÉ ||
-        statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
+        statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
         const objectConventionnement = {
           ...{
@@ -62,7 +62,7 @@ const updateDossierReconventionnement =
             'conventionnement.dossierReconventionnement.nbPostesAttribuees':
               Number(nombreDePostes),
           },
-          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_EN_COURS && {
+          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
             'conventionnement.dossierReconventionnement.dateDeCreation':
               new Date(),
           }),
