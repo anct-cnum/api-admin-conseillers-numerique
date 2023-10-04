@@ -44,9 +44,9 @@ execute(__filename, async ({ app, logger, mailer, exit }) => {
       const user: IUser = await app.service(service.users).Model.findOne({
         name: prefet.Mail.toLowerCase(),
       });
+      const code = String(prefet.Code).padStart(2, '0');
       if (user === null) {
         const localite = {};
-        const code = String(prefet.Code).padStart(2, '0');
         if (prefet.Type === 'Département' && matchDepartement(code)) {
           Object.assign(localite, { departement: code });
         }
@@ -75,6 +75,25 @@ execute(__filename, async ({ app, logger, mailer, exit }) => {
           resolve(p);
         }
       } else {
+        if (prefet.Type === 'Région' && user.region !== code) {
+          logger.warn(
+            `Le préfet ${user.name} n'est pas associé a la région présent dans le fichier`,
+          );
+          reject();
+          return;
+        }
+        if (prefet.Type === 'Département' && user.departement !== code) {
+          logger.warn(
+            `Le préfet ${user.name} n'est pas associé au département présent dans le fichier`,
+          );
+          reject();
+          return;
+        }
+        if (user.roles.includes('prefet')) {
+          logger.warn(`Le compte ${user.name} est un compte préfet`);
+          reject();
+          return;
+        }
         logger.warn(`le compte ${user.name} existe déjà`);
         reject();
       }
