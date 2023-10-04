@@ -89,12 +89,12 @@ execute(__filename, async ({ app, logger, mailer, exit }) => {
           reject();
           return;
         }
-        if (user.roles.includes('prefet')) {
-          logger.warn(`Le compte ${user.name} est un compte préfet`);
+        if (!user.roles.includes('prefet')) {
+          logger.warn(`Le compte ${user.name} n'est pas un compte préfet`);
           reject();
           return;
         }
-        logger.warn(`le compte ${user.name} existe déjà`);
+        logger.info(`le compte ${user.name} existe déjà`);
         reject();
       }
     });
