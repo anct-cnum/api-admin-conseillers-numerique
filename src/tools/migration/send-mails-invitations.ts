@@ -9,8 +9,8 @@ import { IUser } from '../../ts/interfaces/db.interfaces';
 import {
   informationValidationCoselec,
   invitationActiveCompte,
+  informationValidationCoselecCoordinateur,
 } from '../../emails';
-import informationValidationCoselecCoordinateur from '../../emails/structures/informationValidationCoselecCoordinateur';
 
 program.option('-r, --role <role>', 'Role');
 program.option('-l, --limit <limit>', 'Limite');
