@@ -254,10 +254,10 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
             },
             {
               'conventionnement.statut':
-                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
-                structure?.conventionnement?.statut
-                  ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
-                  : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
+                structure?.conventionnement?.statut ===
+                StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+                  ? StatutConventionnement.RECONVENTIONNEMENT_INITIÉ
+                  : structure?.conventionnement?.statut,
               'conventionnement.dossierReconventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),
@@ -305,10 +305,10 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
             },
             {
               'structureObj.conventionnement.statut':
-                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
-                structure?.conventionnement?.statut
-                  ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
-                  : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
+                structure?.conventionnement?.statut ===
+                StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+                  ? StatutConventionnement.RECONVENTIONNEMENT_INITIÉ
+                  : structure?.conventionnement?.statut,
               'structureObj.conventionnement.dossierReconventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),
