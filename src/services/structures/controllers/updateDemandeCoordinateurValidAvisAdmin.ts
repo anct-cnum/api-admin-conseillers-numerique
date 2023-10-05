@@ -113,7 +113,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           champsFormulaire[0].stringValue === 'Non') ||
         structure.statut === 'CREEE'
       ) {
-        const nombreConseillersCoselec = coselec.nombreConseillersCoselec ?? 0;
+        const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
         const nombreConseillersValider = Number(nombreConseillersCoselec) + 1;
         Object.assign(updatedDemandeCoordinateur, {
           $push: {
