@@ -303,6 +303,13 @@ export interface IStructures {
     coordinates: number[];
   };
 
+  coordonneesInsee: {
+    type: string;
+    coordinates: number[];
+  };
+
+  adresseInsee2Ban: object;
+
   nomCommune: string;
 
   codeCommune: string;
@@ -595,6 +602,32 @@ export interface IStatsConseillersCras {
   2022: [Object];
   2023: [Object];
   2024: [Object];
+}
+
+export interface ICommunes {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: number[];
+  };
+  properties: {
+    code: string;
+    nom: string;
+  };
+}
+
+export interface IQpv {
+  type: string;
+  properties: {
+    CODE_QP: string;
+    NOM_QP: string;
+    COMMUNE_QP: string;
+    correction?: string;
+  };
+  geometry: {
+    type: string;
+    coordinates: number[];
+  };
 }
 
 export function isArrayConseillers(item: any): item is IConseillers[] {
