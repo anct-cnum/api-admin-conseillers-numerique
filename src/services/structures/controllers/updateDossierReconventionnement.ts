@@ -9,7 +9,7 @@ import { StatutConventionnement } from '../../../ts/enum';
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
-      query: { action, structureId, nombreDePostes, motif },
+      query: { action, structureId, motif },
       body: { misesEnRelations },
     } = req;
     let statut: string;
@@ -18,7 +18,6 @@ const updateDossierReconventionnement =
     const updateValidation = updateReconventionnement.validate({
       action,
       structureId,
-      nombreDePostes,
       motif,
       misesEnRelations,
     });
@@ -59,8 +58,6 @@ const updateDossierReconventionnement =
             'conventionnement.statut': statut,
             'conventionnement.dossierReconventionnement.dateDerniereModification':
               new Date(),
-            'conventionnement.dossierReconventionnement.nbPostesAttribuees':
-              Number(nombreDePostes),
           },
           ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
             'conventionnement.dossierReconventionnement.dateDeCreation':
