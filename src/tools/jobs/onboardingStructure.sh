@@ -2,6 +2,7 @@
 
 cd ${APP_HOME}
 
-echo "Envoi des mails d'invitations aux tableau de pilotage: START\n"
+echo "Onboarding des nouvelles structures sur le TDP: START\n"
 node_modules/.bin/ts-node src/tools/migration/send-mail-invitations.ts --role structure --limit 50
-echo "Envoi des mails d'invitations aux tableau de pilotage: END\n"
+node_modules/.bin/ts-node src/tools/structures/onboardingStructure.ts
+echo "Onboarding des nouvelles structures sur le TDP: END\n"
