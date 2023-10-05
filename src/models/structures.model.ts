@@ -118,6 +118,10 @@ export default function (app: Application): Model<any> {
 
       contact: { type: contactSchema },
 
+      coordonneesInsee: { type: Object },
+
+      adresseInsee2Ban: { type: Object },
+
       conventionnement: { type: conventionnementSchema },
 
       demandesCoselec: { type: [demandeCoselecSchema], default: undefined },
