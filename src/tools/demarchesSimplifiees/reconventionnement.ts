@@ -230,17 +230,13 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               idPG: dossier.idPG,
               statut: 'VALIDATION_COSELEC',
               'conventionnement.statut': {
-                $nin: [
-                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-                  StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-                  StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-                ],
+                $ne: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
               },
               $or: [
                 {
                   'conventionnement.dossierReconventionnement.dateDerniereModification':
                     {
-                      $gt: new Date(dossier.dateDerniereModification),
+                      $lt: new Date(dossier.dateDerniereModification),
                     },
                 },
                 {
@@ -249,14 +245,19 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                       $exists: false,
                     },
                 },
+                {
+                  'conventionnement.dossierReconventionnement.numero': {
+                    $exists: false,
+                  },
+                },
               ],
             },
             {
               'conventionnement.statut':
-                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
-                structure?.conventionnement?.statut
-                  ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
-                  : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
+                structure?.conventionnement?.statut ===
+                StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+                  ? StatutConventionnement.RECONVENTIONNEMENT_INITIÉ
+                  : structure?.conventionnement?.statut,
               'conventionnement.dossierReconventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),
@@ -279,17 +280,13 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
               'structure.$id': structure._id,
               'structureObj.statut': 'VALIDATION_COSELEC',
               'structureObj.conventionnement.statut': {
-                $nin: [
-                  StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-                  StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-                  StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-                ],
+                $ne: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
               },
               $or: [
                 {
                   'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
                     {
-                      $gt: new Date(dossier.dateDerniereModification),
+                      $lt: new Date(dossier.dateDerniereModification),
                     },
                 },
                 {
@@ -298,14 +295,20 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
                       $exists: false,
                     },
                 },
+                {
+                  'structureObj.conventionnement.dossierReconventionnement.numero':
+                    {
+                      $exists: false,
+                    },
+                },
               ],
             },
             {
               'structureObj.conventionnement.statut':
-                StatutConventionnement.RECONVENTIONNEMENT_EN_COURS ===
-                structure?.conventionnement?.statut
-                  ? StatutConventionnement.RECONVENTIONNEMENT_EN_COURS
-                  : StatutConventionnement.RECONVENTIONNEMENT_INITIÉ,
+                structure?.conventionnement?.statut ===
+                StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+                  ? StatutConventionnement.RECONVENTIONNEMENT_INITIÉ
+                  : structure?.conventionnement?.statut,
               'structureObj.conventionnement.dossierReconventionnement': {
                 numero: dossier._id,
                 dateDeCreation: new Date(dossier.dateDeCreation),
