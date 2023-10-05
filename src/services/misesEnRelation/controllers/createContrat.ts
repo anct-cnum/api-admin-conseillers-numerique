@@ -43,7 +43,19 @@ const createContrat =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-
+      const miseEnRelationRenouvellementInitiee = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          statut: 'renouvellement_initiee',
+          'conseiller.$id': miseEnRelation.conseiller.oid,
+        });
+      if (miseEnRelationRenouvellementInitiee) {
+        res.status(409).json({
+          message: `Renouvellement déjà fait pour le conseiller ${miseEnRelation.conseillerObj.nom} ${miseEnRelation.conseillerObj.prenom}`,
+        });
+        return;
+      }
       const duplicateMiseEnRelation = {
         ...miseEnRelation.toObject(),
         _id: new ObjectId(),
