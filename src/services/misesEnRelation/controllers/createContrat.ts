@@ -52,7 +52,7 @@ const createContrat =
         });
       if (miseEnRelationRenouvellementInitiee) {
         res.status(409).json({
-          message: `Renouvellement déjà fait pour le conseiller ${miseEnRelation.conseillerObj.nom} ${miseEnRelation.conseillerObj.prenom}`,
+          message: `Renouvellement déjà effectué pour le conseiller ${miseEnRelation.conseillerObj.nom} ${miseEnRelation.conseillerObj.prenom}`,
         });
         return;
       }
