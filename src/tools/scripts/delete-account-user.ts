@@ -43,7 +43,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         logger.info(`Le compte ${user.name} a été supprimé`);
         resolve(p);
       } else {
-        logger.warn(`le compte ${user.name} n'existe pas`);
+        logger.warn(`le compte ${userCsv.Mail.toLowerCase()} n'existe pas`);
         reject();
       }
     });
