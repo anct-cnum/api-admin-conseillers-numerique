@@ -4,66 +4,76 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { demandeCoordinateurAvisPrefet } from '../../../schemas/coordinateur.schemas';
 
-const updateDemandeCoordinateurAvisPrefet =
+const updateDemandeCoordinateurRefusAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { avisPrefet, idDemandeCoordinateur, commentaire } = req.body;
-    const avisPrefetValidation = demandeCoordinateurAvisPrefet.validate({
-      avisPrefet,
-      idDemandeCoordinateur,
-      commentaire,
-    });
-
-    if (avisPrefetValidation.error) {
-      res.status(400).json({ message: avisPrefetValidation.error.message });
+    const { idDemandeCoordinateur } = req.body;
+    if (
+      !ObjectId.isValid(idStructure) ||
+      !ObjectId.isValid(idDemandeCoordinateur)
+    ) {
+      res.status(400).json({ message: 'Id incorrect' });
       return;
     }
     const updatedDemandeCoordinateur = {
       $set: {
-        'demandesCoordinateur.$.avisPrefet': avisPrefet,
-        'demandesCoordinateur.$.banniereValidationAvisPrefet': true,
-        'demandesCoordinateur.$.commentaire': commentaire,
+        'demandesCoordinateur.$.statut': 'refusee',
+        'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
-        'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
-        'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
+        'structureObj.demandesCoordinateur.$.statut': 'refusee',
+        'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
           true,
-        'structureObj.demandesCoordinateur.$.commentaire': commentaire,
       },
     };
     try {
-      if (!ObjectId.isValid(idStructure)) {
-        res.status(400).json({ message: 'Id incorrect' });
+      const structure = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: new ObjectId(idStructure),
+          $or: [
+            {
+              statut: 'VALIDATION_COSELEC',
+            },
+            {
+              coordinateurCandidature: true,
+              statut: 'CREEE',
+            },
+          ],
+        });
+      if (!structure) {
+        res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      const structure = await app
+      if (structure.statut === 'CREEE') {
+        Object.assign(updatedDemandeCoordinateur.$set, {
+          statut: 'REFUS_COORDINATEUR',
+        });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          'structureObj.statut': 'REFUS_COORDINATEUR',
+        });
+      }
+      const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: new ObjectId(idStructure),
+            _id: structure._id,
             demandesCoordinateur: {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            $or: [
-              {
-                statut: 'VALIDATION_COSELEC',
-              },
-              {
-                coordinateurCandidature: true,
-                statut: 'CREEE',
-              },
-            ],
           },
           updatedDemandeCoordinateur,
         );
-      if (structure.modifiedCount === 0) {
+      if (structureUpdated.modifiedCount === 0) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
@@ -74,21 +84,12 @@ const updateDemandeCoordinateurAvisPrefet =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            'structure.$id': new ObjectId(idStructure),
+            'structure.$id': structure._id,
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
-            $or: [
-              {
-                'structureObj.statut': 'VALIDATION_COSELEC',
-              },
-              {
-                'structureObj.coordinateurCandidature': true,
-                'structureObj.statut': 'CREEE',
-              },
-            ],
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
@@ -103,4 +104,4 @@ const updateDemandeCoordinateurAvisPrefet =
     }
   };
 
-export default updateDemandeCoordinateurAvisPrefet;
+export default updateDemandeCoordinateurRefusAvisAdmin;

@@ -53,6 +53,7 @@
     "refresh_token_duration": "1d"
   },
   "demarche_simplifiee": {
+    "endpoint": "DEMARCHE_SIMPLIFIEE_ENDPOINT",
     "token_api": "DEMARCHE_SIMPLIFIEE_TOKEN_API",
     "url_entreprise_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE_RECONVENTIONNEMENT",
     "url_association_reconventionnement": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION_RECONVENTIONNEMENT",
@@ -60,7 +61,7 @@
     "url_entreprise_conventionnement": "DEMARCHE_SIMPLIFIEE_URL_ENTREPRISE_CONVENTIONNEMENT",
     "url_association_conventionnement": "DEMARCHE_SIMPLIFIEE_URL_ASSOCIATION_CONVENTIONNEMENT",
     "url_structure_publique_conventionnement": "DEMARCHE_SIMPLIFIEE_URL_STRUCTURE_PUBLIQUE_CONVENTIONNEMENT",
-    "endpoint": "DEMARCHE_SIMPLIFIEE_ENDPOINT"
+    "numero_demarche_recrutement_coordinateur": "DEMARCHE_SIMPLIFIEE_NUMERO_DEMARCHE_RECRUTEMENT_COORDINATEUR"
   },
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {

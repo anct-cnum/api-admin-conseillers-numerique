@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// ts-node src/tools/scripts/reconventionnementStructure.ts -s XXX -st XXX
+
 import { program } from 'commander';
 import { ObjectId } from 'mongodb';
 import execute from '../utils';
@@ -10,21 +12,19 @@ program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-st, --statut <statut>', 'statut');
 program.parse(process.argv);
 
-// ts-node src/tools/scripts/reconventionnementStructure.ts -s XXX -st XXX
-
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
   const valueConvention = Object.values(StatutConventionnement).filter((i) =>
     i.match(/RECONVENTIONNEMENT/g),
   );
-  if (!options.structureId || !ObjectId.isValid(options.structureId)) {
+  if (!ObjectId.isValid(options.structureId)) {
     logger.error(`Veuillez renseigner un id structure.`);
     return;
   }
 
   if (!valueConvention.includes(options.statut)) {
     logger.error(
-      `Veuillez saisir un statut de reconventionnement, parmis la liste : ${valueConvention}`,
+      `Veuillez saisir un statut de reconventionnement, parmi la liste : ${valueConvention}`,
     );
     return;
   }
@@ -48,10 +48,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     );
     logger.info(
-      `Modification éffectué pour la structure ${structureId} en statut ${options.statut}`,
+      `Modification effectuée pour la structure ${structureId} en statut ${options.statut}`,
     );
   } else {
-    logger.info(`Structure non trouvé.`);
+    logger.info(`Structure non trouvée.`);
   }
   exit();
 });

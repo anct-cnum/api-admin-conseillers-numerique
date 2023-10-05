@@ -136,6 +136,14 @@ const queryGetDossierDemarcheSimplifiee = () => gql`
     ... on MultipleDropDownListChamp {
       values
     }
+    ... on PieceJustificativeChamp {
+      id
+      label
+      files {
+        url
+        filename
+      }
+    }
   }
 `;
 

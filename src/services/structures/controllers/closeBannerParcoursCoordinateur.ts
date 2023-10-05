@@ -4,41 +4,52 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { demandeCoordinateurAvisPrefet } from '../../../schemas/coordinateur.schemas';
 
-const updateDemandeCoordinateurAvisPrefet =
+const closeBannerParcoursCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { avisPrefet, idDemandeCoordinateur, commentaire } = req.body;
-    const avisPrefetValidation = demandeCoordinateurAvisPrefet.validate({
-      avisPrefet,
-      idDemandeCoordinateur,
-      commentaire,
-    });
-
-    if (avisPrefetValidation.error) {
-      res.status(400).json({ message: avisPrefetValidation.error.message });
-      return;
-    }
-    const updatedDemandeCoordinateur = {
-      $set: {
-        'demandesCoordinateur.$.avisPrefet': avisPrefet,
-        'demandesCoordinateur.$.banniereValidationAvisPrefet': true,
-        'demandesCoordinateur.$.commentaire': commentaire,
-      },
-    };
-    const updatedDemandeCoordinateurMiseEnRelation = {
-      $set: {
-        'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
-        'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-          true,
-        'structureObj.demandesCoordinateur.$.commentaire': commentaire,
-      },
-    };
+    const { idDemandeCoordinateur, typeBanner } = req.body;
     try {
-      if (!ObjectId.isValid(idStructure)) {
+      if (
+        !ObjectId.isValid(idStructure) ||
+        !ObjectId.isValid(idDemandeCoordinateur)
+      ) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
+      }
+      let objectUpdated = {};
+      let objectUpdatedMiseEnRelation = {};
+      switch (typeBanner) {
+        case 'banniereInformationAvisStructure':
+          objectUpdated = {
+            'demandesCoordinateur.$.banniereInformationAvisStructure': false,
+          };
+          objectUpdatedMiseEnRelation = {
+            'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
+              false,
+          };
+          break;
+        case 'banniereValidationAvisPrefet':
+          objectUpdated = {
+            'demandesCoordinateur.$.banniereValidationAvisPrefet': false,
+          };
+          objectUpdatedMiseEnRelation = {
+            'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
+              false,
+          };
+          break;
+        case 'banniereValidationAvisAdmin':
+          objectUpdated = {
+            'demandesCoordinateur.$.banniereValidationAvisAdmin': false,
+          };
+          objectUpdatedMiseEnRelation = {
+            'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin':
+              false,
+          };
+          break;
+        default:
+          res.status(400).json({ message: 'Type de bannière incorrect' });
+          return;
       }
       const structure = await app
         .service(service.structures)
@@ -57,11 +68,13 @@ const updateDemandeCoordinateurAvisPrefet =
               },
               {
                 coordinateurCandidature: true,
-                statut: 'CREEE',
+                statut: { $in: ['CREEE', 'REFUS_COORDINATEUR'] },
               },
             ],
           },
-          updatedDemandeCoordinateur,
+          {
+            $set: objectUpdated,
+          },
         );
       if (structure.modifiedCount === 0) {
         res
@@ -90,9 +103,11 @@ const updateDemandeCoordinateurAvisPrefet =
               },
             ],
           },
-          updatedDemandeCoordinateurMiseEnRelation,
+          {
+            $set: objectUpdatedMiseEnRelation,
+          },
         );
-      res.status(200).json({ success: true });
+      res.status(200).json(idDemandeCoordinateur);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
@@ -103,4 +118,4 @@ const updateDemandeCoordinateurAvisPrefet =
     }
   };
 
-export default updateDemandeCoordinateurAvisPrefet;
+export default closeBannerParcoursCoordinateur;
