@@ -92,6 +92,7 @@ const getMisesEnRelationRecruter =
           'conseillerObj.prenom': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.emailCN.address': 1,
+          'conseillerObj.mattermost.login': 1,
           statut: 1,
           dossierIncompletRupture: 1,
           dateDebutDeContrat: 1,

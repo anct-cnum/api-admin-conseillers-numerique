@@ -701,6 +701,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Nom',
       'Prénom',
       'Email Professionnelle',
+      'Compte Coop activé',
       'Téléphone professionnel',
       'Email personnelle',
       'Statut',
@@ -722,12 +723,16 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.conseillerObj.idPG,
             miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
-            miseEnRelation.structureObj.nom,
+            miseEnRelation.structureObj.nom?.replaceAll(',', ' '),
             miseEnRelation.structureObj.codePostal,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
-              'compte COOP non créé',
+              `compte COOP non créé (${formatStatutMisesEnRelation(
+                miseEnRelation.statut,
+                miseEnRelation?.dossierIncompletRupture,
+              )})`,
+            miseEnRelation.conseillerObj?.mattermost?.login ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
             formatStatutMisesEnRelation(
