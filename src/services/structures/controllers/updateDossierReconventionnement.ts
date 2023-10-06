@@ -53,22 +53,15 @@ const updateDossierReconventionnement =
         statut === StatutConventionnement.RECONVENTIONNEMENT_INITIÉ ||
         statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
-        const objectConventionnement = {
-          ...{
-            'conventionnement.statut': statut,
-            'conventionnement.dossierReconventionnement.dateDerniereModification':
-              new Date(),
-          },
-          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
-            'conventionnement.dossierReconventionnement.dateDeCreation':
-              new Date(),
-          }),
-        };
         await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne({
-            $set: objectConventionnement,
+            $set: {
+              'conventionnement.statut': statut,
+              'conventionnement.dossierReconventionnement.dateDerniereModification':
+                new Date(),
+            },
           });
       } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
         await app
