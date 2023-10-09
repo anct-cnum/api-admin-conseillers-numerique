@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { updateReconventionnement } from '../../../schemas/reconventionnement.schemas';
 import { StatutConventionnement } from '../../../ts/enum';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -29,6 +30,23 @@ const updateDossierReconventionnement =
 
     if (!ObjectId.isValid(structureId)) {
       res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
+    const structure: IStructures = await app
+      .service(service.structures)
+      .Model.accessibleBy(req.ability, action.read)
+      .findOne();
+    if (!structure) {
+      res.status(404).json({ message: "La structure n'existe pas" });
+      return;
+    }
+    if (
+      action.trim() === 'valider' &&
+      !structure?.conventionnement?.dossierReconventionnement?.numero
+    ) {
+      res
+        .status(404)
+        .json({ message: 'Le numéro de dossier DS est obligatoire' });
       return;
     }
 
