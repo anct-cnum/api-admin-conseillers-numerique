@@ -43,13 +43,18 @@ const createContrat =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-
+      const miseEnRelationObject = miseEnRelation.toObject();
+      if (typeDeContrat === 'CDI') {
+        delete miseEnRelationObject.dateFinDeContrat;
+      }
+      if (!salaire) {
+        delete miseEnRelationObject.salaire;
+      }
       const duplicateMiseEnRelation = {
-        ...miseEnRelation.toObject(),
+        ...miseEnRelationObject,
         _id: new ObjectId(),
         typeDeContrat,
         dateDebutDeContrat: new Date(dateDebutDeContrat),
-        salaire: Number(salaire.replace(',', '.')),
         banniereValidationRenouvellement: false,
         emetteurRenouvellement: {
           date: new Date(),
@@ -72,6 +77,9 @@ const createContrat =
       }
       if (typeDeContrat !== 'CDI') {
         duplicateMiseEnRelation.dateFinDeContrat = new Date(dateFinDeContrat);
+      }
+      if (salaire) {
+        duplicateMiseEnRelation.salaire = Number(salaire.replace(',', '.'));
       }
       const newMiseEnRelation = await app
         .service(service.misesEnRelation)
