@@ -53,7 +53,7 @@ const updateDossierReconventionnement =
         statut === StatutConventionnement.RECONVENTIONNEMENT_INITIÉ ||
         statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
-        await app
+        const structureUpdated = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne({
@@ -63,8 +63,24 @@ const updateDossierReconventionnement =
                 new Date(),
             },
           });
-      } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
+        if (structureUpdated.modifiedCount === 0) {
+          res.status(404).json({
+            message: "La structure n'a pas été mise à jour",
+          });
+          return;
+        }
         await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany({
+            $set: {
+              'structureObj.conventionnement.statut': statut,
+              'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
+                new Date(),
+            },
+          });
+      } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
+        const structureUpdated = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne({
@@ -72,6 +88,23 @@ const updateDossierReconventionnement =
               'conventionnement.statut': statut,
               'conventionnement.motif': motif,
               'conventionnement.dossierReconventionnement.dateDerniereModification':
+                new Date(),
+            },
+          });
+        if (structureUpdated.modifiedCount === 0) {
+          res.status(404).json({
+            message: "La structure n'a pas été mise à jour",
+          });
+          return;
+        }
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany({
+            $set: {
+              'structureObj.conventionnement.statut': statut,
+              'structureObj.conventionnement.motif': motif,
+              'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
                 new Date(),
             },
           });
