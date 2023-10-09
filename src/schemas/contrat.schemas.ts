@@ -25,13 +25,13 @@ const validCreationContrat = Joi.object({
     .error(new Error('La date de début de contrat est invalide')),
   dateFinDeContrat: Joi.date()
     .required()
-    .allow('')
+    .allow(null, '')
     .error(new Error('La date de fin de contrat est invalide')),
   typeDeContrat: Joi.string()
     .required()
     .error(new Error('Le type de contrat est invalide')),
   salaire: Joi.string()
-    .allow('')
+    .allow(null, '')
     .regex(/^(\d+(?:[\\.\\,]\d*)?)$/)
     .required()
     .error(new Error('Le salaire du contrat est invalide')),
