@@ -50,6 +50,16 @@ const createAvenant =
         ? PhaseConventionnement.PHASE_2
         : PhaseConventionnement.PHASE_1;
 
+    if (
+      type === 'retrait' &&
+      phaseConventionnement === PhaseConventionnement.PHASE_1
+    ) {
+      res
+        .status(400)
+        .json({ message: 'Impossible de retirer des postes en phase 1' });
+      return;
+    }
+
     const demandeCoselec = {
       id: new ObjectId(),
       ...(type === 'retrait'

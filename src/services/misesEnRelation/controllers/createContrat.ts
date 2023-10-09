@@ -50,6 +50,19 @@ const createContrat =
       if (!salaire) {
         delete miseEnRelationObject.salaire;
       }
+      const miseEnRelationRenouvellementInitiee = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          statut: 'renouvellement_initiee',
+          'conseiller.$id': miseEnRelation.conseiller.oid,
+        });
+      if (miseEnRelationRenouvellementInitiee) {
+        res.status(409).json({
+          message: `Renouvellement déjà effectué pour le conseiller ${miseEnRelation.conseillerObj.nom} ${miseEnRelation.conseillerObj.prenom}`,
+        });
+        return;
+      }
       const duplicateMiseEnRelation = {
         ...miseEnRelationObject,
         _id: new ObjectId(),
