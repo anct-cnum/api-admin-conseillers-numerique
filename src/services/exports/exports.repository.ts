@@ -723,7 +723,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.conseillerObj.idPG,
             miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
-            miseEnRelation.structureObj.nom?.replaceAll(',', ' '),
+            miseEnRelation.structureObj.nom?.replaceAll(/["',]/g, ' '),
             miseEnRelation.structureObj.codePostal,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
