@@ -190,12 +190,6 @@ const getUrlDossierConventionnement = (
 };
 
 const filterStatut = (typeConvention: string) => {
-  if (typeConvention === 'reconventionnement') {
-    return {
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-    };
-  }
   if (typeConvention === 'conventionnement') {
     return {
       'conventionnement.statut':
@@ -227,10 +221,7 @@ const filterStatut = (typeConvention: string) => {
     $or: [
       {
         'conventionnement.statut': {
-          $in: [
-            StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-            StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-          ],
+          $eq: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
         },
       },
       {
@@ -260,12 +251,8 @@ const filterDateDemandeAndStatutHistorique = (
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      'conventionnement.statut': {
-        $in: [
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-          StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-        ],
-      },
+      'conventionnement.statut':
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
       'conventionnement.dossierReconventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
@@ -313,12 +300,8 @@ const filterDateDemandeAndStatutHistorique = (
   return {
     $or: [
       {
-        'conventionnement.statut': {
-          $in: [
-            StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-            StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-          ],
-        },
+        'conventionnement.statut':
+          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
         'conventionnement.dossierReconventionnement.dateDeCreation': {
           $gte: dateDebut,
           $lte: dateFin,
@@ -361,13 +344,6 @@ const filterDateDemandeAndStatutHistorique = (
 };
 
 const totalParConvention = async (app: Application, req: IRequest) => {
-  const reconventionnement = await app
-    .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-    });
   const conventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
@@ -401,14 +377,10 @@ const totalParConvention = async (app: Application, req: IRequest) => {
   const totalAvenantRenduPoste =
     countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
-    conventionnement +
-    reconventionnement +
-    totalAvenantAjoutPoste +
-    totalAvenantRenduPoste;
+    conventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
 
   return {
     conventionnement,
-    reconventionnement,
     avenantAjoutPoste: totalAvenantAjoutPoste,
     avenantRenduPoste: totalAvenantRenduPoste,
     total,
@@ -425,12 +397,8 @@ const totalParHistoriqueConvention = async (
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': {
-        $in: [
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-          StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-        ],
-      },
+      'conventionnement.statut':
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
       'conventionnement.dossierReconventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
@@ -566,10 +534,13 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
 
 const formatReconventionnementForDossierConventionnement = (
   structures,
-  regex: RegExp,
+  statutConventionnement,
 ) =>
   structures
-    .filter((structure) => structure?.conventionnement?.statut?.match(regex))
+    .filter(
+      (structure) =>
+        structure?.conventionnement?.statut === statutConventionnement,
+    )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
@@ -610,19 +581,8 @@ const sortDossierConventionnement = (
 ) => {
   let avenantSort: any = [];
   let conventionnement: any = [];
-  let reconventionnement: any = [];
   if (type.includes('avenant') || type === 'toutes') {
     avenantSort = formatAvenantForDossierConventionnement(structures);
-  }
-  if (type === 'reconventionnement' || type === 'toutes') {
-    const regex = new RegExp(
-      `${StatutConventionnement.RECONVENTIONNEMENT_EN_COURS}$`,
-      'i',
-    );
-    reconventionnement = formatReconventionnementForDossierConventionnement(
-      structures,
-      regex,
-    );
   }
   if (type === 'conventionnement' || type === 'toutes') {
     conventionnement = formatConventionnementForDossierConventionnement(
@@ -630,10 +590,7 @@ const sortDossierConventionnement = (
       StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
     );
   }
-  const structureFormat = avenantSort.concat(
-    reconventionnement,
-    conventionnement,
-  );
+  const structureFormat = avenantSort.concat(conventionnement);
 
   return sortArrayConventionnement(structureFormat, ordre);
 };
@@ -654,13 +611,9 @@ const sortHistoriqueDossierConventionnement = (
     avenantSort = avenantSort.flat(1);
   }
   if (type === 'reconventionnement' || type === 'toutes') {
-    const regex = new RegExp(
-      `(?:${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}|${StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ})$`,
-      'i',
-    );
     reconventionnement = formatReconventionnementForDossierConventionnement(
       structures,
-      regex,
+      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
     );
   }
   if (type === 'conventionnement' || type === 'toutes') {

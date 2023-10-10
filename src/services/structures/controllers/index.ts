@@ -10,7 +10,6 @@ import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
-import decisionReconventionnement from './decisionReconventionnement';
 import closeBanner from './closeBanner';
 import createAvenant from './createAvenant';
 import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
@@ -35,7 +34,6 @@ export {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
-  decisionReconventionnement,
   closeBanner,
   createAvenant,
   updateAvenantAjoutPoste,
