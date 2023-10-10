@@ -34,6 +34,14 @@ const getExportListeGestionnairesCsv =
         .service(service.users)
         .Model.aggregate([
           {
+            $match: {
+              migrationDashboard: true,
+              $and: [checkAccessGestionnaire],
+              ...filterRole(searchRole),
+              ...filterNomGestionnaire(searchByName),
+            },
+          },
+          {
             $addFields: {
               entity: {
                 $arrayElemAt: [{ $objectToArray: '$entity' }, 1],
@@ -43,14 +51,6 @@ const getExportListeGestionnairesCsv =
           {
             $addFields: {
               entity: '$entity.v',
-            },
-          },
-          {
-            $match: {
-              migrationDashboard: true,
-              $and: [checkAccessGestionnaire],
-              ...filterRole(searchRole),
-              ...filterNomGestionnaire(searchByName),
             },
           },
           {
