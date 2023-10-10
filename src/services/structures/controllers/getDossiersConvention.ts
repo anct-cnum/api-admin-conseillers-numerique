@@ -78,7 +78,6 @@ const getDossiersConvention =
         total: number;
         data: object;
         totalParConvention: {
-          reconventionnement: number;
           conventionnement: number;
           avenantAjoutPoste: number;
           avenantRenduPoste: number;
@@ -90,7 +89,6 @@ const getDossiersConvention =
         total: 0,
         data: [],
         totalParConvention: {
-          reconventionnement: 0,
           conventionnement: 0,
           avenantAjoutPoste: 0,
           avenantRenduPoste: 0,
