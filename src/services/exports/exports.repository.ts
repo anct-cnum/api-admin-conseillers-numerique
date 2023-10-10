@@ -832,7 +832,7 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
         fileHeaders.join(csvCellSeparator),
         ...gestionnaires.map((gestionnaire) =>
           [
-            gestionnaire._id,
+            gestionnaire?.idStructure,
             `"${gestionnaire.roles.join(',')}"`,
             gestionnaire.name,
             gestionnaire.reseau,

@@ -34,6 +34,18 @@ const getExportListeGestionnairesCsv =
         .service(service.users)
         .Model.aggregate([
           {
+            $addFields: {
+              entity: {
+                $arrayElemAt: [{ $objectToArray: '$entity' }, 1],
+              },
+            },
+          },
+          {
+            $addFields: {
+              entity: '$entity.v',
+            },
+          },
+          {
             $match: {
               migrationDashboard: true,
               $and: [checkAccessGestionnaire],
@@ -42,8 +54,23 @@ const getExportListeGestionnairesCsv =
             },
           },
           {
+            $lookup: {
+              localField: 'entity', // DBREF non supporté ici donc passage en objectToArray
+              from: 'structures',
+              foreignField: '_id',
+              as: 'structure',
+            },
+          },
+          {
+            $unwind: {
+              path: '$structure',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
             $project: {
-              _id: 1,
+              _id: 0,
+              idStructure: '$structure.idPG',
               roles: 1,
               name: 1,
               reseau: 1,
