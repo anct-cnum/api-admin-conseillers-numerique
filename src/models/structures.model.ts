@@ -60,6 +60,15 @@ export default function (app: Application): Model<any> {
     { _id: false, strict: false },
   );
 
+  const qpvListe = new Schema(
+    {
+      type: String,
+      geometry: Object,
+      properties: Object,
+    },
+    { strict: false },
+  );
+
   const schema = new Schema<IStructures>(
     {
       idPG: { type: Number },
@@ -115,6 +124,12 @@ export default function (app: Application): Model<any> {
       coselecAt: { type: Date },
 
       reseau: { type: String },
+
+      estZRR: { type: Boolean },
+
+      qpvStatut: { type: String },
+
+      qpvListe: { type: [qpvListe] },
 
       contact: { type: contactSchema },
 

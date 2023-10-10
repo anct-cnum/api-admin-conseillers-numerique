@@ -4,12 +4,28 @@
 // Lancement de ce script : ts-node src/tools/structures/onboardingStructure.ts
 
 import { Application } from '@feathersjs/express';
+import CSVToJSON from 'csvtojson';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 
+const path = require('path');
 const axios = require('axios');
 const circle = require('@turf/circle');
+
+const getZrr = async (codeCommune: string) => {
+  const csvFile = path.join(
+    __dirname,
+    '../../../datas/imports',
+    'diffusion-zonages-zrr-cog2021.csv',
+  );
+  const zrrCsv = await CSVToJSON({ delimiter: 'auto' }).fromFile(csvFile);
+  const zrr = zrrCsv
+    .filter((v) => v.ZRR === 'C - Classée en ZRR')
+    .map((v) => v.INSEE);
+
+  return zrr.includes(codeCommune);
+};
 
 const getGeo = async (adresse) => {
   const adressePostale = encodeURI(
@@ -114,6 +130,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             structure,
             adresse.features[0].geometry.coordinates,
           );
+          const isZRR = await getZrr(insee?.adresse?.code_commune);
           const structureUpdated = await app
             .service(service.structures)
             .Model.updateOne(
@@ -127,6 +144,7 @@ execute(__filename, async ({ app, logger, exit }) => {
                   adresseInsee2Ban: adresse.features[0].properties,
                   qpvStatut: qpv,
                   qpvListe: quartiers,
+                  estZRR: isZRR,
                 },
               },
             );
@@ -135,6 +153,7 @@ execute(__filename, async ({ app, logger, exit }) => {
               `La structure ${structure.idPG} n'a pas été mise à jour`,
             );
           }
+          logger.info(`La structure ${structure.idPG} a été mise à jour`);
           resolve(p);
         } else {
           logger.error(`Le siret ${structure.siret} est incorrect`);

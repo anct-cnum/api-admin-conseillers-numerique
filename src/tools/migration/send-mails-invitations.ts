@@ -76,7 +76,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     const p = new Promise<void>(async (resolve) => {
       try {
         if (
-          messageInformationCoselec ||
+          messageInformationCoselec &&
           messageInformationCoselecCoordinateur
         ) {
           const structure = await app

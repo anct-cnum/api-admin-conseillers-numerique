@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
-import { getCoselec } from '../../utils';
 
 export default function (app: Application, mailer) {
   const templateName = 'informationValidationCoselecCoordinateur';
@@ -10,8 +9,7 @@ export default function (app: Application, mailer) {
     const structure: IStructures = await app
       .service(service.structures)
       .Model.findOne({ _id: user.entity.oid });
-    const coselec = getCoselec(structure);
-    const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
+    const nombreConseillersCoselec = 1;
 
     return mailer.render(__dirname, templateName, {
       structure,
