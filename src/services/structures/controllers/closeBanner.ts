@@ -28,7 +28,7 @@ const closeBanner =
           },
           {
             $set: {
-              'conventionnement.dossierReconventionnement.banniereValidationReconventionnement':
+              'conventionnement.dossierReconventionnement.banniereValidation':
                 false,
             },
           },
@@ -45,7 +45,7 @@ const closeBanner =
           },
           {
             $set: {
-              'structureObj.conventionnement.dossierReconventionnement.banniereValidationReconventionnement':
+              'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
                 false,
             },
           },

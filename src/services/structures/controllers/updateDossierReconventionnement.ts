@@ -78,7 +78,7 @@ const updateDossierReconventionnement =
               new Date(),
           },
           ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
-            'conventionnement.dossierReconventionnement.banniereValidationReconventionnement':
+            'conventionnement.dossierReconventionnement.banniereValidation':
               true,
           }),
         };
@@ -89,7 +89,7 @@ const updateDossierReconventionnement =
               new Date(),
           },
           ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
-            'structureObj.conventionnement.dossierReconventionnement.banniereValidationReconventionnement':
+            'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
               true,
           }),
         };
