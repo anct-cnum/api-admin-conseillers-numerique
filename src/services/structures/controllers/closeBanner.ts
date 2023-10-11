@@ -22,34 +22,40 @@ const closeBanner =
     }
     try {
       if (type === 'reconventionnement') {
-        const structure = await app.service(service.structures).Model.updateOne(
-          {
-            _id: new ObjectId(req.params.id),
-          },
-          {
-            $set: {
-              'conventionnement.dossierReconventionnement.banniereValidation':
-                false,
+        const structure = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(req.params.id),
             },
-          },
-        );
+            {
+              $set: {
+                'conventionnement.dossierReconventionnement.banniereValidation':
+                  false,
+              },
+            },
+          );
         if (structure.modifiedCount === 0) {
           res
             .status(404)
             .json({ message: "La structure n'a pas été mise à jour" });
           return;
         }
-        await app.service(service.misesEnRelation).Model.updateMany(
-          {
-            'structure.$id': new ObjectId(req.params.id),
-          },
-          {
-            $set: {
-              'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
-                false,
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            {
+              'structure.$id': new ObjectId(req.params.id),
             },
-          },
-        );
+            {
+              $set: {
+                'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
+                  false,
+              },
+            },
+          );
       }
       if (type === 'renouvellement') {
         const miseEnRelation = await app
