@@ -77,7 +77,6 @@ const updateContratRecrutement =
         $set: {
           typeDeContrat,
           dateDebutDeContrat: new Date(dateDebutDeContrat),
-          salaire: Number(salaire.replace(',', '.')),
         },
       };
       if (miseEnRelation.statut === 'interessee') {
@@ -93,6 +92,11 @@ const updateContratRecrutement =
         contratUpdated.$set.dateFinDeContrat = new Date(dateFinDeContrat);
       } else {
         contratUpdated.$unset = { dateFinDeContrat: '' };
+      }
+      if (salaire) {
+        contratUpdated.$set.salaire = Number(salaire.replace(',', '.'));
+      } else {
+        contratUpdated.$unset = { salaire: '' };
       }
 
       const miseEnRelationUpdated = await app

@@ -71,15 +71,33 @@ const updateDossierReconventionnement =
         statut === StatutConventionnement.RECONVENTIONNEMENT_INITIÉ ||
         statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
+        const objectConventionnement = {
+          ...{
+            'conventionnement.statut': statut,
+            'conventionnement.dossierReconventionnement.dateDerniereModification':
+              new Date(),
+          },
+          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
+            'conventionnement.dossierReconventionnement.banniereValidation':
+              true,
+          }),
+        };
+        const objectConventionnementMiseEnRelation = {
+          ...{
+            'structureObj.conventionnement.statut': statut,
+            'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
+              new Date(),
+          },
+          ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
+            'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
+              true,
+          }),
+        };
         const structureUpdated = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne({
-            $set: {
-              'conventionnement.statut': statut,
-              'conventionnement.dossierReconventionnement.dateDerniereModification':
-                new Date(),
-            },
+            $set: objectConventionnement,
           });
         if (structureUpdated.modifiedCount === 0) {
           res.status(404).json({
@@ -91,11 +109,7 @@ const updateDossierReconventionnement =
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateMany({
-            $set: {
-              'structureObj.conventionnement.statut': statut,
-              'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
-                new Date(),
-            },
+            $set: objectConventionnementMiseEnRelation,
           });
       } else if (statut === StatutConventionnement.NON_INTERESSÉ) {
         const structureUpdated = await app
