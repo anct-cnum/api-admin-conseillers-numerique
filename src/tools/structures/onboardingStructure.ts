@@ -14,15 +14,9 @@ const axios = require('axios');
 const circle = require('@turf/circle');
 
 const getZrr = async (codeCommune: string) => {
-  const csvFile = path.join(
-    __dirname,
-    '../../../datas/imports',
-    'diffusion-zonages-zrr-cog2021.csv',
-  );
+  const csvFile = path.join(__dirname, '../../../datas/imports', 'zrr.csv');
   const zrrCsv = await CSVToJSON({ delimiter: 'auto' }).fromFile(csvFile);
-  const zrr = zrrCsv
-    .filter((v) => v.ZRR === 'C - Classée en ZRR')
-    .map((v) => v.INSEE);
+  const zrr = zrrCsv.filter((v) => v.ZRR === '1').map((v) => v.INSEE);
 
   return zrr.includes(codeCommune);
 };
