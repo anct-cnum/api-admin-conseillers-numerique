@@ -11,6 +11,7 @@ import {
   formatType,
   getConseillersRecruter,
   getConseillersValider,
+  getConseillersRupture,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -77,6 +78,7 @@ const getDetailStructureById =
                           { $eq: ['nouvelle_rupture', '$statut'] },
                           { $eq: ['recrutee', '$statut'] },
                           { $eq: ['terminee', '$statut'] },
+                          { $eq: ['finalisee_rupture', '$statut'] },
                         ],
                       },
                     },
@@ -195,6 +197,7 @@ const getDetailStructureById =
         structure[0],
         getConseillersValider(structure[0].conseillers),
         getConseillersRecruter(structure[0].conseillers),
+        getConseillersRupture(structure[0].conseillers),
       );
       const checkAccessCras = await checkAccessRequestCras(app, req);
 

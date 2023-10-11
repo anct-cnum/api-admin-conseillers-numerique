@@ -129,6 +129,23 @@ const getConseillersValider = (conseillers) => {
   };
 };
 
+const getConseillersRupture = (conseillers) => {
+  const conseillersRuptureReconventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'finalisee_rupture' &&
+      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
+  );
+  const conseillersRuptureConventionnement = conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === 'finalisee_rupture' &&
+      conseiller?.phaseConventionnement === undefined,
+  );
+  return {
+    conseillersRuptureReconventionnement,
+    conseillersRuptureConventionnement,
+  };
+};
+
 const getConseillersRecruter = (conseillers) => {
   const conseillersRecruterConventionnement = conseillers?.filter(
     (conseiller) =>
@@ -199,6 +216,7 @@ export {
   filterSortColonne,
   getNameStructure,
   getConseillersValider,
+  getConseillersRupture,
   getConseillersRecruter,
   filterStatutAndAvisPrefetDemandesCoordinateur,
 };
