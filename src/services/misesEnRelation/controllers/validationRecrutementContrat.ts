@@ -73,8 +73,7 @@ const validationRecrutementContrat =
       }
       if (
         !miseEnRelationVerif?.dateDebutDeContrat ||
-        !miseEnRelationVerif?.typeDeContrat ||
-        !miseEnRelationVerif?.salaire
+        !miseEnRelationVerif?.typeDeContrat
       ) {
         res.status(400).json({
           message: "Action non autorisée : le contrat n'est pas renseigné",

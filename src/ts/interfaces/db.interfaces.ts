@@ -355,6 +355,7 @@ export interface IStructures {
       nbPostesAttribuees: number;
       statut: string;
       dateDernierModification: Date;
+      banniereValidation?: boolean;
     };
     dossierConventionnement: {
       numero: number;

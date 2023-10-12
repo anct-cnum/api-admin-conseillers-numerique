@@ -42,8 +42,35 @@ const getExportListeGestionnairesCsv =
             },
           },
           {
+            $addFields: {
+              entity: {
+                $arrayElemAt: [{ $objectToArray: '$entity' }, 1],
+              },
+            },
+          },
+          {
+            $addFields: {
+              entity: '$entity.v',
+            },
+          },
+          {
+            $lookup: {
+              localField: 'entity', // DBREF non supporté ici donc passage en objectToArray
+              from: 'structures',
+              foreignField: '_id',
+              as: 'structure',
+            },
+          },
+          {
+            $unwind: {
+              path: '$structure',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
             $project: {
-              _id: 1,
+              _id: 0,
+              idStructure: '$structure.idPG',
               roles: 1,
               name: 1,
               reseau: 1,

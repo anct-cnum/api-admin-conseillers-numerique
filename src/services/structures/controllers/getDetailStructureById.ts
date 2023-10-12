@@ -156,7 +156,7 @@ const getDetailStructureById =
         typeStructure?.type,
         demarcheSimplifiee,
       );
-      if (structure[0]?.conventionnement?.dossierConventionnement) {
+      if (structure[0]?.conventionnement?.dossierConventionnement?.numero) {
         structure[0].urlDossierConventionnement = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
       } else {
         structure[0].urlDossierConventionnement = getUrlDossierConventionnement(
@@ -165,7 +165,7 @@ const getDetailStructureById =
           demarcheSimplifiee,
         );
       }
-      if (structure[0]?.conventionnement?.dossierReconventionnement) {
+      if (structure[0]?.conventionnement?.dossierReconventionnement?.numero) {
         structure[0].urlDossierReconventionnement = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}`;
       } else {
         structure[0].urlDossierReconventionnement =

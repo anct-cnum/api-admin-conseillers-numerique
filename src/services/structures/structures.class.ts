@@ -14,7 +14,6 @@ import {
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
-  decisionReconventionnement,
   createAvenant,
   closeBanner,
   updateAvenantAjoutPoste,
@@ -22,7 +21,8 @@ import {
   getDetailDemandeCoordinateur,
   getDemandesCoordinateur,
   updateDemandeCoordinateurAvisPrefet,
-  closeBannerAvisPrefet,
+  closeBannerParcoursCoordinateur,
+  updateDemandeCoordinateurRefusAvisAdmin,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -110,10 +110,16 @@ export default class Structures extends Service {
       updateDemandeCoordinateurAvisPrefet(app),
     );
     app.patch(
-      '/banner/prefet/coordinateur/:id',
+      '/avis/admin/refus/coordinateur/:id',
       authenticateMode(app),
       createAbilities(app),
-      closeBannerAvisPrefet(app),
+      updateDemandeCoordinateurRefusAvisAdmin(app),
+    );
+    app.patch(
+      '/banner/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerParcoursCoordinateur(app),
     );
     app.get(
       '/conventions/',
@@ -132,12 +138,6 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getDetailDossierConvention(app),
-    );
-    app.patch(
-      '/decision/reconventionnement/:id',
-      authenticateMode(app),
-      createAbilities(app),
-      decisionReconventionnement(app),
     );
     app.patch(
       '/reconventionnement',

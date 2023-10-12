@@ -25,7 +25,6 @@ const formatStatutDemande = (statut: string) => {
     case StatutConventionnement.CONVENTIONNEMENT_VALIDÉ:
     case 'validee':
       return 'Validée';
-    case StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ:
     case 'refusee':
       return 'Refusée';
     default:
@@ -223,9 +222,7 @@ const getExportHistoriqueDossiersConventionCsv =
             structure?.conventionnement?.statut ===
               StatutConventionnement.CONVENTIONNEMENT_VALIDÉ ||
             structure?.conventionnement?.statut ===
-              StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
-            structure?.conventionnement?.statut ===
-              StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
+              StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
         );
         const conventionnement = await Promise.all(
           filterStructures.map(async (structure) => {
@@ -245,9 +242,7 @@ const getExportHistoriqueDossiersConventionCsv =
             }
             if (
               item.conventionnement.statut ===
-                StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
-              item.conventionnement.statut ===
-                StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ
+              StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
             ) {
               item.dateSorted =
                 item.conventionnement?.dossierReconventionnement
