@@ -11,7 +11,8 @@ import {
   formatType,
   getConseillersRecruter,
   getConseillersValider,
-  getConseillersRupture,
+  getConseillersFinaliseeRupture,
+  getConseillersNouvelleRupture,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -197,7 +198,8 @@ const getDetailStructureById =
         structure[0],
         getConseillersValider(structure[0].conseillers),
         getConseillersRecruter(structure[0].conseillers),
-        getConseillersRupture(structure[0].conseillers),
+        getConseillersFinaliseeRupture(structure[0].conseillers),
+        getConseillersNouvelleRupture(structure[0].conseillers),
       );
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
