@@ -134,19 +134,19 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
         });
       }
-      if (structure.statut === 'CREEE') {
-        const updatedAt = new Date();
-        const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
-        Object.assign(updatedDemandeCoordinateur.$set, {
-          statut: 'VALIDATION_COSELEC',
-          updatedAt,
-        });
-        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
-          'structureObj.statut': 'VALIDATION_COSELEC',
-          'structureObj.updatedAt': updatedAt,
-        });
-        await updateStructurePG(pool)(structure.idPG, datePG);
-      }
+      const updatedAt = new Date();
+      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
+      Object.assign(updatedDemandeCoordinateur.$set, {
+        statut: 'VALIDATION_COSELEC',
+        coselecAt: updatedAt,
+        updatedAt,
+      });
+      Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+        'structureObj.statut': 'VALIDATION_COSELEC',
+        'structureObj.coselecAt': updatedAt,
+        'structureObj.updatedAt': updatedAt,
+      });
+      await updateStructurePG(pool)(structure.idPG, datePG);
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)

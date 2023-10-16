@@ -9,11 +9,11 @@ export default function (app: Application, mailer) {
     const structure: IStructures = await app
       .service(service.structures)
       .Model.findOne({ _id: user.entity.oid });
-    const nombreConseillersCoselec = 1;
+    const nombreCoordinateursCoselec = 1;
 
     return mailer.render(__dirname, templateName, {
       structure,
-      nombreConseillersCoselec,
+      nombreCoordinateursCoselec,
     });
   };
 
