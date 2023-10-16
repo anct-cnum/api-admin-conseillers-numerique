@@ -19,12 +19,12 @@ execute(__filename, async ({ app, logger, exit }) => {
     .Model.find({
       siret: { $ne: null },
       insee: { $exists: false },
-      userCreated: { $exists: false },
+      userCreated: false,
       coordonneesInsee: { $exists: false },
       adresseInsee2Ban: { $exists: false },
       qpvStatut: { $exists: false },
       qpvListe: { $exists: false },
-      estZRR: { $exists: false },
+      estZRR: null,
       statut: 'VALIDATION_COSELEC',
     });
   if (structures.length === 0) {
