@@ -37,7 +37,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       } else {
         // récupération de l'utilisateur du serveur d'authentification si le token est valide
         const keycloakUser = response.data;
-
+        keycloakUser.email = keycloakUser?.email?.trim()?.toLowerCase();
         let userInDB: IUser;
 
         // verification de la présence de l'utilisateur du serveur d'authentification en base de données
