@@ -121,6 +121,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
               nombreConseillersCoselec: nombreConseillersValider,
               avisCoselec: 'POSITIF',
               insertedAt: new Date(),
+              type: 'coordinateur',
             },
           },
         });
@@ -130,6 +131,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
               nombreConseillersCoselec: nombreConseillersValider,
               avisCoselec: 'POSITIF',
               insertedAt: new Date(),
+              type: 'coordinateur',
             },
           },
         });
