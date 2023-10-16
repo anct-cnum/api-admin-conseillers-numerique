@@ -12,6 +12,7 @@ import service from '../../../helpers/services';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const { Pool } = require('pg');
 
@@ -139,11 +140,19 @@ const updateDemandeCoordinateurValidAvisAdmin =
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
       Object.assign(updatedDemandeCoordinateur.$set, {
+        ...(structure.statut === 'CREEE' && {
+          'conventionnement.statut':
+            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+        }),
         statut: 'VALIDATION_COSELEC',
         coselecAt: updatedAt,
         updatedAt,
       });
       Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+        ...(structure.statut === 'CREEE' && {
+          'structureObj.conventionnement.statut':
+            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+        }),
         'structureObj.statut': 'VALIDATION_COSELEC',
         'structureObj.coselecAt': updatedAt,
         'structureObj.updatedAt': updatedAt,
