@@ -106,7 +106,9 @@ const updateDemandeCoordinateurValidAvisAdmin =
         return;
       }
       const champsFormulaire = dossier?.dossier?.champs?.filter(
-        (champ) => champ.id === 'Q2hhbXAtMzQ2MzcxNQ==',
+        (champ) =>
+          champ.id === 'Q2hhbXAtMzQ2MzcxNQ==' ||
+          champ.id === 'Q2hhbXAtMzM5NTkxNA==',
       );
       const coselec = getCoselec(structure);
       if (
