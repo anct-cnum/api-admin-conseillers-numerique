@@ -112,8 +112,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
       );
       const coselec = getCoselec(structure);
       if (
-        (champsFormulaire.length > 0 &&
-          champsFormulaire[0].stringValue === 'Non') ||
+        champsFormulaire.some((champ) => champ.stringValue === 'Non') ||
         structure.statut === 'CREEE'
       ) {
         const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
