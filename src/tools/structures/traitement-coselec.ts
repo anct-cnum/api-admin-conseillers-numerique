@@ -64,6 +64,28 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     },
   };
+  if (Number(options.quota) === 0) {
+    const nbMiseEnRelationRecruter = await app
+      .service(service.misesEnRelation)
+      .Model.countDocuments({
+        statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
+        'structure.$id': structure._id,
+      });
+    if (nbMiseEnRelationRecruter > 0) {
+      logger.error(
+        `La structure ${structure._id} possède des conseillers recrutés`,
+      );
+      exit();
+    }
+    Object.assign(objectUpdated.$set, {
+      statut: 'ABANDON',
+      userCreated: false,
+    });
+    Object.assign(objectUpdatedMiseEnRelation.$set, {
+      'structureObj.statut': 'ABANDON',
+      'structureObj.userCreated': false,
+    });
+  }
   if (options.franceService) {
     Object.assign(objectUpdated.$set, {
       estLabelliseFranceServices: true,
