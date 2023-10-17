@@ -60,6 +60,10 @@ const getExportEmbauchesCsv =
               $project: {
                 _id: 0,
                 dateRecrutement: 1,
+                dateDebutDeContrat: 1,
+                dateFinDeContrat: 1,
+                typeDeContrat: 1,
+                salaire: 1,
                 'conseiller.idPG': 1,
                 'conseiller.createdAt': 1,
                 'conseiller.prenom': 1,
