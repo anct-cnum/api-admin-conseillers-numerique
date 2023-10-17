@@ -19,7 +19,6 @@ execute(__filename, async ({ app, logger, exit }) => {
     .Model.find({
       siret: { $ne: null },
       insee: { $exists: false },
-      userCreated: false,
       coordonneesInsee: { $exists: false },
       adresseInsee2Ban: { $exists: false },
       qpvStatut: { $exists: false },
@@ -75,7 +74,23 @@ execute(__filename, async ({ app, logger, exit }) => {
                 },
               },
             );
-          if (structureUpdated.modifiedCount === 0) {
+          if (structureUpdated.modifiedCount === 1) {
+            await app.service(service.misesEnRelation).Model.updateMany(
+              {
+                'structure.$id': structure._id,
+              },
+              {
+                $set: {
+                  insee,
+                  coordonneesInsee: adresse.features[0].geometry,
+                  adresseInsee2Ban: adresse.features[0].properties,
+                  qpvStatut: qpv,
+                  qpvListe: quartiers,
+                  estZRR: isZRR,
+                },
+              },
+            );
+          } else {
             logger.warn(
               `La structure ${structure.idPG} n'a pas été mise à jour`,
             );
