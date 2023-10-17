@@ -64,6 +64,18 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     },
   };
+  if (structure.statut === 'CREEE') {
+    Object.assign(objectUpdated.$set, {
+      'conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      statut: 'VALIDATION_COSELEC',
+    });
+    Object.assign(objectUpdatedMiseEnRelation.$set, {
+      'structureObj.conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      'structureObj.statut': 'VALIDATION_COSELEC',
+    });
+  }
   if (Number(options.quota) === 0) {
     const nbMiseEnRelationRecruter = await app
       .service(service.misesEnRelation)
@@ -105,7 +117,9 @@ execute(__filename, async ({ app, logger, exit }) => {
   }
   if (
     structure?.conventionnement?.statut ===
-    StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
+    structure?.conventionnement?.statut ===
+      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
   ) {
     Object.assign(objectUpdated.$push.coselec, {
       phaseConventionnement: PhaseConventionnement.PHASE_2,
