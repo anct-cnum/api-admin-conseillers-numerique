@@ -9,10 +9,8 @@ import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -245,8 +243,9 @@ const validationRecrutementContrat =
         },
       };
       if (
-        miseEnRelationVerif?.structureObj.conventionnement.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
+        checkStructurePhase2(
+          miseEnRelationVerif?.structureObj.conventionnement.statut,
+        )
       ) {
         Object.assign(objectMiseEnRelationUpdated.$set, {
           phaseConventionnement: PhaseConventionnement.PHASE_2,

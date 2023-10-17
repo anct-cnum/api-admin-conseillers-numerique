@@ -11,6 +11,7 @@ import {
   formatType,
   getConseillersRecruter,
   getConseillersValider,
+  checkStructurePhase2,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -25,7 +26,6 @@ import {
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
-import { StatutConventionnement } from '../../../ts/enum';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -175,10 +175,7 @@ const getDetailStructureById =
             demarcheSimplifiee,
           );
       }
-      if (
-        structure[0]?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
+      if (checkStructurePhase2(structure[0]?.conventionnement?.statut)) {
         structure[0].urlDossierReconventionnementMessagerie = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
       }
       structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {

@@ -5,10 +5,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../repository/structures.repository';
 
 interface ICoselecObject {
   nombreConseillersCoselec: number;
@@ -72,11 +70,18 @@ const updateAvenantRenduPoste =
         avisCoselec: 'POSITIF',
         insertedAt: new Date(),
       };
-      if (
-        structure?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
+      const structureObject = {
+        'demandesCoselec.$.statut': 'validee',
+        'demandesCoselec.$.banniereValidationAvenant': true,
+      };
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         coselecObject.phaseConventionnement = PhaseConventionnement.PHASE_2;
+      }
+      if (coselecObject.nombreConseillersCoselec === 0) {
+        Object.assign(structureObject, {
+          statut: 'ABANDON',
+          userCreated: false,
+        });
       }
       const structureUpdated = await app
         .service(service.structures)
@@ -93,10 +98,7 @@ const updateAvenantRenduPoste =
             statut: 'VALIDATION_COSELEC',
           },
           {
-            $set: {
-              'demandesCoselec.$.statut': 'validee',
-              'demandesCoselec.$.banniereValidationAvenant': true,
-            },
+            $set: structureObject,
             $push: {
               coselec: coselecObject,
             },

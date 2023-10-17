@@ -5,10 +5,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../repository/structures.repository';
 
 interface IUpdateStructureAvenant {
   $push?: {
@@ -107,10 +105,7 @@ const updateAvenantAjoutPoste =
             insertedAt: new Date(),
           },
         };
-        if (
-          structure?.conventionnement?.statut ===
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-        ) {
+        if (checkStructurePhase2(structure?.conventionnement?.statut)) {
           paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
             PhaseConventionnement.PHASE_2;
           paramsUpdateCollectionMiseEnRelation.$push[
