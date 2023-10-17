@@ -81,12 +81,13 @@ execute(__filename, async ({ app, logger, exit }) => {
               },
               {
                 $set: {
-                  insee,
-                  coordonneesInsee: adresse.features[0].geometry,
-                  adresseInsee2Ban: adresse.features[0].properties,
-                  qpvStatut: qpv,
-                  qpvListe: quartiers,
-                  estZRR: isZRR,
+                  'structureObj.insee': insee,
+                  'structureObj.coordonneesInsee': adresse.features[0].geometry,
+                  'structureObj.adresseInsee2Ban':
+                    adresse.features[0].properties,
+                  'structureObj.qpvStatut': qpv,
+                  'structureObj.qpvListe': quartiers,
+                  'structureObj.estZRR': isZRR,
                 },
               },
             );
