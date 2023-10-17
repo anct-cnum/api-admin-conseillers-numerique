@@ -62,9 +62,6 @@ execute(__filename, async ({ app, logger, exit }) => {
           'structure.$id': structure._id,
           statut: { $nin: ['finalisee_rupture', 'terminee'] },
         });
-        await app.service(service.users).Model.deleteMany({
-          'entity.$id': structure._id,
-        });
         resolve(p);
       } catch (e) {
         logger.error(e);

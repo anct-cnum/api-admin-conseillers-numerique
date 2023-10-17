@@ -93,6 +93,9 @@ const updateAvenantRenduPoste =
           'structureObj.statut': 'ABANDON',
           'structureObj.userCreated': false,
         });
+        await app.service(service.users).Model.deleteMany({
+          'entity.$id': structure._id,
+        });
       }
       const structureUpdated = await app
         .service(service.structures)
