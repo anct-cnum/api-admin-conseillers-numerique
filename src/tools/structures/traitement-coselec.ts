@@ -85,6 +85,15 @@ execute(__filename, async ({ app, logger, exit }) => {
       'structureObj.statut': 'ABANDON',
       'structureObj.userCreated': false,
     });
+    const accountDelete = await app.service(service.users).Model.deleteMany({
+      'entity.$id': structure._id,
+    });
+
+    if (accountDelete.deletedCount > 0) {
+      logger.info(
+        `COSELEC ${options.numero}: ${accountDelete.deletedCount} compte(s) utilisateur(s) supprimé(s) lié à la structure ${structure._id}`,
+      );
+    }
   }
   if (options.franceService) {
     Object.assign(objectUpdated.$set, {
