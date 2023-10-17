@@ -112,70 +112,48 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const getConseillersValider = (conseillers) => {
-  const conseillersValiderReconventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'recrutee' &&
-      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
-  );
-  const conseillersValiderConventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'recrutee' &&
-      conseiller?.phaseConventionnement === undefined,
-  );
-  return {
-    conseillersValiderReconventionnement,
-    conseillersValiderConventionnement,
-  };
+const STATUT_PHASE_MAPPING = {
+  recrutee: {
+    [PhaseConventionnement.PHASE_2]: 'conseillersValiderReconventionnement',
+    undefined: 'conseillersValiderConventionnement',
+  },
+  finalisee_rupture: {
+    [PhaseConventionnement.PHASE_2]:
+      'conseillersFinaliseeRuptureReconventionnement',
+    undefined: 'conseillersFinaliseeRuptureConventionnement',
+  },
+  nouvelle_rupture: {
+    [PhaseConventionnement.PHASE_2]:
+      'conseillersNouvelleRuptureReconventionnement',
+    undefined: 'conseillersNouvelleRuptureConventionnement',
+  },
+  finalisee: {
+    [PhaseConventionnement.PHASE_2]: 'conseillersRecruterReconventionnement',
+    undefined: 'conseillersRecruterConventionnement',
+  },
+  terminee: {
+    undefined: 'conseillersRecruterConventionnement',
+  },
 };
 
-const getConseillersFinaliseeRupture = (conseillers) => {
-  const conseillersFinaliseeRuptureReconventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'finalisee_rupture' &&
-      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
-  );
-  const conseillersFinaliseeRuptureConventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'finalisee_rupture' &&
-      conseiller?.phaseConventionnement === undefined,
-  );
-  return {
-    conseillersFinaliseeRuptureReconventionnement,
-    conseillersFinaliseeRuptureConventionnement,
-  };
-};
-const getConseillersNouvelleRupture = (conseillers) => {
-  const conseillersNouvelleRuptureReconventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'nouvelle_rupture' &&
-      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
-  );
-  const conseillersNouvelleRuptureConventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'nouvelle_rupture' &&
-      conseiller?.phaseConventionnement === undefined,
-  );
-  return {
-    conseillersNouvelleRuptureReconventionnement,
-    conseillersNouvelleRuptureConventionnement,
-  };
-};
+const getConseillersByStatus = (conseillers, statut, phase) => {
+  const reconventionnementKey = STATUT_PHASE_MAPPING[statut][phase];
+  const conventionnementKey = STATUT_PHASE_MAPPING[statut].undefined;
 
-const getConseillersRecruter = (conseillers) => {
-  const conseillersRecruterConventionnement = conseillers?.filter(
+  const filtreReconventionnement = conseillers?.filter(
     (conseiller) =>
-      conseiller?.phaseConventionnement === undefined &&
-      (conseiller.statut === 'finalisee' || conseiller.statut === 'terminee'),
+      conseiller.statut === statut &&
+      conseiller.phaseConventionnement === phase,
   );
-  const conseillersRecruterReconventionnement = conseillers?.filter(
+  const filtreConventionnement = conseillers?.filter(
     (conseiller) =>
-      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2 &&
-      conseiller.statut === 'finalisee',
+      conseiller.statut === statut &&
+      conseiller?.phaseConventionnement === undefined,
   );
+
   return {
-    conseillersRecruterConventionnement,
-    conseillersRecruterReconventionnement,
+    [reconventionnementKey]: filtreReconventionnement,
+    [conventionnementKey]: filtreConventionnement,
   };
 };
 
@@ -228,9 +206,6 @@ export {
   formatType,
   filterSortColonne,
   getNameStructure,
-  getConseillersValider,
-  getConseillersFinaliseeRupture,
-  getConseillersNouvelleRupture,
-  getConseillersRecruter,
+  getConseillersByStatus,
   filterStatutAndAvisPrefetDemandesCoordinateur,
 };

@@ -9,10 +9,7 @@ import {
   formatQpv,
   formatZrr,
   formatType,
-  getConseillersRecruter,
-  getConseillersValider,
-  getConseillersFinaliseeRupture,
-  getConseillersNouvelleRupture,
+  getConseillersByStatus,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -27,7 +24,10 @@ import {
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -194,13 +194,22 @@ const getDetailStructureById =
           phaseConventionnement: conseiller?.phaseConventionnement,
         };
       });
-      Object.assign(
-        structure[0],
-        getConseillersValider(structure[0].conseillers),
-        getConseillersRecruter(structure[0].conseillers),
-        getConseillersFinaliseeRupture(structure[0].conseillers),
-        getConseillersNouvelleRupture(structure[0].conseillers),
-      );
+
+      const statusesAndPhases = [
+        { statut: 'recrutee', phase: PhaseConventionnement.PHASE_2 },
+        { statut: 'finalisee_rupture', phase: PhaseConventionnement.PHASE_2 },
+        { statut: 'nouvelle_rupture', phase: PhaseConventionnement.PHASE_2 },
+        { statut: 'finalisee', phase: PhaseConventionnement.PHASE_2 },
+        { statut: 'terminee', phase: undefined },
+      ];
+
+      for (const { statut, phase } of statusesAndPhases) {
+        Object.assign(
+          structure[0],
+          getConseillersByStatus(structure[0].conseillers, statut, phase),
+        );
+      }
+
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
       const craCount = await getNombreCrasByStructureId(
