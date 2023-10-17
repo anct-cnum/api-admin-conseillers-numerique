@@ -64,15 +64,22 @@ const updateAvenantRenduPoste =
         });
         return;
       }
+      const dateCoselec = new Date();
       const coselecObject: ICoselecObject = {
         nombreConseillersCoselec:
           Number(nbDePosteCoselec) - Number(nbDePosteRendu),
         avisCoselec: 'POSITIF',
-        insertedAt: new Date(),
+        insertedAt: dateCoselec,
       };
       const structureObject = {
+        coselecAt: dateCoselec,
         'demandesCoselec.$.statut': 'validee',
         'demandesCoselec.$.banniereValidationAvenant': true,
+      };
+      const structureObjectMiseEnRelation = {
+        'structureObj.coselecAt': dateCoselec,
+        'structureObj.demandesCoselec.$.statut': 'validee',
+        'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
       };
       if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         coselecObject.phaseConventionnement = PhaseConventionnement.PHASE_2;
@@ -81,6 +88,10 @@ const updateAvenantRenduPoste =
         Object.assign(structureObject, {
           statut: 'ABANDON',
           userCreated: false,
+        });
+        Object.assign(structureObjectMiseEnRelation, {
+          'structureObj.statut': 'ABANDON',
+          'structureObj.userCreated': false,
         });
       }
       const structureUpdated = await app
@@ -123,10 +134,7 @@ const updateAvenantRenduPoste =
             'structureObj.statut': 'VALIDATION_COSELEC',
           },
           {
-            $set: {
-              'structureObj.demandesCoselec.$.statut': 'validee',
-              'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
-            },
+            $set: structureObjectMiseEnRelation,
             $push: {
               'structureObj.coselec': coselecObject,
             },
