@@ -5,7 +5,6 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
-import { StatutConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 
 const getCandidatContratById =
