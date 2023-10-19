@@ -118,6 +118,16 @@ const archiverLaSuppression =
     }
   };
 
+const echangeUserCreation = (app, req) => async (email) => {
+  await app
+    .service(service.conseillers)
+    .Model.accessibleBy(req.ability, action.update)
+    .updateOne(
+      { email, userCreated: false, userCreationError: true },
+      { $unset: { userCreationError: '' } },
+    );
+};
+
 const suppressionTotalCandidat =
   (app, req, pool) => async (tableauCandidat) => {
     try {
@@ -212,10 +222,28 @@ const deleteCandidatById =
           ? { _id: new ObjectId(idConseiller), email }
           : { email };
 
+      const nbDoublonsReel = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({ email });
+      const estDoublon = motif === 'doublon' && nbDoublonsReel > 1;
+      const aDoublonRecrute = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({ email, statut: 'RECRUTE' });
+
       const tableauCandidat = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .find(instructionSuppression);
+
+      if (estDoublon && tableauCandidat[0]?.ruptures?.length > 0) {
+        res.status(409).json({
+          message:
+            'Ce doublon possède un historique de ruptures, veuillez supprimer le bon doublon',
+        });
+        return;
+      }
       const errorVerificationCandidaturesRecrutee =
         await verificationCandidaturesRecrutee(app, req)(
           tableauCandidat,
@@ -244,10 +272,13 @@ const deleteCandidatById =
         motif,
       );
       await suppressionTotalCandidat(app, req, pool)(tableauCandidat);
-      if (cv?.file && motif !== 'doublon') {
+      if (estDoublon && aDoublonRecrute === 0) {
+        await echangeUserCreation(app, req)(email);
+      }
+      if (cv?.file && !estDoublon) {
         await suppressionCv(cv, app);
       }
-      if (motif !== 'doublon') {
+      if (!estDoublon) {
         const mailerInstance = mailer(app);
         const message = candidatSupprimePix(mailerInstance);
         const errorSmtpMail = await message
