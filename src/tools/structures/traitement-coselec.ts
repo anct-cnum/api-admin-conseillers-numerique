@@ -8,9 +8,10 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
+import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
 
 program.option('-s, --structureId <structureId>', 'id structure');
-program.option('-q', '--quota <quota>', 'quota');
+program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
 program.parse(process.argv);
@@ -103,28 +104,26 @@ execute(__filename, async ({ app, logger, exit }) => {
 
     if (accountDelete.deletedCount > 0) {
       logger.info(
-        `COSELEC ${options.numero}: ${accountDelete.deletedCount} compte(s) utilisateur(s) supprimé(s) lié à la structure ${structure._id}`,
+        `COSELEC ${options.numeroCoselec}: ${accountDelete.deletedCount} compte(s) utilisateur(s) supprimé(s) lié à la structure ${structure._id}`,
       );
     }
   }
   if (options.franceService) {
     Object.assign(objectUpdated.$set, {
-      estLabelliseFranceServices: true,
+      estLabelliseFranceServices: 'OUI',
     });
     Object.assign(objectUpdatedMiseEnRelation.$set, {
-      'structureObj.estLabelliseFranceServices': true,
+      'structureObj.estLabelliseFranceServices': 'OUI',
     });
   }
   if (
-    structure?.conventionnement?.statut ===
-      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
-    structure?.conventionnement?.statut ===
-      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
+    checkStructurePhase2(structure?.conventionnement?.statut) ||
+    structure?.statut === 'CREEE'
   ) {
     Object.assign(objectUpdated.$push.coselec, {
       phaseConventionnement: PhaseConventionnement.PHASE_2,
     });
-    Object.assign(objectUpdated.$push['structureObj.coselec'], {
+    Object.assign(objectUpdatedMiseEnRelation.$push['structureObj.coselec'], {
       phaseConventionnement: PhaseConventionnement.PHASE_2,
     });
   }
@@ -139,7 +138,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         objectUpdatedMiseEnRelation,
       );
     logger.info(
-      `COSELEC ${options.numero}: Structure ${structure._id} possède désormais ${options.quota} conseillers`,
+      `COSELEC ${options.numeroCoselec}: Structure ${structure._id} possède désormais ${options.quota} conseillers`,
     );
   } else {
     logger.info(`La structure ${structure._id} n'a pas été mise à jour`);
