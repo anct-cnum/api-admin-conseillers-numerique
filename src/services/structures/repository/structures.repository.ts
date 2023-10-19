@@ -2,7 +2,6 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { PhaseConventionnement } from '../../../ts/enum';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -112,65 +111,12 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const STATUT_PHASE_MAPPING = {
-  recrutee: {
-    [PhaseConventionnement.PHASE_2]: 'conseillersValiderReconventionnement',
-    undefined: 'conseillersValiderConventionnement',
-  },
-  finalisee_rupture: {
-    [PhaseConventionnement.PHASE_2]:
-      'conseillersFinaliseeRuptureReconventionnement',
-    undefined: 'conseillersFinaliseeRuptureConventionnement',
-  },
-  nouvelle_rupture: {
-    [PhaseConventionnement.PHASE_2]:
-      'conseillersNouvelleRuptureReconventionnement',
-    undefined: 'conseillersNouvelleRuptureConventionnement',
-  },
-  finalisee: {
-    [PhaseConventionnement.PHASE_2]: 'conseillersRecruterReconventionnement',
-    undefined: 'conseillersRecruterConventionnement',
-  },
-  terminee: {
-    undefined: 'conseillersRecruterConventionnement',
-  },
-};
-
-const getDefaultKeys = () => {
-  const defaultKeys = {};
-
-  Object.keys(STATUT_PHASE_MAPPING).forEach((statut) => {
-    Object.keys(STATUT_PHASE_MAPPING[statut]).forEach((phase) => {
-      defaultKeys[STATUT_PHASE_MAPPING[statut][phase]] = [];
-    });
-  });
-
-  return defaultKeys;
-};
-
 const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
-  const isStatutMatched = (conseillerStatut) =>
-    statuts.some((statut) => statut === conseillerStatut);
-
-  const filtreReconventionnement = conseillers?.filter(
+  return conseillers.filter(
     (conseiller) =>
-      isStatutMatched(conseiller.statut) &&
+      statuts.includes(conseiller.statut) &&
       conseiller.phaseConventionnement === phase,
   );
-  const filtreConventionnement = conseillers?.filter(
-    (conseiller) =>
-      isStatutMatched(conseiller.statut) &&
-      conseiller?.phaseConventionnement === undefined,
-  );
-
-  const reconventionnementKey = STATUT_PHASE_MAPPING[statuts[0]][phase];
-  const conventionnementKey = STATUT_PHASE_MAPPING[statuts[0]].undefined;
-
-  const result = getDefaultKeys();
-  result[reconventionnementKey] = filtreReconventionnement;
-  result[conventionnementKey] = filtreConventionnement;
-
-  return result;
 };
 
 const filterAvisPrefet = (avisPrefet) => {

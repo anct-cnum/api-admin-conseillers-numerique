@@ -24,7 +24,10 @@ import {
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -192,16 +195,58 @@ const getDetailStructureById =
         };
       });
 
-      Object.assign(
-        structure[0],
-        getConseillersByStatus(structure[0].conseillers, [
-          'finalisee',
-          'terminee',
-        ]),
-        getConseillersByStatus(structure[0].conseillers, ['nouvelle_rupture']),
-        getConseillersByStatus(structure[0].conseillers, ['recrutee']),
-        getConseillersByStatus(structure[0].conseillers, ['finalisee_rupture']),
+      const conseillersValiderConventionnement = getConseillersByStatus(
+        structure[0].conseillers,
+        ['recrutee'],
       );
+
+      const conseillersValiderReconventionnement = getConseillersByStatus(
+        structure[0].conseillers,
+        ['recrutee'],
+        PhaseConventionnement.PHASE_2,
+      );
+
+      const conseillersFinaliseeRuptureReconventionnement =
+        getConseillersByStatus(
+          structure[0].conseillers,
+          ['finalisee_rupture'],
+          PhaseConventionnement.PHASE_2,
+        );
+      const conseillersFinaliseeRuptureConventionnement =
+        getConseillersByStatus(structure[0].conseillers, ['finalisee_rupture']);
+
+      const conseillersNouvelleRuptureReconventionnement =
+        getConseillersByStatus(
+          structure[0].conseillers,
+          ['nouvelle_rupture'],
+          PhaseConventionnement.PHASE_2,
+        );
+      const conseillersNouvelleRuptureConventionnement = getConseillersByStatus(
+        structure[0].conseillers,
+        ['nouvelle_rupture'],
+      );
+
+      const conseillersRecruterConventionnement = getConseillersByStatus(
+        structure[0].conseillers,
+        ['finalisee', 'terminee'],
+      );
+
+      const conseillersRecruterReconventionnement = getConseillersByStatus(
+        structure[0].conseillers,
+        ['finalisee'],
+        PhaseConventionnement.PHASE_2,
+      );
+
+      Object.assign(structure[0], {
+        conseillersValiderConventionnement,
+        conseillersValiderReconventionnement,
+        conseillersFinaliseeRuptureReconventionnement,
+        conseillersFinaliseeRuptureConventionnement,
+        conseillersNouvelleRuptureReconventionnement,
+        conseillersNouvelleRuptureConventionnement,
+        conseillersRecruterConventionnement,
+        conseillersRecruterReconventionnement,
+      });
 
       const checkAccessCras = await checkAccessRequestCras(app, req);
 
