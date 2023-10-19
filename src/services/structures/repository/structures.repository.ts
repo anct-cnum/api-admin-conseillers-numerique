@@ -112,48 +112,71 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const STATUT_PHASE_MAPPING = {
-  recrutee: {
-    [PhaseConventionnement.PHASE_2]: 'conseillersValiderReconventionnement',
-    undefined: 'conseillersValiderConventionnement',
-  },
-  finalisee_rupture: {
-    [PhaseConventionnement.PHASE_2]:
-      'conseillersFinaliseeRuptureReconventionnement',
-    undefined: 'conseillersFinaliseeRuptureConventionnement',
-  },
-  nouvelle_rupture: {
-    [PhaseConventionnement.PHASE_2]:
-      'conseillersNouvelleRuptureReconventionnement',
-    undefined: 'conseillersNouvelleRuptureConventionnement',
-  },
-  finalisee: {
-    [PhaseConventionnement.PHASE_2]: 'conseillersRecruterReconventionnement',
-    undefined: 'conseillersRecruterConventionnement',
-  },
-  terminee: {
-    undefined: 'conseillersRecruterConventionnement',
-  },
+const getConseillersByStatut = (conseillers, status, phase = undefined) => {
+  return conseillers?.filter(
+    (conseiller) =>
+      conseiller.statut === status &&
+      (phase === undefined || conseiller.phaseConventionnement === phase),
+  );
 };
 
-const getConseillersByStatus = (conseillers, statut, phase) => {
-  const reconventionnementKey = STATUT_PHASE_MAPPING[statut][phase];
-  const conventionnementKey = STATUT_PHASE_MAPPING[statut].undefined;
+const getConseillersFinaliseeRupture = (conseillers) => {
+  return {
+    conseillersFinaliseeRuptureReconventionnement: getConseillersByStatut(
+      conseillers,
+      'finalisee_rupture',
+      PhaseConventionnement.PHASE_2,
+    ),
+    conseillersFinaliseeRuptureConventionnement: getConseillersByStatut(
+      conseillers,
+      'finalisee_rupture',
+    ),
+  };
+};
 
-  const filtreReconventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === statut &&
-      conseiller.phaseConventionnement === phase,
-  );
-  const filtreConventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === statut &&
-      conseiller?.phaseConventionnement === undefined,
+const getConseillersNouvelleRupture = (conseillers) => {
+  return {
+    conseillersNouvelleRuptureReconventionnement: getConseillersByStatut(
+      conseillers,
+      'nouvelle_rupture',
+      PhaseConventionnement.PHASE_2,
+    ),
+    conseillersNouvelleRuptureConventionnement: getConseillersByStatut(
+      conseillers,
+      'nouvelle_rupture',
+    ),
+  };
+};
+
+const getConseillersRecruter = (conseillers) => {
+  const conseillersRecruterConventionnement = getConseillersByStatut(
+    conseillers,
+    'finalisee',
+  ).concat(getConseillersByStatut(conseillers, 'terminee'));
+
+  const conseillersRecruterReconventionnement = getConseillersByStatut(
+    conseillers,
+    'finalisee',
+    PhaseConventionnement.PHASE_2,
   );
 
   return {
-    [reconventionnementKey]: filtreReconventionnement,
-    [conventionnementKey]: filtreConventionnement,
+    conseillersRecruterConventionnement,
+    conseillersRecruterReconventionnement,
+  };
+};
+
+const getConseillersValider = (conseillers) => {
+  return {
+    conseillersValiderReconventionnement: getConseillersByStatut(
+      conseillers,
+      'recrutee',
+      PhaseConventionnement.PHASE_2,
+    ),
+    conseillersValiderConventionnement: getConseillersByStatut(
+      conseillers,
+      'recrutee',
+    ),
   };
 };
 
@@ -206,6 +229,9 @@ export {
   formatType,
   filterSortColonne,
   getNameStructure,
-  getConseillersByStatus,
+  getConseillersRecruter,
+  getConseillersValider,
+  getConseillersFinaliseeRupture,
+  getConseillersNouvelleRupture,
   filterStatutAndAvisPrefetDemandesCoordinateur,
 };
