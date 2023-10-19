@@ -9,10 +9,7 @@ import {
   formatQpv,
   formatZrr,
   formatType,
-  getConseillersValider,
-  getConseillersFinaliseeRupture,
-  getConseillersNouvelleRupture,
-  getConseillersRecruter,
+  getConseillersByStatus,
 } from '../repository/structures.repository';
 import {
   checkAccessRequestCras,
@@ -197,10 +194,13 @@ const getDetailStructureById =
 
       Object.assign(
         structure[0],
-        getConseillersValider(structure[0].conseillers),
-        getConseillersFinaliseeRupture(structure[0].conseillers),
-        getConseillersNouvelleRupture(structure[0].conseillers),
-        getConseillersRecruter(structure[0].conseillers),
+        getConseillersByStatus(structure[0].conseillers, [
+          'finalisee',
+          'terminee',
+        ]),
+        getConseillersByStatus(structure[0].conseillers, ['nouvelle_rupture']),
+        getConseillersByStatus(structure[0].conseillers, ['recrutee']),
+        getConseillersByStatus(structure[0].conseillers, ['finalisee_rupture']),
       );
 
       const checkAccessCras = await checkAccessRequestCras(app, req);
