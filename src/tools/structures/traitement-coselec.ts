@@ -127,10 +127,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       phaseConventionnement: PhaseConventionnement.PHASE_2,
     });
   }
-  const update = await app
+  const structureUpdated = await app
     .service(service.structures)
     .Model.updateOne({ _id: structure._id }, objectUpdated);
-  if (update.modifiedCount === 1) {
+  if (structureUpdated.modifiedCount === 1) {
     await app
       .service(service.misesEnRelation)
       .Model.updateMany(
