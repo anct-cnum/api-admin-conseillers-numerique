@@ -17,7 +17,7 @@ import {
   StatutConventionnement,
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
-import informationCandidaturePosteCoordinateur from '../../../emails/structures/informationCandidaturePosteCoordinateur';
+import { informationCandidaturePosteCoordinateur } from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -94,6 +94,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             statut: 1,
             coselec: 1,
             conventionnement: 1,
+            idPG: 1,
           },
         );
       if (!structure) {

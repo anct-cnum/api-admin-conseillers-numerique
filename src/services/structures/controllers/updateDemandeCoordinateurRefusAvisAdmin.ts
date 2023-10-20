@@ -5,7 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
-import informationCandidaturePosteCoordinateur from '../../../emails/structures/informationCandidaturePosteCoordinateur';
+import { informationCandidaturePosteCoordinateur } from '../../../emails';
 
 const updateDemandeCoordinateurRefusAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -89,20 +89,20 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           (demandeCoordinateur) =>
             demandeCoordinateur.id.toString() === idDemandeCoordinateur,
         );
-      // await app
-      //   .service(service.misesEnRelation)
-      //   .Model.accessibleBy(req.ability, action.update)
-      //   .updateMany(
-      //     {
-      //       'structure.$id': structure._id,
-      //       'structureObj.demandesCoordinateur': {
-      //         $elemMatch: {
-      //           id: { $eq: new ObjectId(idDemandeCoordinateur) },
-      //         },
-      //       },
-      //     },
-      //     updatedDemandeCoordinateurMiseEnRelation,
-      //   );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': structure._id,
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+              },
+            },
+          },
+          updatedDemandeCoordinateurMiseEnRelation,
+        );
       const mailerInstance = mailer(app);
       const messageInformationCandidaturePosteCoordinateur =
         informationCandidaturePosteCoordinateur(mailerInstance);
