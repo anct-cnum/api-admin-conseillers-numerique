@@ -35,6 +35,8 @@ export interface Ressource {
   permanences: string;
   conseillersSupprimes: string;
   conseillersRuptures: string;
+  qpv: string;
+  communes: string;
 }
 
 export interface IStructuresConseillers {
