@@ -16,7 +16,7 @@ export default function (mailer) {
     send: async (structure: IStructures) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour le recrutement d’un conseiller coordinateur à la structure ${structure.idPG}`,
+          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de conseiller coordinateur à la structure ${structure.idPG}`,
         );
       };
       const onError = async (err: Error) => {
