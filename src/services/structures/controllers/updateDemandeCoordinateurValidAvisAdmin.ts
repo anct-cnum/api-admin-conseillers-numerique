@@ -89,6 +89,10 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
           {
             'demandesCoordinateur.$': 1,
+            statut: 1,
+            coselec: 1,
+            conventionnement: 1,
+            idPG: 1,
           },
         );
       if (!structure) {
