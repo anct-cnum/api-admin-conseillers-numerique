@@ -29,7 +29,7 @@ const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
     await pool.query(
       `
       UPDATE djapp_hostorganization
-      SET (updated) = $2
+      SET updated = $2
       WHERE id = $1`,
       [idPG, datePG],
     );
