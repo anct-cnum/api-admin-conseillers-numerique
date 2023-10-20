@@ -69,23 +69,28 @@ const updateDemandeCoordinateurValidAvisAdmin =
       const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({
-          _id: new ObjectId(idStructure),
-          $or: [
-            {
-              statut: 'VALIDATION_COSELEC',
-            },
-            {
-              coordinateurCandidature: true,
-              statut: 'CREEE',
-            },
-          ],
-          demandesCoordinateur: {
-            $elemMatch: {
-              id: { $eq: new ObjectId(idDemandeCoordinateur) },
+        .findOne(
+          {
+            _id: new ObjectId(idStructure),
+            $or: [
+              {
+                statut: 'VALIDATION_COSELEC',
+              },
+              {
+                coordinateurCandidature: true,
+                statut: 'CREEE',
+              },
+            ],
+            demandesCoordinateur: {
+              $elemMatch: {
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+              },
             },
           },
-        });
+          {
+            'demandesCoordinateur.$': 1,
+          },
+        );
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
@@ -138,7 +143,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             },
           },
         });
-        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation, {
           $push: {
             'structureObj.coselec': {
               nombreConseillersCoselec: nombreConseillersValider,
