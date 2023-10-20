@@ -1,0 +1,36 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text>
+            Votre candidature à l’attribution d’un poste de conseiller coordinateur a été <%= statutFormat %>
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-column width="600px">
+        <mj-button
+          font-size="14px"
+          href="https://go.crisp.chat/chat/embed/?website_id=ea669e13-e40f-40c8-be23-e43565c0e62c"
+          text-decoration="underline"
+          background-color
+          color="#0063CB"
+        >
+          Besoin d’aide ? Nous restons à votre disposition pour vous accompagner
+        </mj-button>
+      </mj-column>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
