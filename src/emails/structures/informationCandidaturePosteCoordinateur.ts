@@ -20,7 +20,7 @@ export default function (mailer) {
         );
       };
       const onError = async (err: Error) => {
-        logger.info(err.message);
+        throw err;
       };
 
       return mailer
