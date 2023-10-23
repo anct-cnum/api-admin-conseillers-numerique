@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { StatutConventionnement } from '../../../ts/enum';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -48,6 +49,16 @@ const filterSearchBar = (input: string) => {
     };
   }
   return {};
+};
+
+const checkStructurePhase2 = (statut: string) => {
+  if (statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ) {
+    return true;
+  }
+  if (statut === StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2) {
+    return true;
+  }
+  return false;
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
@@ -170,4 +181,5 @@ export {
   getNameStructure,
   getConseillersByStatus,
   filterStatutAndAvisPrefetDemandesCoordinateur,
+  checkStructurePhase2,
 };

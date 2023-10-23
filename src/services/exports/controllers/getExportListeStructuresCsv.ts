@@ -76,6 +76,7 @@ const getExportListeStructuresCsv =
             'contact.email': 1,
             'contact.telephone': 1,
             'contact.fonction': 1,
+            conventionnement: 1,
           },
         },
         { $sort: sortColonne },
