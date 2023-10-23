@@ -245,7 +245,7 @@ const validationRecrutementContrat =
         },
       };
       if (
-        miseEnRelationVerif?.structureObj.conventionnement.statut ===
+        miseEnRelationVerif?.structureObj?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
         Object.assign(objectMiseEnRelationUpdated.$set, {
