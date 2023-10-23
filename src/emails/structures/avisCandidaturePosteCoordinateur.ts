@@ -2,7 +2,7 @@ import { IStructures } from '../../ts/interfaces/db.interfaces';
 import logger from '../../logger';
 
 export default function (mailer) {
-  const templateName = 'informationCandidaturePosteCoordinateur';
+  const templateName = 'avisCandidaturePosteCoordinateur';
 
   const render = async (statut: string) => {
     const statutFormat = statut === 'validee' ? 'acceptée' : 'refusée';

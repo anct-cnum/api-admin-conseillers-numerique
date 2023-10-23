@@ -5,7 +5,8 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
-import { informationCandidaturePosteCoordinateur } from '../../../emails';
+import { avisCandidaturePosteCoordinateur } from '../../../emails';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const updateDemandeCoordinateurRefusAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -34,7 +35,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       },
     };
     try {
-      const structure = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
@@ -103,21 +104,24 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
-      const mailerInstance = mailer(app);
-      const messageInformationCandidaturePosteCoordinateur =
-        informationCandidaturePosteCoordinateur(mailerInstance);
-      const errorSmtpMailCandidaturePosteCoordinateur =
-        await messageInformationCandidaturePosteCoordinateur
-          .send(structureUpdated)
-          .catch((errSmtp: Error) => {
-            return errSmtp;
+      if (structure?.contact?.email) {
+        const mailerInstance = mailer(app);
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateur(mailerInstance);
+        const errorSmtpMailCandidaturePosteCoordinateur =
+          await messageAvisCandidaturePosteCoordinateur
+            .send(structureUpdated)
+            .catch((errSmtp: Error) => {
+              return errSmtp;
+            });
+        if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+          res.status(503).json({
+            message: errorSmtpMailCandidaturePosteCoordinateur.message,
           });
-      if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
-        res
-          .status(503)
-          .json({ message: errorSmtpMailCandidaturePosteCoordinateur.message });
-        return;
+          return;
+        }
       }
+
       res.status(200).json({ success: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {

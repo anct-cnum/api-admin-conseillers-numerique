@@ -17,7 +17,7 @@ import {
   StatutConventionnement,
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
-import { informationCandidaturePosteCoordinateur } from '../../../emails';
+import { avisCandidaturePosteCoordinateur } from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -221,17 +221,20 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
-      if (structure.statut === 'VALIDATION_COSELEC') {
+      if (
+        structure.statut === 'VALIDATION_COSELEC' &&
+        structure?.contact?.email
+      ) {
         structureUpdated.demandesCoordinateur =
           structureUpdated.demandesCoordinateur.filter(
             (demandeCoordinateur) =>
               demandeCoordinateur.id.toString() === idDemandeCoordinateur,
           );
         const mailerInstance = mailer(app);
-        const messageInformationCandidaturePosteCoordinateur =
-          informationCandidaturePosteCoordinateur(mailerInstance);
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateur(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
-          await messageInformationCandidaturePosteCoordinateur
+          await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)
             .catch((errSmtp: Error) => {
               return errSmtp;
