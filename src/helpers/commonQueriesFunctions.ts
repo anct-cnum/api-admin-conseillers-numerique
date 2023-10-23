@@ -28,9 +28,9 @@ const getConseillersById = (app: Application) => async (structuresIds: any) => {
       : { $eq: structuresIds };
 
     const conseillersIds: ObjectId[] = await app
-      .service(service.conseillers)
+      .service(service.cras)
       .Model.find({ structureId: query })
-      .distinct('_id');
+      .distinct('conseiller.$id');
 
     return conseillersIds;
   } catch (error) {
