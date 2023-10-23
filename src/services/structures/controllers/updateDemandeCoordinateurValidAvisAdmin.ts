@@ -221,6 +221,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
+      // les nouvelles structures recevront un mail d'information COSELEC
       if (
         structure.statut === 'VALIDATION_COSELEC' &&
         structure?.contact?.email
