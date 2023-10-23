@@ -273,7 +273,9 @@ const validationRecrutementContrat =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            statut: ['finalisee_rupture', 'terminee', 'nouvelle_rupture'],
+            statut: {
+              $in: ['finalisee_rupture', 'terminee', 'nouvelle_rupture'],
+            },
             'conseiller.$id': conseillerUpdated.value?._id,
           },
           {
