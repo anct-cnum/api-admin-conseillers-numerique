@@ -1,14 +1,16 @@
 import { Application } from '@feathersjs/express';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { getConseillersById } from '../../commonQueriesFunctions';
+import { getConseillersByIdCras } from '../../commonQueriesFunctions';
 
 export default async function structureRules(
   app: Application,
   user: IUser,
   can: any,
 ): Promise<any> {
-  const conseillersIds = await getConseillersById(app)(user?.entity.oid);
+  const conseillersIdsCras = await getConseillersByIdCras(app)(
+    user?.entity.oid,
+  );
 
   // Restreindre les permissions : les structures ne peuvent voir que les informations les concernant
   can([action.read, action.update], ressource.structures, {
@@ -43,7 +45,7 @@ export default async function structureRules(
   });
   can([action.read], ressource.statsConseillersCras, {
     'conseiller.$id': {
-      $in: conseillersIds,
+      $in: conseillersIdsCras,
     },
   });
   can([action.read], ressource.statsTerritoires);

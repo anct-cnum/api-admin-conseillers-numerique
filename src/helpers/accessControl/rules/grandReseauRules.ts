@@ -3,7 +3,10 @@ import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
-import { getConseillersById } from '../../commonQueriesFunctions';
+import {
+  getConseillersById,
+  getConseillersByIdCras,
+} from '../../commonQueriesFunctions';
 
 export default async function grandReseauRules(
   app: Application,
@@ -22,6 +25,7 @@ export default async function grandReseauRules(
   }
 
   const conseillersIds = await getConseillersById(app)(structuresIds);
+  const conseillersIdsCras = await getConseillersByIdCras(app)(structuresIds);
 
   can([action.read], ressource.conseillers, {
     structureId: { $in: structuresIds },
@@ -47,7 +51,7 @@ export default async function grandReseauRules(
   });
   can([action.read], ressource.statsConseillersCras, {
     'conseiller.$id': {
-      $in: conseillersIds,
+      $in: conseillersIdsCras,
     },
   });
   can([action.read], ressource.statsTerritoires, {

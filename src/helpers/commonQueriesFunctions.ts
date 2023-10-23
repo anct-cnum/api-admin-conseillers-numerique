@@ -28,9 +28,9 @@ const getConseillersById = (app: Application) => async (structuresIds: any) => {
       : { $eq: structuresIds };
 
     const conseillersIds: ObjectId[] = await app
-      .service(service.cras)
+      .service(service.conseillers)
       .Model.find({ structureId: query })
-      .distinct('conseiller.$id');
+      .distinct('_id');
 
     return conseillersIds;
   } catch (error) {
@@ -38,8 +38,27 @@ const getConseillersById = (app: Application) => async (structuresIds: any) => {
   }
 };
 
+const getConseillersByIdCras =
+  (app: Application) => async (structuresIds: any) => {
+    try {
+      const query = Array.isArray(structuresIds)
+        ? { $in: structuresIds }
+        : { $eq: structuresIds };
+
+      const conseillersIds: ObjectId[] = await app
+        .service(service.cras)
+        .Model.find({ 'structure.$id': query })
+        .distinct('conseiller.$id');
+
+      return conseillersIds;
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
 export {
   findDepartementOrRegion,
   findNumDepartementsByRegion,
   getConseillersById,
+  getConseillersByIdCras,
 };

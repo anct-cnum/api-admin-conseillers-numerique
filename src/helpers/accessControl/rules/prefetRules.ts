@@ -3,7 +3,10 @@ import { ObjectId } from 'mongodb';
 import { action, ressource } from '../accessList';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
-import { getConseillersById } from '../../commonQueriesFunctions';
+import {
+  getConseillersById,
+  getConseillersByIdCras,
+} from '../../commonQueriesFunctions';
 
 const getConseillersIds = async (
   app: Application,
@@ -44,7 +47,9 @@ export default async function prefetRules(
     .service(service.structures)
     .Model.find(query)
     .distinct('_id');
+
   const conseillersIds = await getConseillersIds(app, user, structures);
+  const conseillersIdsCras = await getConseillersByIdCras(app)(structures);
   // Restreindre les permissions : les prefets ne peuvent voir que les structures de leur departement ou région
   can([action.read, action.update], ressource.structures, {
     codeDepartement: String(user?.departement),
@@ -76,12 +81,12 @@ export default async function prefetRules(
   });
   can([action.read], ressource.cras, {
     'structure.$id': {
-      $in: structures,
+      $in: conseillersIdsCras,
     },
   });
   can([action.read], ressource.statsConseillersCras, {
     'conseiller.$id': {
-      $in: conseillersIds,
+      $in: conseillersIdsCras,
     },
   });
 }
