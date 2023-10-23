@@ -6,7 +6,7 @@ import conseillerRuptureStructure from './structures/conseillerRuptureStructure'
 import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
 import informationValidationCoselecCoordinateur from './structures/informationValidationCoselecCoordinateur';
-import informationCandidaturePosteCoordinateur from './structures/informationCandidaturePosteCoordinateur';
+import avisCandidaturePosteCoordinateur from './structures/avisCandidaturePosteCoordinateur';
 
 export {
   creationCompteCandidat,
@@ -17,5 +17,5 @@ export {
   candidatSupprimePix,
   informationValidationCoselec,
   informationValidationCoselecCoordinateur,
-  informationCandidaturePosteCoordinateur,
+  avisCandidaturePosteCoordinateur,
 };
