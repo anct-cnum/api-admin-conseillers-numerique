@@ -12,6 +12,7 @@ import {
   IUser,
 } from '../../ts/interfaces/db.interfaces';
 import {
+  checkStructurePhase2,
   formatAdresseStructure,
   formatQpv,
 } from '../structures/repository/structures.repository';
@@ -779,6 +780,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
       'Zone rurale',
       'Nombre de CRA total cumulés',
       'Candidats recrutés',
+      'Conventionnement phase 2',
     ];
     res.write(
       [
@@ -800,6 +802,9 @@ const generateCsvListeStructures = async (structures, res: Response) => {
             formatQpv(structure?.qpvStatut),
             structure.craCount,
             `${structure.conseillersRecruter}/${structure.posteValiderCoselec}`,
+            checkStructurePhase2(structure?.conventionnement?.statut)
+              ? 'Oui'
+              : 'Non',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

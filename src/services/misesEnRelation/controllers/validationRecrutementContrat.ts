@@ -245,7 +245,7 @@ const validationRecrutementContrat =
         },
       };
       if (
-        miseEnRelationVerif?.structureObj.conventionnement.statut ===
+        miseEnRelationVerif?.structureObj?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {
         Object.assign(objectMiseEnRelationUpdated.$set, {
@@ -273,7 +273,9 @@ const validationRecrutementContrat =
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
-            statut: ['finalisee_rupture', 'terminee', 'nouvelle_rupture'],
+            statut: {
+              $in: ['finalisee_rupture', 'terminee', 'nouvelle_rupture'],
+            },
             'conseiller.$id': conseillerUpdated.value?._id,
           },
           {

@@ -22,7 +22,7 @@ import { avisCandidaturePosteCoordinateur } from '../../../emails';
 const { Pool } = require('pg');
 
 const checkIfStructurePhase2 = (structure: IStructures) =>
-  structure.conventionnement.statut ===
+  structure?.conventionnement?.statut ===
     StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
   structure.statut === 'CREEE';
 
