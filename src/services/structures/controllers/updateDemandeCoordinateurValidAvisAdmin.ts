@@ -17,7 +17,7 @@ import {
   StatutConventionnement,
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
-import { avisCandidaturePosteCoordinateur } from '../../../emails';
+import { avisCandidaturePosteCoordinateurStructure } from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -233,7 +233,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           );
         const mailerInstance = mailer(app);
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateur(mailerInstance);
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)

@@ -5,7 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
-import { avisCandidaturePosteCoordinateur } from '../../../emails';
+import { avisCandidaturePosteCoordinateurStructure } from '../../../emails';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const updateDemandeCoordinateurRefusAvisAdmin =
@@ -107,7 +107,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       if (structure?.contact?.email) {
         const mailerInstance = mailer(app);
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateur(mailerInstance);
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)
