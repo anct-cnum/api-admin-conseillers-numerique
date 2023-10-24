@@ -5,8 +5,11 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
-import { avisCandidaturePosteCoordinateur } from '../../../emails';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import {
+  avisCandidaturePosteCoordinateur,
+  avisCandidaturePosteCoordinateurPrefet,
+} from '../../../emails';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 
 const updateDemandeCoordinateurRefusAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -104,8 +107,38 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
+      const prefets: IUser[] = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          roles: { $in: ['prefet'] },
+          departement: structure.codeDepartement,
+        });
+      const mailerInstance = mailer(app);
+      if (prefets.length > 0) {
+        const promises: Promise<void>[] = [];
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+        await prefets.forEach(async (prefet) => {
+          // eslint-disable-next-line no-async-promise-executor
+          const p = new Promise<void>(async (resolve, reject) => {
+            const errorSmtpMailCandidaturePosteCoordinateur =
+              await messageAvisCandidaturePosteCoordinateur
+                .send(prefet, structureUpdated)
+                .catch((errSmtp: Error) => {
+                  return errSmtp;
+                });
+            if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+              reject();
+              return;
+            }
+            resolve(p);
+          });
+          promises.push(p);
+        });
+        await Promise.allSettled(promises);
+      }
       if (structure?.contact?.email) {
-        const mailerInstance = mailer(app);
         const messageAvisCandidaturePosteCoordinateur =
           avisCandidaturePosteCoordinateur(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =

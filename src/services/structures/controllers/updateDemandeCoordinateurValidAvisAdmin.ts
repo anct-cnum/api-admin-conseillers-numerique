@@ -11,13 +11,16 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 import {
   PhaseConventionnement,
   StatutConventionnement,
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
-import { avisCandidaturePosteCoordinateur } from '../../../emails';
+import {
+  avisCandidaturePosteCoordinateur,
+  avisCandidaturePosteCoordinateurPrefet,
+} from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -221,17 +224,47 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
+      const prefets: IUser[] = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          roles: { $in: ['prefet'] },
+          departement: structure.codeDepartement,
+        });
+      structureUpdated.demandesCoordinateur =
+        structureUpdated.demandesCoordinateur.filter(
+          (demandeCoordinateur) =>
+            demandeCoordinateur.id.toString() === idDemandeCoordinateur,
+        );
+      const mailerInstance = mailer(app);
+      if (prefets.length > 0) {
+        const promises: Promise<void>[] = [];
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+        await prefets.forEach(async (prefet) => {
+          // eslint-disable-next-line no-async-promise-executor
+          const p = new Promise<void>(async (resolve, reject) => {
+            const errorSmtpMailCandidaturePosteCoordinateur =
+              await messageAvisCandidaturePosteCoordinateur
+                .send(prefet, structureUpdated)
+                .catch((errSmtp: Error) => {
+                  return errSmtp;
+                });
+            if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+              reject();
+              return;
+            }
+            resolve(p);
+          });
+          promises.push(p);
+        });
+        await Promise.allSettled(promises);
+      }
       // les nouvelles structures recevront un mail d'information COSELEC
       if (
         structure.statut === 'VALIDATION_COSELEC' &&
         structure?.contact?.email
       ) {
-        structureUpdated.demandesCoordinateur =
-          structureUpdated.demandesCoordinateur.filter(
-            (demandeCoordinateur) =>
-              demandeCoordinateur.id.toString() === idDemandeCoordinateur,
-          );
-        const mailerInstance = mailer(app);
         const messageAvisCandidaturePosteCoordinateur =
           avisCandidaturePosteCoordinateur(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
