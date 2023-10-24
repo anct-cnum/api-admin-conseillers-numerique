@@ -57,6 +57,13 @@ const validationRecrutementContrat =
         res.status(404).json({ message: 'Mise en relation non trouvée' });
         return;
       }
+      const gandi = app.get('gandi');
+      if (miseEnRelationVerif.conseillerObj.email.includes(gandi.domain)) {
+        res.status(400).json({
+          message: `Action non autorisée : le conseiller utilise une adresse mail personnelle en ${gandi.domain}`,
+        });
+        return;
+      }
       const conseillerVerif = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
