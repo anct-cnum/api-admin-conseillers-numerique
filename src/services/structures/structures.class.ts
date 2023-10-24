@@ -24,7 +24,6 @@ import {
   closeBannerParcoursCoordinateur,
   updateDemandeCoordinateurRefusAvisAdmin,
   updateDemandeCoordinateurValidAvisAdmin,
-  checkDisplayBannerParcoursCoordinateur,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -128,12 +127,6 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       closeBannerParcoursCoordinateur(app),
-    );
-    app.get(
-      '/structure/banner/coordinateur/check',
-      authenticateMode(app),
-      createAbilities(app),
-      checkDisplayBannerParcoursCoordinateur(app),
     );
     app.get(
       '/conventions/',
