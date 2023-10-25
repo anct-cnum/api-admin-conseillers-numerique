@@ -6,6 +6,7 @@ import {
   createRefreshToken,
 } from '../../../helpers/auth/createTokens';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
+import service from '../../../helpers/services';
 
 const allowedRoles = [
   'admin',
@@ -43,7 +44,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         // verification de la présence de l'utilisateur du serveur d'authentification en base de données
         try {
           userInDB = await app
-            .service('users')
+            .service(service.users)
             .Model.findOne({
               sub: keycloakUser.sub,
               roles: { $in: allowedRoles },
@@ -53,35 +54,39 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
           if (!userInDB) {
             if (req.query.verificationToken) {
-              userInDB = await app.service('users').Model.findOneAndUpdate(
-                {
-                  token: req.query.verificationToken,
-                  name: keycloakUser.email,
-                  roles: { $in: allowedRoles },
-                },
-                {
-                  sub: keycloakUser.sub,
-                  token: null,
-                  tokenCreatedAt: null,
-                  passwordCreated: true,
-                },
-              );
+              userInDB = await app
+                .service(service.users)
+                .Model.findOneAndUpdate(
+                  {
+                    token: req.query.verificationToken,
+                    name: keycloakUser.email,
+                    roles: { $in: allowedRoles },
+                  },
+                  {
+                    sub: keycloakUser.sub,
+                    token: null,
+                    tokenCreatedAt: null,
+                    passwordCreated: true,
+                  },
+                );
             }
             if (!userInDB) {
-              userInDB = await app.service('users').Model.findOneAndUpdate(
-                {
-                  name: keycloakUser.email,
-                  sub: { $exists: false },
-                  token: { $ne: null },
-                  roles: { $in: allowedRoles },
-                },
-                {
-                  sub: keycloakUser.sub,
-                  token: null,
-                  tokenCreatedAt: null,
-                  passwordCreated: true,
-                },
-              );
+              userInDB = await app
+                .service(service.users)
+                .Model.findOneAndUpdate(
+                  {
+                    name: keycloakUser.email,
+                    sub: { $exists: false },
+                    token: { $ne: null },
+                    roles: { $in: allowedRoles },
+                  },
+                  {
+                    sub: keycloakUser.sub,
+                    token: null,
+                    tokenCreatedAt: null,
+                    passwordCreated: true,
+                  },
+                );
             }
           }
         } catch (error) {
@@ -110,7 +115,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
 
           // mise à jour de l'utilisateur avec son nouveau refresh token et sa dernière date de connexion
           const user = await app
-            .service('users')
+            .service(service.users)
             .Model.findOneAndUpdate(
               { name: userInDB.name },
               { refreshToken, lastLogin: Date.now() },
@@ -119,8 +124,62 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             .select({ password: 0, refreshToken: 0 });
           if (user.roles.includes('structure')) {
             const structure = await app
-              .service('structures')
-              .Model.findOne({ _id: user.entity.oid }, { _id: 0, nom: 1 });
+              .service(service.structures)
+              .Model.findOne(
+                { _id: user.entity.oid },
+                { nom: 1, demandesCoordinateur: 1 },
+              );
+            const countDemandesCoordinateurValider =
+              structure?.demandesCoordinateur?.filter(
+                (demandeCoordinateur) =>
+                  demandeCoordinateur.statut === 'validee',
+              ).length;
+            if (countDemandesCoordinateurValider > 0) {
+              const coordinateurs = await app
+                .service(service.conseillers)
+                .Model.aggregate([
+                  {
+                    $match: {
+                      structureId: structure._id,
+                      statut: 'RECRUTE',
+                      estCoordinateur: true,
+                    },
+                  },
+                  {
+                    $lookup: {
+                      from: 'users',
+                      let: { idConseiller: '$_id' },
+                      as: 'users',
+                      pipeline: [
+                        {
+                          $match: {
+                            $and: [
+                              {
+                                $expr: {
+                                  $eq: ['$$idConseiller', '$entity.oid'],
+                                },
+                              },
+                              {
+                                $expr: { $in: ['coordinateur_coop', '$roles'] },
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    $group: {
+                      _id: null,
+                      count: { $sum: 1 },
+                    },
+                  },
+                ]);
+              const countCoordinateur =
+                coordinateurs.length > 0 ? coordinateurs[0].count : 0;
+              user._doc.displayBannerPosteCoordinateurStructure =
+                countCoordinateur < countDemandesCoordinateurValider;
+            }
             user._doc.nomStructure = structure.nom;
           }
           // envoi du refresh token dans un cookie
