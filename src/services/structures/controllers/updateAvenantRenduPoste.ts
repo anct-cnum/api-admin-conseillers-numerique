@@ -64,20 +64,17 @@ const updateAvenantRenduPoste =
         });
         return;
       }
-      const dateCoselec = new Date();
       const coselecObject: ICoselecObject = {
         nombreConseillersCoselec:
           Number(nbDePosteCoselec) - Number(nbDePosteRendu),
         avisCoselec: 'POSITIF',
-        insertedAt: dateCoselec,
+        insertedAt: new Date(),
       };
       const structureObject = {
-        coselecAt: dateCoselec,
         'demandesCoselec.$.statut': 'validee',
         'demandesCoselec.$.banniereValidationAvenant': true,
       };
       const structureObjectMiseEnRelation = {
-        'structureObj.coselecAt': dateCoselec,
         'structureObj.demandesCoselec.$.statut': 'validee',
         'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
       };

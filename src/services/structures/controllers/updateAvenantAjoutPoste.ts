@@ -18,6 +18,7 @@ interface IUpdateStructureAvenant {
     };
   };
   $set?: {
+    coselecAt?: Date;
     'demandesCoselec.$.statut': string;
     'demandesCoselec.$.nombreDePostesAccordes'?: number;
     'demandesCoselec.$.banniereValidationAvenant'?: boolean;
@@ -34,6 +35,7 @@ interface IUpdateMiseEnRelationAvenant {
     };
   };
   $set?: {
+    'structureObj.coselecAt'?: Date;
     'structureObj.demandesCoselec.$.statut': string;
     'structureObj.demandesCoselec.$.nombreDePostesAccordes'?: number;
     'structureObj.demandesCoselec.$.banniereValidationAvenant'?: boolean;
@@ -78,7 +80,9 @@ const updateAvenantAjoutPoste =
         return;
       }
       if (statut === 'POSITIF') {
+        const dateCoselec = new Date();
         paramsUpdateCollectionStructure.$set = {
+          coselecAt: dateCoselec,
           'demandesCoselec.$.statut': 'validee',
           'demandesCoselec.$.nombreDePostesAccordes': Number(nbDePosteAccorder),
           'demandesCoselec.$.banniereValidationAvenant': true,
@@ -88,10 +92,11 @@ const updateAvenantAjoutPoste =
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',
-            insertedAt: new Date(),
+            insertedAt: dateCoselec,
           },
         };
         paramsUpdateCollectionMiseEnRelation.$set = {
+          'structureObj.coselecAt': dateCoselec,
           'structureObj.demandesCoselec.$.statut': 'validee',
           'structureObj.demandesCoselec.$.nombreDePostesAccordes':
             Number(nbDePosteAccorder),
@@ -102,7 +107,7 @@ const updateAvenantAjoutPoste =
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',
-            insertedAt: new Date(),
+            insertedAt: dateCoselec,
           },
         };
         if (checkStructurePhase2(structure?.conventionnement?.statut)) {
