@@ -88,11 +88,6 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      structureUpdated.demandesCoordinateur =
-        structureUpdated.demandesCoordinateur.filter(
-          (demandeCoordinateur) =>
-            demandeCoordinateur.id.toString() === idDemandeCoordinateur,
-        );
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -113,7 +108,14 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         .find({
           roles: { $in: ['prefet'] },
           departement: structure.codeDepartement,
-        });
+        })
+        .select({ _id: 0, name: 1 });
+
+      structureUpdated.demandesCoordinateur =
+        structureUpdated.demandesCoordinateur.filter(
+          (demandeCoordinateur) =>
+            demandeCoordinateur.id.toString() === idDemandeCoordinateur,
+        );
       const mailerInstance = mailer(app);
       if (prefets.length > 0) {
         const promises: Promise<void>[] = [];

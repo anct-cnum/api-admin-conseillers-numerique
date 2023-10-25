@@ -230,7 +230,9 @@ const updateDemandeCoordinateurValidAvisAdmin =
         .find({
           roles: { $in: ['prefet'] },
           departement: structure.codeDepartement,
-        });
+        })
+        .select({ _id: 0, name: 1 });
+
       structureUpdated.demandesCoordinateur =
         structureUpdated.demandesCoordinateur.filter(
           (demandeCoordinateur) =>
