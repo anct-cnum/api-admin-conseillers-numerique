@@ -1,14 +1,45 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 import {
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierConventionnement,
+  getUrlDossierReconventionnement,
 } from '../../structures/repository/reconventionnement.repository';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+
+const getUrlDossierDepotPiece = (
+  structure: IStructures,
+  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
+) => {
+  const typeStructure = getTypeDossierDemarcheSimplifiee(
+    structure?.insee?.unite_legale?.forme_juridique?.libelle,
+  );
+  if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+    return structure?.conventionnement?.dossierReconventionnement?.numero
+      ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
+      : getUrlDossierReconventionnement(
+          structure.idPG,
+          typeStructure?.type,
+          demarcheSimplifiee,
+        );
+  }
+  return structure?.conventionnement?.dossierConventionnement?.numero
+    ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`
+    : getUrlDossierConventionnement(
+        structure.idPG,
+        typeStructure?.type,
+        demarcheSimplifiee,
+      );
+};
 
 const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -81,9 +112,6 @@ const getMiseEnRelation =
       if (candidat.length === 0) {
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
-      const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.unite_legale?.forme_juridique?.libelle,
-      );
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -98,11 +126,7 @@ const getMiseEnRelation =
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
-        urlDossierConventionnement: getUrlDossierConventionnement(
-          structure.idPG,
-          typeStructure?.type,
-          demarcheSimplifiee,
-        ),
+        urlDossierDS: getUrlDossierDepotPiece(structure, demarcheSimplifiee),
       };
       delete candidatFormat.idConseiller;
       delete candidatFormat.statut;
