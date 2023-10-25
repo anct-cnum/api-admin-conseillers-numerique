@@ -133,13 +133,6 @@ const updateAvenantAjoutPoste =
             insertedAt: dateCoselec,
           },
         };
-        if (checkStructurePhase2(structure?.conventionnement?.statut)) {
-          paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
-            PhaseConventionnement.PHASE_2;
-          paramsUpdateCollectionMiseEnRelation.$push[
-            'structureObj.coselec'
-          ].phaseConventionnement = PhaseConventionnement.PHASE_2;
-        }
         await updateStructurePG(pool)(structure.idPG, datePG);
       }
       if (statut === 'NÉGATIF') {
@@ -165,6 +158,13 @@ const updateAvenantAjoutPoste =
             insertedAt: new Date(),
           },
         };
+      }
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+        paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
+          PhaseConventionnement.PHASE_2;
+        paramsUpdateCollectionMiseEnRelation.$push[
+          'structureObj.coselec'
+        ].phaseConventionnement = PhaseConventionnement.PHASE_2;
       }
       const structureUpdated = await app
         .service(service.structures)
