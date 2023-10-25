@@ -18,7 +18,7 @@ import {
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
 import {
-  avisCandidaturePosteCoordinateur,
+  avisCandidaturePosteCoordinateurStructure,
   avisCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 
@@ -268,7 +268,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         structure?.contact?.email
       ) {
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateur(mailerInstance);
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)
