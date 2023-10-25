@@ -173,7 +173,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             const countCoordinateur =
               coordinateurs.length > 0 ? coordinateurs[0].count : 0;
             user._doc.nomStructure = structure.nom;
-            user._doc.displayBannerStructure =
+            user._doc.displayBannerPosteCoordinateurStructure =
               countCoordinateur < countDemandesCoordinateurValider;
           }
           // envoi du refresh token dans un cookie
