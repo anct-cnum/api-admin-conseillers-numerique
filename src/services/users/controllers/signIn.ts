@@ -134,47 +134,53 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 (demandeCoordinateur) =>
                   demandeCoordinateur.statut === 'validee',
               ).length;
-            const coordinateurs = await app
-              .service(service.conseillers)
-              .Model.aggregate([
-                {
-                  $match: {
-                    structureId: structure._id,
-                    statut: 'RECRUTE',
-                    estCoordinateur: true,
+            if (countDemandesCoordinateurValider > 0) {
+              const coordinateurs = await app
+                .service(service.conseillers)
+                .Model.aggregate([
+                  {
+                    $match: {
+                      structureId: structure._id,
+                      statut: 'RECRUTE',
+                      estCoordinateur: true,
+                    },
                   },
-                },
-                {
-                  $lookup: {
-                    from: 'users',
-                    let: { idConseiller: '$_id' },
-                    as: 'users',
-                    pipeline: [
-                      {
-                        $match: {
-                          $and: [
-                            {
-                              $expr: { $eq: ['$$idConseiller', '$entity.oid'] },
-                            },
-                            { $expr: { $in: ['coordinateur_coop', '$roles'] } },
-                          ],
+                  {
+                    $lookup: {
+                      from: 'users',
+                      let: { idConseiller: '$_id' },
+                      as: 'users',
+                      pipeline: [
+                        {
+                          $match: {
+                            $and: [
+                              {
+                                $expr: {
+                                  $eq: ['$$idConseiller', '$entity.oid'],
+                                },
+                              },
+                              {
+                                $expr: { $in: ['coordinateur_coop', '$roles'] },
+                              },
+                            ],
+                          },
                         },
-                      },
-                    ],
+                      ],
+                    },
                   },
-                },
-                {
-                  $group: {
-                    _id: null,
-                    count: { $sum: 1 },
+                  {
+                    $group: {
+                      _id: null,
+                      count: { $sum: 1 },
+                    },
                   },
-                },
-              ]);
-            const countCoordinateur =
-              coordinateurs.length > 0 ? coordinateurs[0].count : 0;
+                ]);
+              const countCoordinateur =
+                coordinateurs.length > 0 ? coordinateurs[0].count : 0;
+              user._doc.displayBannerPosteCoordinateurStructure =
+                countCoordinateur < countDemandesCoordinateurValider;
+            }
             user._doc.nomStructure = structure.nom;
-            user._doc.displayBannerPosteCoordinateurStructure =
-              countCoordinateur < countDemandesCoordinateurValider;
           }
           // envoi du refresh token dans un cookie
           res.cookie(
