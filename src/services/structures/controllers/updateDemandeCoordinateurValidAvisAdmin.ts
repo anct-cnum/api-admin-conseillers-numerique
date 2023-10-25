@@ -16,6 +16,8 @@ import {
   PhaseConventionnement,
   StatutConventionnement,
 } from '../../../ts/enum';
+import mailer from '../../../mailer';
+import { avisCandidaturePosteCoordinateurStructure } from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -185,7 +187,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             _id: structure._id,
             demandesCoordinateur: {
@@ -195,8 +197,11 @@ const updateDemandeCoordinateurValidAvisAdmin =
             },
           },
           updatedDemandeCoordinateur,
+          {
+            new: true,
+          },
         );
-      if (structureUpdated.modifiedCount === 0) {
+      if (!structureUpdated) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
@@ -216,6 +221,32 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
+      // les nouvelles structures recevront un mail d'information COSELEC
+      if (
+        structure.statut === 'VALIDATION_COSELEC' &&
+        structure?.contact?.email
+      ) {
+        structureUpdated.demandesCoordinateur =
+          structureUpdated.demandesCoordinateur.filter(
+            (demandeCoordinateur) =>
+              demandeCoordinateur.id.toString() === idDemandeCoordinateur,
+          );
+        const mailerInstance = mailer(app);
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
+        const errorSmtpMailCandidaturePosteCoordinateur =
+          await messageAvisCandidaturePosteCoordinateur
+            .send(structureUpdated)
+            .catch((errSmtp: Error) => {
+              return errSmtp;
+            });
+        if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+          res.status(503).json({
+            message: errorSmtpMailCandidaturePosteCoordinateur.message,
+          });
+          return;
+        }
+      }
       res.status(200).json({ success: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {

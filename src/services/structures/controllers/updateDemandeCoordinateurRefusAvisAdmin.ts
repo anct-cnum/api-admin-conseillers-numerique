@@ -4,6 +4,9 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import mailer from '../../../mailer';
+import { avisCandidaturePosteCoordinateurStructure } from '../../../emails';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const updateDemandeCoordinateurRefusAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -32,7 +35,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       },
     };
     try {
-      const structure = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
@@ -62,7 +65,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             _id: structure._id,
             demandesCoordinateur: {
@@ -72,13 +75,21 @@ const updateDemandeCoordinateurRefusAvisAdmin =
             },
           },
           updatedDemandeCoordinateur,
+          {
+            new: true,
+          },
         );
-      if (structureUpdated.modifiedCount === 0) {
+      if (!structureUpdated) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
+      structureUpdated.demandesCoordinateur =
+        structureUpdated.demandesCoordinateur.filter(
+          (demandeCoordinateur) =>
+            demandeCoordinateur.id.toString() === idDemandeCoordinateur,
+        );
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -93,6 +104,24 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
+      if (structure?.contact?.email) {
+        const mailerInstance = mailer(app);
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
+        const errorSmtpMailCandidaturePosteCoordinateur =
+          await messageAvisCandidaturePosteCoordinateur
+            .send(structureUpdated)
+            .catch((errSmtp: Error) => {
+              return errSmtp;
+            });
+        if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+          res.status(503).json({
+            message: errorSmtpMailCandidaturePosteCoordinateur.message,
+          });
+          return;
+        }
+      }
+
       res.status(200).json({ success: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
