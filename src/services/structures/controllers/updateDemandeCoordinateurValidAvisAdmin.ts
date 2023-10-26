@@ -11,11 +11,16 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 import {
   PhaseConventionnement,
   StatutConventionnement,
 } from '../../../ts/enum';
+import mailer from '../../../mailer';
+import {
+  avisCandidaturePosteCoordinateurStructure,
+  avisCandidaturePosteCoordinateurPrefet,
+} from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -185,7 +190,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             _id: structure._id,
             demandesCoordinateur: {
@@ -195,8 +200,11 @@ const updateDemandeCoordinateurValidAvisAdmin =
             },
           },
           updatedDemandeCoordinateur,
+          {
+            new: true,
+          },
         );
-      if (structureUpdated.modifiedCount === 0) {
+      if (!structureUpdated) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
@@ -216,6 +224,64 @@ const updateDemandeCoordinateurValidAvisAdmin =
           },
           updatedDemandeCoordinateurMiseEnRelation,
         );
+      const prefets: IUser[] = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          roles: { $in: ['prefet'] },
+          departement: structure.codeDepartement,
+        })
+        .select({ _id: 0, name: 1 });
+
+      structureUpdated.demandesCoordinateur =
+        structureUpdated.demandesCoordinateur.filter(
+          (demandeCoordinateur) =>
+            demandeCoordinateur.id.toString() === idDemandeCoordinateur,
+        );
+      const mailerInstance = mailer(app);
+      if (prefets.length > 0) {
+        const promises: Promise<void>[] = [];
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+        await prefets.forEach(async (prefet) => {
+          // eslint-disable-next-line no-async-promise-executor
+          const p = new Promise<void>(async (resolve, reject) => {
+            const errorSmtpMailCandidaturePosteCoordinateur =
+              await messageAvisCandidaturePosteCoordinateur
+                .send(prefet, structureUpdated)
+                .catch((errSmtp: Error) => {
+                  return errSmtp;
+                });
+            if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+              reject();
+              return;
+            }
+            resolve(p);
+          });
+          promises.push(p);
+        });
+        await Promise.allSettled(promises);
+      }
+      // les nouvelles structures recevront un mail d'information COSELEC
+      if (
+        structure.statut === 'VALIDATION_COSELEC' &&
+        structure?.contact?.email
+      ) {
+        const messageAvisCandidaturePosteCoordinateur =
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
+        const errorSmtpMailCandidaturePosteCoordinateur =
+          await messageAvisCandidaturePosteCoordinateur
+            .send(structureUpdated)
+            .catch((errSmtp: Error) => {
+              return errSmtp;
+            });
+        if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+          res.status(503).json({
+            message: errorSmtpMailCandidaturePosteCoordinateur.message,
+          });
+          return;
+        }
+      }
       res.status(200).json({ success: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
