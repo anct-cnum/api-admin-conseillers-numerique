@@ -68,7 +68,7 @@ export class Exports implements ServiceMethods<Data> {
       getExportCandidatsByStructureCsv(app),
     );
     app.get(
-      '/exports/candidats-coordinateurs-avis-prefets-csv',
+      '/exports/candidatures-coordinateurs-csv',
       authenticateMode(app),
       createAbilities(app),
       getExportCandidatsCoordinateursCsv(app),
