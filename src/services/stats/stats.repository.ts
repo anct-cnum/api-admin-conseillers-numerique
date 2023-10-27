@@ -677,22 +677,27 @@ const getStatsEvolutions = async (query, ability, read, app) => {
 
   // Cas des stats par structure
   if (Object.prototype.hasOwnProperty.call(query, 'structure.$id')) {
-    let resultCnfsStructure = await app.service(service.conseillers).Model.find(
-      {
-        structureId: query['structure.$id'],
-      },
-      {
-        _id: 1,
-      },
-    );
+    let resultCnfsStructure = await app
+      .service(service.conseillers)
+      .Model.accessibleBy(ability, read)
+      .find(
+        {
+          structureId: query['structure.$id'],
+        },
+        {
+          _id: 1,
+        },
+      );
     resultCnfsStructure = resultCnfsStructure.map(
       (conseiller) => conseiller._id,
     );
     let resultCnfsRupture = await app
       .service(service.conseillersRuptures)
-      .Model.find(
+      .Model.accessibleBy(ability, read)
+      .find(
         {
           structureId: query['structure.$id'],
+          dateRupture: { $lte: dateDebutEvo, $gte: dateFinEvo },
         },
         {
           conseillerId: 1,
