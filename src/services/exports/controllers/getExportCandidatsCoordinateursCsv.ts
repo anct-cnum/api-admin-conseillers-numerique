@@ -23,7 +23,6 @@ const getDemandesCoordo =
     avisPrefet: string,
   ) =>
     app.service(service.structures).Model.aggregate([
-      { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
           $and: [
@@ -37,6 +36,7 @@ const getDemandesCoordo =
       },
       {
         $project: {
+          _id: 0,
           nom: 1,
           codePostal: 1,
           idPG: 1,

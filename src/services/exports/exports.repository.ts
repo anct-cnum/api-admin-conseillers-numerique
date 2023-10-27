@@ -150,7 +150,7 @@ const generateCsvCandidatByStructure = async (
 };
 
 const generateCsvCandidaturesCoordinateur = async (
-  candidatsCoordinateurs,
+  candidaturesCoordinateurs,
   res: Response,
 ) => {
   try {
@@ -164,16 +164,16 @@ const generateCsvCandidaturesCoordinateur = async (
       'Avis préfet',
     ];
     const fileLine = [];
-    candidatsCoordinateurs.forEach((candidat) => {
-      candidat.demandesCoordinateur.map((demande) =>
+    candidaturesCoordinateurs.forEach((candidature) => {
+      candidature.demandesCoordinateur.map((demande) =>
         fileLine.push(
-          candidat.idPG,
-          candidat.nom,
-          candidat.codePostal,
-          demande.dossier.numero,
-          demande.statut,
-          formatDate(demande.dossier.dateDeCreation),
-          demande.avisPrefet,
+          candidature.idPG,
+          candidature.nom,
+          candidature.codePostal,
+          demande?.dossier?.numero,
+          demande?.statut,
+          formatDate(demande?.dossier?.dateDeCreation),
+          demande?.avisPrefet,
         ),
       );
     });
