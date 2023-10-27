@@ -93,20 +93,20 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'structure.$id': structure._id,
-            'structureObj.demandesCoordinateur': {
-              $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
-              },
-            },
-          },
-          updatedDemandeCoordinateurMiseEnRelation,
-        );
+      // await app
+      //   .service(service.misesEnRelation)
+      //   .Model.accessibleBy(req.ability, action.update)
+      //   .updateMany(
+      //     {
+      //       'structure.$id': structure._id,
+      //       'structureObj.demandesCoordinateur': {
+      //         $elemMatch: {
+      //           id: { $eq: new ObjectId(idDemandeCoordinateur) },
+      //         },
+      //       },
+      //     },
+      //     updatedDemandeCoordinateurMiseEnRelation,
+      //   );
       const prefets: IUser[] = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
@@ -121,11 +121,11 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           (demandeCoordinateur) =>
             demandeCoordinateur.id.toString() === idDemandeCoordinateur,
         );
+      const mailerInstance = mailer(app);
       if (prefets.length > 0) {
-        const mailerInstancePrefet = mailer(app);
         const promises: Promise<void>[] = [];
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurPrefet(mailerInstancePrefet);
+          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
         await prefets.forEach(async (prefet) => {
           // eslint-disable-next-line no-async-promise-executor
           const p = new Promise<void>(async (resolve, reject) => {
@@ -146,9 +146,8 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         await Promise.allSettled(promises);
       }
       if (structure?.contact?.email) {
-        const mailerInstanceStructure = mailer(app);
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurStructure(mailerInstanceStructure);
+          avisCandidaturePosteCoordinateurStructure(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)
