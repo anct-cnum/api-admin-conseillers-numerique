@@ -9,6 +9,7 @@ import { IUser } from '../../ts/interfaces/db.interfaces';
 import {
   informationValidationCoselec,
   invitationActiveCompte,
+  informationValidationCoselecCoordinateur,
 } from '../../emails';
 
 program.option('-r, --role <role>', 'Role');
@@ -18,6 +19,10 @@ program.parse(process.argv);
 execute(__filename, async ({ app, mailer, logger, exit }) => {
   const promises: Promise<void>[] = [];
   let messageInformationCoselec: null | {
+    render: (user: IUser) => Promise<any>;
+    send: (user: IUser) => Promise<any>;
+  } = null;
+  let messageInformationCoselecCoordinateur: null | {
     render: (user: IUser) => Promise<any>;
     send: (user: IUser) => Promise<any>;
   } = null;
@@ -40,6 +45,8 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
   const messageInvitation = invitationActiveCompte(app, mailer);
   if (options.role === 'structure') {
     messageInformationCoselec = informationValidationCoselec(app, mailer);
+    messageInformationCoselecCoordinateur =
+      informationValidationCoselecCoordinateur(app, mailer);
   }
 
   const users: IUser[] = await app
@@ -50,7 +57,13 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       migrationDashboard: true, // Nécessaire pour inviter que les users autorisés & migrés
       token: { $ne: null },
     })
-    .select({ name: 1, token: 1, entity: 1, mailSentCoselecDate: 1 })
+    .select({
+      name: 1,
+      token: 1,
+      entity: 1,
+      mailSentCoselecDate: 1,
+      mailSentCoselecCoordinateurDate: 1,
+    })
     .limit(limit);
 
   if (users.length === 0) {
@@ -62,10 +75,15 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve) => {
       try {
-        if (messageInformationCoselec) {
+        if (
+          messageInformationCoselec &&
+          messageInformationCoselecCoordinateur
+        ) {
           const structure = await app
             .service(service.structures)
-            .Model.findOne({ _id: user.entity.oid });
+            .Model.findOne({
+              _id: user.entity.oid,
+            });
           if (structure.statut !== 'VALIDATION_COSELEC') {
             logger.warn(
               `Invitation NON envoyée pour ${user.name} : structure en statut ${structure.statut}`,
@@ -73,8 +91,18 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
             resolve(p);
             return;
           }
-          if (!user.mailSentCoselecDate) {
+          const demandeCoordinateurValider =
+            structure?.demandesCoordinateur?.find(
+              (demande) => demande.statut === 'validee',
+            );
+          if (!user.mailSentCoselecDate && !demandeCoordinateurValider) {
             await messageInformationCoselec.send(user);
+          }
+          if (
+            !user.mailSentCoselecCoordinateurDate &&
+            demandeCoordinateurValider
+          ) {
+            await messageInformationCoselecCoordinateur.send(user);
           }
         }
         await messageInvitation.send(user);

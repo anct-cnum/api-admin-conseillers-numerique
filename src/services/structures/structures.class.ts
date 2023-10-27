@@ -23,6 +23,7 @@ import {
   updateDemandeCoordinateurAvisPrefet,
   closeBannerParcoursCoordinateur,
   updateDemandeCoordinateurRefusAvisAdmin,
+  updateDemandeCoordinateurValidAvisAdmin,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -114,6 +115,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateDemandeCoordinateurRefusAvisAdmin(app),
+    );
+    app.patch(
+      '/avis/admin/valid/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDemandeCoordinateurValidAvisAdmin(app),
     );
     app.patch(
       '/banner/coordinateur/:id',
