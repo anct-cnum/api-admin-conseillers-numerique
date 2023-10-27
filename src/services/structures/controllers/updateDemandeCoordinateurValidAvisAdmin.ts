@@ -59,15 +59,12 @@ const updateDemandeCoordinateurValidAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'validee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'validee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
-          true,
       },
     };
     try {
@@ -238,11 +235,11 @@ const updateDemandeCoordinateurValidAvisAdmin =
           (demandeCoordinateur) =>
             demandeCoordinateur.id.toString() === idDemandeCoordinateur,
         );
-      const mailerInstance = mailer(app);
       if (prefets.length > 0) {
+        const mailerInstancePrefet = mailer(app);
         const promises: Promise<void>[] = [];
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+          avisCandidaturePosteCoordinateurPrefet(mailerInstancePrefet);
         await prefets.forEach(async (prefet) => {
           // eslint-disable-next-line no-async-promise-executor
           const p = new Promise<void>(async (resolve, reject) => {
@@ -267,8 +264,9 @@ const updateDemandeCoordinateurValidAvisAdmin =
         structure.statut === 'VALIDATION_COSELEC' &&
         structure?.contact?.email
       ) {
+        const mailerInstanceStructure = mailer(app);
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurStructure(mailerInstance);
+          avisCandidaturePosteCoordinateurStructure(mailerInstanceStructure);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)

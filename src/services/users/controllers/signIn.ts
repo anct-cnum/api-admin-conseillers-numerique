@@ -177,6 +177,16 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 ]);
               const countCoordinateur =
                 coordinateurs.length > 0 ? coordinateurs[0].count : 0;
+              const demandesCoordinateurRefusPoste =
+                structure.demandesCoordinateur.filter(
+                  (demandeCoordinateur) =>
+                    demandeCoordinateur?.banniereRefusAttributionPosteStructure ===
+                    true,
+                );
+              if (demandesCoordinateurRefusPoste.length > 0) {
+                user._doc.demandesCoordinateurRefusPoste =
+                  demandesCoordinateurRefusPoste;
+              }
               user._doc.displayBannerPosteCoordinateurStructure =
                 countCoordinateur < countDemandesCoordinateurValider;
             }
