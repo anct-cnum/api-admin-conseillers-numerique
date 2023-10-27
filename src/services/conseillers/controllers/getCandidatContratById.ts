@@ -1,7 +1,10 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
@@ -59,7 +62,15 @@ const getCandidatContratById =
         });
         return;
       }
-      if (
+      if (conseillerFormat.miseEnRelation?.contratCoordinateur) {
+        const posteCoordinateur = structure?.demandesCoordinateur
+          ?.filter((demande) => demande.statut === 'validee')
+          .pop();
+        const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+          'demarche_simplifiee',
+        );
+        conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${posteCoordinateur?.dossier?.numero}/messagerie`;
+      } else if (
         structure?.conventionnement?.statut ===
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
       ) {

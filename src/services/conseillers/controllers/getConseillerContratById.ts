@@ -72,6 +72,7 @@ const getConseillerContratById =
                     dateDebutDeContrat: 1,
                     typeDeContrat: 1,
                     motifRupture: 1,
+                    contratCoordinateur: 1,
                     dossierIncompletRupture: 1,
                     emetteurRupture: 1,
                     emetteurRenouvellement: 1,
@@ -163,7 +164,15 @@ const getConseillerContratById =
         });
         return;
       }
-      if (
+      if (conseiller[0].contrat?.contratCoordinateur) {
+        const posteCoordinateur = structure?.demandesCoordinateur
+          ?.filter((demande) => demande.statut === 'validee')
+          .pop();
+        const numeroDemarche = app.get(
+          'numero_demarche_recrutement_coordinateur',
+        );
+        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${numeroDemarche}/dossiers/${posteCoordinateur?.dossier?.numero}/messagerie`;
+      } else if (
         conseiller[0].contrat?.phaseConventionnement ===
         PhaseConventionnement.PHASE_2
       ) {
@@ -171,6 +180,7 @@ const getConseillerContratById =
       } else {
         conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
       }
+
       res.status(200).json(conseiller[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

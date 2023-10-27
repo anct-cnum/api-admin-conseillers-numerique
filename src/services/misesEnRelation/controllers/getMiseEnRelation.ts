@@ -13,16 +13,29 @@ import {
   getUrlDossierConventionnement,
   getUrlDossierReconventionnement,
 } from '../../structures/repository/reconventionnement.repository';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
-import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
+import {
+  checkQuotaRecrutementCoordinateur,
+  checkStructurePhase2,
+} from '../../structures/repository/structures.repository';
+
+interface IStructuresCoordinateur extends IStructures {
+  posteCoordinateur: IDemandesCoordinateur | undefined;
+}
 
 const getUrlDossierDepotPiece = (
-  structure: IStructures,
+  structure: IStructuresCoordinateur,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
   const typeStructure = getTypeDossierDemarcheSimplifiee(
     structure?.insee?.unite_legale?.forme_juridique?.libelle,
   );
+  if (structure?.posteCoordinateur) {
+    return `https://www.demarches-simplifiees.fr/dossiers/${structure.posteCoordinateur?.dossier?.numero}/messagerie`;
+  }
   if (checkStructurePhase2(structure?.conventionnement?.statut)) {
     return structure?.conventionnement?.dossierReconventionnement?.numero
       ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
@@ -45,12 +58,12 @@ const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
     const demarcheSimplifiee = app.get('demarche_simplifiee');
-
+    let quotaCoordinateur = false;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         return res.status(400).json({ message: 'Id incorrect' });
       }
-      const structure = await app
+      const structure: IStructuresCoordinateur = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne();
@@ -86,6 +99,7 @@ const getMiseEnRelation =
               dateFinDeContrat: 1,
               salaire: 1,
               typeDeContrat: 1,
+              contratCoordinateur: 1,
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',
@@ -112,6 +126,22 @@ const getMiseEnRelation =
       if (candidat.length === 0) {
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
+      const posteCoordinateur = structure?.demandesCoordinateur
+        ?.filter((demande) => demande.statut === 'validee')
+        .pop();
+      if (posteCoordinateur) {
+        if (candidat[0]?.contratCoordinateur) {
+          Object.assign(structure, {
+            posteCoordinateur,
+          });
+          quotaCoordinateur = true;
+        } else {
+          quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
+            app,
+            structure,
+          );
+        }
+      }
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -123,6 +153,8 @@ const getMiseEnRelation =
           dateFinDeContrat: candidat[0]?.dateFinDeContrat,
           salaire: candidat[0]?.salaire,
           typeDeContrat: candidat[0]?.typeDeContrat,
+          contratCoordinateur: candidat[0]?.contratCoordinateur,
+          quotaCoordinateur,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
@@ -136,7 +168,7 @@ const getMiseEnRelation =
       delete candidatFormat.dateFinDeContrat;
       delete candidatFormat.salaire;
       delete candidatFormat.typeDeContrat;
-
+      delete candidatFormat.contratCoordinateur;
       return res.status(200).json(candidatFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

@@ -7,12 +7,18 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
 
 const updateContratRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const miseEnrelationId = req.params.id;
-    const { typeDeContrat, dateDebutDeContrat, dateFinDeContrat, salaire } =
-      req.body;
+    const {
+      typeDeContrat,
+      dateDebutDeContrat,
+      dateFinDeContrat,
+      salaire,
+      isRecrutementCoordinateur,
+    } = req.body;
 
     if (!ObjectId.isValid(miseEnrelationId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -25,6 +31,7 @@ const updateContratRecrutement =
         dateDebutDeContrat,
         dateFinDeContrat,
         salaire,
+        isRecrutementCoordinateur,
       });
       if (creationContrat.error) {
         res.status(400).json({ message: creationContrat.error.message });
@@ -98,6 +105,22 @@ const updateContratRecrutement =
       } else {
         contratUpdated.$unset = { salaire: '' };
       }
+      if (isRecrutementCoordinateur) {
+        const quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
+          app,
+          structure,
+        );
+        if (!quotaCoordinateur && !miseEnRelation?.contratCoordinateur) {
+          res.status(400).json({
+            message:
+              'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués pour le coordinateur',
+          });
+          return;
+        }
+        contratUpdated.$set.contratCoordinateur = isRecrutementCoordinateur;
+      } else {
+        contratUpdated.$unset = { contratCoordinateur: '' };
+      }
 
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
@@ -119,7 +142,6 @@ const updateContratRecrutement =
         });
         return;
       }
-
       res.status(200).json({
         miseEnRelation: miseEnRelationUpdated.value,
       });
