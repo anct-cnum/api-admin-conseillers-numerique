@@ -4,11 +4,14 @@
 
 import { program } from 'commander';
 import { ObjectId } from 'mongodb';
+import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
+
+const { Pool } = require('pg');
 
 program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-q, --quota <quota>', 'quota');
@@ -16,9 +19,23 @@ program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
 program.parse(process.argv);
 
+const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
+  try {
+    await pool.query(
+      `
+      UPDATE djapp_hostorganization
+      SET updated = $2
+      WHERE id = $1`,
+      [idPG, datePG],
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
-
+  const pool = new Pool();
   if (!ObjectId.isValid(options.structureId)) {
     logger.error(`Veuillez renseigner un id structure.`);
     return;
@@ -37,6 +54,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     exit();
   }
   const updatedAt = new Date();
+  const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
   const objectUpdated = {
     $set: {
       updatedAt,
@@ -77,7 +95,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       'structureObj.statut': 'VALIDATION_COSELEC',
     });
   }
-  if (Number(options.quota) === 0) {
+  if (
+    Number(options.quota) === 0 &&
+    structure.statut === 'VALIDATION_COSELEC'
+  ) {
     const nbMiseEnRelationRecruter = await app
       .service(service.misesEnRelation)
       .Model.countDocuments({
@@ -127,6 +148,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       phaseConventionnement: PhaseConventionnement.PHASE_2,
     });
   }
+  await updateStructurePG(pool)(structure.idPG, datePG);
   const structureUpdated = await app
     .service(service.structures)
     .Model.updateOne({ _id: structure._id }, objectUpdated);
