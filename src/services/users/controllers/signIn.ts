@@ -129,12 +129,17 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 { _id: user.entity.oid },
                 { nom: 1, demandesCoordinateur: 1 },
               );
-            const countDemandesCoordinateurValider =
-              structure?.demandesCoordinateur?.filter(
+            if (
+              structure?.demandesCoordinateur?.some(
                 (demandeCoordinateur) =>
                   demandeCoordinateur.statut === 'validee',
-              ).length;
-            if (countDemandesCoordinateurValider > 0) {
+              )
+            ) {
+              const countDemandesCoordinateurValider =
+                structure?.demandesCoordinateur?.filter(
+                  (demandeCoordinateur) =>
+                    demandeCoordinateur.statut === 'validee',
+                ).length;
               const coordinateurs = await app
                 .service(service.conseillers)
                 .Model.aggregate([
@@ -177,18 +182,22 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 ]);
               const countCoordinateur =
                 coordinateurs.length > 0 ? coordinateurs[0].count : 0;
-              const demandesCoordinateurRefusPoste =
+              user._doc.displayBannerPosteCoordinateurStructure =
+                countCoordinateur < countDemandesCoordinateurValider;
+            }
+            if (
+              structure?.demandesCoordinateur?.some(
+                (demandeCoordinateur) =>
+                  demandeCoordinateur?.banniereRefusAttributionPosteStructure ===
+                  true,
+              )
+            ) {
+              user._doc.demandesCoordinateurRefusPoste =
                 structure.demandesCoordinateur.filter(
                   (demandeCoordinateur) =>
                     demandeCoordinateur?.banniereRefusAttributionPosteStructure ===
                     true,
                 );
-              if (demandesCoordinateurRefusPoste.length > 0) {
-                user._doc.demandesCoordinateurRefusPoste =
-                  demandesCoordinateurRefusPoste;
-              }
-              user._doc.displayBannerPosteCoordinateurStructure =
-                countCoordinateur < countDemandesCoordinateurValider;
             }
             user._doc.nomStructure = structure.nom;
           }
