@@ -677,21 +677,18 @@ const getStatsEvolutions = async (query, ability, read, app) => {
 
   // Cas des stats par structure
   if (Object.prototype.hasOwnProperty.call(query, 'structure.$id')) {
-    const cnfsIds = [];
-    const resultCnfsStructure = await app
-      .service(service.conseillers)
-      .Model.find(
-        {
-          structureId: query['structure.$id'],
-        },
-        {
-          _id: 1,
-        },
-      );
-    for (const cnfs of resultCnfsStructure) {
-      cnfsIds.push(cnfs._id);
-    }
-    const resultCnfsRupture = await app
+    let resultCnfsStructure = await app.service(service.conseillers).Model.find(
+      {
+        structureId: query['structure.$id'],
+      },
+      {
+        _id: 1,
+      },
+    );
+    resultCnfsStructure = resultCnfsStructure.map(
+      (conseiller) => conseiller._id,
+    );
+    let resultCnfsRupture = await app
       .service(service.conseillersRuptures)
       .Model.find(
         {
@@ -701,12 +698,11 @@ const getStatsEvolutions = async (query, ability, read, app) => {
           conseillerId: 1,
         },
       );
-    for (const cnfs of resultCnfsRupture) {
-      cnfsIds.push(cnfs.conseillerId);
-    }
+    resultCnfsRupture = resultCnfsStructure.map((conseiller) => conseiller._id);
+    resultCnfsStructure.concat(resultCnfsRupture);
     matchQuery = {
       'conseiller.$id': {
-        $in: cnfsIds,
+        $in: resultCnfsStructure,
       },
     };
   }
