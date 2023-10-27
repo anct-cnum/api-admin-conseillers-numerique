@@ -13,7 +13,7 @@ import {
   getZrr,
 } from '../../utils/geography';
 
-execute(__filename, async ({ app, logger, exit }) => {
+execute(__filename, async ({ app, logger, Sentry, exit }) => {
   const structures: IStructures[] = await app
     .service(service.structures)
     .Model.find({
@@ -41,12 +41,14 @@ execute(__filename, async ({ app, logger, exit }) => {
               app.get('api_entreprise'),
             );
           if (insee instanceof Error || Object.keys(insee).length === 0) {
+            Sentry.captureException(insee?.message ?? "l'insee est vide");
             logger.error(insee?.message ?? "l'insee est vide");
             reject();
             return;
           }
           const adresse: any | Error = await getGeo(insee.adresse);
           if (adresse instanceof Error || Object.keys(adresse).length === 0) {
+            Sentry.captureException(adresse?.message ?? "l'adresse est vide");
             logger.error(adresse?.message ?? "l'adresse est vide");
             reject();
             return;
