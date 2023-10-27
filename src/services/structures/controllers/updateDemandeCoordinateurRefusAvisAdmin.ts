@@ -93,20 +93,20 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      // await app
-      //   .service(service.misesEnRelation)
-      //   .Model.accessibleBy(req.ability, action.update)
-      //   .updateMany(
-      //     {
-      //       'structure.$id': structure._id,
-      //       'structureObj.demandesCoordinateur': {
-      //         $elemMatch: {
-      //           id: { $eq: new ObjectId(idDemandeCoordinateur) },
-      //         },
-      //       },
-      //     },
-      //     updatedDemandeCoordinateurMiseEnRelation,
-      //   );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': structure._id,
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+              },
+            },
+          },
+          updatedDemandeCoordinateurMiseEnRelation,
+        );
       const prefets: IUser[] = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
