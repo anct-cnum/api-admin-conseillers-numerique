@@ -165,7 +165,7 @@ const generateCsvCandidaturesCoordinateur = async (
     ];
     const fileLine = [];
     candidaturesCoordinateurs.forEach((candidature) => {
-      candidature.demandesCoordinateur.map((demande) =>
+      candidature.demandesCoordinateur?.map((demande) =>
         fileLine.push(
           candidature.idPG,
           candidature.nom,
