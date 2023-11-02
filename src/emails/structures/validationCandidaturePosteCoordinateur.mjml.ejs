@@ -10,9 +10,12 @@
           <mj-text>
             Madame, Monsieur,
           </mj-text>
-          <mj-text>
+          <mj-text align="left">
             Suite à votre dépôt de dossier à l’Appel à candidature Conseiller numérique Coordinateur,
-            votre structure s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller numérique Coordinateur.
+            votre structure s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
+            numérique Coordinateur.
+          </mj-text>
+          <mj-text align="left">
             L’instruction de votre dossier est désormais opérée sur la messagerie Démarches-Simplifiées.
           </mj-text>
           <mj-text align="left">
@@ -43,11 +46,10 @@
            <li style="padding-top: 10px">Un relevé d’identité bancaire</li>
           </ul>
           </mj-text>
-          <mj-text>
-            Merci de bien vouloir noter que la présente messagerie n’autorise qu’une pièce
-            jointe par message.
-          </mj-text>
-          <mj-text>
+          <mj-button href="<%= lienVersDossierDSCoordinateur %>" background-color="#060091" color="white" font-size="16px" font-weight="bold">
+            Compléter mon dossier
+          </mj-button>
+          <mj-text  align="left">
             Restant à votre disposition si besoin,
           </mj-text>
         </mj-column>

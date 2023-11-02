@@ -1,14 +1,19 @@
+import { Application } from '@feathersjs/express';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 import logger from '../../logger';
 
-export default function (mailer) {
+export default function (app: Application, mailer) {
   const templateName = 'validationCandidaturePosteCoordinateur';
 
-  const render = async (typeStructure: string) => {
+  const render = async (typeStructure: string, numeroDossierDS: number) => {
     const nombreCoordinateursCoselec = 1;
+    const demarcheSimplifiee = app.get('demarche_simplifiee');
+    const lienVersDossierDSCoordinateur = `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee?.numero_demarche_recrutement_coordinateur}/dossiers/${numeroDossierDS}/messagerie`;
+
     return mailer.render(__dirname, templateName, {
       typeStructure,
       nombreCoordinateursCoselec,
+      lienVersDossierDSCoordinateur,
     });
   };
 
@@ -29,7 +34,10 @@ export default function (mailer) {
         .sendEmail(structure.contact.email, {
           subject:
             'Réponse à candidature : recrutement d’un Conseiller numérique Coordinateur',
-          body: await render(structure.type),
+          body: await render(
+            structure.type,
+            structure.demandesCoordinateur[0].dossier.numero,
+          ),
         })
         .then(onSuccess)
         .catch(onError);
