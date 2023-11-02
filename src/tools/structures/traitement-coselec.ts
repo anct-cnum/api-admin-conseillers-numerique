@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
-import { IStructures } from '../../ts/interfaces/db.interfaces';
+import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
 
 const { Pool } = require('pg');
@@ -59,6 +59,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     $set: {
       updatedAt,
       coselecAt: updatedAt,
+      estLabelliseFranceServices: 'NON',
     },
     $push: {
       coselec: {
@@ -73,6 +74,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     $set: {
       'structureObj.updatedAt': updatedAt,
       'structureObj.coselecAt': updatedAt,
+      'structureObj.estLabelliseFranceServices': 'NON',
     },
     $push: {
       'structureObj.coselec': {
@@ -119,8 +121,40 @@ execute(__filename, async ({ app, logger, exit }) => {
       'structureObj.statut': 'ABANDON',
       'structureObj.userCreated': false,
     });
+    const userIds: IUser[] = await app
+      .service(service.users)
+      .Model.find({
+        'entity.$id': structure._id,
+        $and: [
+          { roles: { $elemMatch: { $eq: 'structure' } } },
+          { roles: { $elemMatch: { $eq: 'grandReseau' } } },
+        ],
+      })
+      .select({ _id: 1 });
+    if (userIds.length > 0) {
+      const userUpdated = await app.service(service.users).Model.updateMany(
+        {
+          _id: { $in: userIds },
+        },
+        {
+          $unset: {
+            entity: '',
+          },
+          $pull: {
+            roles: { $in: ['structure', 'structure_coop'] },
+          },
+        },
+      );
+      if (userUpdated.modifiedCount > 0) {
+        logger.info(
+          `COSELEC ${options.numeroCoselec}: ${userUpdated.modifiedCount} compte(s) utilisateur(s) mise à jour lié à la structure ${structure._id}`,
+        );
+      }
+    }
     const accountDelete = await app.service(service.users).Model.deleteMany({
+      _id: { $nin: userIds },
       'entity.$id': structure._id,
+      roles: { $in: ['structure'] },
     });
 
     if (accountDelete.deletedCount > 0) {
