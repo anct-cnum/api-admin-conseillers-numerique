@@ -92,6 +92,7 @@ const updateAvenantRenduPoste =
         });
         await app.service(service.users).Model.deleteMany({
           'entity.$id': structure._id,
+          roles: { $in: ['structure'] },
         });
       }
       const structureUpdated = await app

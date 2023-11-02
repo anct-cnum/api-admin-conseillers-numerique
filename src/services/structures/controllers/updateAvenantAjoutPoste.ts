@@ -162,9 +162,12 @@ const updateAvenantAjoutPoste =
       if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
           PhaseConventionnement.PHASE_2;
-        paramsUpdateCollectionMiseEnRelation.$push[
-          'structureObj.coselec'
-        ].phaseConventionnement = PhaseConventionnement.PHASE_2;
+        Object.assign(
+          paramsUpdateCollectionMiseEnRelation.$push['structureObj.coselec'],
+          {
+            phaseConventionnement: PhaseConventionnement.PHASE_2,
+          },
+        );
       }
       const structureUpdated = await app
         .service(service.structures)

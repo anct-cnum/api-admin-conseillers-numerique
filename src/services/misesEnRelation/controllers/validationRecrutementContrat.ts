@@ -242,11 +242,7 @@ const validationRecrutementContrat =
           conseillerObj: conseillerUpdated.value,
         },
       };
-      if (
-        checkStructurePhase2(
-          miseEnRelationVerif?.structureObj?.conventionnement?.statut,
-        )
-      ) {
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         Object.assign(objectMiseEnRelationUpdated.$set, {
           phaseConventionnement: PhaseConventionnement.PHASE_2,
         });
