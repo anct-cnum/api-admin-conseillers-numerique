@@ -49,7 +49,7 @@ export default function (app: Application, mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Réponse à candidature : recrutement de Coordinateur Conseiller numérique',
+            'Réponse à candidature : recrutement de Conseiller numérique Coordinateur',
           body: await render(user),
         })
         .then(onSuccess)

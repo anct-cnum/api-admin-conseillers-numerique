@@ -2,12 +2,13 @@ import { IStructures } from '../../ts/interfaces/db.interfaces';
 import logger from '../../logger';
 
 export default function (mailer) {
-  const templateName = 'avisCandidaturePosteCoordinateurStructure';
+  const templateName = 'validationCandidaturePosteCoordinateur';
 
-  const render = async (statut: string) => {
-    const statutFormat = statut === 'validee' ? 'acceptée' : 'refusée';
+  const render = async (typeStructure: string) => {
+    const nombreCoordinateursCoselec = 1;
     return mailer.render(__dirname, templateName, {
-      statutFormat,
+      typeStructure,
+      nombreCoordinateursCoselec,
     });
   };
 
@@ -16,7 +17,7 @@ export default function (mailer) {
     send: async (structure: IStructures) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de conseiller coordinateur à la structure ${structure.idPG}`,
+          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de Conseiller numérique Coordinateur à la structure ${structure.idPG}`,
         );
       };
       const onError = async (err: Error) => {
@@ -27,8 +28,8 @@ export default function (mailer) {
         .createMailer()
         .sendEmail(structure.contact.email, {
           subject:
-            'Réponse à candidature : recrutement d’un conseiller coordinateur',
-          body: await render(structure.demandesCoordinateur[0].statut),
+            'Réponse à candidature : recrutement d’un Conseiller numérique Coordinateur',
+          body: await render(structure.type),
         })
         .then(onSuccess)
         .catch(onError);

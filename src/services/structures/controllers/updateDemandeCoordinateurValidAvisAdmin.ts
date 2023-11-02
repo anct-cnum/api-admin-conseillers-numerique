@@ -18,7 +18,7 @@ import {
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
 import {
-  avisCandidaturePosteCoordinateurStructure,
+  validationCandidaturePosteCoordinateur,
   avisCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 
@@ -98,6 +98,8 @@ const updateDemandeCoordinateurValidAvisAdmin =
             coselec: 1,
             conventionnement: 1,
             idPG: 1,
+            'contact.email': 1,
+            codeDepartement: 1,
           },
         );
       if (!structure) {
@@ -268,7 +270,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         structure?.contact?.email
       ) {
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurStructure(mailerInstance);
+          validationCandidaturePosteCoordinateur(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)

@@ -7,7 +7,8 @@ import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
 import informationValidationCoselecCoordinateur from './structures/informationValidationCoselecCoordinateur';
 import avisCandidaturePosteCoordinateurPrefet from './prefets/avisCandidaturePosteCoordinateurPrefet';
-import avisCandidaturePosteCoordinateurStructure from './structures/avisCandidaturePosteCoordinateurStructure';
+import refusCandidaturePosteCoordinateur from './structures/refusCandidaturePosteCoordinateur';
+import validationCandidaturePosteCoordinateur from './structures/validationCandidaturePosteCoordinateur';
 
 export {
   creationCompteCandidat,
@@ -19,5 +20,6 @@ export {
   informationValidationCoselec,
   informationValidationCoselecCoordinateur,
   avisCandidaturePosteCoordinateurPrefet,
-  avisCandidaturePosteCoordinateurStructure,
+  refusCandidaturePosteCoordinateur,
+  validationCandidaturePosteCoordinateur,
 };
