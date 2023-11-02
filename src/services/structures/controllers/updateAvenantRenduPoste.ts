@@ -7,6 +7,7 @@ import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 
 interface ICoselecObject {
   nombreConseillersCoselec: number;
@@ -90,7 +91,33 @@ const updateAvenantRenduPoste =
           'structureObj.statut': 'ABANDON',
           'structureObj.userCreated': false,
         });
+        const userIds: IUser[] = await app
+          .service(service.users)
+          .Model.find({
+            'entity.$id': structure._id,
+            $and: [
+              { roles: { $elemMatch: { $eq: 'structure' } } },
+              { roles: { $elemMatch: { $eq: 'grandReseau' } } },
+            ],
+          })
+          .select({ _id: 1 });
+        if (userIds.length > 0) {
+          await app.service(service.users).Model.updateMany(
+            {
+              _id: { $in: userIds },
+            },
+            {
+              $unset: {
+                entity: '',
+              },
+              $pull: {
+                roles: { $in: ['structure', 'structure_coop'] },
+              },
+            },
+          );
+        }
         await app.service(service.users).Model.deleteMany({
+          _id: { $nin: userIds },
           'entity.$id': structure._id,
           roles: { $in: ['structure'] },
         });
