@@ -113,7 +113,7 @@ const updateContratRecrutement =
         if (!quotaCoordinateur && !miseEnRelation?.contratCoordinateur) {
           res.status(400).json({
             message:
-              'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués pour le coordinateur',
+              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués pour le coordinateur',
           });
           return;
         }
