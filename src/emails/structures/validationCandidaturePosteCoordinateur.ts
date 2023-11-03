@@ -1,14 +1,12 @@
-import { Application } from '@feathersjs/express';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 import logger from '../../logger';
 
-export default function (app: Application, mailer) {
+export default function (mailer) {
   const templateName = 'validationCandidaturePosteCoordinateur';
 
   const render = async (typeStructure: string, numeroDossierDS: number) => {
     const nombreCoordinateursCoselec = 1;
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
-    const lienVersDossierDSCoordinateur = `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${numeroDossierDS}/messagerie`;
+    const lienVersDossierDSCoordinateur = `https://www.demarches-simplifiees.fr/dossiers/${numeroDossierDS}/messagerie`;
 
     return mailer.render(__dirname, templateName, {
       typeStructure,

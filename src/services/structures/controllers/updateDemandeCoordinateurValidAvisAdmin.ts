@@ -266,7 +266,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
       }
       if (structure?.contact?.email) {
         const messageAvisCandidaturePosteCoordinateur =
-          validationCandidaturePosteCoordinateur(app, mailerInstance);
+          validationCandidaturePosteCoordinateur(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
           await messageAvisCandidaturePosteCoordinateur
             .send(structureUpdated)
