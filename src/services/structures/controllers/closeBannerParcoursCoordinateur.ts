@@ -20,13 +20,12 @@ const closeBannerParcoursCoordinateur =
       let objectUpdated = {};
       let objectUpdatedMiseEnRelation = {};
       switch (typeBanner) {
-        case 'banniereRefusAttributionPosteStructure':
+        case 'banniereInformationAvisStructure':
           objectUpdated = {
-            'demandesCoordinateur.$.banniereRefusAttributionPosteStructure':
-              false,
+            'demandesCoordinateur.$.banniereInformationAvisStructure': false,
           };
           objectUpdatedMiseEnRelation = {
-            'structureObj.demandesCoordinateur.$.banniereRefusAttributionPosteStructure':
+            'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
               false,
           };
           break;

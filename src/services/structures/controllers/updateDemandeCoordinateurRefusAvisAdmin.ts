@@ -63,10 +63,10 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         });
       } else {
         Object.assign(updatedDemandeCoordinateur.$set, {
-          'demandesCoordinateur.$.banniereRefusAttributionPosteStructure': true,
+          'demandesCoordinateur.$.banniereInformationAvisStructure': true,
         });
         Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
-          'structureObj.demandesCoordinateur.$.banniereRefusAttributionPosteStructure':
+          'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
             true,
         });
       }

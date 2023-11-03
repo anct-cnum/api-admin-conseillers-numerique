@@ -129,17 +129,18 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 { _id: user.entity.oid },
                 { nom: 1, demandesCoordinateur: 1 },
               );
-            if (
-              structure?.demandesCoordinateur?.some(
+            const countDemandesCoordinateurValider =
+              structure?.demandesCoordinateur?.filter(
                 (demandeCoordinateur) =>
                   demandeCoordinateur.statut === 'validee',
-              )
-            ) {
-              const countDemandesCoordinateurValider =
-                structure?.demandesCoordinateur?.filter(
-                  (demandeCoordinateur) =>
-                    demandeCoordinateur.statut === 'validee',
-                ).length;
+              ).length;
+            const demandesCoordinateurBannerInformation =
+              structure?.demandesCoordinateur?.filter(
+                (demandeCoordinateur) =>
+                  demandeCoordinateur?.banniereInformationAvisStructure ===
+                  true,
+              );
+            if (countDemandesCoordinateurValider > 0) {
               const coordinateurs = await app
                 .service(service.conseillers)
                 .Model.aggregate([
@@ -185,19 +186,9 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               user._doc.displayBannerPosteCoordinateurStructure =
                 countCoordinateur < countDemandesCoordinateurValider;
             }
-            if (
-              structure?.demandesCoordinateur?.some(
-                (demandeCoordinateur) =>
-                  demandeCoordinateur?.banniereRefusAttributionPosteStructure ===
-                  true,
-              )
-            ) {
-              user._doc.demandesCoordinateurRefusPoste =
-                structure.demandesCoordinateur.filter(
-                  (demandeCoordinateur) =>
-                    demandeCoordinateur?.banniereRefusAttributionPosteStructure ===
-                    true,
-                );
+            if (demandesCoordinateurBannerInformation?.length > 0) {
+              user._doc.demandesCoordinateurBannerInformation =
+                demandesCoordinateurBannerInformation;
             }
             user._doc.nomStructure = structure.nom;
           }
