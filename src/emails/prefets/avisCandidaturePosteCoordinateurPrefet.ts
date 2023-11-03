@@ -17,7 +17,7 @@ export default function (mailer) {
     send: async (user: IUser, structure: IStructures) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de conseiller coordinateur au préfet ${user.name}`,
+          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de Conseiller numérique Coordinateur au préfet ${user.name}`,
         );
       };
       const onError = async (err: Error) => {
@@ -28,7 +28,7 @@ export default function (mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Réponse à candidature : recrutement d’un conseiller coordinateur',
+            'Réponse à candidature : recrutement d’un Conseiller numérique Coordinateur',
           body: await render(
             structure.demandesCoordinateur[0].statut,
             structure.nom,
