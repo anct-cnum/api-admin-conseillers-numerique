@@ -4,11 +4,14 @@ import logger from '../../logger';
 export default function (mailer) {
   const templateName = 'validationCandidaturePosteCoordinateur';
 
-  const render = async (typeStructure: string) => {
+  const render = async (typeStructure: string, numeroDossierDS: number) => {
     const nombreCoordinateursCoselec = 1;
+    const lienVersDossierDSCoordinateur = `https://www.demarches-simplifiees.fr/dossiers/${numeroDossierDS}/messagerie`;
+
     return mailer.render(__dirname, templateName, {
       typeStructure,
       nombreCoordinateursCoselec,
+      lienVersDossierDSCoordinateur,
     });
   };
 
@@ -29,7 +32,10 @@ export default function (mailer) {
         .sendEmail(structure.contact.email, {
           subject:
             'Réponse à candidature : recrutement d’un Conseiller numérique Coordinateur',
-          body: await render(structure.type),
+          body: await render(
+            structure.type,
+            structure.demandesCoordinateur[0].dossier.numero,
+          ),
         })
         .then(onSuccess)
         .catch(onError);

@@ -264,11 +264,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         });
         await Promise.allSettled(promises);
       }
-      // les nouvelles structures recevront un mail d'information COSELEC
-      if (
-        structure.statut === 'VALIDATION_COSELEC' &&
-        structure?.contact?.email
-      ) {
+      if (structure?.contact?.email) {
         const messageAvisCandidaturePosteCoordinateur =
           validationCandidaturePosteCoordinateur(mailerInstance);
         const errorSmtpMailCandidaturePosteCoordinateur =
