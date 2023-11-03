@@ -73,21 +73,23 @@ const getExportCandidatsCoordinateursCsv =
         checkAccess,
       )(statut, search, region, departement, avisPrefet);
 
-      candidaturesCoordinateurs.sort((a, b) => {
-        if (
-          getTimestampByDate(a.dossier.dateDeCreation) <
-          getTimestampByDate(b.dossier.dateDeCreation)
-        ) {
-          return ordre < 0 ? 1 : -1;
-        }
-        if (
-          getTimestampByDate(a.dossier.dateDeCreation) >
-          getTimestampByDate(b.dossier.dateDeCreation)
-        ) {
-          return ordre;
-        }
-        return 0;
-      });
+      if (nomOrdre === 'dateCandidature') {
+        candidaturesCoordinateurs.sort((a, b) => {
+          if (
+            getTimestampByDate(a.dossier.dateDeCreation) <
+            getTimestampByDate(b.dossier.dateDeCreation)
+          ) {
+            return ordre < 0 ? 1 : -1;
+          }
+          if (
+            getTimestampByDate(a.dossier.dateDeCreation) >
+            getTimestampByDate(b.dossier.dateDeCreation)
+          ) {
+            return ordre;
+          }
+          return 0;
+        });
+      }
 
       generateCsvCandidaturesCoordinateur(candidaturesCoordinateurs, res);
     } catch (error) {
