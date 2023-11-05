@@ -7,7 +7,8 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
-import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
+import getMiseEnRelationConseiller from './getMiseEnRelationConseiller';
+import getMiseEnRelation from './getMiseEnRelation';
 
 const updateContratRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -106,22 +107,10 @@ const updateContratRecrutement =
         contratUpdated.$unset = { salaire: '' };
       }
       if (isRecrutementCoordinateur) {
-        const quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
-          app,
-          structure,
-        );
-        if (!quotaCoordinateur && !miseEnRelation?.contratCoordinateur) {
-          res.status(400).json({
-            message:
-              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués pour le coordinateur',
-          });
-          return;
-        }
         contratUpdated.$set.contratCoordinateur = isRecrutementCoordinateur;
       } else {
         contratUpdated.$unset = { contratCoordinateur: '' };
       }
-
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -142,9 +131,14 @@ const updateContratRecrutement =
         });
         return;
       }
-      res.status(200).json({
-        miseEnRelation: miseEnRelationUpdated.value,
-      });
+      if (
+        miseEnRelation.conseillerObj.statut === 'RECRUTE' ||
+        miseEnRelation.conseillerObj.statut === 'RUPTURE'
+      ) {
+        await getMiseEnRelationConseiller(app)(req, res);
+        return;
+      }
+      await getMiseEnRelation(app)(req, res);
     } catch (error) {
       res.status(500).json({ message: error.message });
       throw new Error(error);

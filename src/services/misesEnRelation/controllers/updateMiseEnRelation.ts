@@ -73,6 +73,7 @@ const updateMiseEnRelation =
           typeDeContrat: '',
           salaire: '',
           emetteurRecrutement: '',
+          contratCoordinateur: '',
         };
       }
       if (req.body.statut === 'nouvelle_rupture') {

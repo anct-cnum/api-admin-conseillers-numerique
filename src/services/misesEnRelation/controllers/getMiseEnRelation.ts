@@ -23,7 +23,7 @@ import {
 } from '../../structures/repository/structures.repository';
 
 interface IStructuresCoordinateur extends IStructures {
-  posteCoordinateur: IDemandesCoordinateur | undefined;
+  demandeCoordinateurValider: IDemandesCoordinateur | undefined;
 }
 
 const getUrlDossierDepotPiece = (
@@ -33,8 +33,8 @@ const getUrlDossierDepotPiece = (
   const typeStructure = getTypeDossierDemarcheSimplifiee(
     structure?.insee?.unite_legale?.forme_juridique?.libelle,
   );
-  if (structure?.posteCoordinateur) {
-    return `https://www.demarches-simplifiees.fr/dossiers/${structure.posteCoordinateur?.dossier?.numero}/messagerie`;
+  if (structure?.demandeCoordinateurValider) {
+    return `https://www.demarches-simplifiees.fr/dossiers/${structure.demandeCoordinateurValider?.dossier?.numero}/messagerie`;
   }
   if (checkStructurePhase2(structure?.conventionnement?.statut)) {
     return structure?.conventionnement?.dossierReconventionnement?.numero
@@ -126,15 +126,14 @@ const getMiseEnRelation =
       if (candidat.length === 0) {
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
-      const posteCoordinateur = structure?.demandesCoordinateur
+      const demandeCoordinateurValider = structure?.demandesCoordinateur
         ?.filter((demande) => demande.statut === 'validee')
         .pop();
-      if (posteCoordinateur) {
+      if (demandeCoordinateurValider) {
         if (candidat[0]?.contratCoordinateur) {
           Object.assign(structure, {
-            posteCoordinateur,
+            demandeCoordinateurValider,
           });
-          quotaCoordinateur = true;
         } else {
           quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
             app,

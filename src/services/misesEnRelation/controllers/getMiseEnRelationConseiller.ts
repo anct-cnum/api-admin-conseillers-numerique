@@ -13,7 +13,10 @@ import {
   getUrlDossierConventionnement,
   getUrlDossierReconventionnement,
 } from '../../structures/repository/reconventionnement.repository';
-import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+import {
+  checkQuotaRecrutementCoordinateur,
+  checkStructurePhase2,
+} from '../../structures/repository/structures.repository';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const getUrlDossierDepotPiece = (
@@ -45,7 +48,7 @@ const getMiseEnRelationConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
     const demarcheSimplifiee = app.get('demarche_simplifiee');
-
+    let quotaCoordinateur = false;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -119,6 +122,21 @@ const getMiseEnRelationConseiller =
         res.status(404).json({ message: 'Candidat non trouvé' });
         return;
       }
+      const demandeCoordinateurValider = structure?.demandesCoordinateur
+        ?.filter((demande) => demande.statut === 'validee')
+        .pop();
+      if (demandeCoordinateurValider) {
+        if (candidat[0]?.contratCoordinateur) {
+          Object.assign(structure, {
+            demandeCoordinateurValider,
+          });
+        } else {
+          quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
+            app,
+            structure,
+          );
+        }
+      }
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -130,6 +148,8 @@ const getMiseEnRelationConseiller =
           dateFinDeContrat: candidat[0].dateFinDeContrat,
           salaire: candidat[0].salaire,
           typeDeContrat: candidat[0].typeDeContrat,
+          contratCoordinateur: candidat[0]?.contratCoordinateur,
+          quotaCoordinateur,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
