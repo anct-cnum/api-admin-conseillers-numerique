@@ -132,7 +132,7 @@ const updateContratRecrutement =
         });
         return;
       }
-      if (req.query.role === 'admin') {
+      if (req.query.role === 'admin' && req.user.roles.includes('admin')) {
         req.params.idConseiller = miseEnRelation.conseillerObj._id;
         req.params.idMiseEnRelation = miseEnRelation._id;
         await getCandidatContratById(app)(req, res);
