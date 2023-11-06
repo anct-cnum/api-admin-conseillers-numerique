@@ -625,7 +625,7 @@ const generateCsvTerritoires = async (
       'Code',
       'Nom',
       'Personnes accompagnées',
-      'Accompagnements totaux',
+      "Nombre d'accompagnement",
       'Dotation de conseillers',
       "CnFS activé sur l'espace coop",
       "CnFS en attente d'activation",
