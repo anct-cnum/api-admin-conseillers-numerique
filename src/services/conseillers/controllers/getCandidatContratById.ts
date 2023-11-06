@@ -8,10 +8,7 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
-import {
-  checkQuotaRecrutementCoordinateur,
-  checkStructurePhase2,
-} from '../../structures/repository/structures.repository';
+import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 
 const getCandidatContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -65,23 +62,15 @@ const getCandidatContratById =
         });
         return;
       }
-      const demandeCoordinateurValider = structure?.demandesCoordinateur
-        ?.filter((demande) => demande.statut === 'validee')
-        .pop();
-      if (demandeCoordinateurValider) {
-        if (conseillerFormat.miseEnRelation?.contratCoordinateur) {
-          const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
-            'demarche_simplifiee',
-          );
-          conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
-        } else {
-          conseillerFormat.miseEnRelation.quotaCoordinateur =
-            await checkQuotaRecrutementCoordinateur(app, structure);
-        }
-      } else if (
-        checkStructurePhase2(structure?.conventionnement?.statut) &&
-        !conseillerFormat.url
-      ) {
+      if (conseillerFormat.miseEnRelation?.contratCoordinateur) {
+        const demandeCoordinateurValider = structure?.demandesCoordinateur
+          ?.filter((demande) => demande.statut === 'validee')
+          .pop();
+        const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+          'demarche_simplifiee',
+        );
+        conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
+      } else if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
       } else {
         conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;

@@ -9,6 +9,7 @@ import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import getMiseEnRelationConseiller from './getMiseEnRelationConseiller';
 import getMiseEnRelation from './getMiseEnRelation';
+import getCandidatContratById from '../../conseillers/controllers/getCandidatContratById';
 
 const updateContratRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -131,9 +132,15 @@ const updateContratRecrutement =
         });
         return;
       }
+      if (req.query.role === 'admin') {
+        req.params.idConseiller = miseEnRelation.conseillerObj._id;
+        req.params.idMiseEnRelation = miseEnRelation._id;
+        await getCandidatContratById(app)(req, res);
+        return;
+      }
       if (
-        miseEnRelation.conseillerObj.statut === 'RECRUTE' ||
-        miseEnRelation.conseillerObj.statut === 'RUPTURE'
+        miseEnRelation.conseillerObj?.statut === 'RECRUTE' ||
+        miseEnRelation.conseillerObj?.statut === 'RUPTURE'
       ) {
         await getMiseEnRelationConseiller(app)(req, res);
         return;
