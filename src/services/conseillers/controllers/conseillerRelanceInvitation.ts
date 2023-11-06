@@ -6,7 +6,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import mailer from '../../../mailer';
-import { creationCompteConseiller } from '../../../emails';
+import { relanceCreationCompteConseiller } from '../../../emails';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -15,6 +15,10 @@ const conseillerRelanceInvitation =
     const idConseiller = req.params.id;
 
     try {
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -26,11 +30,15 @@ const conseillerRelanceInvitation =
       const conseillerUser = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ 'entity.$id': conseiller._id });
+        .findOne({
+          'entity.$id': conseiller._id,
+          roles: {
+            $in: 'conseiller',
+          },
+        });
       if (!conseillerUser) {
         res.status(404).json({
-          message:
-            'Le conseiller ne possède pas de compte (doublon ou inactivité)',
+          message: 'Le conseiller ne possède pas de compte.',
         });
         return;
       }
@@ -49,7 +57,7 @@ const conseillerRelanceInvitation =
           { returnOriginal: false },
         );
       const mailerInstance = mailer(app);
-      const message = creationCompteConseiller(app, mailerInstance, req);
+      const message = relanceCreationCompteConseiller(app, mailerInstance, req);
       const errorSmtpMail = await message
         .send(users)
         .catch((errSmtp: Error) => {
