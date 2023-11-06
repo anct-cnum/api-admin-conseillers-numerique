@@ -5,15 +5,12 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
-import { getCoselec } from '../../../utils';
-import { countConseillersRecrutees } from '../misesEnRelation.repository';
-import getMiseEnRelationConseiller from './getMiseEnRelationConseiller';
-import getMiseEnRelation from './getMiseEnRelation';
 import getCandidatContratById from '../../conseillers/controllers/getCandidatContratById';
 
-const updateContratRecrutement =
+const updateContratRecrutementAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const miseEnrelationId = req.params.id;
+    const miseEnrelationId = req.params.idMiseEnRelation;
+    const conseillerId = req.params.idConseiller;
     const {
       typeDeContrat,
       dateDebutDeContrat,
@@ -22,7 +19,10 @@ const updateContratRecrutement =
       isRecrutementCoordinateur,
     } = req.body;
 
-    if (!ObjectId.isValid(miseEnrelationId)) {
+    if (
+      !ObjectId.isValid(miseEnrelationId) ||
+      !ObjectId.isValid(conseillerId)
+    ) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
@@ -47,40 +47,15 @@ const updateContratRecrutement =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-      const structure = await app
-        .service(service.structures)
+      const conseiller = await app
+        .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
-          _id: miseEnRelation.structureObj._id,
-          statut: 'VALIDATION_COSELEC',
+          _id: new ObjectId(conseillerId),
         });
-      if (!structure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
+      if (!conseiller) {
+        res.status(404).json({ message: 'Candidat non trouvé' });
         return;
-      }
-      const dernierCoselec = getCoselec(structure);
-      if (dernierCoselec !== null) {
-        // Nombre de candidats déjà recrutés pour cette structure
-        const misesEnRelationRecrutees = await countConseillersRecrutees(
-          app,
-          req,
-          miseEnRelation.structure.oid,
-        );
-        let countMisesEnRelationRecruteesFutur =
-          misesEnRelationRecrutees.length;
-        if (miseEnRelation.statut === 'interessee') {
-          countMisesEnRelationRecruteesFutur += 1; // prendre en compte celui qui va être recruté dans le quota
-        }
-        if (
-          countMisesEnRelationRecruteesFutur >
-          dernierCoselec.nombreConseillersCoselec
-        ) {
-          res.status(400).json({
-            message:
-              'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
-          });
-          return;
-        }
       }
       const contratUpdated: any = {
         $set: {
@@ -88,15 +63,6 @@ const updateContratRecrutement =
           dateDebutDeContrat: new Date(dateDebutDeContrat),
         },
       };
-      if (miseEnRelation.statut === 'interessee') {
-        Object.assign(contratUpdated.$set, {
-          statut: 'recrutee',
-          emetteurRecrutement: {
-            email: req.user.name,
-            date: new Date(),
-          },
-        });
-      }
       if (dateFinDeContrat !== null) {
         contratUpdated.$set.dateFinDeContrat = new Date(dateFinDeContrat);
       } else {
@@ -117,8 +83,8 @@ const updateContratRecrutement =
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           {
-            _id: miseEnrelationId,
-            statut: { $in: ['interessee', 'recrutee'] },
+            _id: miseEnRelation._id,
+            statut: 'recrutee',
           },
           contratUpdated,
           {
@@ -132,24 +98,11 @@ const updateContratRecrutement =
         });
         return;
       }
-      if (req.query.role === 'admin' && req.user.roles.includes('admin')) {
-        req.params.idConseiller = miseEnRelation.conseillerObj._id;
-        req.params.idMiseEnRelation = miseEnRelation._id;
-        await getCandidatContratById(app)(req, res);
-        return;
-      }
-      if (
-        miseEnRelation.conseillerObj?.statut === 'RECRUTE' ||
-        miseEnRelation.conseillerObj?.statut === 'RUPTURE'
-      ) {
-        await getMiseEnRelationConseiller(app)(req, res);
-        return;
-      }
-      await getMiseEnRelation(app)(req, res);
+      await getCandidatContratById(app)(req, res);
     } catch (error) {
       res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
 
-export default updateContratRecrutement;
+export default updateContratRecrutementAdmin;
