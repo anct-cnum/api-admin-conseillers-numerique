@@ -84,4 +84,7 @@ export default async function prefetRules(
       $in: conseillersIds,
     },
   });
+  can([action.read], ressource.conseillersRuptures, {
+    structureId: structures,
+  });
 }
