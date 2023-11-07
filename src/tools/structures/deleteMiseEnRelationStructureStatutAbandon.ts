@@ -5,55 +5,30 @@
 
 import execute from '../utils';
 import service from '../../helpers/services';
-import { IMisesEnRelation } from '../../ts/interfaces/db.interfaces';
+import { IStructures } from '../../ts/interfaces/db.interfaces';
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const misesEnRelation: IMisesEnRelation[] = await app
-    .service(service.misesEnRelation)
-    .Model.aggregate([
-      {
-        $match: {
-          statut: { $in: ['nouvelle', 'nonInteressee', 'interessee'] },
-        },
-      },
-      {
-        $lookup: {
-          from: 'structures',
-          let: {
-            idStructure: '$structureObj._id',
-          },
-          as: 'structure',
-          pipeline: [
-            {
-              $match: {
-                $and: [
-                  { $expr: { $eq: ['$$idStructure', '$_id'] } },
-                  { $expr: { $eq: ['ABANDON', '$statut'] } },
-                  { $expr: { $eq: [false, '$userCreated'] } },
-                ],
-              },
-            },
-          ],
-        },
-      },
-      { $unwind: '$structure' },
-      {
-        $project: {
-          _id: 1,
-        },
-      },
-    ]);
-
-  if (misesEnRelation.length === 0) {
+  const dateMoins2Jours = new Date();
+  dateMoins2Jours.setDate(dateMoins2Jours.getDate() - 2);
+  const structures = await app.service(service.structures).Model.find({
+    statut: 'ABANDON',
+    userCreated: false,
+    updatedAt: {
+      $gte: dateMoins2Jours,
+      $lte: new Date(),
+    },
+  });
+  if (structures.length === 0) {
     exit();
   }
   const promises: Promise<void>[] = [];
-  misesEnRelation.forEach(async (miseEnRelation: IMisesEnRelation) => {
+  structures.forEach(async (structure: IStructures) => {
     // eslint-disable-next-line no-async-promise-executor
     const p = new Promise<void>(async (resolve) => {
       try {
-        await app.service(service.misesEnRelation).Model.deleteOne({
-          _id: miseEnRelation._id,
+        await app.service(service.misesEnRelation).Model.deleteMany({
+          statut: { $in: ['nouvelle', 'nonInteressee', 'interessee'] },
+          'structure.$id': structure._id,
         });
         resolve(p);
       } catch (e) {
