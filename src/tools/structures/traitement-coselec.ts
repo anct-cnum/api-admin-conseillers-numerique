@@ -197,7 +197,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       `COSELEC ${options.numeroCoselec}: Structure ${structure._id} possède désormais ${options.quota} conseillers`,
     );
   } else {
-    logger.info(`La structure ${structure._id} n'a pas été mise à jour`);
+    logger.error(`La structure ${structure._id} n'a pas été mise à jour`);
   }
   exit();
 });
