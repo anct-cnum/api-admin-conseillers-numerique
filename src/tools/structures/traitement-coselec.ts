@@ -17,7 +17,10 @@ program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
-program.option('-st, --statut <statut>', 'nouveau statut de la structure');
+program.option(
+  '-st, --statut <statut>',
+  'nouveau statut de la structure (DOUBLON, ANNULEE, ABANDON)',
+);
 program.parse(process.argv);
 
 const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
@@ -43,6 +46,13 @@ execute(__filename, async ({ app, logger, exit }) => {
   }
   if (!options.quota || !options.numeroCoselec) {
     logger.error(`Veuillez renseigner un quota et un numero COSELEC.`);
+    return;
+  }
+  if (
+    options.statut &&
+    !['DOUBLON', 'ANNULEE', 'ABANDON'].includes(options.statut)
+  ) {
+    logger.error(`Le statut ${options.statut} n'est pas valide.`);
     return;
   }
   const structure: IStructures = await app
@@ -87,7 +97,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     },
   };
   if (structure.statut === 'CREEE') {
-    if (options.statut === 'ABANDON' || options.statut === 'ANNULEE') {
+    if (options.statut === 'DOUBLON') {
       Object.assign(objectUpdated.$set, {
         statut: options.statut,
       });
@@ -123,13 +133,21 @@ execute(__filename, async ({ app, logger, exit }) => {
         `La structure ${structure._id} possède des conseillers recrutés`,
       );
       exit();
+      return;
+    }
+    if (!['ANNULEE', 'ABANDON'].includes(options.statut)) {
+      logger.error(
+        `Le statut ${options.statut} n'est pas valide pour cette structure`,
+      );
+      exit();
+      return;
     }
     Object.assign(objectUpdated.$set, {
-      statut: 'ABANDON',
+      statut: options.statut,
       userCreated: false,
     });
     Object.assign(objectUpdatedMiseEnRelation.$set, {
-      'structureObj.statut': 'ABANDON',
+      'structureObj.statut': options.statut,
       'structureObj.userCreated': false,
     });
     const userIds: IUser[] = await app
