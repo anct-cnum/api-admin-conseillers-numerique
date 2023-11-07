@@ -17,7 +17,7 @@ program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
-program.option('-st, --statut <statut>', 'statut de la structure');
+program.option('-st, --statut <statut>', 'nouveau statut de la structure');
 program.parse(process.argv);
 
 const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
