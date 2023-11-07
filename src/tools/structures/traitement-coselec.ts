@@ -19,7 +19,7 @@ program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
 program.option(
   '-st, --statut <statut>',
-  'nouveau statut de la structure (DOUBLON, ANNULEE, ABANDON)',
+  'nouveau statut de la structure (ANNULEE, ABANDON)',
 );
 program.parse(process.argv);
 
@@ -46,13 +46,6 @@ execute(__filename, async ({ app, logger, exit }) => {
   }
   if (!options.quota || !options.numeroCoselec) {
     logger.error(`Veuillez renseigner un quota et un numero COSELEC.`);
-    return;
-  }
-  if (
-    options.statut &&
-    !['DOUBLON', 'ANNULEE', 'ABANDON'].includes(options.statut)
-  ) {
-    logger.error(`Le statut ${options.statut} n'est pas valide.`);
     return;
   }
   const structure: IStructures = await app
@@ -97,26 +90,16 @@ execute(__filename, async ({ app, logger, exit }) => {
     },
   };
   if (structure.statut === 'CREEE') {
-    if (options.statut === 'DOUBLON') {
-      Object.assign(objectUpdated.$set, {
-        statut: options.statut,
-      });
-    } else if (options.quota > 0) {
-      Object.assign(objectUpdated.$set, {
-        'conventionnement.statut':
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-        statut: 'VALIDATION_COSELEC',
-      });
-      Object.assign(objectUpdatedMiseEnRelation.$set, {
-        'structureObj.conventionnement.statut':
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-        'structureObj.statut': 'VALIDATION_COSELEC',
-      });
-    } else {
-      logger.error(
-        'Le traitement pour les structures en statut CREEE est incorrect',
-      );
-    }
+    Object.assign(objectUpdated.$set, {
+      'conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      statut: 'VALIDATION_COSELEC',
+    });
+    Object.assign(objectUpdatedMiseEnRelation.$set, {
+      'structureObj.conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      'structureObj.statut': 'VALIDATION_COSELEC',
+    });
   }
   if (
     Number(options.quota) === 0 &&
