@@ -17,6 +17,7 @@ program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
+program.option('-st, --statut <statut>', 'statut de la structure');
 program.parse(process.argv);
 
 const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
@@ -86,16 +87,26 @@ execute(__filename, async ({ app, logger, exit }) => {
     },
   };
   if (structure.statut === 'CREEE') {
-    Object.assign(objectUpdated.$set, {
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-      statut: 'VALIDATION_COSELEC',
-    });
-    Object.assign(objectUpdatedMiseEnRelation.$set, {
-      'structureObj.conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-      'structureObj.statut': 'VALIDATION_COSELEC',
-    });
+    if (options.statut === 'ABANDON' || options.statut === 'ANNULEE') {
+      Object.assign(objectUpdated.$set, {
+        statut: options.statut,
+      });
+    } else if (options.quota > 0) {
+      Object.assign(objectUpdated.$set, {
+        'conventionnement.statut':
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+        statut: 'VALIDATION_COSELEC',
+      });
+      Object.assign(objectUpdatedMiseEnRelation.$set, {
+        'structureObj.conventionnement.statut':
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+        'structureObj.statut': 'VALIDATION_COSELEC',
+      });
+    } else {
+      logger.error(
+        'Le traitement pour les structures en statut CREEE est incorrect',
+      );
+    }
   }
   if (
     Number(options.quota) === 0 &&
