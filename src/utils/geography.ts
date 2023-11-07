@@ -53,7 +53,7 @@ const getEtablissementBySiretEntrepriseApiV3 = async (
 const getQpv = async (
   app: Application,
   structure: IStructures,
-  coordonnees: number[],
+  coordonnees: number[] | undefined,
 ) => {
   let qpv = 'Sans objet';
   let quartiers = [];
@@ -67,7 +67,10 @@ const getQpv = async (
 
     qpv = quartiers.length > 0 ? 'Oui' : 'Non';
   }
-  if (['COLLECTIVITE', 'GIP', 'PRIVATE'].includes(structure.type)) {
+  if (
+    ['COLLECTIVITE', 'GIP', 'PRIVATE'].includes(structure.type) &&
+    Array.isArray(coordonnees)
+  ) {
     const radius = 0.1;
     const circlePoint = circle.default(coordonnees, radius);
     quartiers = await app.service(service.qpv).Model.find({
