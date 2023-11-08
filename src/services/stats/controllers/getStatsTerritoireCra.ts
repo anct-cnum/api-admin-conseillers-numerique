@@ -12,9 +12,9 @@ const getStatsTerritoireCra =
     const dateDebut: Date = new Date(req.query.dateDebut);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
-    const conseillerIds = JSON.parse(req.query?.conseillerIds as string);
+    const structureIds = JSON.parse(req.query?.structureIds as string);
     const statsValidation = validTerritoireCra.validate({
-      conseillerIds,
+      structureIds,
       dateDebut,
       dateFin,
     });
@@ -24,14 +24,14 @@ const getStatsTerritoireCra =
       return;
     }
     try {
-      if (conseillerIds) {
-        const ids = conseillerIds.map((id: string) => new ObjectId(id));
+      if (structureIds) {
+        const ids = structureIds.map((id: string) => new ObjectId(id));
         const query = {
           'cra.dateAccompagnement': {
             $gte: dateDebut,
             $lte: dateFin,
           },
-          'conseiller.$id': { $in: ids },
+          'structure.$id': { $in: ids },
         };
         const stats = await getStatsGlobales(
           query,

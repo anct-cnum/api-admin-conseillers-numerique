@@ -74,6 +74,16 @@ const getDepartement =
       { $sort: { [nomOrdre]: parseInt(ordre, 10) } },
     ]);
 
+const getStructuresMailles =
+  (app: Application) => async (territoire: string, code: string) =>
+    app
+      .service(service.structures)
+      .Model.find({
+        [territoire]: code === '978' ? '00' : code,
+        statut: { $ne: 'CREEE' },
+      })
+      .distinct('_id');
+
 const getExportTerritoiresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { territoire, nomOrdre, ordre } = req.query;
@@ -112,15 +122,19 @@ const getExportTerritoiresCsv =
       }
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const item = { ...ligneStats };
+          const listStructureId = await getStructuresMailles(app)(
+            territoire,
+            ligneStats[territoire],
+          );
+          const item = ligneStats ?? {};
+          item.structureIds = listStructureId;
           item.tauxActivation = getTauxActivation(
             item.nombreConseillersCoselec,
             item.cnfsActives,
           );
-
-          if (item.conseillerIds?.length > 0) {
+          if (item.structureIds?.length > 0) {
             const query = {
-              'conseiller.$id': { $in: item.conseillerIds },
+              'structure.$id': { $in: item.structureIds },
               'cra.dateAccompagnement': {
                 $gte: dateDebut,
                 $lte: dateFin,

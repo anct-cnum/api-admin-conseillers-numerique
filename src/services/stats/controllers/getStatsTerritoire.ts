@@ -56,6 +56,15 @@ const getRegion =
         },
       },
     ]);
+const getStructuresMailles =
+  (app: Application) => async (typeTerritoire: string, idTerritoire: string) =>
+    app
+      .service(service.structures)
+      .Model.find({
+        [typeTerritoire]: idTerritoire === '978' ? '00' : idTerritoire,
+        statut: { $ne: 'CREEE' },
+      })
+      .distinct('_id');
 
 const getStatsTerritoire =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -73,15 +82,23 @@ const getStatsTerritoire =
       return;
     }
     try {
-      let territoire: any[];
+      let territoire: { structureIds: any[] };
       const checkRoleAccessStatsTerritoires =
         await checkAccessRequestStatsTerritoires(app, req);
+      const listStructureId = await getStructuresMailles(app)(
+        typeTerritoire,
+        idTerritoire,
+      );
       if (typeTerritoire === 'codeDepartement') {
         territoire = await getDepartement(app, req)(
           dateFinFormat,
           typeTerritoire,
           String(idTerritoire),
         );
+        territoire = {
+          ...territoire[`${'_doc'}`],
+          structureIds: listStructureId,
+        };
         res.status(200).json(territoire);
       } else if (typeTerritoire === 'codeRegion') {
         territoire = await getRegion(app, checkRoleAccessStatsTerritoires)(
@@ -89,7 +106,11 @@ const getStatsTerritoire =
           typeTerritoire,
           String(idTerritoire),
         );
-        res.status(200).json(territoire[0]);
+        territoire = {
+          ...territoire[`${'_doc'}`],
+          structureIds: listStructureId,
+        };
+        res.status(200).json(territoire);
       } else {
         res.status(400).json('le type de territoire est invalide');
       }

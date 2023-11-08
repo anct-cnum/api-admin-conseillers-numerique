@@ -111,6 +111,15 @@ const getRegion =
       { $skip: page },
       { $limit: limit },
     ]);
+const getStructuresMailles =
+  (app: Application) => async (territoire: string, code: string) =>
+    app
+      .service(service.structures)
+      .Model.find({
+        [territoire]: code === '978' ? '00' : code,
+        statut: { $ne: 'CREEE' },
+      })
+      .distinct('_id');
 
 const getStatsTerritoires =
   (app: Application, options) => async (req: IRequest, res: Response) => {
@@ -181,7 +190,12 @@ const getStatsTerritoires =
 
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const item = { ...ligneStats };
+          const listStructureId = await getStructuresMailles(app)(
+            territoire,
+            ligneStats[territoire],
+          );
+          const item = ligneStats ?? {};
+          item.structureIds = listStructureId;
           item.personnesAccompagnees = 0;
           item.CRAEnregistres = 0;
           item.tauxActivation = getTauxActivation(
@@ -189,9 +203,9 @@ const getStatsTerritoires =
             item.cnfsActives,
           );
 
-          if (item.conseillerIds?.length > 0) {
+          if (item.structureIds?.length > 0) {
             const query = {
-              'conseiller.$id': { $in: item.conseillerIds },
+              'structure.$id': { $in: item.structureIds },
               'cra.dateAccompagnement': {
                 $gte: dateDebut,
                 $lte: dateFin,
