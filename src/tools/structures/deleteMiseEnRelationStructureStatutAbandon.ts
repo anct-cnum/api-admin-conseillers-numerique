@@ -10,14 +10,16 @@ import { IStructures } from '../../ts/interfaces/db.interfaces';
 execute(__filename, async ({ app, logger, exit }) => {
   const dateMoins2Jours = new Date();
   dateMoins2Jours.setDate(dateMoins2Jours.getDate() - 2);
-  const structures = await app.service(service.structures).Model.find({
-    statut: 'ABANDON',
-    userCreated: false,
-    updatedAt: {
-      $gte: dateMoins2Jours,
-      $lte: new Date(),
-    },
-  });
+  const structures: IStructures[] = await app
+    .service(service.structures)
+    .Model.find({
+      statut: 'ABANDON',
+      userCreated: false,
+      updatedAt: {
+        $gte: dateMoins2Jours,
+        $lte: new Date(),
+      },
+    });
   if (structures.length === 0) {
     exit();
   }
