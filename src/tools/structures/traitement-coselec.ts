@@ -159,7 +159,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
       if (userUpdated.modifiedCount > 0) {
         logger.info(
-          `COSELEC ${options.numeroCoselec}: ${userUpdated.modifiedCount} compte(s) utilisateur(s) mise à jour lié à la structure ${structure._id}`,
+          `COSELEC ${options.numeroCoselec}: ${userUpdated.modifiedCount} compte(s) utilisateur(s) mis à jour lié à la structure ${structure._id}`,
         );
       }
     }
