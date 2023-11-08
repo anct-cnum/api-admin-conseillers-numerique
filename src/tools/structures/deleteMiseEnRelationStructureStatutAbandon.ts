@@ -13,7 +13,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   const structures: IStructures[] = await app
     .service(service.structures)
     .Model.find({
-      statut: 'ABANDON',
+      statut: { $in: ['ABANDON', 'ANNULEE'] },
       userCreated: false,
       updatedAt: {
         $gte: dateMoins2Jours,
