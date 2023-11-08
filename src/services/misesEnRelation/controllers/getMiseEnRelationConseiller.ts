@@ -17,15 +17,25 @@ import {
   checkQuotaRecrutementCoordinateur,
   checkStructurePhase2,
 } from '../../structures/repository/structures.repository';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
+
+interface IStructuresCoordinateur extends IStructures {
+  demandeCoordinateurValider: IDemandesCoordinateur | undefined;
+}
 
 const getUrlDossierDepotPiece = (
-  structure: IStructures,
+  structure: IStructuresCoordinateur,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
   const typeStructure = getTypeDossierDemarcheSimplifiee(
     structure?.insee?.unite_legale?.forme_juridique?.libelle,
   );
+  if (structure?.demandeCoordinateurValider) {
+    return `https://www.demarches-simplifiees.fr/dossiers/${structure.demandeCoordinateurValider?.dossier?.numero}/messagerie`;
+  }
   if (checkStructurePhase2(structure?.conventionnement?.statut)) {
     return structure?.conventionnement?.dossierReconventionnement?.numero
       ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
