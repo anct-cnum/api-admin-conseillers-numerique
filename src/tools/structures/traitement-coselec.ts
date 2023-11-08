@@ -171,7 +171,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
     if (accountDelete.deletedCount > 0) {
       logger.info(
-        `COSELEC ${options.numeroCoselec}: ${accountDelete.deletedCount} compte(s) utilisateur(s) supprimé(s) lié à la structure ${structure._id}`,
+        `COSELEC ${options.numeroCoselec}: ${accountDelete.deletedCount} compte(s) utilisateur(s) supprimé(s) lié(s) à la structure ${structure._id}`,
       );
     }
   }
