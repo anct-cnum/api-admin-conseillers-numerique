@@ -14,6 +14,19 @@ import {
   checkAvisPrefet,
 } from '../../structures/repository/structures.repository';
 
+const formatStatutDemandeCoordinateur = (statut: string) => {
+  switch (statut) {
+    case 'en_cours':
+      return 'Nouvelle candidature';
+    case 'validee':
+      return 'Candidature validée';
+    case 'refusee':
+      return 'Non validée';
+    default:
+      return 'Non renseigné';
+  }
+};
+
 const getDemandesCoordo =
   (app: Application, checkAccess) =>
   async (
@@ -97,6 +110,7 @@ const getExportCandidatsCoordinateursCsv =
             item.nomStructure = structure.nom;
             item.codePostal = structure.codePostal;
             item.idPG = structure.idPG;
+            item.statut = formatStatutDemandeCoordinateur(demande.statut);
             return item;
           },
         );

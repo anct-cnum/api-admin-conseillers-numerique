@@ -42,19 +42,6 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
-const formatStatutDemandeCoordinateur = (statut: string) => {
-  switch (statut) {
-    case 'en_cours':
-      return 'Nouvelle candidature';
-    case 'validee':
-      return 'Candidature validée';
-    case 'refusee':
-      return 'Non validée';
-    default:
-      return 'Non renseigné';
-  }
-};
-
 const formatDateWithoutGetTime = (date: Date) => {
   if (date !== undefined && date !== null) {
     return dayjs.utc(date).format('DD/MM/YYYY');
@@ -185,7 +172,7 @@ const generateCsvCandidaturesCoordinateur = async (
             candidature.nomStructure,
             candidature.codePostal,
             candidature.dossier.numero,
-            formatStatutDemandeCoordinateur(candidature?.statut),
+            candidature.statut,
             formatDate(candidature.dossier.dateDeCreation),
             candidature?.avisPrefet,
           ].join(csvCellSeparator),
