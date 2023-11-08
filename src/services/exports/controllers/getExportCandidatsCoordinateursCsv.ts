@@ -76,14 +76,14 @@ const getExportCandidatsCoordinateursCsv =
       if (nomOrdre === 'dateCandidature') {
         candidaturesCoordinateurs.sort((a, b) => {
           if (
-            getTimestampByDate(a.dossier.dateDeCreation) <
-            getTimestampByDate(b.dossier.dateDeCreation)
+            getTimestampByDate(a.dossier?.dateDeCreation) <
+            getTimestampByDate(b.dossier?.dateDeCreation)
           ) {
             return ordre < 0 ? 1 : -1;
           }
           if (
-            getTimestampByDate(a.dossier.dateDeCreation) >
-            getTimestampByDate(b.dossier.dateDeCreation)
+            getTimestampByDate(a.dossier?.dateDeCreation) >
+            getTimestampByDate(b.dossier?.dateDeCreation)
           ) {
             return ordre;
           }
