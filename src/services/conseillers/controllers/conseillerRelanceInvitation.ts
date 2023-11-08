@@ -33,7 +33,7 @@ const conseillerRelanceInvitation =
         .findOne({
           'entity.$id': conseiller._id,
           roles: {
-            $in: 'conseiller',
+            $in: ['conseiller'],
           },
         });
       if (!conseillerUser) {
