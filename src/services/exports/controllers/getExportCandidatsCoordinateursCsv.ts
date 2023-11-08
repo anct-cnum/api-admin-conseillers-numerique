@@ -76,8 +76,8 @@ const getExportCandidatsCoordinateursCsv =
       let demandesCoordo = candidaturesCoordinateurs.map((structure) => {
         const structureFormat = structure;
         // si une structure possède deux demandes coordinateurs avec des statuts différents
-        // la requete renvoie toute les demandes coordinateurs de la structure sans prendre en compte le filtre statut
-        // dans l'agregate on ne peut pas récupérer seulement l'element du tableau qui match avec le filtre
+        // la requête renvoie toute les demandes coordinateurs de la structure sans prendre en compte le filtre statut
+        // dans l'aggregate on ne peut pas récupérer seulement l'élément du tableau qui match avec le filtre
         if (statut === 'toutes') {
           structureFormat.demandesCoordinateur =
             structure.demandesCoordinateur.filter((demande) =>
