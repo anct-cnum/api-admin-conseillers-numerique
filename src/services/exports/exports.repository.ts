@@ -42,6 +42,19 @@ const formatDate = (date: Date) => {
   return 'non renseignée';
 };
 
+const formatStatutDemandeCoordinateur = (statut: string) => {
+  switch (statut) {
+    case 'en_cours':
+      return 'Nouvelle candidature';
+    case 'validee':
+      return 'Candidature validée';
+    case 'refusee':
+      return 'Non validée';
+    default:
+      return 'Non renseigné';
+  }
+};
+
 const formatDateWithoutGetTime = (date: Date) => {
   if (date !== undefined && date !== null) {
     return dayjs.utc(date).format('DD/MM/YYYY');
@@ -155,32 +168,28 @@ const generateCsvCandidaturesCoordinateur = async (
 ) => {
   try {
     const fileHeaders = [
-      'IdPG de la structure',
+      'Id de la structure',
       'Nom de la structure',
       'Code postal',
       'Numéro de dossier',
-      'statut',
-      'date de création',
+      'Statut de la demande',
+      'Date de candidature',
       'Avis préfet',
     ];
-    const fileLine = [];
-    candidaturesCoordinateurs.forEach((candidature) => {
-      candidature.demandesCoordinateur?.map((demande) =>
-        fileLine.push(
-          candidature.idPG,
-          candidature.nom,
-          candidature.codePostal,
-          demande?.dossier?.numero,
-          demande?.statut,
-          formatDate(demande?.dossier?.dateDeCreation),
-          demande?.avisPrefet,
-        ),
-      );
-    });
     res.write(
       [
         fileHeaders.join(csvCellSeparator),
-        fileLine.join(csvCellSeparator),
+        ...candidaturesCoordinateurs.map((candidature) =>
+          [
+            candidature.idPG,
+            candidature.nomStructure,
+            candidature.codePostal,
+            candidature.dossier.numero,
+            formatStatutDemandeCoordinateur(candidature?.statut),
+            formatDate(candidature.dossier.dateDeCreation),
+            candidature?.avisPrefet,
+          ].join(csvCellSeparator),
+        ),
       ].join(csvLineSeparator),
     );
     res.end();
