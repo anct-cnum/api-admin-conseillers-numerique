@@ -11,7 +11,21 @@ import {
   filterRegion,
   filterDepartement,
   filterStatutAndAvisPrefetDemandesCoordinateur,
+  checkAvisPrefet,
 } from '../../structures/repository/structures.repository';
+
+const formatStatutDemandeCoordinateur = (statut: string) => {
+  switch (statut) {
+    case 'en_cours':
+      return 'Nouvelle candidature';
+    case 'validee':
+      return 'Candidature validée';
+    case 'refusee':
+      return 'Non validée';
+    default:
+      return 'Non renseigné';
+  }
+};
 
 const getDemandesCoordo =
   (app: Application, checkAccess) =>
@@ -72,9 +86,40 @@ const getExportCandidatsCoordinateursCsv =
         app,
         checkAccess,
       )(statut, search, region, departement, avisPrefet);
+      let demandesCoordo = candidaturesCoordinateurs.map((structure) => {
+        const structureFormat = structure;
+        // si une structure possède deux demandes coordinateurs avec des statuts différents
+        // la requête renvoie toute les demandes coordinateurs de la structure sans prendre en compte le filtre statut
+        // dans l'aggregate on ne peut pas récupérer seulement l'élément du tableau qui match avec le filtre
+        if (statut === 'toutes') {
+          structureFormat.demandesCoordinateur =
+            structure.demandesCoordinateur.filter((demande) =>
+              checkAvisPrefet(avisPrefet, demande.avisPrefet),
+            );
+        } else {
+          structureFormat.demandesCoordinateur =
+            structure.demandesCoordinateur.filter(
+              (demande) =>
+                demande.statut === statut &&
+                checkAvisPrefet(avisPrefet, demande.avisPrefet),
+            );
+        }
+        const demandesCoordinateur = structureFormat.demandesCoordinateur.map(
+          (demande) => {
+            const item = demande;
+            item.nomStructure = structure.nom;
+            item.codePostal = structure.codePostal;
+            item.idPG = structure.idPG;
+            item.statut = formatStatutDemandeCoordinateur(demande.statut);
+            return item;
+          },
+        );
 
+        return demandesCoordinateur;
+      });
+      demandesCoordo = demandesCoordo.flat(1);
       if (nomOrdre === 'dateCandidature') {
-        candidaturesCoordinateurs.sort((a, b) => {
+        demandesCoordo.sort((a, b) => {
           if (
             getTimestampByDate(a.dossier.dateDeCreation) <
             getTimestampByDate(b.dossier.dateDeCreation)
@@ -91,7 +136,7 @@ const getExportCandidatsCoordinateursCsv =
         });
       }
 
-      generateCsvCandidaturesCoordinateur(candidaturesCoordinateurs, res);
+      generateCsvCandidaturesCoordinateur(demandesCoordo, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

@@ -164,6 +164,16 @@ const filterStatutAndAvisPrefetDemandesCoordinateur = (
   };
 };
 
+const checkAvisPrefet = (filtreAvisPrefet: string, avisPrefet: string) => {
+  if (filtreAvisPrefet === 'sans-avis' && avisPrefet === undefined) {
+    return true;
+  }
+  if (avisPrefet === filtreAvisPrefet || filtreAvisPrefet === undefined) {
+    return true;
+  }
+  return false;
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -182,4 +192,5 @@ export {
   getConseillersByStatus,
   filterStatutAndAvisPrefetDemandesCoordinateur,
   checkStructurePhase2,
+  checkAvisPrefet,
 };

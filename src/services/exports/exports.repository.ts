@@ -155,32 +155,28 @@ const generateCsvCandidaturesCoordinateur = async (
 ) => {
   try {
     const fileHeaders = [
-      'IdPG de la structure',
+      'Id de la structure',
       'Nom de la structure',
       'Code postal',
       'Numéro de dossier',
-      'statut',
-      'date de création',
+      'Statut de la demande',
+      'Date de candidature',
       'Avis préfet',
     ];
-    const fileLine = [];
-    candidaturesCoordinateurs.forEach((candidature) => {
-      candidature.demandesCoordinateur?.map((demande) =>
-        fileLine.push(
-          candidature.idPG,
-          candidature.nom,
-          candidature.codePostal,
-          demande?.dossier?.numero,
-          demande?.statut,
-          formatDate(demande?.dossier?.dateDeCreation),
-          demande?.avisPrefet,
-        ),
-      );
-    });
     res.write(
       [
         fileHeaders.join(csvCellSeparator),
-        fileLine.join(csvCellSeparator),
+        ...candidaturesCoordinateurs.map((candidature) =>
+          [
+            candidature.idPG,
+            candidature.nomStructure,
+            candidature.codePostal,
+            candidature.dossier.numero,
+            candidature.statut,
+            formatDate(candidature.dossier.dateDeCreation),
+            candidature?.avisPrefet,
+          ].join(csvCellSeparator),
+        ),
       ].join(csvLineSeparator),
     );
     res.end();
