@@ -2,7 +2,10 @@ import { Application } from '@feathersjs/express';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  StatutConventionnement,
+  PhaseConventionnement,
+} from '../../../ts/enum';
 
 const countStructures = async (ability, read, app) =>
   app
