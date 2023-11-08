@@ -3,7 +3,6 @@
 // ts-node src/tools/structures/traitement-coselec.ts -s XXX -q XXX -nc XXX -fs XXX
 
 import { program } from 'commander';
-import { ObjectId } from 'mongodb';
 import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
@@ -13,7 +12,7 @@ import { checkStructurePhase2 } from '../../services/structures/repository/struc
 
 const { Pool } = require('pg');
 
-program.option('-s, --structureId <structureId>', 'id structure');
+program.option('-id, --idPG <idPG>', 'idPG de la structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService <franceService>', 'label France Service');
@@ -40,8 +39,8 @@ const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
   const pool = new Pool();
-  if (!ObjectId.isValid(options.structureId)) {
-    logger.error(`Veuillez renseigner un id structure.`);
+  if (Number.isNaN(options.idPG)) {
+    logger.error(`Veuillez renseigner un idPG valide.`);
     return;
   }
   if (!options.quota || !options.numeroCoselec) {
@@ -51,7 +50,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   const structure: IStructures = await app
     .service(service.structures)
     .Model.findOne({
-      _id: new ObjectId(options.structureId),
+      idPG: options.idPG,
     });
   if (structure === null) {
     logger.error(`Structure non trouvée.`);

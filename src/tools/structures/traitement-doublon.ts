@@ -3,24 +3,23 @@
 // ts-node src/tools/structures/traitement-doublon.ts -s XXX
 
 import { program } from 'commander';
-import { ObjectId } from 'mongodb';
 import execute from '../utils';
 import service from '../../helpers/services';
 
-program.option('-s, --structureId <structureId>', 'id structure');
+program.option('-id, --idPG <idPG>', 'idPG de la structure');
 program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
-  if (!ObjectId.isValid(options.structureId)) {
-    logger.error(`Veuillez renseigner un id structure.`);
+  if (Number.isNaN(options.idPG)) {
+    logger.error(`Veuillez renseigner un idPG valide.`);
     return;
   }
   const structureUpdated = await app
     .service(service.structures)
     .Model.updateOne(
       {
-        _id: new ObjectId(options.structureId),
+        idPG: options.idPG,
         statut: 'CREEE',
       },
       {
