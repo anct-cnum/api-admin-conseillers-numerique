@@ -46,7 +46,7 @@ execute(__filename, async ({ app, logger, Sentry, exit }) => {
             reject();
             return;
           }
-          const adresse: any | Error = await getGeo(`${insee.adresse}`);
+          const adresse: any | Error = await getGeo(insee.adresse);
           if (adresse instanceof Error || adresse.features.length === 0) {
             Sentry.captureException(
               adresse?.message
