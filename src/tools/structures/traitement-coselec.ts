@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// ts-node src/tools/structures/traitement-coselec.ts -s XXX -q XXX -nc XXX -fs XXX
+// ts-node src/tools/structures/traitement-coselec.ts -id XXX -q XXX -nc XXX -fs XXX
 
 import { program } from 'commander';
 import dayjs from 'dayjs';
