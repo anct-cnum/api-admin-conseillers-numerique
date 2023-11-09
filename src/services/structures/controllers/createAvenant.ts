@@ -6,10 +6,8 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationAvenant } from '../../../schemas/structures.schemas';
 import getDetailStructureById from './getDetailStructureById';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../repository/structures.repository';
 
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -44,11 +42,11 @@ const createAvenant =
       return;
     }
 
-    const phaseConventionnement =
-      getStructure?.conventionnement?.statut ===
-      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-        ? PhaseConventionnement.PHASE_2
-        : PhaseConventionnement.PHASE_1;
+    const phaseConventionnement = checkStructurePhase2(
+      getStructure?.conventionnement?.statut,
+    )
+      ? PhaseConventionnement.PHASE_2
+      : PhaseConventionnement.PHASE_1;
 
     if (
       type === 'retrait' &&
