@@ -28,6 +28,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     });
   if (structures.length === 0) {
     exit();
+    return;
   }
   const promises: Promise<void>[] = [];
   structures.forEach(async (structure: IStructures) => {

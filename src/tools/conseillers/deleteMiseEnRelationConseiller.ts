@@ -19,6 +19,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   });
   if (conseillers.length === 0) {
     exit();
+    return;
   }
   let countDeleteMiseEnRelation = 0;
   let countDeleteDoublonConseillers = 0;
