@@ -16,10 +16,8 @@ const addRoleCoordinateur =
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({
-          _id: new ObjectId(req.user?.entity?.oid),
-          statut: 'VALIDATION_COSELEC',
-        });
+        .findOne();
+
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
@@ -29,34 +27,34 @@ const addRoleCoordinateur =
           (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
         ).length;
 
-      if (countDemandesCoordinateurValider > 0) {
-        const coordinateurs = await app
-          .service(service.conseillers)
-          .Model.aggregate([
-            {
-              $match: {
-                structureId: new ObjectId(structure._id),
-                statut: 'RECRUTE',
-                estCoordinateur: true,
-              },
-            },
-          ]);
+      if (countDemandesCoordinateurValider === 0) {
+        res.status(400).json({
+          message:
+            'Vous devez valider une demande de coordinateur pour votre structure',
+        });
+        return;
+      }
 
-        const countCoordinateur = coordinateurs.length;
+      const countCoordinateur = await app
+        .service(service.conseillers)
+        .Model.countDocuments({
+          structureId: new ObjectId(structure._id),
+          statut: 'RECRUTE',
+          estCoordinateur: true,
+        });
 
-        if (countCoordinateur >= countDemandesCoordinateurValider) {
-          res.status(400).json({
-            message:
-              'Vous avez atteint le nombre maximum de coordinateurs pour votre structure',
-          });
-          return;
-        }
+      if (countCoordinateur >= countDemandesCoordinateurValider) {
+        res.status(403).json({
+          message:
+            'Vous avez atteint le nombre maximum de coordinateurs pour votre structure',
+        });
+        return;
       }
 
       const conseiller = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
-        .findOneAndUpdate(
+        .updateOne(
           { _id: new ObjectId(conseillerId) },
           { $set: { estCoordinateur: true } },
         );
@@ -68,22 +66,22 @@ const addRoleCoordinateur =
       const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
-        .findOneAndUpdate(
+        .updateMany(
           {
-            'conseillerObj._id': new ObjectId(conseillerId),
-            statut: 'finalisee',
+            'conseiller.$id': new ObjectId(conseillerId),
           },
           { $set: { 'conseillerObj.estCoordinateur': true } },
         );
-      if (!miseEnRelation) {
+      if (miseEnRelation.modifiedCount === 0) {
         res.status(404).json({ message: 'La mise en relation n’existe pas' });
       }
 
       await app
         .service(service.users)
-        .Model.findOneAndUpdate(
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
           { 'entity.$id': new ObjectId(conseillerId) },
-          { $set: { roles: ['coordinateur_coop'] } },
+          { $push: { roles: ['coordinateur_coop'] } },
         );
 
       res.status(200).json(conseillerId);
