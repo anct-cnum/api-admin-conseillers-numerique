@@ -1,0 +1,64 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Suite à votre dépôt de dossier à l’Appel à candidature Conseiller numérique Coordinateur,
+            votre structure s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
+            numérique Coordinateur.
+          </mj-text>
+          <mj-text align="left">
+            L’instruction de votre dossier est désormais opérée sur la messagerie Démarches-Simplifiées.
+          </mj-text>
+          <mj-text align="left">
+            Merci de bien vouloir déposer les pièces suivantes, dans les meilleurs délais :
+              <ul align="left">
+                <% if(typeStructure == 'PRIVATE') { %>
+                <li style="padding-top: 10px">Une pièce d'identité en cours de validité du président de l'association (CNI recto-verso ou passeport)</li>
+                <li style="padding-top: 10px">
+                  La Liste des membres du bureau datée de 2023 et signée, identifiant formellement
+                  les membres du bureau en 2023 ( Nom, prénom et fonction dans l'association ex: président,
+                  trésorier, secrétaire).
+                </li>
+                <li style="padding-top: 10px">Les statuts de l’association à jour obligatoirement datés et signés.</li>
+                <li style="padding-top: 10px">Le Procès Verbal d'Assemblée Générale "à minima de 2023" obligatoirement signé et daté</li>
+                <li style="padding-top: 10px">
+                  Les derniers comptes annuels obligatoirement certifiés et signés par un Commissaire Aux
+                  Comptes. Ils doivent a minima être relatifs à l'exercice 2022. Si votre association
+                  n'est pas soumise à l’obligation de faire certifier ses comptes par un commissaire aux
+                  comptes, merci de nous l'indiquer expressément pour que nous puissions l'indiquer
+                  aux Instances de Contrôle. Les comptes non certifiés devront être obligatoirement
+                  signés par un expert comptable ou le Président(e) de l'Association.
+                </li>
+            <% } else{ %>
+                <li style="padding-top: 10px">Un document officiel identifiant le Président (ex: délégation de signature, PV d'AG etc.. )</li>
+                <li style="padding-top: 10px">La pièce d'identité du Président en cours de validité (CNI recto-verso ou passeport)</li>
+           <% } %>
+           <li style="padding-top: 10px">Avis de situation au répertoire SIRENE de moins de 3 mois</li>
+           <li style="padding-top: 10px">Un relevé d’identité bancaire</li>
+          </ul>
+          </mj-text>
+          <mj-button href="<%= lienVersDossierDSCoordinateur %>" background-color="#060091" color="white" font-size="16px" font-weight="bold">
+            Compléter mon dossier
+          </mj-button>
+          <mj-text  align="left">
+            Restant à votre disposition si besoin,
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

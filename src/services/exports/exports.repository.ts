@@ -149,6 +149,45 @@ const generateCsvCandidatByStructure = async (
   }
 };
 
+const generateCsvCandidaturesCoordinateur = async (
+  candidaturesCoordinateurs,
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Code postal',
+      'Numéro de dossier',
+      'Statut de la demande',
+      'Date de candidature',
+      'Avis préfet',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...candidaturesCoordinateurs.map((candidature) =>
+          [
+            candidature.idPG,
+            candidature.nomStructure,
+            candidature.codePostal,
+            candidature.dossier.numero,
+            candidature.statut,
+            formatDate(candidature.dossier.dateDeCreation),
+            candidature?.avisPrefet,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
 const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
   res.write(
     'Nom;Prénom;Email @conseiller-numerique.fr;Nom de la Structure;Email de la structure;Adresse de la structure;Code région de la structure\n',
@@ -972,6 +1011,7 @@ export {
   generateCsvConseillersWithoutCRA,
   generateCsvStructure,
   generateCsvDemandesRuptures,
+  generateCsvCandidaturesCoordinateur,
   generateCsvConseillersHub,
   generateCsvStatistiques,
   generateCsvTerritoires,
