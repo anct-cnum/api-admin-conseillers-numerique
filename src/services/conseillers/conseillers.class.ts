@@ -11,6 +11,7 @@ import dossierIncompletRuptureConseiller from './controllers/dossierIncompletRup
 import getCandidats from './controllers/getCandidats';
 import deleteCandidatById from './controllers/deleteCandidatById';
 import candidatRelanceInvitation from './controllers/candidatRelanceInvitation';
+import conseillerRelanceInvitation from './controllers/conseillerRelanceInvitation';
 import getCandidatsStructure from './controllers/getCandidatsStructure';
 import getConseillerContratById from './controllers/getConseillerContratById';
 import getCandidatContratById from './controllers/getCandidatContratById';
@@ -53,6 +54,12 @@ export default class Conseillers extends Service {
       authenticateMode(app),
       createAbilities(app),
       candidatRelanceInvitation(app),
+    );
+    app.post(
+      '/conseiller/relance-invitation/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      conseillerRelanceInvitation(app),
     );
     app.delete(
       '/candidat/:id',
