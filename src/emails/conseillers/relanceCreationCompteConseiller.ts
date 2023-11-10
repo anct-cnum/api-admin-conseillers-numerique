@@ -56,7 +56,7 @@ export default function (app: Application, mailer, req: IRequest) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Veuillez activer votre compte Coop des Conseillers numériques France Services',
+            'Veuillez activer votre compte Coop des conseillers numériques',
           body: await render(user),
         })
         .then(onSuccess)
