@@ -8,10 +8,8 @@ import {
   IConseillers,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../repository/structures.repository';
 
 interface IObjetMiseEnRelation {
   conseiller: DBRef;
@@ -66,10 +64,7 @@ const preSelectionnerCandidat =
         conseillerObj: conseiller,
         structureObj: structure,
       };
-      if (
-        structure?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         objMiseEnRelation.phaseConventionnement = PhaseConventionnement.PHASE_2;
       }
 

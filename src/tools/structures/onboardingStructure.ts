@@ -13,7 +13,7 @@ import {
   getZrr,
 } from '../../utils/geography';
 
-execute(__filename, async ({ app, logger, exit }) => {
+execute(__filename, async ({ app, logger, Sentry, exit }) => {
   const structures: IStructures[] = await app
     .service(service.structures)
     .Model.find({
@@ -28,6 +28,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     });
   if (structures.length === 0) {
     exit();
+    return;
   }
   const promises: Promise<void>[] = [];
   structures.forEach(async (structure: IStructures) => {
@@ -41,20 +42,28 @@ execute(__filename, async ({ app, logger, exit }) => {
               app.get('api_entreprise'),
             );
           if (insee instanceof Error || Object.keys(insee).length === 0) {
+            Sentry.captureException(insee?.message ?? "l'insee est vide");
             logger.error(insee?.message ?? "l'insee est vide");
             reject();
             return;
           }
           const adresse: any | Error = await getGeo(insee.adresse);
-          if (adresse instanceof Error || Object.keys(adresse).length === 0) {
-            logger.error(adresse?.message ?? "l'adresse est vide");
-            reject();
-            return;
+          if (adresse instanceof Error || adresse.features.length === 0) {
+            Sentry.captureException(
+              adresse?.message
+                ? `${adresse?.message} pour la structure ${structure.idPG}`
+                : `l'adresse est vide pour la structure ${structure.idPG}`,
+            );
+            logger.warn(
+              adresse?.message
+                ? `${adresse?.message} pour la structure ${structure.idPG}`
+                : `l'adresse est vide pour la structure ${structure.idPG}`,
+            );
           }
           const { qpv, quartiers } = await getQpv(
             app,
             structure,
-            adresse.features[0].geometry.coordinates,
+            adresse.features[0]?.geometry?.coordinates,
           );
           const isZRR = await getZrr(insee?.adresse?.code_commune);
           const structureUpdated = await app
@@ -66,8 +75,8 @@ execute(__filename, async ({ app, logger, exit }) => {
               {
                 $set: {
                   insee,
-                  coordonneesInsee: adresse.features[0].geometry,
-                  adresseInsee2Ban: adresse.features[0].properties,
+                  coordonneesInsee: adresse.features[0]?.geometry,
+                  adresseInsee2Ban: adresse.features[0]?.properties,
                   qpvStatut: qpv,
                   qpvListe: quartiers,
                   estZRR: isZRR,
@@ -82,9 +91,10 @@ execute(__filename, async ({ app, logger, exit }) => {
               {
                 $set: {
                   'structureObj.insee': insee,
-                  'structureObj.coordonneesInsee': adresse.features[0].geometry,
+                  'structureObj.coordonneesInsee':
+                    adresse.features[0]?.geometry,
                   'structureObj.adresseInsee2Ban':
-                    adresse.features[0].properties,
+                    adresse.features[0]?.properties,
                   'structureObj.qpvStatut': qpv,
                   'structureObj.qpvListe': quartiers,
                   'structureObj.estZRR': isZRR,

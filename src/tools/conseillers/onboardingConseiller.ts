@@ -18,6 +18,7 @@ execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
   });
   if (conseillers.length === 0) {
     exit();
+    return;
   }
   for (const conseiller of conseillers) {
     const user = await app.service(service.users).Model.findOne({

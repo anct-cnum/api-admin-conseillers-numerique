@@ -669,10 +669,47 @@ const getStatsEvolutions = async (query, ability, read, app) => {
     .Model.accessibleBy(ability, read)
     .getQuery();
 
-  // Cas des stats par territoire ou par
+  // Cas des stats par territoire
   if (Object.prototype.hasOwnProperty.call(query, 'conseiller.$id')) {
     const cnfsIds = query['conseiller.$id'];
     matchQuery = { 'conseiller.$id': cnfsIds };
+  }
+
+  // Cas des stats par structure
+  if (Object.prototype.hasOwnProperty.call(query, 'structure.$id')) {
+    let resultCnfsStructure = await app
+      .service(service.conseillers)
+      .Model.accessibleBy(ability, read)
+      .find(
+        {
+          structureId: query['structure.$id'],
+        },
+        {
+          _id: 1,
+        },
+      );
+    resultCnfsStructure = resultCnfsStructure.map(
+      (conseiller) => conseiller._id,
+    );
+    let resultCnfsRupture = await app
+      .service(service.conseillersRuptures)
+      .Model.accessibleBy(ability, read)
+      .find(
+        {
+          structureId: query['structure.$id'],
+          dateRupture: { $lte: dateDebutEvo, $gte: dateFinEvo },
+        },
+        {
+          conseillerId: 1,
+        },
+      );
+    resultCnfsRupture = resultCnfsStructure.map((conseiller) => conseiller._id);
+    resultCnfsStructure.concat(resultCnfsRupture);
+    matchQuery = {
+      'conseiller.$id': {
+        $in: resultCnfsStructure,
+      },
+    };
   }
 
   aggregateEvol = await app
