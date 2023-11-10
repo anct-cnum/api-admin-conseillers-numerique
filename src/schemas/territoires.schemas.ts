@@ -66,10 +66,14 @@ const validTerritoireDetails = Joi.object({
 });
 
 const validTerritoireCra = Joi.object({
-  structureIds: Joi.array()
-    .items(Joi.string())
+  typeTerritoire: Joi.string()
     .required()
-    .error(new Error('Le tableau des structures est invalide')),
+    .error(new Error('Le type de territoire est invalide')),
+  idTerritoire: Joi.string()
+    .min(2)
+    .max(3)
+    .required()
+    .error(new Error("L'id du territoire est invalide")),
   dateDebut: Joi.date()
     .required()
     .error(new Error('La date de début est invalide')),

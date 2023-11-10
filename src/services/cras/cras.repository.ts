@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import dayjs from 'dayjs';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -103,16 +102,16 @@ const getNombreCrasByStructureId =
         'structure.$id': { $eq: structureId },
       });
 
-const getConseillersIdsByTerritoire = async (dateFin, type, idType, app) => {
+const getStructuresIdsByTerritoire = async (type, idType, app) => {
   const query = {
-    date: dayjs(dateFin).format('DD/MM/YYYY'),
-    [type]: idType,
+    [type]: idType === '978' ? '00' : idType,
+    statut: { $ne: 'CREEE' },
   };
-  const conseillersIds = await app
-    .service(service.statsTerritoires)
+  const structuresIds = await app
+    .service(service.structures)
     .Model.find(query)
-    .distinct('conseillerIds');
-  return conseillersIds;
+    .distinct('_id');
+  return structuresIds;
 };
 
 const getCodesPostauxStatistiquesCras =
@@ -174,7 +173,7 @@ export {
   checkAccessRequestCras,
   getConseillersIdsRecruterByStructure,
   getConseillersIdsRuptureByStructure,
-  getConseillersIdsByTerritoire,
+  getStructuresIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
   getNombreCrasByStructureId,

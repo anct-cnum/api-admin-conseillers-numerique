@@ -6,6 +6,7 @@ import service from '../../../helpers/services';
 import { validTerritoireDetails } from '../../../schemas/territoires.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
 import { checkAccessRequestStatsTerritoires } from '../../statsTerritoires/statsTerritoires.repository';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 
 const getDepartement =
   (app: Application, req: IRequest) =>
@@ -56,15 +57,6 @@ const getRegion =
         },
       },
     ]);
-const getStructuresMailles =
-  (app: Application) => async (typeTerritoire: string, idTerritoire: string) =>
-    app
-      .service(service.structures)
-      .Model.find({
-        [typeTerritoire]: idTerritoire === '978' ? '00' : idTerritoire,
-        statut: { $ne: 'CREEE' },
-      })
-      .distinct('_id');
 
 const getStatsTerritoire =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -85,9 +77,10 @@ const getStatsTerritoire =
       let territoire: { structureIds: any[] };
       const checkRoleAccessStatsTerritoires =
         await checkAccessRequestStatsTerritoires(app, req);
-      const listStructureId = await getStructuresMailles(app)(
+      const listStructureId = await getStructuresIdsByTerritoire(
         typeTerritoire,
         idTerritoire,
+        app,
       );
       if (typeTerritoire === 'codeDepartement') {
         territoire = await getDepartement(app, req)(

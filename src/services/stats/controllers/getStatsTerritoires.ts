@@ -10,7 +10,10 @@ import {
   countPersonnesAccompagnees,
   getTauxActivation,
 } from '../../statsTerritoires/statsTerritoires.repository';
-import { checkAccessRequestCras } from '../../cras/cras.repository';
+import {
+  checkAccessRequestCras,
+  getStructuresIdsByTerritoire,
+} from '../../cras/cras.repository';
 
 const getTotalDepartements =
   (app: Application, req: IRequest) => async (date: string) =>
@@ -111,15 +114,6 @@ const getRegion =
       { $skip: page },
       { $limit: limit },
     ]);
-const getStructuresMailles =
-  (app: Application) => async (territoire: string, code: string) =>
-    app
-      .service(service.structures)
-      .Model.find({
-        [territoire]: code === '978' ? '00' : code,
-        statut: { $ne: 'CREEE' },
-      })
-      .distinct('_id');
 
 const getStatsTerritoires =
   (app: Application, options) => async (req: IRequest, res: Response) => {
@@ -190,9 +184,10 @@ const getStatsTerritoires =
 
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const listStructureId = await getStructuresMailles(app)(
+          const listStructureId = await getStructuresIdsByTerritoire(
             territoire,
             ligneStats[territoire],
+            app,
           );
           const item = ligneStats ?? {};
           item.structureIds = listStructureId;

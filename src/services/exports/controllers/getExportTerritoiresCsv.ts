@@ -11,6 +11,7 @@ import {
   getTauxActivation,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -74,16 +75,6 @@ const getDepartement =
       { $sort: { [nomOrdre]: parseInt(ordre, 10) } },
     ]);
 
-const getStructuresMailles =
-  (app: Application) => async (territoire: string, code: string) =>
-    app
-      .service(service.structures)
-      .Model.find({
-        [territoire]: code === '978' ? '00' : code,
-        statut: { $ne: 'CREEE' },
-      })
-      .distinct('_id');
-
 const getExportTerritoiresCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { territoire, nomOrdre, ordre } = req.query;
@@ -122,9 +113,10 @@ const getExportTerritoiresCsv =
       }
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const listStructureId = await getStructuresMailles(app)(
+          const listStructureId = await getStructuresIdsByTerritoire(
             territoire,
             ligneStats[territoire],
+            app,
           );
           const item = ligneStats ?? {};
           item.structureIds = listStructureId;
