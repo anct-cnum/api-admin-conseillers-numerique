@@ -135,7 +135,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                   demandeCoordinateur.statut === 'validee',
               ).length;
             if (countDemandesCoordinateurValider > 0) {
-              const countCoordinateurs = await app
+              const countCoordinateurs: number = await app
                 .service(service.misesEnRelation)
                 .Model.countDocuments({
                   'structure.$id': structure._id,

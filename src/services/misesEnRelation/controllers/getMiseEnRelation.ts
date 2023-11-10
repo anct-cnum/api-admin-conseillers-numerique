@@ -21,7 +21,6 @@ const getMiseEnRelation =
     const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
       'demarche_simplifiee',
     );
-    console.log(req);
     let quotaCoordinateur = false;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
