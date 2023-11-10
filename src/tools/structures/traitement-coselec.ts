@@ -88,7 +88,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     },
   };
-  if (structure.statut === 'CREEE') {
+  if (Number(options.quota) > 0 && structure.statut !== 'VALIDATION_COSELEC') {
     Object.assign(objectUpdated.$set, {
       'conventionnement.statut':
         StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
