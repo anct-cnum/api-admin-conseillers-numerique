@@ -39,7 +39,7 @@ export default function (app: Application, mailer, req: IRequest) {
       const onError = async (err: Error) => {
         await app
           .service(service.users)
-          .Model.accessibleBy(req.ability, action.read)
+          .Model.accessibleBy(req.ability, action.update)
           .updateOne(
             { _id: user._id },
             {
