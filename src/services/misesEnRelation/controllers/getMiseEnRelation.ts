@@ -9,61 +9,25 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 import {
-  getTypeDossierDemarcheSimplifiee,
-  getUrlDossierConventionnement,
-  getUrlDossierReconventionnement,
-} from '../../structures/repository/reconventionnement.repository';
-import {
   IDemandesCoordinateur,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
-import {
-  checkQuotaRecrutementCoordinateur,
-  checkStructurePhase2,
-} from '../../structures/repository/structures.repository';
-
-interface IStructuresCoordinateur extends IStructures {
-  demandeCoordinateurValider: IDemandesCoordinateur | undefined;
-}
-
-const getUrlDossierDepotPiece = (
-  structure: IStructuresCoordinateur,
-  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
-) => {
-  const typeStructure = getTypeDossierDemarcheSimplifiee(
-    structure?.insee?.unite_legale?.forme_juridique?.libelle,
-  );
-  if (structure?.demandeCoordinateurValider) {
-    return `https://www.demarches-simplifiees.fr/dossiers/${structure.demandeCoordinateurValider?.dossier?.numero}/messagerie`;
-  }
-  if (checkStructurePhase2(structure?.conventionnement?.statut)) {
-    return structure?.conventionnement?.dossierReconventionnement?.numero
-      ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
-      : getUrlDossierReconventionnement(
-          structure.idPG,
-          typeStructure?.type,
-          demarcheSimplifiee,
-        );
-  }
-  return structure?.conventionnement?.dossierConventionnement?.numero
-    ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`
-    : getUrlDossierConventionnement(
-        structure.idPG,
-        typeStructure?.type,
-        demarcheSimplifiee,
-      );
-};
+import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
+import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
 
 const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
+    const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+      'demarche_simplifiee',
+    );
+    console.log(req);
     let quotaCoordinateur = false;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         return res.status(400).json({ message: 'Id incorrect' });
       }
-      const structure: IStructuresCoordinateur = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne();
@@ -126,20 +90,16 @@ const getMiseEnRelation =
       if (candidat.length === 0) {
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
-      const demandeCoordinateurValider = structure?.demandesCoordinateur
-        ?.filter((demande) => demande.statut === 'validee')
-        .pop();
-      if (demandeCoordinateurValider) {
-        if (candidat[0]?.contratCoordinateur) {
-          Object.assign(structure, {
-            demandeCoordinateurValider,
-          });
-        } else {
-          quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
-            app,
-            structure,
-          );
-        }
+      const demandeCoordinateurValider: IDemandesCoordinateur | undefined =
+        structure?.demandesCoordinateur
+          ?.filter((demande) => demande.statut === 'validee')
+          .pop();
+      if (demandeCoordinateurValider && !candidat[0]?.contratCoordinateur) {
+        quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
+          app,
+          req,
+          structure,
+        );
       }
       const candidatFormat = {
         ...candidat[0],
@@ -157,7 +117,12 @@ const getMiseEnRelation =
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
-        urlDossierDS: getUrlDossierDepotPiece(structure, demarcheSimplifiee),
+        urlDossierDS: getUrlDossierDepotPieceDS(
+          demandeCoordinateurValider,
+          candidat[0]?.contratCoordinateur,
+          structure,
+          demarcheSimplifiee,
+        ),
       };
       delete candidatFormat.idConseiller;
       delete candidatFormat.statut;

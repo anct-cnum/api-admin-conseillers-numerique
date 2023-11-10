@@ -4,6 +4,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { countCoordinateurRecrutees } from '../../misesEnRelation/misesEnRelation.repository';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -64,6 +65,7 @@ const checkStructurePhase2 = (statut: string) => {
 
 const checkQuotaRecrutementCoordinateur = async (
   app: Application,
+  req: IRequest,
   structure: IStructures,
 ) => {
   const countDemandesCoordinateurValider =
@@ -71,59 +73,12 @@ const checkQuotaRecrutementCoordinateur = async (
       (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
     ).length;
   if (countDemandesCoordinateurValider > 0) {
-    const countCoordinateursEnRecrutement = await app
-      .service(service.misesEnRelation)
-      .Model.countDocuments({
-        'structure.$id': structure._id,
-        statut: 'recrutee',
-        contratCoordinateur: true,
-      });
-    const coordinateurs = await app
-      .service(service.conseillers)
-      .Model.aggregate([
-        {
-          $match: {
-            structureId: structure._id,
-            statut: 'RECRUTE',
-            estCoordinateur: true,
-          },
-        },
-        {
-          $lookup: {
-            from: 'users',
-            let: { idConseiller: '$_id' },
-            as: 'users',
-            pipeline: [
-              {
-                $match: {
-                  $and: [
-                    {
-                      $expr: {
-                        $eq: ['$$idConseiller', '$entity.oid'],
-                      },
-                    },
-                    {
-                      $expr: { $in: ['coordinateur_coop', '$roles'] },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            count: { $sum: 1 },
-          },
-        },
-      ]);
-    const countCoordinateur =
-      coordinateurs.length > 0 ? coordinateurs[0].count : 0;
-    return (
-      countCoordinateur + countCoordinateursEnRecrutement <
-      countDemandesCoordinateurValider
+    const countCoordinateurs = await countCoordinateurRecrutees(
+      app,
+      req,
+      structure._id,
     );
+    return countCoordinateurs < countDemandesCoordinateurValider;
   }
   return false;
 };

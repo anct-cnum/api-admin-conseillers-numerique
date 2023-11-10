@@ -400,6 +400,9 @@ export interface IDemandesCoordinateur {
   id: ObjectId;
   statut: string;
   avisPrefet?: string;
+  banniereInformationAvisStructure?: boolean;
+  banniereValidationAvisPrefet?: boolean;
+  banniereValidationAvisAdmin?: boolean;
   dossier: {
     numero: number;
     dateDeCreation: Date;

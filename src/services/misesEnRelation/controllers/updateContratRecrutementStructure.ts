@@ -6,9 +6,16 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
 import { getCoselec } from '../../../utils';
-import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import {
+  countConseillersRecrutees,
+  countCoordinateurRecrutees,
+} from '../misesEnRelation.repository';
 import getMiseEnRelationConseiller from './getMiseEnRelationConseiller';
 import getMiseEnRelation from './getMiseEnRelation';
+import {
+  IMisesEnRelation,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
 
 const updateContratRecrutementStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -38,7 +45,7 @@ const updateContratRecrutementStructure =
         res.status(400).json({ message: creationContrat.error.message });
         return;
       }
-      const miseEnRelation = await app
+      const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(miseEnrelationId) });
@@ -46,7 +53,7 @@ const updateContratRecrutementStructure =
         res.status(404).json({ message: "La mise en relation n'existe pas" });
         return;
       }
-      const structure = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
@@ -63,7 +70,7 @@ const updateContratRecrutementStructure =
         const misesEnRelationRecrutees = await countConseillersRecrutees(
           app,
           req,
-          miseEnRelation.structure.oid,
+          structure._id,
         );
         let countMisesEnRelationRecruteesFutur =
           misesEnRelationRecrutees.length;
@@ -107,6 +114,27 @@ const updateContratRecrutementStructure =
         contratUpdated.$unset = { salaire: '' };
       }
       if (isRecrutementCoordinateur) {
+        const misesEnRelationRecruteesCoordinateur =
+          await countCoordinateurRecrutees(app, req, structure._id);
+        let countMisesEnRelationRecruteesCoordinateurFutur =
+          misesEnRelationRecruteesCoordinateur;
+        if (miseEnRelation.statut === 'interessee') {
+          countMisesEnRelationRecruteesCoordinateurFutur += 1; // prendre en compte celui qui va être recruté dans le quota
+        }
+        const countDemandesCoordinateurValider =
+          structure.demandesCoordinateur.filter(
+            (demande) => demande.statut === 'validee',
+          ).length;
+        if (
+          countMisesEnRelationRecruteesCoordinateurFutur >
+          countDemandesCoordinateurValider
+        ) {
+          res.status(400).json({
+            message:
+              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
+          });
+          return;
+        }
         contratUpdated.$set.contratCoordinateur = isRecrutementCoordinateur;
       } else {
         contratUpdated.$unset = { contratCoordinateur: '' };

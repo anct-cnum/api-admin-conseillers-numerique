@@ -291,6 +291,20 @@ const countConseillersRecrutees = async (
       statut: { $in: ['recrutee', 'finalisee'] },
     });
 
+const countCoordinateurRecrutees = async (
+  app: Application,
+  req: IRequest,
+  structureId: ObjectId,
+): Promise<number> =>
+  app
+    .service(service.misesEnRelation)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'structure.$id': structureId,
+      statut: { $in: ['recrutee', 'finalisee'] },
+      contratCoordinateur: true,
+    });
+
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
@@ -307,5 +321,6 @@ export {
   totalHistoriqueContrat,
   totalContrat,
   countConseillersRecrutees,
+  countCoordinateurRecrutees,
   filtrePiecesManquantes,
 };

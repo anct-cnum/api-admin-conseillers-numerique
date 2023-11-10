@@ -10,8 +10,15 @@ import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
 } from '../../../ts/interfaces/global.interfaces';
-import { checkAccessReadRequestStructures } from './structures.repository';
+import {
+  checkAccessReadRequestStructures,
+  checkStructurePhase2,
+} from './structures.repository';
 import { getCoselecConventionnement, getTimestampByDate } from '../../../utils';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -630,6 +637,36 @@ const sortHistoriqueDossierConventionnement = (
   return sortArrayConventionnement(structureFormat, ordre);
 };
 
+const getUrlDossierDepotPieceDS = (
+  demandeCoordinateurValider: IDemandesCoordinateur | undefined,
+  isRecrutementCoordinateur: boolean,
+  structure: IStructures,
+  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
+) => {
+  const typeStructure = getTypeDossierDemarcheSimplifiee(
+    structure?.insee?.unite_legale?.forme_juridique?.libelle,
+  );
+  if (demandeCoordinateurValider && isRecrutementCoordinateur) {
+    return `https://www.demarches-simplifiees.fr/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
+  }
+  if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+    return structure?.conventionnement?.dossierReconventionnement?.numero
+      ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
+      : getUrlDossierReconventionnement(
+          structure.idPG,
+          typeStructure?.type,
+          demarcheSimplifiee,
+        );
+  }
+  return structure?.conventionnement?.dossierConventionnement?.numero
+    ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`
+    : getUrlDossierConventionnement(
+        structure.idPG,
+        typeStructure?.type,
+        demarcheSimplifiee,
+      );
+};
+
 export {
   queryGetDemarcheDemarcheSimplifiee,
   queryGetDossierDemarcheSimplifiee,
@@ -643,4 +680,5 @@ export {
   sortDossierConventionnement,
   sortHistoriqueDossierConventionnement,
   sortArrayConventionnement,
+  getUrlDossierDepotPieceDS,
 };
