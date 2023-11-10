@@ -1,4 +1,6 @@
 import creationCompteCandidat from './candidats/creationCompteCandidat';
+import creationCompteConseiller from './conseillers/creationCompteConseiller';
+import relanceCreationCompteConseiller from './conseillers/relanceCreationCompteConseiller';
 import invitationActiveCompte from './invitations/invitationActiveCompte';
 import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
 import conseillerRupturePix from './pix/conseillerRupturePix';
@@ -12,6 +14,8 @@ import validationCandidaturePosteCoordinateur from './structures/validationCandi
 
 export {
   creationCompteCandidat,
+  creationCompteConseiller,
+  relanceCreationCompteConseiller,
   invitationActiveCompte,
   invitationMultiRoleCompte,
   conseillerRupturePix,
