@@ -19,6 +19,7 @@ import {
   IDemandesCoordinateur,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
+import { ITypeStructure } from '../../../ts/interfaces/json.interface';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -643,9 +644,10 @@ const getUrlDossierDepotPieceDS = (
   structure: IStructures,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ) => {
-  const typeStructure = getTypeDossierDemarcheSimplifiee(
-    structure?.insee?.unite_legale?.forme_juridique?.libelle,
-  );
+  const typeStructure: ITypeStructure | undefined =
+    getTypeDossierDemarcheSimplifiee(
+      structure?.insee?.unite_legale?.forme_juridique?.libelle,
+    );
   if (demandeCoordinateurValider && isRecrutementCoordinateur) {
     return `https://www.demarches-simplifiees.fr/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
   }
@@ -667,6 +669,27 @@ const getUrlDossierDepotPieceDS = (
       );
 };
 
+const getUrlDossierDSAdmin = (
+  app: Application,
+  structure: IStructures,
+  isRecrutementCoordinateur: boolean,
+  typeStructure: ITypeStructure | undefined,
+) => {
+  if (isRecrutementCoordinateur) {
+    const demandeCoordinateurValider = structure?.demandesCoordinateur
+      ?.filter((demande) => demande.statut === 'validee')
+      .pop();
+    const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+      'demarche_simplifiee',
+    );
+    return `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
+  }
+  if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+    return `https://www.demarches-simplifiees.fr/procedures/${typeStructure?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+  }
+  return `https://www.demarches-simplifiees.fr/procedures/${typeStructure?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
+};
+
 export {
   queryGetDemarcheDemarcheSimplifiee,
   queryGetDossierDemarcheSimplifiee,
@@ -681,4 +704,5 @@ export {
   sortHistoriqueDossierConventionnement,
   sortArrayConventionnement,
   getUrlDossierDepotPieceDS,
+  getUrlDossierDSAdmin,
 };

@@ -61,6 +61,7 @@ const getMiseEnRelationConseiller =
               typeDeContrat: 1,
               dateRupture: 1,
               motifRupture: 1,
+              contratCoordinateur: 1,
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',

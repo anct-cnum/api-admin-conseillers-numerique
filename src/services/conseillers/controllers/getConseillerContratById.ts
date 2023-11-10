@@ -4,9 +4,12 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
-import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
+import {
+  getTypeDossierDemarcheSimplifiee,
+  getUrlDossierDSAdmin,
+} from '../../structures/repository/reconventionnement.repository';
 import { action } from '../../../helpers/accessControl/accessList';
-import { PhaseConventionnement } from '../../../ts/enum';
+import { ITypeStructure } from '../../../ts/interfaces/json.interface';
 
 const getConseillerContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -155,31 +158,22 @@ const getConseillerContratById =
         .findOne({
           _id: new ObjectId(conseiller[0].contrat?.structureObj?._id),
         });
-      const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.unite_legale?.forme_juridique?.libelle,
-      );
-      if (typeDossierDs === null) {
+      const typeStructure: ITypeStructure | undefined =
+        getTypeDossierDemarcheSimplifiee(
+          structure?.insee?.unite_legale?.forme_juridique?.libelle,
+        );
+      if (typeStructure === null) {
         res.status(500).json({
           message: 'Erreur lors de la récupération du type de la structure',
         });
         return;
       }
-      if (conseiller[0].contrat?.contratCoordinateur) {
-        const posteCoordinateur = structure?.demandesCoordinateur
-          ?.filter((demande) => demande.statut === 'validee')
-          .pop();
-        const numeroDemarche = app.get(
-          'numero_demarche_recrutement_coordinateur',
-        );
-        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${numeroDemarche}/dossiers/${posteCoordinateur?.dossier?.numero}/messagerie`;
-      } else if (
-        conseiller[0].contrat?.phaseConventionnement ===
-        PhaseConventionnement.PHASE_2
-      ) {
-        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
-      } else {
-        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
-      }
+      conseiller[0].url = getUrlDossierDSAdmin(
+        app,
+        structure,
+        conseiller[0].contrat?.contratCoordinateur,
+        typeStructure,
+      );
 
       res.status(200).json(conseiller[0]);
     } catch (error) {
