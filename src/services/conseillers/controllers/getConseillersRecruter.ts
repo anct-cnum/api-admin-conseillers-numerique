@@ -126,6 +126,7 @@ const getMisesEnRelationRecruter =
           'conseillerObj._id': 1,
           'conseillerObj.emailCN.address': 1,
           'conseillerObj.estCoordinateur': 1,
+          'conseillerObj.mattermost.login': 1,
         },
       },
       { $sort: sortColonne },
@@ -236,6 +237,7 @@ const getConseillersStatutRecrute =
           item.address = item.conseillerObj?.emailCN?.address;
           item.estCoordinateur = item.conseillerObj?.estCoordinateur;
           item.nomStructure = item.structureObj?.nom;
+          item.compteCoopActif = !!item.conseillerObj?.mattermost?.login;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
