@@ -50,9 +50,5 @@ export default async function grandReseauRules(
       $in: conseillersIds,
     },
   });
-  can([action.read], ressource.statsTerritoires, {
-    conseillerIds: {
-      $in: conseillersIds,
-    },
-  });
+  can([action.read], ressource.statsTerritoires);
 }
