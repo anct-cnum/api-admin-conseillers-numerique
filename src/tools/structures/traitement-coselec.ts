@@ -9,6 +9,7 @@ import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
+import { getCoselec } from '../../utils';
 
 const { Pool } = require('pg');
 
@@ -55,6 +56,25 @@ execute(__filename, async ({ app, logger, exit }) => {
   if (structure === null) {
     logger.error(`Structure non trouvée.`);
     exit();
+  }
+  const coselec = getCoselec(structure);
+  const nbDePosteCoselec = coselec?.nombreConseillersCoselec ?? 0;
+  if (nbDePosteCoselec > Number(options.quota)) {
+    const nbMiseEnRelationRecruter = await app
+      .service(service.misesEnRelation)
+      .Model.countDocuments({
+        statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
+        'structure.$id': structure._id,
+      });
+    const nbDePosteLibre =
+      Number(nbDePosteCoselec) - Number(nbMiseEnRelationRecruter);
+    if (nbDePosteLibre < Number(options.quota)) {
+      logger.error(
+        'Le nombre de postes rendus ne peut pas être supérieur ou égal au nombre de conseillers en poste',
+      );
+      exit();
+      return;
+    }
   }
   const updatedAt = new Date();
   const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
@@ -104,19 +124,6 @@ execute(__filename, async ({ app, logger, exit }) => {
     Number(options.quota) === 0 &&
     structure.statut === 'VALIDATION_COSELEC'
   ) {
-    const nbMiseEnRelationRecruter = await app
-      .service(service.misesEnRelation)
-      .Model.countDocuments({
-        statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
-        'structure.$id': structure._id,
-      });
-    if (nbMiseEnRelationRecruter > 0) {
-      logger.error(
-        `La structure ${structure._id} possède des conseillers recrutés`,
-      );
-      exit();
-      return;
-    }
     if (!['ANNULEE', 'ABANDON'].includes(options.statut)) {
       logger.error(
         `Le statut ${options.statut} n'est pas valide pour cette structure`,
