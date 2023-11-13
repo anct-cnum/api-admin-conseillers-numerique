@@ -67,7 +67,7 @@ const checkQuotaRecrutementCoordinateur = async (
   app: Application,
   req: IRequest,
   structure: IStructures,
-) => {
+): Promise<boolean> => {
   const countDemandesCoordinateurValider =
     structure?.demandesCoordinateur?.filter(
       (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',

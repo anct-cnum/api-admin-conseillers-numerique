@@ -643,7 +643,7 @@ const getUrlDossierDepotPieceDS = (
   isRecrutementCoordinateur: boolean,
   structure: IStructures,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
-) => {
+): string => {
   const typeStructure: ITypeStructure | undefined =
     getTypeDossierDemarcheSimplifiee(
       structure?.insee?.unite_legale?.forme_juridique?.libelle,
@@ -674,7 +674,7 @@ const getUrlDossierDSAdmin = (
   structure: IStructures,
   isRecrutementCoordinateur: boolean,
   typeStructure: ITypeStructure | undefined,
-) => {
+): string => {
   if (isRecrutementCoordinateur) {
     const demandeCoordinateurValider = structure?.demandesCoordinateur
       ?.filter((demande) => demande.statut === 'validee')
