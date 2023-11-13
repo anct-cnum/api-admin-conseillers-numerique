@@ -58,16 +58,15 @@ execute(__filename, async ({ app, logger, exit }) => {
     exit();
   }
   const coselec = getCoselec(structure);
-  const nbDePosteCoselec = coselec?.nombreConseillersCoselec ?? 0;
+  const nbDePosteCoselec: number = coselec?.nombreConseillersCoselec ?? 0;
   if (nbDePosteCoselec > Number(options.quota)) {
-    const nbMiseEnRelationRecruter = await app
+    const nbMiseEnRelationRecruter: number = await app
       .service(service.misesEnRelation)
       .Model.countDocuments({
         statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
         'structure.$id': structure._id,
       });
-    const nbDePosteLibre =
-      Number(nbDePosteCoselec) - Number(nbMiseEnRelationRecruter);
+    const nbDePosteLibre = nbDePosteCoselec - nbMiseEnRelationRecruter;
     if (nbDePosteLibre < Number(options.quota)) {
       logger.error(
         'Le nombre de postes rendus ne peut pas être supérieur ou égal au nombre de conseillers en poste',
