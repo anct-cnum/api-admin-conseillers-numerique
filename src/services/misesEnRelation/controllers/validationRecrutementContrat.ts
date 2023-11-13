@@ -10,7 +10,10 @@ import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
-import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+import {
+  checkQuotaRecrutementCoordinateur,
+  checkStructurePhase2,
+} from '../../structures/repository/structures.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -104,6 +107,17 @@ const validationRecrutementContrat =
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
+      }
+      if (miseEnRelationVerif?.contratCoordinateur) {
+        const checkQuotaCoordinateurValid =
+          await checkQuotaRecrutementCoordinateur(app, req, structure);
+        if (!checkQuotaCoordinateurValid) {
+          res.status(400).json({
+            message:
+              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
+          });
+          return;
+        }
       }
       const misesEnRelationRecrutees = await countConseillersRecrutees(
         app,
