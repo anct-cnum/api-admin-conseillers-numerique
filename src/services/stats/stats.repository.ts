@@ -655,7 +655,7 @@ const getStatsReorientations = async (query, ability, read, app) => {
   return reorientations;
 };
 
-const getStatsEvolutions = async (query, ability, read, app) => {
+const getStatsEvolutions = async (query, ability, read, app, territoire) => {
   let statsEvolutions = {};
   let aggregateEvol = [];
   const dateFinEvo = new Date();
@@ -669,14 +669,20 @@ const getStatsEvolutions = async (query, ability, read, app) => {
     .Model.accessibleBy(ability, read)
     .getQuery();
 
-  // Cas des stats par territoire
-  if (Object.prototype.hasOwnProperty.call(query, 'conseiller.$id')) {
-    const cnfsIds = query['conseiller.$id'];
-    matchQuery = { 'conseiller.$id': cnfsIds };
+  // Cas des stats par territoire à la maille structures
+  if (
+    Object.prototype.hasOwnProperty.call(query, 'structure.$id') &&
+    territoire
+  ) {
+    const cnfsIds = query['structure.$id'];
+    matchQuery = { 'structure.$id': cnfsIds };
   }
 
   // Cas des stats par structure
-  if (Object.prototype.hasOwnProperty.call(query, 'structure.$id')) {
+  if (
+    Object.prototype.hasOwnProperty.call(query, 'structure.$id') &&
+    !territoire
+  ) {
     let resultCnfsStructure = await app
       .service(service.conseillers)
       .Model.accessibleBy(ability, read)

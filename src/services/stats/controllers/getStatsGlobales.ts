@@ -27,6 +27,7 @@ const getStatsGlobales = async (
   app,
   pilotage = false,
   codesPostauxQuery = null,
+  territoire = null,
 ) => {
   try {
     let codesPostaux = [];
@@ -92,6 +93,7 @@ const getStatsGlobales = async (
       ability,
       action,
       app,
+      territoire,
     );
 
     const donneesStats = {

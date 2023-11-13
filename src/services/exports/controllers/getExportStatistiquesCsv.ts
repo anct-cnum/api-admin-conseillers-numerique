@@ -135,6 +135,9 @@ const getExportStatistiquesCsv =
             req.ability,
             action.read,
             app,
+            false,
+            null,
+            'territoire',
           );
           break;
         case 'grandReseau':
