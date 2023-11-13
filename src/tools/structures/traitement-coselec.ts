@@ -66,8 +66,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
         'structure.$id': structure._id,
       });
-    const nbDePosteLibre = nbDePosteCoselec - nbMiseEnRelationRecruter;
-    if (nbDePosteLibre < Number(options.quota)) {
+    if (nbMiseEnRelationRecruter > Number(options.quota)) {
       logger.error(
         'Le nombre de postes rendus ne peut pas être supérieur ou égal au nombre de conseillers en poste',
       );
