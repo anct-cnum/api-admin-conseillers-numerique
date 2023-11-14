@@ -19,36 +19,30 @@ export default function (app: Application, mailer, req: IRequest) {
     render,
     send: async (user) => {
       const onSuccess = async () => {
-        await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            { _id: user._id },
-            {
-              $set: {
-                mailSentDate: new Date(),
-                resend: !!user.mailSentDate,
-              },
-              $unset: {
-                mailError: '',
-                mailErrorDetail: '',
-              },
+        await app.service(service.users).Model.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              mailSentDate: new Date(),
+              resend: !!user.mailSentDate,
             },
-          );
+            $unset: {
+              mailError: '',
+              mailErrorDetail: '',
+            },
+          },
+        );
       };
       const onError = async (err: Error) => {
-        await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            { _id: user._id },
-            {
-              $set: {
-                mailError: 'smtpError',
-                mailErrorDetail: err.message,
-              },
+        await app.service(service.users).Model.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              mailError: 'smtpError',
+              mailErrorDetail: err.message,
             },
-          );
+          },
+        );
         throw err;
       };
 
