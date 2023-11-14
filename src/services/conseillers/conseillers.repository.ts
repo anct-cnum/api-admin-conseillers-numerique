@@ -71,7 +71,10 @@ const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
 
 const filterIsCoordinateur = (coordinateur: string) => {
   if (coordinateur === 'true') {
-    return { estCoordinateur: { $eq: true } };
+    return {
+      estCoordinateur: { $eq: true },
+      'listeSubordonnes.type': { $exists: true },
+    };
   }
   if (coordinateur === 'false') {
     return { estCoordinateur: { $exists: false } };
