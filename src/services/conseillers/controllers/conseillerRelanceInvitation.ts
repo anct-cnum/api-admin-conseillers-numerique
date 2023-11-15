@@ -29,7 +29,7 @@ const conseillerRelanceInvitation =
       }
       const conseillerUser = await app
         .service(service.users)
-        .Model
+        .Model.accessibleBy(req.ability, action.read)
         .findOne({
           'entity.$id': conseiller._id,
           roles: {
@@ -50,7 +50,7 @@ const conseillerRelanceInvitation =
       }
       const users = await app
         .service(service.users)
-        .Model
+        .Model.accessibleBy(req.ability, action.read)
         .findOneAndUpdate(
           { _id: conseillerUser._id },
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
@@ -59,12 +59,11 @@ const conseillerRelanceInvitation =
             rawResult: true,
           },
         );
-      if (users.modifiedCount === 0) {
+      if (users.lastErrorObject.n === 0) {
         res.status(409).json({
           message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
         });
       }
-      console.log(users);
       const mailerInstance = mailer(app);
       const message = relanceCreationCompteConseiller(app, mailerInstance, req);
       const errorSmtpMail = await message
