@@ -50,7 +50,7 @@ const conseillerRelanceInvitation =
       }
       const users = await app
         .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
+        .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           { _id: conseillerUser._id },
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
