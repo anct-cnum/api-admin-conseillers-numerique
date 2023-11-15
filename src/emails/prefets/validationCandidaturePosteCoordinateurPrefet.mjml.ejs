@@ -11,26 +11,25 @@
             Madame, Monsieur,
           </mj-text>
           <mj-text align="left">
-            Suite à votre dépôt de dossier à l’Appel à candidature Conseiller numérique Coordinateur,
-            votre structure s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
-            numérique Coordinateur.
+            Nous avons le plaisir de vous informer que la structure <%= nomStructure %>, dont vous avez soutenu
+            la candidature dans le cadre de l’appel à candidature Conseiller numérique coordinateur,
+            s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de coordinateur.
           </mj-text>
           <mj-text align="left">
-            L’instruction de votre dossier est désormais opérée sur la messagerie Démarches-Simplifiées.
+            La structure a été informée par email de cette décision et devra se rendre sur son
+            Tableau de pilotage pour effectuer le recrutement du conseiller coordinateur.
+            <a href="https://outline.incubateur.anct.gouv.fr/s/7eab5468-b0ec-4704-a6c4-87411e30d03e" target="_blank" style="color: #0063CB;">
+              En savoir plus sur ces étapes
+            </a>
           </mj-text>
           <mj-text align="left">
-            Merci de bien vouloir déposer les pièces suivantes, dans les meilleurs délais :
+            Elle doit désormais transmettre aux équipes en charge de l’instruction, via la plateforme
+            Démarches simplifiées et dans les meilleurs délais, les pièces suivantes :
             <% if(typeStructure == 'PRIVATE') { %>
               <%- include('../commun/piece-justificatif-structure-private.mjml.ejs'); %>
             <% } else{ %>
               <%- include('../commun/piece-justificatif-structure-public.mjml.ejs'); %>
            <% } %>
-          </mj-text>
-          <mj-button href="<%= lienVersDossierDSCoordinateur %>" background-color="#060091" color="white" font-size="16px" font-weight="bold">
-            Compléter mon dossier
-          </mj-button>
-          <mj-text  align="left">
-            Restant à votre disposition si besoin,
           </mj-text>
         </mj-column>
       </mj-section>
