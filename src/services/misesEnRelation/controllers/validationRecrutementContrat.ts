@@ -108,17 +108,6 @@ const validationRecrutementContrat =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      if (miseEnRelationVerif?.contratCoordinateur) {
-        const checkQuotaCoordinateurValid =
-          await checkQuotaRecrutementCoordinateur(app, req, structure);
-        if (!checkQuotaCoordinateurValid) {
-          res.status(400).json({
-            message:
-              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
-          });
-          return;
-        }
-      }
       const misesEnRelationRecrutees = await countConseillersRecrutees(
         app,
         req,
@@ -144,6 +133,19 @@ const validationRecrutementContrat =
             'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
         });
         return;
+      }
+      const roles = Array('conseiller');
+      if (miseEnRelationVerif?.contratCoordinateur) {
+        const checkQuotaCoordinateurValid =
+          await checkQuotaRecrutementCoordinateur(app, req, structure);
+        if (!checkQuotaCoordinateurValid) {
+          res.status(400).json({
+            message:
+              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
+          });
+          return;
+        }
+        roles.push('coordinateur_coop');
       }
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
@@ -173,7 +175,7 @@ const validationRecrutementContrat =
           prenom: miseEnRelationVerif.conseillerObj.prenom,
           nom: miseEnRelationVerif.conseillerObj.nom,
           password: passwordHash, // random password (required to create user)
-          roles: Array('conseiller'),
+          roles,
           entity: new DBRef(
             'conseillers',
             miseEnRelationVerif.conseillerObj._id,
@@ -201,7 +203,7 @@ const validationRecrutementContrat =
                 prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
                 nom: miseEnRelationVerif.conseillerObj?.nom,
                 password: passwordHash,
-                roles: Array('conseiller'),
+                roles,
                 token: uuidv4(),
                 mailSentDate: null,
                 passwordCreated: false,
@@ -234,6 +236,9 @@ const validationRecrutementContrat =
               updatedAt,
               userCreated: true,
               estRecrute: true,
+              ...(miseEnRelationVerif?.contratCoordinateur && {
+                estCoordinateur: true,
+              }),
               datePrisePoste: null,
               dateFinDeFormation: null,
               structureId: miseEnRelationVerif.structureObj._id,
