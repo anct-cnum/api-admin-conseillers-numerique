@@ -26,15 +26,12 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'refusee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'refusee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
-          true,
       },
     };
     try {
@@ -63,6 +60,14 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         });
         Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
           'structureObj.statut': 'REFUS_COORDINATEUR',
+        });
+      } else {
+        Object.assign(updatedDemandeCoordinateur.$set, {
+          'demandesCoordinateur.$.banniereInformationAvisStructure': true,
+        });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
+            true,
         });
       }
       const structureUpdated = await app

@@ -134,6 +134,12 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 (demandeCoordinateur) =>
                   demandeCoordinateur.statut === 'validee',
               ).length;
+            const demandesCoordinateurBannerInformation =
+              structure?.demandesCoordinateur?.filter(
+                (demandeCoordinateur) =>
+                  demandeCoordinateur?.banniereInformationAvisStructure ===
+                  true,
+              );
             if (countDemandesCoordinateurValider > 0) {
               const coordinateurs = await app
                 .service(service.conseillers)
@@ -179,6 +185,10 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 coordinateurs.length > 0 ? coordinateurs[0].count : 0;
               user._doc.displayBannerPosteCoordinateurStructure =
                 countCoordinateur < countDemandesCoordinateurValider;
+            }
+            if (demandesCoordinateurBannerInformation?.length > 0) {
+              user._doc.demandesCoordinateurBannerInformation =
+                demandesCoordinateurBannerInformation;
             }
             user._doc.nomStructure = structure.nom;
           }
