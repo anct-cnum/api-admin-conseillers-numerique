@@ -137,7 +137,6 @@ const getExportStatistiquesCsv =
             app,
             false,
             null,
-            'territoire',
           );
           break;
         case 'grandReseau':

@@ -43,9 +43,6 @@ const getStatsTerritoireCra =
           req.ability,
           action.read,
           app,
-          false,
-          null,
-          'territoire',
         );
         res.status(200).json(stats);
       }

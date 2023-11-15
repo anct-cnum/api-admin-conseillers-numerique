@@ -655,95 +655,70 @@ const getStatsReorientations = async (query, ability, read, app) => {
   return reorientations;
 };
 
-const getStatsEvolutions = async (query, ability, read, app, territoire) => {
+const getStatsEvolutions = async (query, ability, read, app) => {
   let statsEvolutions = {};
   let aggregateEvol = [];
   const dateFinEvo = new Date();
   const dateDebutEvo = new Date(String(dayjs(new Date()).subtract(4, 'month')));
   const dateDebutEvoYear = dateDebutEvo.getFullYear();
   const dateFinEvoYear = dateFinEvo.getFullYear();
-  let matchQuery = {};
-
+  const matchQuery = { ...query };
+  let collection = service.statsConseillersCras;
+  let statCrasMailleStructures = [];
   const queryAccess = await app
     .service(service.statsConseillersCras)
     .Model.accessibleBy(ability, read)
     .getQuery();
 
-  // Cas des stats par territoire à la maille structures
-  if (
-    Object.prototype.hasOwnProperty.call(query, 'structure.$id') &&
-    territoire
-  ) {
-    const cnfsIds = query['structure.$id'];
-    matchQuery = { 'structure.$id': cnfsIds };
-  }
-
-  // Cas des stats par structure
-  if (
-    Object.prototype.hasOwnProperty.call(query, 'structure.$id') &&
-    !territoire
-  ) {
-    let resultCnfsStructure = await app
-      .service(service.conseillers)
-      .Model.accessibleBy(ability, read)
-      .find(
-        {
-          structureId: query['structure.$id'],
-        },
-        {
-          _id: 1,
-        },
-      );
-    resultCnfsStructure = resultCnfsStructure.map(
-      (conseiller) => conseiller._id,
-    );
-    let resultCnfsRupture = await app
-      .service(service.conseillersRuptures)
-      .Model.accessibleBy(ability, read)
-      .find(
-        {
-          structureId: query['structure.$id'],
-          dateRupture: { $lte: dateDebutEvo, $gte: dateFinEvo },
-        },
-        {
-          conseillerId: 1,
-        },
-      );
-    resultCnfsRupture = resultCnfsStructure.map((conseiller) => conseiller._id);
-    resultCnfsStructure.concat(resultCnfsRupture);
-    matchQuery = {
-      'conseiller.$id': {
-        $in: resultCnfsStructure,
-      },
-    };
-  }
-
-  aggregateEvol = await app
-    .service(service.statsConseillersCras)
-    .Model.aggregate([
-      { $match: { ...matchQuery, $and: [queryAccess] } },
-      { $unwind: `$${dateFinEvoYear}` },
+  // Cas des stats par territoire à la maille structures || Cas des stats par structure
+  if (Object.prototype.hasOwnProperty.call(query, 'structure.$id')) {
+    collection = service.cras;
+    statCrasMailleStructures = [
       {
         $group: {
-          _id: `$${dateFinEvoYear}.mois`,
-          totalCras: { $sum: `$${dateFinEvoYear}.totalCras` },
+          _id: {
+            mois: { $month: '$cra.dateAccompagnement' },
+            annee: { $year: '$cra.dateAccompagnement' },
+          },
+          countCras: { $sum: 1 },
         },
       },
       {
-        $addFields: { mois: '$_id', annee: dateFinEvoYear },
+        $group: {
+          _id: '$_id.annee',
+          annee: { $push: { mois: '$_id.mois', totalCras: '$countCras' } },
+        },
       },
-    ]);
-
-  statsEvolutions = JSON.parse(
-    `{"${dateFinEvoYear.toString()}": ${JSON.stringify(aggregateEvol)}}`,
-  );
-
-  // Si année glissante on récupère les données de l'année n-1
+      {
+        $group: {
+          _id: null,
+          data: { $push: { k: { $toString: '$_id' }, v: '$annee' } },
+        },
+      },
+      { $replaceRoot: { newRoot: { $arrayToObject: '$data' } } },
+    ];
+  }
+  aggregateEvol = await app.service(collection).Model.aggregate([
+    { $match: { ...matchQuery, $and: [queryAccess] } },
+    ...statCrasMailleStructures,
+    { $unwind: `$${dateFinEvoYear}` },
+    {
+      $group: {
+        _id: `$${dateFinEvoYear}.mois`,
+        totalCras: { $sum: `$${dateFinEvoYear}.totalCras` },
+      },
+    },
+    {
+      $addFields: { mois: '$_id', annee: dateFinEvoYear },
+    },
+  ]);
   if (dateDebutEvoYear !== dateFinEvoYear) {
+    // Si année glissante on récupère les données de l'année n-1
     const aggregateEvolLastYear = await app
-      .service(service.statsConseillersCras)
+      .service(collection)
       .Model.aggregate([
         { $match: { ...matchQuery, $and: [queryAccess] } },
+        ...statCrasMailleStructures,
         { $unwind: `$${dateDebutEvoYear}` },
         {
           $group: {
@@ -759,6 +734,10 @@ const getStatsEvolutions = async (query, ability, read, app, territoire) => {
       `{"${dateDebutEvoYear.toString()}": ${JSON.stringify(
         aggregateEvolLastYear,
       )},"${dateFinEvoYear.toString()}": ${JSON.stringify(aggregateEvol)}}`,
+    );
+  } else {
+    statsEvolutions = JSON.parse(
+      `{"${dateFinEvoYear.toString()}": ${JSON.stringify(aggregateEvol)}}`,
     );
   }
 
