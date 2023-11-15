@@ -37,7 +37,8 @@ const addRoleCoordinateur =
 
       const countCoordinateur = await app
         .service(service.conseillers)
-        .Model.countDocuments({
+        .Model.accessibleBy(req.ability, action.read)
+        .countDocuments({
           structureId: new ObjectId(structure._id),
           statut: 'RECRUTE',
           estCoordinateur: true,
@@ -59,8 +60,10 @@ const addRoleCoordinateur =
           { $set: { estCoordinateur: true } },
         );
 
-      if (!conseiller) {
-        res.status(404).json({ message: 'Le conseiller n’existe pas' });
+      if (conseiller.modifiedCount === 0) {
+        res
+          .status(404)
+          .json({ message: "Le conseiller n'a pas été mise à jour" });
       }
 
       const miseEnRelation = await app
@@ -73,15 +76,34 @@ const addRoleCoordinateur =
           { $set: { 'conseillerObj.estCoordinateur': true } },
         );
       if (miseEnRelation.modifiedCount === 0) {
-        res.status(404).json({ message: 'La mise en relation n’existe pas' });
+        res.status(404).json({
+          message: "Les mises en relations n'ont pas été mise à jour",
+        });
       }
 
-      await app
+      const user = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           { 'entity.$id': new ObjectId(conseillerId) },
           { $push: { roles: ['coordinateur_coop'] } },
+        );
+
+      if (user.modifiedCount === 0) {
+        res
+          .status(404)
+          .json({ message: "L'utilisateur n'a pas été mise à jour" });
+      }
+
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            'conseiller.$id': new ObjectId(conseillerId),
+            statut: 'finalisee',
+          },
+          { $set: { 'conseillerObj.banniereAjoutRoleCoordinateur': true } },
         );
 
       res.status(200).json(conseillerId);
