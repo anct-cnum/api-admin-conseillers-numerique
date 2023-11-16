@@ -30,7 +30,7 @@ const addRoleCoordinateur =
       if (countDemandesCoordinateurValider === 0) {
         res.status(400).json({
           message:
-            'Vous devez valider une demande de coordinateur pour votre structure',
+            "Aucune demande coordinateur n'a encore été validée pour votre structure",
         });
         return;
       }
@@ -45,7 +45,7 @@ const addRoleCoordinateur =
         });
 
       if (countCoordinateur >= countDemandesCoordinateurValider) {
-        res.status(403).json({
+        res.status(409).json({
           message:
             'Vous avez atteint le nombre maximum de coordinateurs pour votre structure',
         });
@@ -56,7 +56,9 @@ const addRoleCoordinateur =
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
-          { _id: new ObjectId(conseillerId) },
+          {
+            _id: new ObjectId(conseillerId),
+          },
           { $set: { estCoordinateur: true } },
         );
 
@@ -85,7 +87,10 @@ const addRoleCoordinateur =
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
-          { 'entity.$id': new ObjectId(conseillerId) },
+          {
+            'entity.$id': new ObjectId(conseillerId),
+            roles: { $in: ['conseiller'] },
+          },
           { $push: { roles: ['coordinateur_coop'] } },
         );
 
@@ -104,6 +109,17 @@ const addRoleCoordinateur =
             statut: 'finalisee',
           },
           { $set: { 'conseillerObj.banniereAjoutRoleCoordinateur': true } },
+        );
+
+      await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: new ObjectId(conseillerId),
+            role: { $in: ['conseiller'] },
+          },
+          { $set: { banniereAjoutRoleCoordinateur: true } },
         );
 
       res.status(200).json(conseillerId);

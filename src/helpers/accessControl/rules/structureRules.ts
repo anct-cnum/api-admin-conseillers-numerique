@@ -55,5 +55,8 @@ export default async function structureRules(
     'entity.$id': {
       $in: conseillersIds,
     },
+    roles: {
+      $in: ['conseiller'],
+    },
   });
 }

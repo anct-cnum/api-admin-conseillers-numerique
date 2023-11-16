@@ -140,12 +140,22 @@ const closeBanner =
         await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
-          .updateMany(
+          .updateOne(
             {
               'conseiller.$id': new ObjectId(conseillerId),
               statut: 'finalisee',
             },
             { $set: { 'conseillerObj.banniereAjoutRoleCoordinateur': false } },
+          );
+
+        await app
+          .service(service.conseillers)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(conseillerId),
+            },
+            { $set: { banniereAjoutRoleCoordinateur: false } },
           );
       }
 
