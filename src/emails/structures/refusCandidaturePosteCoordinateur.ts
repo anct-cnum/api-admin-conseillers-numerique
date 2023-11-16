@@ -13,7 +13,7 @@ export default function (mailer) {
     send: async (structure: IStructures) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de Conseiller numérique Coordinateur à la structure ${structure.idPG}`,
+          `Email envoyé avec succès pour la réponse à candidature défavorable d’un recrutement de Conseiller numérique Coordinateur à la structure ${structure.idPG}`,
         );
       };
       const onError = async (err: Error) => {

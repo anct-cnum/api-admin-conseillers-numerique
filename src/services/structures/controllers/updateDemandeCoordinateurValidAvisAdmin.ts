@@ -19,7 +19,7 @@ import {
 import mailer from '../../../mailer';
 import {
   validationCandidaturePosteCoordinateur,
-  avisCandidaturePosteCoordinateurPrefet,
+  validationCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 
 const { Pool } = require('pg');
@@ -244,7 +244,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
       if (prefets.length > 0) {
         const promises: Promise<void>[] = [];
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+          validationCandidaturePosteCoordinateurPrefet(mailerInstance);
         await prefets.forEach(async (prefet) => {
           // eslint-disable-next-line no-async-promise-executor
           const p = new Promise<void>(async (resolve, reject) => {
