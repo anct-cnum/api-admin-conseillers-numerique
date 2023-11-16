@@ -140,7 +140,10 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 .Model.countDocuments({
                   'structure.$id': structure._id,
                   statut: { $in: ['recrutee', 'finalisee'] },
-                  contratCoordinateur: true,
+                  $or: [
+                    { contratCoordinateur: true },
+                    { 'conseillerObj.estCoordinateur': true },
+                  ],
                 });
 
               user._doc.displayBannerPosteCoordinateurStructure =

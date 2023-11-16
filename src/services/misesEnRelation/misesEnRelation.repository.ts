@@ -302,7 +302,10 @@ const countCoordinateurRecrutees = async (
     .countDocuments({
       'structure.$id': structureId,
       statut: { $in: ['recrutee', 'finalisee'] },
-      contratCoordinateur: true,
+      $or: [
+        { contratCoordinateur: true },
+        { 'conseillerObj.estCoordinateur': true },
+      ],
     });
 
 export {
