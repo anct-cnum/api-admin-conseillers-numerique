@@ -1,0 +1,48 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text>
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Dans le cadre de l’appel à candidature Conseiller numérique coordinateur,
+            une candidature a été déposée par une structure de votre département.
+            Préalablement à l’instruction de cette dernière par l’ANCT, il vous est
+            demandé de formuler un avis sur cette candidature.
+          </mj-text>
+          <mj-text align="left">
+            Pour ce faire, vous devez vous rendre sur votre
+            <a style="color: #0063CB;" target="_blank" href="https://pilotage.conseiller-numerique.gouv.fr">
+              Tableau de pilotage Conseiller numérique
+            </a>
+            et suivre les étapes décrites dans ce guide pas-à-pas :
+            <a style="color: #0063CB;" target="_blank" href="https://outline.incubateur.anct.gouv.fr/s/383e3974-6128-453d-98cd-f2c27e577e4a/doc/traiter-une-demande-de-candidature-au-poste-de-conseiller-coordinateur-hLLiSFtvNE">
+              Traiter une demande de candidature au poste de conseiller coordinateur
+            </a>
+          </mj-text>
+          <mj-text align="left">
+            La structure a été informée par email de cette décision.
+          </mj-text>
+          <mj-text align="left">
+            L’équipe société numérique reste disponible à l’adresse&nbsp;
+            <a target="_blank" style="color: #0063CB;" href="mailto:societe.numerique@anct.gouv.fr">
+              societe.numerique@anct.gouv.fr
+            </a>
+            &nbsp;pour toute question.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

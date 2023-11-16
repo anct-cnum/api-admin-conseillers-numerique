@@ -11,6 +11,7 @@ import informationValidationCoselecCoordinateur from './structures/informationVa
 import avisCandidaturePosteCoordinateurPrefet from './prefets/avisCandidaturePosteCoordinateurPrefet';
 import refusCandidaturePosteCoordinateur from './structures/refusCandidaturePosteCoordinateur';
 import validationCandidaturePosteCoordinateur from './structures/validationCandidaturePosteCoordinateur';
+import informationNouvelleCandidatureCoordinateur from './prefets/informationNouvelleCandidatureCoordinateur';
 
 export {
   creationCompteCandidat,
@@ -26,4 +27,5 @@ export {
   avisCandidaturePosteCoordinateurPrefet,
   refusCandidaturePosteCoordinateur,
   validationCandidaturePosteCoordinateur,
+  informationNouvelleCandidatureCoordinateur,
 };
