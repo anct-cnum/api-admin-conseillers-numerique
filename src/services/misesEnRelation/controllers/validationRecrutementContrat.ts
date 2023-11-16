@@ -134,7 +134,6 @@ const validationRecrutementContrat =
         });
         return;
       }
-      const roles = Array('conseiller');
       if (miseEnRelationVerif?.contratCoordinateur) {
         const checkQuotaCoordinateurValid =
           await checkQuotaRecrutementCoordinateur(app, req, structure);
@@ -145,7 +144,6 @@ const validationRecrutementContrat =
           });
           return;
         }
-        roles.push('coordinateur_coop');
       }
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
@@ -175,7 +173,7 @@ const validationRecrutementContrat =
           prenom: miseEnRelationVerif.conseillerObj.prenom,
           nom: miseEnRelationVerif.conseillerObj.nom,
           password: passwordHash, // random password (required to create user)
-          roles,
+          roles: Array('conseiller'),
           entity: new DBRef(
             'conseillers',
             miseEnRelationVerif.conseillerObj._id,
@@ -203,7 +201,7 @@ const validationRecrutementContrat =
                 prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
                 nom: miseEnRelationVerif.conseillerObj?.nom,
                 password: passwordHash,
-                roles,
+                roles: Array('conseiller'),
                 token: uuidv4(),
                 mailSentDate: null,
                 passwordCreated: false,
