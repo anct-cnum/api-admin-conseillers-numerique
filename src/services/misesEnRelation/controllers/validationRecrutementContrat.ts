@@ -234,9 +234,6 @@ const validationRecrutementContrat =
               updatedAt,
               userCreated: true,
               estRecrute: true,
-              ...(miseEnRelationVerif?.contratCoordinateur && {
-                estCoordinateur: true,
-              }),
               datePrisePoste: null,
               dateFinDeFormation: null,
               structureId: miseEnRelationVerif.structureObj._id,
