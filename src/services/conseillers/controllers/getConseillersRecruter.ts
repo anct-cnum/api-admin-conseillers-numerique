@@ -126,7 +126,6 @@ const getMisesEnRelationRecruter =
           'conseillerObj._id': 1,
           'conseillerObj.emailCN.address': 1,
           'conseillerObj.estCoordinateur': 1,
-          'conseillerObj.listeSubordonnes': 1,
           'conseillerObj.mattermost.login': 1,
         },
       },
@@ -237,7 +236,6 @@ const getConseillersStatutRecrute =
           item.prenom = item.conseillerObj?.prenom;
           item.address = item.conseillerObj?.emailCN?.address;
           item.estCoordinateur = item.conseillerObj?.estCoordinateur;
-          item.listeSubordonnes = item.conseillerObj?.listeSubordonnes;
           item.nomStructure = item.structureObj?.nom;
           item.compteCoopActif = !!item.conseillerObj?.mattermost?.login;
           item.craCount = await getNombreCras(app, req)(item._id);
