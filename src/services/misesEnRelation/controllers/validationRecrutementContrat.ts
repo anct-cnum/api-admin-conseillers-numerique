@@ -11,29 +11,10 @@ import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+import { updateConseillersPG } from '../../conseillers/conseillers.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
-
-const updateConseillersPG =
-  (pool) => async (email: string, disponible: boolean, datePG: string) => {
-    try {
-      await pool.query(
-        `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-        [email, disponible, datePG],
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
 
 const validationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {

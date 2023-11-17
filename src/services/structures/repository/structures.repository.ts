@@ -174,6 +174,20 @@ const checkAvisPrefet = (filtreAvisPrefet: string, avisPrefet: string) => {
   return false;
 };
 
+const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
+  try {
+    await pool.query(
+      `
+      UPDATE djapp_hostorganization
+      SET updated = $2
+      WHERE id = $1`,
+      [idPG, datePG],
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -193,4 +207,5 @@ export {
   filterStatutAndAvisPrefetDemandesCoordinateur,
   checkStructurePhase2,
   checkAvisPrefet,
+  updateStructurePG,
 };

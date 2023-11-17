@@ -207,6 +207,26 @@ const filterIsRuptureConseiller = (
   }
 };
 
+const updateConseillersPG =
+  (pool) => async (email: string, disponible: boolean, datePG: string) => {
+    try {
+      await pool.query(
+        `
+      UPDATE djapp_coach
+      SET (
+        disponible,
+        updated
+      )
+      =
+      ($2,$3)
+      WHERE LOWER(email) = LOWER($1)`,
+        [email, disponible, datePG],
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
 export {
   checkAccessReadRequestConseillers,
   formatStatutMisesEnRelation,
@@ -221,4 +241,5 @@ export {
   filterDiplome,
   filterPix,
   filterCCP1,
+  updateConseillersPG,
 };

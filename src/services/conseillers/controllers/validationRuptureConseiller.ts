@@ -18,28 +18,10 @@ import {
   conseillerRupturePix,
   conseillerRuptureStructure,
 } from '../../../emails';
+import { updateConseillersPG } from '../conseillers.repository';
 
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
-
-const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-      [email, disponible, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const conseillerRecruteReinscription =
   (app, req) =>

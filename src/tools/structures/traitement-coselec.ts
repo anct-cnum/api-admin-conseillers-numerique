@@ -8,7 +8,10 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
-import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
+import {
+  checkStructurePhase2,
+  updateStructurePG,
+} from '../../services/structures/repository/structures.repository';
 
 const { Pool } = require('pg');
 
@@ -21,20 +24,6 @@ program.option(
   'nouveau statut de la structure (ANNULEE, ABANDON)',
 );
 program.parse(process.argv);
-
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_hostorganization
-      SET updated = $2
-      WHERE id = $1`,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();

@@ -7,7 +7,10 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
 import { PhaseConventionnement } from '../../../ts/enum';
-import { checkStructurePhase2 } from '../repository/structures.repository';
+import {
+  checkStructurePhase2,
+  updateStructurePG,
+} from '../repository/structures.repository';
 
 const { Pool } = require('pg');
 
@@ -46,21 +49,6 @@ interface IUpdateMiseEnRelationAvenant {
     'structureObj.demandesCoselec.$.banniereValidationAvenant'?: boolean;
   };
 }
-
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-        UPDATE djapp_hostorganization
-        SET updated = $2
-        WHERE id = $1
-      `,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const updateAvenantAjoutPoste =
   (app: Application) => async (req: IRequest, res: Response) => {

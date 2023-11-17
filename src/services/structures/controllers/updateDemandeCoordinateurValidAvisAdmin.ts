@@ -21,6 +21,7 @@ import {
   validationCandidaturePosteCoordinateur,
   validationCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
+import { updateStructurePG } from '../repository/structures.repository';
 
 const { Pool } = require('pg');
 
@@ -28,20 +29,6 @@ const checkIfStructurePhase2 = (structure: IStructures) =>
   structure?.conventionnement?.statut ===
     StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
   structure.statut === 'CREEE';
-
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_hostorganization
-      SET updated = $2
-      WHERE id = $1`,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const updateDemandeCoordinateurValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
