@@ -245,8 +245,8 @@ const getStatsAccompagnements = async (query, ability, read, app) => {
     .getQuery();
 
   return app.service(service.cras).Model.aggregate([
-    { $unwind: '$cra.accompagnement' },
     { $match: { ...query, $and: [queryAccess] } },
+    { $unwind: '$cra.accompagnement' },
     {
       $group: {
         _id: 'accompagnement',
@@ -265,8 +265,8 @@ const getStatsActivites = async (query, ability, read, app) => {
     .getQuery();
 
   return app.service(service.cras).Model.aggregate([
-    { $unwind: '$cra.activite' },
     { $match: { ...query, $and: [queryAccess] } },
+    { $unwind: '$cra.activite' },
     {
       $group: {
         _id: '$cra.activite',
@@ -325,14 +325,13 @@ const getStatsThemes = async (query, ability, read, app) => {
   const themes = await app
     .service(service.cras)
     .Model.aggregate([
-      { $unwind: '$cra.themes' },
       { $match: { ...query, $and: [queryAccess] } },
+      { $unwind: '$cra.themes' },
       { $group: { _id: '$cra.themes', count: { $sum: 1 } } },
       { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
     ]);
 
   const sousThemes = await app.service(service.cras).Model.aggregate([
-    { $unwind: '$cra.sousThemes' },
     {
       $match: {
         ...query,
@@ -342,6 +341,7 @@ const getStatsThemes = async (query, ability, read, app) => {
         $and: [queryAccess],
       },
     },
+    { $unwind: '$cra.sousThemes' },
     { $group: { _id: 'espace-sante', count: { $sum: 1 } } },
     { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
   ]);
@@ -385,8 +385,8 @@ const getStatsLieux = async (query, ability, read, app) => {
   const lieux = await app
     .service(service.cras)
     .Model.aggregate([
-      { $unwind: '$cra.canal' },
       { $match: { ...query, $and: [queryAccess] } },
+      { $unwind: '$cra.canal' },
       { $group: { _id: '$cra.canal', count: { $sum: 1 } } },
       { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
     ]);
@@ -402,7 +402,6 @@ const getStatsLieux = async (query, ability, read, app) => {
 
 const durees = async (query, queryAccess, app) =>
   app.service(service.cras).Model.aggregate([
-    { $unwind: '$cra.duree' },
     {
       $match: {
         ...query,
@@ -410,6 +409,7 @@ const durees = async (query, queryAccess, app) =>
         'cra.duree': { $in: ['0-30', '30-60'] },
       },
     },
+    { $unwind: '$cra.duree' },
     { $group: { _id: '$cra.duree', count: { $sum: 1 } } },
     { $project: { _id: 0, nom: '$_id', valeur: '$count' } },
   ]);
@@ -597,7 +597,6 @@ const getStatsReorientations = async (query, ability, read, app) => {
     .getQuery();
 
   const statsReorientations = await app.service(service.cras).Model.aggregate([
-    { $unwind: '$cra.organismes' },
     {
       $match: {
         ...query,
@@ -605,6 +604,7 @@ const getStatsReorientations = async (query, ability, read, app) => {
         'cra.organismes': { $ne: null },
       },
     },
+    { $unwind: '$cra.organismes' },
     { $project: { _id: 0, organismes: '$cra.organismes' } },
   ]);
 
@@ -790,13 +790,13 @@ const getStatsTempsAccompagnement = async (query, ability, read, app) => {
   ];
   const dureeTotalParActiviter: Array<{ nom: string; valeur: number }> =
     await app.service(service.cras).Model.aggregate([
-      { $unwind: '$cra.duree' },
       {
         $match: {
           ...query,
           $and: [queryAccess],
         },
       },
+      { $unwind: '$cra.duree' },
       {
         $group: {
           _id: '$cra.activite',
