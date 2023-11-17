@@ -10,7 +10,6 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
 import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
-import { IDemandesCoordinateur } from '../../../ts/interfaces/db.interfaces';
 
 const getMiseEnRelationConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -18,7 +17,6 @@ const getMiseEnRelationConseiller =
     const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
       'demarche_simplifiee',
     );
-    let quotaCoordinateur = false;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -93,17 +91,8 @@ const getMiseEnRelationConseiller =
         res.status(404).json({ message: 'Candidat non trouvé' });
         return;
       }
-      const demandeCoordinateurValider: IDemandesCoordinateur | undefined =
-        structure?.demandesCoordinateur
-          ?.filter((demande) => demande.statut === 'validee')
-          .pop();
-      if (demandeCoordinateurValider && !candidat[0]?.contratCoordinateur) {
-        quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
-          app,
-          req,
-          structure,
-        );
-      }
+      const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
+        await checkQuotaRecrutementCoordinateur(app, req, structure);
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -116,7 +105,7 @@ const getMiseEnRelationConseiller =
           salaire: candidat[0].salaire,
           typeDeContrat: candidat[0].typeDeContrat,
           contratCoordinateur: candidat[0]?.contratCoordinateur,
-          quotaCoordinateur,
+          quotaCoordinateur: quotaCoordinateurDisponible > 0,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),

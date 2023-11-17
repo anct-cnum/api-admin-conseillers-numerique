@@ -8,10 +8,7 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
-import {
-  IDemandesCoordinateur,
-  IStructures,
-} from '../../../ts/interfaces/db.interfaces';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
 import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
 
@@ -21,7 +18,6 @@ const getMiseEnRelation =
     const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
       'demarche_simplifiee',
     );
-    let quotaCoordinateur = false;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         return res.status(400).json({ message: 'Id incorrect' });
@@ -89,17 +85,8 @@ const getMiseEnRelation =
       if (candidat.length === 0) {
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
-      const demandeCoordinateurValider: IDemandesCoordinateur | undefined =
-        structure?.demandesCoordinateur
-          ?.filter((demande) => demande.statut === 'validee')
-          .pop();
-      if (demandeCoordinateurValider && !candidat[0]?.contratCoordinateur) {
-        quotaCoordinateur = await checkQuotaRecrutementCoordinateur(
-          app,
-          req,
-          structure,
-        );
-      }
+      const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
+        await checkQuotaRecrutementCoordinateur(app, req, structure);
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -112,7 +99,7 @@ const getMiseEnRelation =
           salaire: candidat[0]?.salaire,
           typeDeContrat: candidat[0]?.typeDeContrat,
           contratCoordinateur: candidat[0]?.contratCoordinateur,
-          quotaCoordinateur,
+          quotaCoordinateur: quotaCoordinateurDisponible > 0,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),

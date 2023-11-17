@@ -136,14 +136,11 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               ).length;
             if (countDemandesCoordinateurValider > 0) {
               const countCoordinateurs: number = await app
-                .service(service.misesEnRelation)
+                .service(service.conseillers)
                 .Model.countDocuments({
-                  'structure.$id': structure._id,
-                  statut: { $in: ['recrutee', 'finalisee'] },
-                  $or: [
-                    { contratCoordinateur: true },
-                    { 'conseillerObj.estCoordinateur': true },
-                  ],
+                  structureId: structure._id,
+                  statut: 'RECRUTE',
+                  estCoordinateur: true,
                 });
 
               user._doc.displayBannerPosteCoordinateurStructure =

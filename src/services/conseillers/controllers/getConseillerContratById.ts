@@ -9,7 +9,7 @@ import {
   getUrlDossierDSAdmin,
 } from '../../structures/repository/reconventionnement.repository';
 import { action } from '../../../helpers/accessControl/accessList';
-import { ITypeStructure } from '../../../ts/interfaces/json.interface';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getConseillerContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -158,11 +158,11 @@ const getConseillerContratById =
         .findOne({
           _id: new ObjectId(conseiller[0].contrat?.structureObj?._id),
         });
-      const typeStructure: ITypeStructure | undefined =
+      const typeDossierDS: ITypeDossierDS | undefined =
         getTypeDossierDemarcheSimplifiee(
           structure?.insee?.unite_legale?.forme_juridique?.libelle,
         );
-      if (typeStructure === null) {
+      if (typeDossierDS === null) {
         res.status(500).json({
           message: 'Erreur lors de la récupération du type de la structure',
         });
@@ -172,7 +172,7 @@ const getConseillerContratById =
         app,
         structure,
         conseiller[0].contrat?.contratCoordinateur,
-        typeStructure,
+        typeDossierDS,
       );
 
       res.status(200).json(conseiller[0]);

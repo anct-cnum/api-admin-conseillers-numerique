@@ -4,11 +4,11 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
-import { ITypeStructure } from '../../../ts/interfaces/json.interface';
 import {
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierDSAdmin,
 } from '../../structures/repository/reconventionnement.repository';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getCandidatContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -53,11 +53,11 @@ const getCandidatContratById =
         .findOne({
           _id: conseillerFormat.miseEnRelation?.structureObj?._id,
         });
-      const typeStructure: ITypeStructure | undefined =
+      const typeDossierDS: ITypeDossierDS | undefined =
         getTypeDossierDemarcheSimplifiee(
           structure?.insee?.unite_legale?.forme_juridique?.libelle,
         );
-      if (typeStructure === null) {
+      if (typeDossierDS === null) {
         res.status(500).json({
           message: 'Erreur lors de la récupération du type de la structure',
         });
@@ -67,7 +67,7 @@ const getCandidatContratById =
         app,
         structure,
         conseillerFormat.miseEnRelation?.contratCoordinateur,
-        typeStructure,
+        typeDossierDS,
       );
 
       res.status(200).json(conseillerFormat);

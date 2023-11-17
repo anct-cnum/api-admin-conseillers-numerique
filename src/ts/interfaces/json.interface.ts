@@ -10,7 +10,7 @@ export interface IDepartement {
   region_name: string;
 }
 
-export interface ITypeStructure {
+export interface ITypeDossierDS {
   type: string;
   numero_demarche_reconventionnement: string;
   numero_demarche_conventionnement: string;

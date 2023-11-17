@@ -3,7 +3,10 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
 import { countCoordinateurRecrutees } from '../../misesEnRelation/misesEnRelation.repository';
 
 const countStructures = async (ability, read, app) =>
@@ -67,20 +70,28 @@ const checkQuotaRecrutementCoordinateur = async (
   app: Application,
   req: IRequest,
   structure: IStructures,
-): Promise<boolean> => {
-  const countDemandesCoordinateurValider =
+) => {
+  const demandeCoordinateurValider: IDemandesCoordinateur[] | undefined =
     structure?.demandesCoordinateur?.filter(
-      (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
-    ).length;
-  if (countDemandesCoordinateurValider > 0) {
+      (demande) => demande.statut === 'validee',
+    );
+  if (demandeCoordinateurValider) {
     const countCoordinateurs = await countCoordinateurRecrutees(
       app,
       req,
       structure._id,
     );
-    return countCoordinateurs < countDemandesCoordinateurValider;
+    const quotaCoordinateurDisponible =
+      demandeCoordinateurValider.length - countCoordinateurs;
+    return {
+      demandeCoordinateurValider: demandeCoordinateurValider.pop(),
+      quotaCoordinateurDisponible,
+    };
   }
-  return false;
+  return {
+    demandeCoordinateurValider: undefined,
+    quotaCoordinateurDisponible: 0,
+  };
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});

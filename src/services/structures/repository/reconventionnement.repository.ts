@@ -19,7 +19,7 @@ import {
   IDemandesCoordinateur,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
-import { ITypeStructure } from '../../../ts/interfaces/json.interface';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -644,7 +644,7 @@ const getUrlDossierDepotPieceDS = (
   structure: IStructures,
   demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
 ): string => {
-  const typeStructure: ITypeStructure | undefined =
+  const typeDossierDS: ITypeDossierDS | undefined =
     getTypeDossierDemarcheSimplifiee(
       structure?.insee?.unite_legale?.forme_juridique?.libelle,
     );
@@ -656,7 +656,7 @@ const getUrlDossierDepotPieceDS = (
       ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
       : getUrlDossierReconventionnement(
           structure.idPG,
-          typeStructure?.type,
+          typeDossierDS?.type,
           demarcheSimplifiee,
         );
   }
@@ -664,7 +664,7 @@ const getUrlDossierDepotPieceDS = (
     ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`
     : getUrlDossierConventionnement(
         structure.idPG,
-        typeStructure?.type,
+        typeDossierDS?.type,
         demarcheSimplifiee,
       );
 };
@@ -673,7 +673,7 @@ const getUrlDossierDSAdmin = (
   app: Application,
   structure: IStructures,
   isRecrutementCoordinateur: boolean,
-  typeStructure: ITypeStructure | undefined,
+  typeDossierDS: ITypeDossierDS | undefined,
 ): string => {
   if (isRecrutementCoordinateur) {
     const demandeCoordinateurValider = structure?.demandesCoordinateur
@@ -685,9 +685,9 @@ const getUrlDossierDSAdmin = (
     return `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
   }
   if (checkStructurePhase2(structure?.conventionnement?.statut)) {
-    return `https://www.demarches-simplifiees.fr/procedures/${typeStructure?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+    return `https://www.demarches-simplifiees.fr/procedures/${typeDossierDS?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
   }
-  return `https://www.demarches-simplifiees.fr/procedures/${typeStructure?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
+  return `https://www.demarches-simplifiees.fr/procedures/${typeDossierDS?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
 };
 
 export {
