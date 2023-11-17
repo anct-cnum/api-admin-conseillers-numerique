@@ -90,7 +90,8 @@ const updateMiseEnRelation =
           });
           return;
         }
-        update.dossierIncompletRupture = true;
+        // false : afin de définir le flag 'nouvelle demande'
+        update.dossierIncompletRupture = false;
         update.emetteurRupture = {
           email: req.user.name,
           date: new Date(),

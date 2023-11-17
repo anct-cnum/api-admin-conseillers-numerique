@@ -99,6 +99,7 @@ const getConseillerById =
               ],
             },
           },
+          /*
           {
             $lookup: {
               from: 'permanences',
@@ -119,6 +120,7 @@ const getConseillerById =
               ],
             },
           },
+          */
           {
             $project: {
               idPG: 1,
