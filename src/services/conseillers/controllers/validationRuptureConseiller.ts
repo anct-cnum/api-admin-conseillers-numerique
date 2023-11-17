@@ -155,6 +155,15 @@ const updateConseillerRupture =
 
       await app
         .service(service.permanences)
+        .Model.accessibleBy(req.ability, action.delete)
+        .deleteMany({
+          conseillers: {
+            $eq: [conseiller._id],
+          },
+        });
+
+      await app
+        .service(service.permanences)
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           {
