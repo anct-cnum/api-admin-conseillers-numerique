@@ -79,7 +79,7 @@ const addRoleCoordinateur =
         );
       if (miseEnRelation.modifiedCount === 0) {
         res.status(404).json({
-          message: "Les mises en relations n'ont pas été mise à jour",
+          message: "Les mises en relation n'ont pas été mise à jour",
         });
       }
 
@@ -97,7 +97,7 @@ const addRoleCoordinateur =
       if (user.modifiedCount === 0) {
         res
           .status(404)
-          .json({ message: "L'utilisateur n'a pas été mise à jour" });
+          .json({ message: "L'utilisateur n'a pas été mis à jour" });
       }
 
       await app

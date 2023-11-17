@@ -138,6 +138,16 @@ const closeBanner =
 
       if (type === 'ajoutRoleCoordinateur') {
         await app
+          .service(service.conseillers)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(conseillerId),
+            },
+            { $set: { banniereAjoutRoleCoordinateur: false } },
+          );
+
+        await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
@@ -146,16 +156,6 @@ const closeBanner =
               statut: 'finalisee',
             },
             { $set: { 'conseillerObj.banniereAjoutRoleCoordinateur': false } },
-          );
-
-        await app
-          .service(service.conseillers)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            {
-              _id: new ObjectId(conseillerId),
-            },
-            { $set: { banniereAjoutRoleCoordinateur: false } },
           );
       }
 
