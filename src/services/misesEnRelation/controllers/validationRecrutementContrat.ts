@@ -220,8 +220,10 @@ const validationRecrutementContrat =
               updatedAt,
               userCreated: true,
               estRecrute: true,
-              datePrisePoste: null,
-              dateFinDeFormation: null,
+              datePrisePoste:
+                miseEnRelationVerif.conseillerObj.datePrisePoste ?? null,
+              dateFinDeFormation:
+                miseEnRelationVerif.conseillerObj.dateFinDeFormation ?? null,
               structureId: miseEnRelationVerif.structureObj._id,
               codeRegionStructure: miseEnRelationVerif.structureObj.codeRegion,
               codeDepartementStructure:
@@ -323,7 +325,7 @@ const validationRecrutementContrat =
             $set: {
               structure: new DBRef(
                 'structures',
-                miseEnRelationUpdated?.value?.structure?.oid,
+                miseEnRelationVerif.structureObj._id,
                 database,
               ),
             },
