@@ -273,6 +273,8 @@ export interface IConseillers {
   };
 
   inactivite: boolean;
+
+  banniereAjoutRoleCoordinateur: boolean;
 }
 
 export interface IStructures {
