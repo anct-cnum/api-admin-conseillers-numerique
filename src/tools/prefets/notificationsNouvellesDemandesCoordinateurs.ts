@@ -5,7 +5,7 @@
 
 import execute from '../utils';
 import service from '../../helpers/services';
-import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
+import { IStructures } from '../../ts/interfaces/db.interfaces';
 import { informationNouvelleCandidatureCoordinateur } from '../../emails';
 
 execute(__filename, async ({ app, mailer, logger, exit }) => {
@@ -31,7 +31,6 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     return;
   }
   const departements = structures.map((structure) => structure.codeDepartement);
-  console.log(departements);
   const prefets = await app.service(service.users).Model.find(
     {
       departement: { $in: departements },
@@ -42,38 +41,41 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       departement: 1,
     },
   );
-  console.log(prefets);
-  const prefetsFormat = prefets.toObject();
-  const structureWithPrefets = structures.map((structure) => {
+
+  const structureWithPrefets = prefets.map((prefet) => {
     const structureFormat = structures.find(
-      (structure) => structure.codeDepartement === prefet.departement,
+      (structure) => structure.codeDepartement === prefet._doc.departement,
     );
     return {
-      ...prefet,
+      ...prefet._doc,
       structureFormat,
     };
   });
-  console.log(structureWithPrefets);
-  // const messageAvisCandidaturePosteCoordinateur =
-  //   informationNouvelleCandidatureCoordinateur(app, mailer);
-  // const promises: Promise<void>[] = [];
-  // prefets.forEach(async (prefet: IPrefe) => {
-  //   // eslint-disable-next-line no-async-promise-executor
-  //   const p = new Promise<void>(async (resolve, reject) => {
-  //     const errorSmtpMailCandidaturePosteCoordinateur =
-  //       await messageAvisCandidaturePosteCoordinateur
-  //         .send(prefet, structureUpdated)
-  //         .catch((errSmtp: Error) => {
-  //           return errSmtp;
-  //         });
-  //     if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
-  //       reject();
-  //       return;
-  //     }
-  //     resolve(p);
-  //   });
-  //   promises.push(p);
-  // });
-  // await Promise.allSettled(promises);
-  // exit();
+  const messageAvisCandidaturePosteCoordinateur =
+    informationNouvelleCandidatureCoordinateur(app, mailer);
+  const promises: Promise<void>[] = [];
+  let count = 0;
+  structureWithPrefets.forEach(async (structureWithPrefet) => {
+    // eslint-disable-next-line no-async-promise-executor
+    const p = new Promise<void>(async (resolve, reject) => {
+      const errorSmtpMailCandidaturePosteCoordinateur =
+        await messageAvisCandidaturePosteCoordinateur
+          .send(structureWithPrefet)
+          .catch((errSmtp: Error) => {
+            return errSmtp;
+          });
+      if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+        reject();
+        return;
+      }
+      count += 1;
+      resolve(p);
+    });
+    promises.push(p);
+  });
+  await Promise.allSettled(promises);
+  logger.info(
+    `Nombre de mails envoyés pour les notifications de candidature coordinateur : ${count}`,
+  );
+  exit();
 });

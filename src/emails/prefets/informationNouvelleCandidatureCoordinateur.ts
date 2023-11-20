@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 
 export default function (app: Application, mailer) {
   const templateName = 'informationNouvelleCandidatureCoordinateur';
@@ -11,14 +10,17 @@ export default function (app: Application, mailer) {
 
   return {
     render,
-    send: async (user: IUser, structure: IStructures) => {
+    send: async (structureWithPrefets) => {
       const onSuccess = async () => {
         await app.service(service.structures).Model.updateOne(
           {
-            _id: structure._id,
+            _id: structureWithPrefets.structureFormat._id,
             demandesCoordinateur: {
               $elemMatch: {
-                id: { $eq: structure.demandesCoordinateur[0].id },
+                id: {
+                  $eq: structureWithPrefets.structureFormat
+                    .demandesCoordinateur[0].id,
+                },
               },
             },
           },
@@ -36,10 +38,13 @@ export default function (app: Application, mailer) {
       const onError = async (err: Error) => {
         await app.service(service.structures).Model.updateOne(
           {
-            _id: structure._id,
+            _id: structureWithPrefets.structureFormat._id,
             demandesCoordinateur: {
               $elemMatch: {
-                id: { $eq: structure.demandesCoordinateur[0].id },
+                id: {
+                  $eq: structureWithPrefets.structureFormat
+                    .demandesCoordinateur[0].id,
+                },
               },
             },
           },
@@ -53,7 +58,7 @@ export default function (app: Application, mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(user.name, {
+        .sendEmail(structureWithPrefets.name, {
           subject:
             'Réponse à candidature : recrutement de Conseiller(s) numérique(s) France Services',
           body: await render(),
