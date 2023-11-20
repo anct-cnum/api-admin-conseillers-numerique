@@ -24,7 +24,7 @@ export default function (mailer) {
         .createMailer()
         .sendEmail(structure.contact.email, {
           subject:
-            'Réponse à candidature : recrutement d’un Conseiller numérique Coordinateur',
+            'Conseiller numérique coordinateur - votre candidature a été examinée',
           body: await render(),
         })
         .then(onSuccess)
