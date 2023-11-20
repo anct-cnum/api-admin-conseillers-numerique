@@ -79,7 +79,7 @@ const addRoleCoordinateur =
         );
       if (miseEnRelation.modifiedCount === 0) {
         res.status(404).json({
-          message: "Les mises en relation n'ont pas été mise à jour",
+          message: "Les mises en relation n'ont pas été mises à jour",
         });
       }
 
@@ -107,17 +107,6 @@ const addRoleCoordinateur =
           {
             'conseiller.$id': new ObjectId(conseillerId),
             statut: 'finalisee',
-          },
-          { $set: { 'conseillerObj.banniereAjoutRoleCoordinateur': true } },
-        );
-
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          {
-            _id: new ObjectId(conseillerId),
-            role: { $in: ['conseiller'] },
           },
           { $set: { banniereAjoutRoleCoordinateur: true } },
         );
