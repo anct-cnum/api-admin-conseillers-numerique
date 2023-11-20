@@ -58,6 +58,10 @@ const updateDemandeCoordinateurValidAvisAdmin =
     const updatedDemandeCoordinateur = {
       $set: {
         'demandesCoordinateur.$.statut': 'validee',
+        'demandesCoordinateur.$.emetteurValidation': {
+          email: req.user?.name,
+          date: new Date(),
+        },
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
@@ -66,6 +70,10 @@ const updateDemandeCoordinateurValidAvisAdmin =
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'validee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'structureObj.demandesCoordinateur.$.emetteurValidation': {
+          email: req.user?.name,
+          date: new Date(),
+        },
         'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
           true,
       },
