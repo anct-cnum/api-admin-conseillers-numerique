@@ -662,7 +662,7 @@ const getStatsEvolutions = async (query, ability, read, app) => {
   const dateDebutEvo = new Date(String(dayjs(new Date()).subtract(4, 'month')));
   const dateDebutEvoYear = dateDebutEvo.getFullYear();
   const dateFinEvoYear = dateFinEvo.getFullYear();
-  const matchQuery = { ...query };
+  let matchQuery = { ...query };
   let collection = service.statsConseillersCras;
   let statCrasMailleStructures = [];
   const queryAccess = await app
@@ -697,6 +697,13 @@ const getStatsEvolutions = async (query, ability, read, app) => {
       },
       { $replaceRoot: { newRoot: { $arrayToObject: '$data' } } },
     ];
+  } else if (Object.prototype.hasOwnProperty.call(query, 'conseiller.$id')) {
+    // Pour le filtre par CN (grand reseaux) || stat par CN
+    const cnfsIds = query['conseiller.$id'];
+    matchQuery = { 'conseiller.$id': cnfsIds };
+  } else {
+    // Pour les stats Nationales
+    matchQuery = {};
   }
   aggregateEvol = await app.service(collection).Model.aggregate([
     { $match: { ...matchQuery, $and: [queryAccess] } },
