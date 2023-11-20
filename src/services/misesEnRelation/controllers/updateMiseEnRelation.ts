@@ -92,6 +92,24 @@ const updateMiseEnRelation =
             });
             return;
           }
+          await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateMany(
+              {
+                _id: structure._id,
+                demandesCoordinateur: {
+                  $elemMatch: {
+                    miseEnRelationId: miseEnRelationVerif._id,
+                  },
+                },
+              },
+              {
+                $unset: {
+                  'demandesCoordinateur.$.miseEnRelationId': '',
+                },
+              },
+            );
         }
         remove = {
           dateDebutDeContrat: '',

@@ -101,6 +101,25 @@ const updateContratRecrutementAdmin =
           });
           return;
         }
+        await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            {
+              _id: miseEnRelation.structureObj._id,
+              demandesCoordinateur: {
+                $elemMatch: {
+                  statut: 'validee',
+                  miseEnRelationId: miseEnRelation._id,
+                },
+              },
+            },
+            {
+              $unset: {
+                'demandesCoordinateur.$.miseEnRelationId': '',
+              },
+            },
+          );
       }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)

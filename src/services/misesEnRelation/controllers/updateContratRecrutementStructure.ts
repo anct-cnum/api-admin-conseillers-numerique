@@ -161,6 +161,25 @@ const updateContratRecrutementStructure =
           });
           return;
         }
+        await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            {
+              _id: structure._id,
+              demandesCoordinateur: {
+                $elemMatch: {
+                  statut: 'validee',
+                  miseEnRelationId: { $exists: false },
+                },
+              },
+            },
+            {
+              $set: {
+                'demandesCoordinateur.$.miseEnRelationId': miseEnRelation._id,
+              },
+            },
+          );
       } else {
         contratUpdated.$unset = { contratCoordinateur: '' };
         const structureUpdated = await app
@@ -188,6 +207,25 @@ const updateContratRecrutementStructure =
           });
           return;
         }
+        await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            {
+              _id: structure._id,
+              demandesCoordinateur: {
+                $elemMatch: {
+                  statut: 'validee',
+                  miseEnRelationId: miseEnRelation._id,
+                },
+              },
+            },
+            {
+              $unset: {
+                'demandesCoordinateur.$.miseEnRelationId': '',
+              },
+            },
+          );
       }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
