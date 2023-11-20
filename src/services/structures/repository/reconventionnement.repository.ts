@@ -673,12 +673,13 @@ const getUrlDossierDSAdmin = (
   app: Application,
   structure: IStructures,
   isRecrutementCoordinateur: boolean,
+  idMiseEnRelation: string | undefined,
   typeDossierDS: ITypeDossierDS | undefined,
 ): string => {
   if (isRecrutementCoordinateur) {
-    const demandeCoordinateurValider = structure?.demandesCoordinateur
-      ?.filter((demande) => demande.statut === 'validee')
-      .pop();
+    const demandeCoordinateurValider = structure?.demandesCoordinateur?.find(
+      (demande) => demande?.miseEnRelationId?.toString() === idMiseEnRelation,
+    );
     const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
       'demarche_simplifiee',
     );

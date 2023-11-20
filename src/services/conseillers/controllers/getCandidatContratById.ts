@@ -67,6 +67,7 @@ const getCandidatContratById =
         app,
         structure,
         conseillerFormat.miseEnRelation?.contratCoordinateur,
+        conseillerFormat.miseEnRelation?._id?.toString(),
         typeDossierDS,
       );
 

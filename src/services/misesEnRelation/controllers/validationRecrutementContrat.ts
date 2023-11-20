@@ -136,16 +136,21 @@ const validationRecrutementContrat =
       }
       if (miseEnRelationVerif?.contratCoordinateur) {
         const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
-          await checkQuotaRecrutementCoordinateur(app, req, structure);
+          await checkQuotaRecrutementCoordinateur(
+            app,
+            req,
+            structure,
+            miseEnRelationVerif._id,
+          );
         if (!demandeCoordinateurValider) {
-          res.status(400).json({
+          res.status(404).json({
             message:
               'Action non autorisée : vous ne possédez aucun poste coordinateur au sein de votre structure',
           });
           return;
         }
         if (quotaCoordinateurDisponible < 0) {
-          res.status(400).json({
+          res.status(409).json({
             message:
               'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
           });

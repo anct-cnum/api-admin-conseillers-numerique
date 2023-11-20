@@ -403,6 +403,7 @@ export interface IDemandesCoordinateur {
   banniereInformationAvisStructure?: boolean;
   banniereValidationAvisPrefet?: boolean;
   banniereValidationAvisAdmin?: boolean;
+  miseEnRelationId?: ObjectId;
   emetteurValidation?: {
     date: Date;
     email: string;

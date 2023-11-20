@@ -77,6 +77,30 @@ const updateContratRecrutementAdmin =
         contratUpdated.$set.contratCoordinateur = isRecrutementCoordinateur;
       } else {
         contratUpdated.$unset = { contratCoordinateur: '' };
+        const structureUpdated = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: miseEnRelation.structureObj._id,
+              demandesCoordinateur: {
+                $elemMatch: {
+                  miseEnRelationId: miseEnRelation._id,
+                },
+              },
+            },
+            {
+              $unset: {
+                'demandesCoordinateur.$.miseEnRelationId': '',
+              },
+            },
+          );
+        if (structureUpdated.modifiedCount === 0) {
+          res.status(404).json({
+            message: "La structure n'a pas été mise à jour",
+          });
+          return;
+        }
       }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
@@ -85,6 +109,7 @@ const updateContratRecrutementAdmin =
           {
             _id: miseEnRelation._id,
             statut: 'recrutee',
+            'conseiller.$id': conseiller._id,
           },
           contratUpdated,
           {

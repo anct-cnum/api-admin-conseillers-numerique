@@ -67,6 +67,32 @@ const updateMiseEnRelation =
         req.body.statut === 'interessee' &&
         miseEnRelationVerif.statut === 'recrutee'
       ) {
+        if (miseEnRelationVerif?.contratCoordinateur) {
+          const structureUpdated = await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              {
+                _id: structure._id,
+                demandesCoordinateur: {
+                  $elemMatch: {
+                    miseEnRelationId: miseEnRelationVerif._id,
+                  },
+                },
+              },
+              {
+                $unset: {
+                  'demandesCoordinateur.$.miseEnRelationId': '',
+                },
+              },
+            );
+          if (structureUpdated.modifiedCount === 0) {
+            res.status(400).json({
+              message: "la structure n'a pas pu être mise à jour",
+            });
+            return;
+          }
+        }
         remove = {
           dateDebutDeContrat: '',
           dateFinDeContrat: '',

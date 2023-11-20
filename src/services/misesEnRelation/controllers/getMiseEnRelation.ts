@@ -86,7 +86,12 @@ const getMiseEnRelation =
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
       const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
-        await checkQuotaRecrutementCoordinateur(app, req, structure);
+        await checkQuotaRecrutementCoordinateur(
+          app,
+          req,
+          structure,
+          candidat[0]._id,
+        );
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {

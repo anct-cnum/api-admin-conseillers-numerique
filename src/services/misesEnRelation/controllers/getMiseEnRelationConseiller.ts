@@ -92,7 +92,12 @@ const getMiseEnRelationConseiller =
         return;
       }
       const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
-        await checkQuotaRecrutementCoordinateur(app, req, structure);
+        await checkQuotaRecrutementCoordinateur(
+          app,
+          req,
+          structure,
+          candidat[0]._id,
+        );
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {

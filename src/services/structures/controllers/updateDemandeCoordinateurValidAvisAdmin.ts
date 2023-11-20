@@ -69,11 +69,11 @@ const updateDemandeCoordinateurValidAvisAdmin =
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'validee',
-        'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'structureObj.demandesCoordinateur.$.emetteurValidation': {
           email: req.user?.name,
           date: new Date(),
         },
+        'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
         'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
           true,
       },

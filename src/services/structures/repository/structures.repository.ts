@@ -1,4 +1,5 @@
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
@@ -70,12 +71,13 @@ const checkQuotaRecrutementCoordinateur = async (
   app: Application,
   req: IRequest,
   structure: IStructures,
+  idMiseEnRelation: ObjectId,
 ) => {
   const demandeCoordinateurValider: IDemandesCoordinateur[] | undefined =
     structure?.demandesCoordinateur?.filter(
       (demande) => demande.statut === 'validee',
     );
-  if (demandeCoordinateurValider) {
+  if (demandeCoordinateurValider?.length > 0) {
     const countCoordinateurs = await countCoordinateurRecrutees(
       app,
       req,
@@ -84,7 +86,11 @@ const checkQuotaRecrutementCoordinateur = async (
     const quotaCoordinateurDisponible =
       demandeCoordinateurValider.length - countCoordinateurs;
     return {
-      demandeCoordinateurValider: demandeCoordinateurValider.pop(),
+      demandeCoordinateurValider: demandeCoordinateurValider.find(
+        (demande) =>
+          demande?.miseEnRelationId?.toString() ===
+            idMiseEnRelation.toString() || !demande?.miseEnRelationId,
+      ),
       quotaCoordinateurDisponible,
     };
   }

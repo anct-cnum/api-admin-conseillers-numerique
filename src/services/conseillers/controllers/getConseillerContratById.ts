@@ -172,6 +172,7 @@ const getConseillerContratById =
         app,
         structure,
         conseiller[0].contrat?.contratCoordinateur,
+        conseiller[0].contrat?._id?.toString(),
         typeDossierDS,
       );
 
