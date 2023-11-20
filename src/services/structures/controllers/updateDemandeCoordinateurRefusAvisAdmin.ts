@@ -7,7 +7,7 @@ import service from '../../../helpers/services';
 import mailer from '../../../mailer';
 import {
   refusCandidaturePosteCoordinateur,
-  avisCandidaturePosteCoordinateurPrefet,
+  refusCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 
@@ -26,15 +26,12 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'refusee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'refusee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
-          true,
       },
     };
     try {
@@ -63,6 +60,14 @@ const updateDemandeCoordinateurRefusAvisAdmin =
         });
         Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
           'structureObj.statut': 'REFUS_COORDINATEUR',
+        });
+      } else {
+        Object.assign(updatedDemandeCoordinateur.$set, {
+          'demandesCoordinateur.$.banniereInformationAvisStructure': true,
+        });
+        Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+          'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
+            true,
         });
       }
       const structureUpdated = await app
@@ -120,7 +125,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       if (prefets.length > 0) {
         const promises: Promise<void>[] = [];
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+          refusCandidaturePosteCoordinateurPrefet(mailerInstance);
         await prefets.forEach(async (prefet) => {
           // eslint-disable-next-line no-async-promise-executor
           const p = new Promise<void>(async (resolve, reject) => {
