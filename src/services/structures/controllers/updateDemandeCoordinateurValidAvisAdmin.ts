@@ -11,7 +11,11 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
-import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
+import {
+  IMisesEnRelation,
+  IStructures,
+  IUser,
+} from '../../../ts/interfaces/db.interfaces';
 import {
   PhaseConventionnement,
   StatutConventionnement,
@@ -113,6 +117,60 @@ const updateDemandeCoordinateurValidAvisAdmin =
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
+      }
+      const miseEnRelations: IMisesEnRelation[] = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          'conseillerObj.statut': 'RECRUTE',
+          'conseillerObj.estCoordinateur': true,
+          'structure.$id': structure._id,
+        })
+        .select({ _id: 1 });
+      if (miseEnRelations.length > 0) {
+        const demandesCoordinateurValider = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne(
+            {
+              _id: new ObjectId(idStructure),
+              demandesCoordinateur: {
+                $elemMatch: {
+                  statut: 'validee',
+                  miseEnRelationId: { $in: miseEnRelations },
+                },
+              },
+            },
+            {
+              demandesCoordinateur: 1,
+            },
+          );
+        if (!demandesCoordinateurValider) {
+          Object.assign(updatedDemandeCoordinateur.$set, {
+            'demandesCoordinateur.$.miseEnRelationId': miseEnRelations[0]._id,
+          });
+          Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+            'structureObj.demandesCoordinateur.$.miseEnRelationId':
+              miseEnRelations[0]._id,
+          });
+        } else {
+          const miseEnRelationId = miseEnRelations.find((miseEnRelation) => {
+            return demandesCoordinateurValider.demandesCoordinateur.every(
+              (demandeCoordinateur) =>
+                demandeCoordinateur?.miseEnRelationId?.toString() !==
+                miseEnRelation._id.toString(),
+            );
+          })?._id;
+          if (miseEnRelationId) {
+            Object.assign(updatedDemandeCoordinateur.$set, {
+              'demandesCoordinateur.$.miseEnRelationId': miseEnRelationId,
+            });
+            Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
+              'structureObj.demandesCoordinateur.$.miseEnRelationId':
+                miseEnRelationId,
+            });
+          }
+        }
       }
       const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
         'demarche_simplifiee',
