@@ -77,49 +77,51 @@ const updateContratRecrutementAdmin =
         contratUpdated.$set.contratCoordinateur = isRecrutementCoordinateur;
       } else {
         contratUpdated.$unset = { contratCoordinateur: '' };
-        const structureUpdated = await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            {
-              _id: miseEnRelation.structureObj._id,
-              demandesCoordinateur: {
-                $elemMatch: {
-                  miseEnRelationId: miseEnRelation._id,
+        if (miseEnRelation?.contratCoordinateur) {
+          const structureUpdated = await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              {
+                _id: miseEnRelation.structureObj._id,
+                demandesCoordinateur: {
+                  $elemMatch: {
+                    miseEnRelationId: miseEnRelation._id,
+                  },
                 },
               },
-            },
-            {
-              $unset: {
-                'demandesCoordinateur.$.miseEnRelationId': '',
+              {
+                $unset: {
+                  'demandesCoordinateur.$.miseEnRelationId': '',
+                },
               },
-            },
-          );
-        if (structureUpdated.modifiedCount === 0) {
-          res.status(404).json({
-            message: "La structure n'a pas été mise à jour",
-          });
-          return;
+            );
+          if (structureUpdated.modifiedCount === 0) {
+            res.status(404).json({
+              message: "La structure n'a pas été mise à jour",
+            });
+            return;
+          }
+          await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateMany(
+              {
+                _id: miseEnRelation.structureObj._id,
+                demandesCoordinateur: {
+                  $elemMatch: {
+                    statut: 'validee',
+                    miseEnRelationId: miseEnRelation._id,
+                  },
+                },
+              },
+              {
+                $unset: {
+                  'demandesCoordinateur.$.miseEnRelationId': '',
+                },
+              },
+            );
         }
-        await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateMany(
-            {
-              _id: miseEnRelation.structureObj._id,
-              demandesCoordinateur: {
-                $elemMatch: {
-                  statut: 'validee',
-                  miseEnRelationId: miseEnRelation._id,
-                },
-              },
-            },
-            {
-              $unset: {
-                'demandesCoordinateur.$.miseEnRelationId': '',
-              },
-            },
-          );
       }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
