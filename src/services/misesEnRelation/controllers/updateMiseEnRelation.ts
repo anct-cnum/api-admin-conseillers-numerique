@@ -93,12 +93,12 @@ const updateMiseEnRelation =
             return;
           }
           await app
-            .service(service.structures)
+            .service(service.misesEnRelation)
             .Model.accessibleBy(req.ability, action.update)
             .updateMany(
               {
-                _id: structure._id,
-                demandesCoordinateur: {
+                'structure.$id': structure._id,
+                'structureObj.demandesCoordinateur': {
                   $elemMatch: {
                     miseEnRelationId: miseEnRelationVerif._id,
                   },
@@ -106,7 +106,7 @@ const updateMiseEnRelation =
               },
               {
                 $unset: {
-                  'demandesCoordinateur.$.miseEnRelationId': '',
+                  'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
                 },
               },
             );

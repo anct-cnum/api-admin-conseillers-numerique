@@ -103,12 +103,12 @@ const updateContratRecrutementAdmin =
             return;
           }
           await app
-            .service(service.structures)
+            .service(service.misesEnRelation)
             .Model.accessibleBy(req.ability, action.update)
             .updateMany(
               {
-                _id: miseEnRelation.structureObj._id,
-                demandesCoordinateur: {
+                'structure.$id': miseEnRelation.structureObj._id,
+                'structureObj.demandesCoordinateur': {
                   $elemMatch: {
                     statut: 'validee',
                     miseEnRelationId: miseEnRelation._id,
@@ -117,7 +117,7 @@ const updateContratRecrutementAdmin =
               },
               {
                 $unset: {
-                  'demandesCoordinateur.$.miseEnRelationId': '',
+                  'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
                 },
               },
             );

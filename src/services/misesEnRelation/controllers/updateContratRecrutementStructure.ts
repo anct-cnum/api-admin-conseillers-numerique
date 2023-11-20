@@ -163,12 +163,12 @@ const updateContratRecrutementStructure =
             return;
           }
           await app
-            .service(service.structures)
+            .service(service.misesEnRelation)
             .Model.accessibleBy(req.ability, action.update)
             .updateMany(
               {
-                _id: structure._id,
-                demandesCoordinateur: {
+                'structure.$id': structure._id,
+                'structureObj.demandesCoordinateur': {
                   $elemMatch: {
                     statut: 'validee',
                     miseEnRelationId: { $exists: false },
@@ -177,7 +177,8 @@ const updateContratRecrutementStructure =
               },
               {
                 $set: {
-                  'demandesCoordinateur.$.miseEnRelationId': miseEnRelation._id,
+                  'structureObj.demandesCoordinateur.$.miseEnRelationId':
+                    miseEnRelation._id,
                 },
               },
             );
@@ -211,12 +212,12 @@ const updateContratRecrutementStructure =
             return;
           }
           await app
-            .service(service.structures)
+            .service(service.misesEnRelation)
             .Model.accessibleBy(req.ability, action.update)
             .updateMany(
               {
-                _id: structure._id,
-                demandesCoordinateur: {
+                'structure.$id': structure._id,
+                'structureObj.demandesCoordinateur': {
                   $elemMatch: {
                     statut: 'validee',
                     miseEnRelationId: miseEnRelation._id,
@@ -225,7 +226,7 @@ const updateContratRecrutementStructure =
               },
               {
                 $unset: {
-                  'demandesCoordinateur.$.miseEnRelationId': '',
+                  'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
                 },
               },
             );
