@@ -88,8 +88,7 @@ const checkQuotaRecrutementCoordinateur = async (
     return {
       demandeCoordinateurValider: demandeCoordinateurValider.find(
         (demande) =>
-          demande?.miseEnRelationId?.toString() ===
-            idMiseEnRelation.toString() || !demande?.miseEnRelationId,
+          demande?.miseEnRelationId?.toString() === idMiseEnRelation.toString(),
       ),
       quotaCoordinateurDisponible,
     };
