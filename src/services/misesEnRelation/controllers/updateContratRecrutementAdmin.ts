@@ -107,7 +107,7 @@ const updateContratRecrutementAdmin =
             .Model.accessibleBy(req.ability, action.update)
             .updateMany(
               {
-                'structure.$id': miseEnRelation.structureObj._id,
+                'structure.$id': miseEnRelation?.structureObj._id,
                 'structureObj.demandesCoordinateur': {
                   $elemMatch: {
                     statut: 'validee',
