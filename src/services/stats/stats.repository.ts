@@ -656,7 +656,6 @@ const getStatsReorientations = async (query, ability, read, app) => {
 };
 
 const getStatsEvolutions = async (query, ability, read, app) => {
-  console.log('query:', query);
   let statsEvolutions = {};
   let aggregateEvol = [];
   const dateFinEvo = new Date();

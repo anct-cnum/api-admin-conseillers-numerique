@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { string } from 'joi';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
