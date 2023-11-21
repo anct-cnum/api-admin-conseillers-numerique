@@ -123,7 +123,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .find({
-          'conseillerObj.statut': 'RECRUTE',
+          statut: 'finalisee',
           'conseillerObj.estCoordinateur': true,
           'structure.$id': structure._id,
         })
