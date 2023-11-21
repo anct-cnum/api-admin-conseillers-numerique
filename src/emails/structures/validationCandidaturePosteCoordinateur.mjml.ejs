@@ -7,18 +7,30 @@
     <mj-wrapper css-class="wrapper">
       <mj-section>
         <mj-column>
-          <mj-text>
+          <mj-text align="left">
             Madame, Monsieur,
           </mj-text>
           <mj-text align="left">
-            Suite à votre dépôt de dossier à l’Appel à candidature Conseiller numérique coordinateur,
-            votre structure s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
-            numérique coordinateur.
+            Nous avons le plaisir de vous informer qu’à la suite de votre dépôt de dossier à
+            l’Appel à candidature Conseiller numérique coordinateur, <strong>votre structure s’est
+              vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
+              numérique coordinateur.</strong>
+          </mj-text>
+          <mj-text align="left">
+            Nous vous invitons à effectuer votre recrutement de conseiller Coordinateur
+            depuis votre Tableau de pilotage.
+          </mj-text>
+          <mj-text align="left">
+            <strong>Comment faire ?</strong>
+          </mj-text>
+          <mj-text align="left">
+            on vous explique tout
+            <a href="https://outline.incubateur.anct.gouv.fr/s/954f5e39-4590-44be-9f41-39013e64f895" target="_blank" style="color: #0063CB;">
+              ici
+            </a>
           </mj-text>
           <mj-text align="left">
             L’instruction de votre dossier est désormais opérée sur la messagerie Démarches-Simplifiées.
-          </mj-text>
-          <mj-text align="left">
             Merci de bien vouloir déposer les pièces suivantes, dans les meilleurs délais :
             <% if(typeStructure == 'PRIVATE') { %>
               <%- include('../commun/piece-justificatif-structure-private.mjml.ejs'); %>
@@ -29,8 +41,12 @@
           <mj-button href="<%= lienVersDossierDSCoordinateur %>" background-color="#060091" color="white" font-size="16px" font-weight="bold">
             Compléter mon dossier
           </mj-button>
+          <mj-text align="left">
+            Merci de bien vouloir noter que la messagerie Démarches-Simplifiées
+            n’autorise qu’une pièce jointe par message.
+          </mj-text>
           <mj-text  align="left">
-            Restant à votre disposition si besoin,
+            Restant à votre disposition,
           </mj-text>
         </mj-column>
       </mj-section>
