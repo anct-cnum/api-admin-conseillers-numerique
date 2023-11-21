@@ -156,15 +156,18 @@ const filterStatutContrat = (statut: string) => {
   };
 };
 
-const filtrePiecesManquantes = (piecesManquantes: string) =>
-  piecesManquantes
-    ? { dossierIncompletRupture: true }
-    : {
-        $or: [
-          { dossierIncompletRupture: { $exists: false } },
-          { dossierIncompletRupture: false },
-        ],
-      };
+const filtrePiecesManquantes = (piecesManquantes: string) => {
+  if (piecesManquantes === 'true') {
+    return { dossierIncompletRupture: true };
+  }
+  if (piecesManquantes === 'false') {
+    return { dossierIncompletRupture: false };
+  }
+  if (piecesManquantes === 'null') {
+    return { dossierIncompletRupture: { $exists: false } };
+  }
+  return {};
+};
 
 const filterStatutContratHistorique = (statut: string) => {
   if (statut === 'renouvelee') {

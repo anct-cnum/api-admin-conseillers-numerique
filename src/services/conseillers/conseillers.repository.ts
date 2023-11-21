@@ -133,15 +133,18 @@ const filterDepartement = (departement: string) => {
   return {};
 };
 
-const filtrePiecesManquantes = (piecesManquantes: boolean) =>
-  piecesManquantes
-    ? { dossierIncompletRupture: true }
-    : {
-        $or: [
-          { dossierIncompletRupture: { $exists: false } },
-          { dossierIncompletRupture: false },
-        ],
-      };
+const filtrePiecesManquantes = (piecesManquantes: boolean) => {
+  if (piecesManquantes === true) {
+    return { dossierIncompletRupture: true };
+  }
+  if (piecesManquantes === false) {
+    return { dossierIncompletRupture: false };
+  }
+  if (piecesManquantes === null) {
+    return { dossierIncompletRupture: { $exists: false } };
+  }
+  return {};
+};
 
 const filterIsRuptureMisesEnRelation = (
   rupture: string,
