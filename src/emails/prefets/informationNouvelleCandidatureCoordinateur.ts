@@ -26,11 +26,11 @@ export default function (app: Application, mailer) {
           },
           {
             $set: {
-              'demandesCoordinateur.$.mailSentDate': new Date(),
+              'demandesCoordinateur.$.mailSendDatePrefet': new Date(),
             },
             $unset: {
-              'demandesCoordinateur.$.mailErrorSentDate': '',
-              'demandesCoordinateur.$.mailErrorDetailSentDate': '',
+              'demandesCoordinateur.$.mailErrorSentDatePrefet': '',
+              'demandesCoordinateur.$.mailErrorDetailSentDatePrefet': '',
             },
           },
         );
@@ -49,8 +49,8 @@ export default function (app: Application, mailer) {
             },
           },
           {
-            'demandesCoordinateur.$.mailErrorSent': 'smtpError',
-            'demandesCoordinateur.$.mailErrorDetailSent': err.message,
+            'demandesCoordinateur.$.mailErrorSentPrefet': 'smtpError',
+            'demandesCoordinateur.$.mailErrorDetailSentPrefet': err.message,
           },
         );
         throw err;
@@ -60,7 +60,7 @@ export default function (app: Application, mailer) {
         .createMailer()
         .sendEmail(structureWithPrefets.name, {
           subject:
-            'Réponse à candidature : recrutement de Conseiller(s) numérique(s) France Services',
+            'Nouvelle candidature pour un poste de Conseiller numérique coordinateur',
           body: await render(),
         })
         .then(onSuccess)

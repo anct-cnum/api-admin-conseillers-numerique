@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/structures/deleteMiseEnRelationStructureStatutAbandon.ts
+// Lancement de ce script : ts-node src/tools/prefets/notificationsNouvellesDemandesCoordinateurs.ts
 
 import execute from '../utils';
 import service from '../../helpers/services';
@@ -17,7 +17,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           $elemMatch: {
             statut: { $eq: 'en_cours' },
             avisPrefet: { $exists: false },
-            mailSendDate: { $exists: false },
+            mailSendDatePrefet: { $exists: false },
           },
         },
       },
