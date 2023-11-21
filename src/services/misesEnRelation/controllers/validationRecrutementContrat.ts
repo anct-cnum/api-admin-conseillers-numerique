@@ -10,7 +10,10 @@ import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
-import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+import {
+  checkQuotaRecrutementCoordinateur,
+  checkStructurePhase2,
+} from '../../structures/repository/structures.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -130,6 +133,29 @@ const validationRecrutementContrat =
             'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
         });
         return;
+      }
+      if (miseEnRelationVerif?.contratCoordinateur) {
+        const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
+          await checkQuotaRecrutementCoordinateur(
+            app,
+            req,
+            structure,
+            miseEnRelationVerif._id,
+          );
+        if (!demandeCoordinateurValider) {
+          res.status(404).json({
+            message:
+              'Action non autorisée : vous ne possédez aucun poste coordinateur au sein de votre structure',
+          });
+          return;
+        }
+        if (quotaCoordinateurDisponible < 0) {
+          res.status(409).json({
+            message:
+              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
+          });
+          return;
+        }
       }
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');

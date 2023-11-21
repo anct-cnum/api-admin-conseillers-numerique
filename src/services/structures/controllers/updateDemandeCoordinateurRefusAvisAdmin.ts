@@ -26,12 +26,20 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'refusee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'demandesCoordinateur.$.emetteurValidation': {
+          email: req.user?.name,
+          date: new Date(),
+        },
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'refusee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'structureObj.demandesCoordinateur.$.emetteurValidation': {
+          email: req.user?.name,
+          date: new Date(),
+        },
       },
     };
     try {
