@@ -57,7 +57,7 @@ const addRoleCoordinateur =
             miseEnRelation._id.toString(),
       );
       if (!checkLiaisonDemandesCoordo) {
-        res.status(400).json({
+        res.status(409).json({
           message:
             "Le conseiller sélectionné n'est pas celui que vous avez recruté pour devenir Conseiller numérique coordinateur",
         });
