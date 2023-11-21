@@ -128,7 +128,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           'structure.$id': structure._id,
         })
         .select({ _id: 1 });
-      // traitement liés aux coordinateurs en poste avant le nouveau parcours coordinateur
+      // traitement lié aux coordinateurs en poste avant le nouveau parcours coordinateur
       if (miseEnRelations.length > 0) {
         // récupération des demandes coordinateurs validées de la structure qui sont déjà liées à des coordinateurs
         const structureWithDemandeCoordoValider = await app
