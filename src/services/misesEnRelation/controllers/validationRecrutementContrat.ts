@@ -248,8 +248,8 @@ const validationRecrutementContrat =
               estRecrute: true,
               datePrisePoste:
                 miseEnRelationVerif.conseillerObj.datePrisePoste ?? null,
-              dateFinDeFormation:
-                miseEnRelationVerif.conseillerObj.dateFinDeFormation ?? null,
+              dateFinFormation:
+                miseEnRelationVerif.conseillerObj.dateFinFormation ?? null,
               structureId: miseEnRelationVerif.structureObj._id,
               codeRegionStructure: miseEnRelationVerif.structureObj.codeRegion,
               codeDepartementStructure:
