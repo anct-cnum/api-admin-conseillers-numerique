@@ -107,13 +107,6 @@ const getStatsGlobales = async (
     };
 
     const totalParticipants = await getStatsTotalParticipants(donneesStats);
-    donneesStats.tauxTotalUsagersAccompagnes = Math.round(
-      await getStatsTauxAccompagnements(
-        donneesStats.nbUsagersBeneficiantSuivi,
-        totalParticipants,
-      ),
-    );
-
     const [
       nbUsagersBeneficiantSuivi,
       statsLieuxPourcentage,
@@ -135,6 +128,12 @@ const getStatsGlobales = async (
       conversionPourcentage(donneesStats.statsAges, totalParticipants),
       conversionPourcentage(donneesStats.statsUsagers, totalParticipants),
     ]);
+    donneesStats.tauxTotalUsagersAccompagnes = Math.round(
+      await getStatsTauxAccompagnements(
+        nbUsagersBeneficiantSuivi,
+        totalParticipants,
+      ),
+    );
     donneesStats.nbUsagersBeneficiantSuivi = nbUsagersBeneficiantSuivi;
     // Conversion en %
     donneesStats.statsLieux = statsLieuxPourcentage;
