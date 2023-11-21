@@ -156,12 +156,15 @@ const filterStatutContrat = (statut: string) => {
   };
 };
 
-const filtrePiecesManquantes = (piecesManquantes: string) => {
-  if (piecesManquantes === 'true') {
-    return { dossierIncompletRupture: true };
-  }
-  return {};
-};
+const filtrePiecesManquantes = (piecesManquantes: string) =>
+  piecesManquantes
+    ? { dossierIncompletRupture: true }
+    : {
+        $or: [
+          { dossierIncompletRupture: { $exists: false } },
+          { dossierIncompletRupture: false },
+        ],
+      };
 
 const filterStatutContratHistorique = (statut: string) => {
   if (statut === 'renouvelee') {

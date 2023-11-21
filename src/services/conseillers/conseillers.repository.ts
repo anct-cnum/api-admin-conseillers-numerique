@@ -136,7 +136,12 @@ const filterDepartement = (departement: string) => {
 const filtrePiecesManquantes = (piecesManquantes: boolean) =>
   piecesManquantes
     ? { dossierIncompletRupture: true }
-    : { dossierIncompletRupture: { $exists: false } };
+    : {
+        $or: [
+          { dossierIncompletRupture: { $exists: false } },
+          { dossierIncompletRupture: false },
+        ],
+      };
 
 const filterIsRuptureMisesEnRelation = (
   rupture: string,
