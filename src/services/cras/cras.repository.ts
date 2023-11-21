@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
+import { string } from 'joi';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -103,10 +104,20 @@ const getNombreCrasByStructureId =
       });
 
 const getStructuresIdsByTerritoire = async (type, idType, app) => {
-  const query = {
-    [type]: idType === '978' ? '00' : idType,
+  let query = {
     statut: { $ne: 'CREEE' },
   };
+  if (['978'].includes(idType)) {
+    query = {
+      ...query,
+      ...{ codeCom: { $eq: idType } },
+    };
+  } else {
+    query = {
+      ...query,
+      [type]: idType,
+    };
+  }
   const structuresIds = await app
     .service(service.structures)
     .Model.find(query)
