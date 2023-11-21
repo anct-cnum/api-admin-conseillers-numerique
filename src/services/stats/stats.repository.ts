@@ -663,11 +663,6 @@ const getStatsEvolutions = async (query, ability, read, app) => {
   const dateDebutEvo = new Date(String(dayjs(new Date()).subtract(4, 'month')));
   const dateDebutEvoYear = dateDebutEvo.getFullYear();
   const dateFinEvoYear = dateFinEvo.getFullYear();
-  const listMois = Array.from({ length: 12 }, (e, i) => {
-    return new Date(null, i + 1, null).toLocaleDateString('fr', {
-      month: 'long',
-    });
-  });
   let matchQuery = { ...query };
   let collection = service.statsConseillersCras;
   let statCrasMailleStructures = [];
@@ -726,12 +721,14 @@ const getStatsEvolutions = async (query, ability, read, app) => {
       $addFields: { mois: '$_id', annee: dateFinEvoYear },
     },
   ]);
-  aggregateEvol = aggregateEvol.map((i) => {
-    return {
-      ...i,
-      mois: i.mois - 1,
-    };
-  });
+  if (collection === service.cras) {
+    aggregateEvol = aggregateEvol.map((i) => {
+      return {
+        ...i,
+        mois: i.mois - 1,
+      };
+    });
+  }
 
   if (dateDebutEvoYear !== dateFinEvoYear) {
     // Si année glissante on récupère les données de l'année n-1
@@ -749,12 +746,14 @@ const getStatsEvolutions = async (query, ability, read, app) => {
         $addFields: { mois: '$_id', annee: dateDebutEvoYear },
       },
     ]);
-    aggregateEvolLastYear = aggregateEvolLastYear.map((i) => {
-      return {
-        ...i,
-        mois: i.mois - 1,
-      };
-    });
+    if (collection === service.cras) {
+      aggregateEvolLastYear = aggregateEvolLastYear.map((i) => {
+        return {
+          ...i,
+          mois: i.mois - 1,
+        };
+      });
+    }
     statsEvolutions = JSON.parse(
       `{"${dateDebutEvoYear.toString()}": ${JSON.stringify(
         aggregateEvolLastYear,
