@@ -81,7 +81,7 @@ const updateContratRecrutementStructure =
           countMisesEnRelationRecruteesFutur >
           dernierCoselec.nombreConseillersCoselec
         ) {
-          res.status(400).json({
+          res.status(409).json({
             message:
               'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
           });
@@ -129,7 +129,7 @@ const updateContratRecrutementStructure =
           countMisesEnRelationRecruteesCoordinateurFutur >
           countDemandesCoordinateurValider
         ) {
-          res.status(400).json({
+          res.status(409).json({
             message:
               'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
           });

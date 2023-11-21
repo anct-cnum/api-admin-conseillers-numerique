@@ -118,6 +118,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
+      // récupération des éventuels coordinateurs de la structure
       const miseEnRelations: IMisesEnRelation[] = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -127,7 +128,9 @@ const updateDemandeCoordinateurValidAvisAdmin =
           'structure.$id': structure._id,
         })
         .select({ _id: 1 });
+      // traitement liés aux coordinateurs en poste avant le nouveau parcours coordinateur
       if (miseEnRelations.length > 0) {
+        // récupération des demandes coordinateurs validées de la structure qui sont déjà liées à des coordinateurs
         const structureWithDemandeCoordoValider = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
@@ -145,6 +148,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
               demandesCoordinateur: 1,
             },
           );
+        // si aucune demande coordinateur validée n'est liée à un coordinateur, on lie la demande au premier coordinateur récupéré
         if (!structureWithDemandeCoordoValider) {
           Object.assign(updatedDemandeCoordinateur.$set, {
             'demandesCoordinateur.$.miseEnRelationId': miseEnRelations[0]._id,
@@ -154,6 +158,8 @@ const updateDemandeCoordinateurValidAvisAdmin =
               miseEnRelations[0]._id,
           });
         } else {
+          // si une demande coordinateur validée est déjà liée à un coordinateur,
+          // on trouve le premier coordinateur qui n'est pas lié à une demande
           const miseEnRelationId = miseEnRelations.find((miseEnRelation) => {
             return structureWithDemandeCoordoValider.demandesCoordinateur.every(
               (demandeCoordinateur) =>
@@ -161,6 +167,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
                 miseEnRelation._id.toString(),
             );
           })?._id;
+          // si on trouve un coordinateur, on lie la demande à ce coordinateur sinon cela signifie que tous les coordinateurs sont déjà liés à une demande
           if (miseEnRelationId) {
             Object.assign(updatedDemandeCoordinateur.$set, {
               'demandesCoordinateur.$.miseEnRelationId': miseEnRelationId,
