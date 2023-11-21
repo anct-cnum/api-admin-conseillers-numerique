@@ -1,8 +1,14 @@
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
+import { countCoordinateurRecrutees } from '../../misesEnRelation/misesEnRelation.repository';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -59,6 +65,38 @@ const checkStructurePhase2 = (statut: string) => {
     return true;
   }
   return false;
+};
+
+const checkQuotaRecrutementCoordinateur = async (
+  app: Application,
+  req: IRequest,
+  structure: IStructures,
+  idMiseEnRelation: ObjectId,
+) => {
+  const demandeCoordinateurValider: IDemandesCoordinateur[] | undefined =
+    structure?.demandesCoordinateur?.filter(
+      (demande) => demande.statut === 'validee',
+    );
+  if (demandeCoordinateurValider?.length > 0) {
+    const countCoordinateurs = await countCoordinateurRecrutees(
+      app,
+      req,
+      structure._id,
+    );
+    const quotaCoordinateurDisponible =
+      demandeCoordinateurValider.length - countCoordinateurs;
+    return {
+      demandeCoordinateurValider: demandeCoordinateurValider.find(
+        (demande) =>
+          demande?.miseEnRelationId?.toString() === idMiseEnRelation.toString(),
+      ),
+      quotaCoordinateurDisponible,
+    };
+  }
+  return {
+    demandeCoordinateurValider: undefined,
+    quotaCoordinateurDisponible: 0,
+  };
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
@@ -193,4 +231,5 @@ export {
   filterStatutAndAvisPrefetDemandesCoordinateur,
   checkStructurePhase2,
   checkAvisPrefet,
+  checkQuotaRecrutementCoordinateur,
 };

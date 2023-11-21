@@ -111,6 +111,8 @@ export interface IMisesEnRelation {
   typeDeContrat: string | undefined;
 
   salaire: number | undefined;
+
+  contratCoordinateur: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -394,10 +396,18 @@ interface IDemandesCoselec {
   banniereValidationAvenant: boolean;
 }
 
-interface IDemandesCoordinateur {
+export interface IDemandesCoordinateur {
   id: ObjectId;
   statut: string;
   avisPrefet?: string;
+  banniereInformationAvisStructure?: boolean;
+  banniereValidationAvisPrefet?: boolean;
+  banniereValidationAvisAdmin?: boolean;
+  miseEnRelationId?: ObjectId;
+  emetteurValidation?: {
+    date: Date;
+    email: string;
+  };
   dossier: {
     numero: number;
     dateDeCreation: Date;

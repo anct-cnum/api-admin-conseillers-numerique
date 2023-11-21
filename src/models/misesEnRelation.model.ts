@@ -39,6 +39,8 @@ export default function (app: Application): Model<any> {
       typeDeContrat: { type: String },
 
       salaire: { type: Number },
+
+      contratCoordinateur: { type: Boolean },
     },
     {
       strict: false,
