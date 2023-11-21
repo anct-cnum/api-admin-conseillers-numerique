@@ -111,6 +111,8 @@ export interface IMisesEnRelation {
   typeDeContrat: string | undefined;
 
   salaire: number | undefined;
+
+  banniereAjoutRoleCoordinateur: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -273,8 +275,6 @@ export interface IConseillers {
   };
 
   inactivite: boolean;
-
-  banniereAjoutRoleCoordinateur: boolean;
 }
 
 export interface IStructures {

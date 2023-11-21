@@ -224,8 +224,6 @@ export default function (app: Application): Model<any> {
       supHierarchique: { type: supHierarchiqueSchema },
 
       inactivite: { type: Boolean },
-
-      banniereAjoutRoleCoordinateur: { type: Boolean },
     },
 
     { strict: false },

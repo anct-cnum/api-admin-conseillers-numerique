@@ -136,13 +136,14 @@ const closeBanner =
           );
       }
 
-      if (type === 'ajoutRoleCoordinateur') {
+      if (type === 'ajoutRoleCoordinateur' && conseillerId) {
         await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
             {
               'conseiller.$id': new ObjectId(conseillerId),
+              'structure.$id': new ObjectId(req.params.id),
               statut: 'finalisee',
             },
             { $set: { banniereAjoutRoleCoordinateur: false } },

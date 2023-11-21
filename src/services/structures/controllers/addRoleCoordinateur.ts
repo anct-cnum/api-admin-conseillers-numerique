@@ -39,7 +39,7 @@ const addRoleCoordinateur =
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
-          structureId: new ObjectId(structure._id),
+          structureId: structure._id,
           statut: 'RECRUTE',
           estCoordinateur: true,
         });
@@ -58,6 +58,8 @@ const addRoleCoordinateur =
         .updateOne(
           {
             _id: new ObjectId(conseillerId),
+            statut: 'RECRUTE',
+            structureId: new ObjectId(structure._id),
           },
           { $set: { estCoordinateur: true } },
         );
@@ -109,7 +111,6 @@ const addRoleCoordinateur =
             demandesCoordinateur: {
               $elemMatch: {
                 statut: 'validee',
-                miseEnRelationId: { $exists: false },
               },
             },
           },
@@ -153,6 +154,7 @@ const addRoleCoordinateur =
         .updateOne(
           {
             'conseiller.$id': new ObjectId(conseillerId),
+            'structure.$id': structure._id,
             statut: 'finalisee',
           },
           { $set: { banniereAjoutRoleCoordinateur: true } },
