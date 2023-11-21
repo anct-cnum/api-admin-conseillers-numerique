@@ -6,31 +6,39 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import mailer from '../../../mailer';
-import { creationCompteCandidat } from '../../../emails';
+import { relanceCreationCompteConseiller } from '../../../emails';
 
 const { v4: uuidv4 } = require('uuid');
 
-const candidatRelanceInvitation =
+const conseillerRelanceInvitation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
 
     try {
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idConseiller) });
       if (!conseiller) {
-        res.status(404).json({ message: "Le candidat n'existe pas" });
+        res.status(404).json({ message: "Le conseiller n'existe pas" });
         return;
       }
       const conseillerUser = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({ 'entity.$id': new ObjectId(idConseiller) });
+        .findOne({
+          'entity.$id': conseiller._id,
+          roles: {
+            $in: ['conseiller'],
+          },
+        });
       if (!conseillerUser) {
         res.status(404).json({
-          message:
-            'Le candidat ne possède pas de compte (doublon ou inactivité)',
+          message: 'Le conseiller ne possède pas de compte.',
         });
         return;
       }
@@ -46,10 +54,18 @@ const candidatRelanceInvitation =
         .findOneAndUpdate(
           { _id: conseillerUser._id },
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
-          { returnOriginal: false },
+          {
+            returnOriginal: false,
+            rawResult: true,
+          },
         );
+      if (users.lastErrorObject.n === 0) {
+        res.status(409).json({
+          message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
+        });
+      }
       const mailerInstance = mailer(app);
-      const message = creationCompteCandidat(app, mailerInstance, req);
+      const message = relanceCreationCompteConseiller(app, mailerInstance, req);
       const errorSmtpMail = await message
         .send(users.value)
         .catch((errSmtp: Error) => {
@@ -61,7 +77,7 @@ const candidatRelanceInvitation =
         res
           .status(200)
           .json(
-            `L'email d'invitation à l'espace candidat a bien été envoyé à ${conseillerUser.nom} ${conseillerUser.prenom}`,
+            `L'email d'invitation à l'espace Coop a bien été envoyé à ${conseillerUser.nom} ${conseillerUser.prenom}`,
           );
       }
     } catch (error) {
@@ -74,4 +90,4 @@ const candidatRelanceInvitation =
     }
   };
 
-export default candidatRelanceInvitation;
+export default conseillerRelanceInvitation;

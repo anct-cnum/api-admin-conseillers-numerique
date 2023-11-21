@@ -20,7 +20,7 @@ export default function (mailer) {
     send: async (structure: IStructures) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour la réponse à candidature d’un recrutement de Conseiller numérique Coordinateur à la structure ${structure.idPG}`,
+          `Email envoyé avec succès pour la réponse à candidature favorable d’un recrutement de Conseiller numérique Coordinateur à la structure ${structure.idPG}`,
         );
       };
       const onError = async (err: Error) => {
@@ -31,7 +31,7 @@ export default function (mailer) {
         .createMailer()
         .sendEmail(structure.contact.email, {
           subject:
-            'Réponse à candidature : recrutement d’un Conseiller numérique Coordinateur',
+            'Appel à candidature Conseiller numérique coordinateur - attribution de poste',
           body: await render(
             structure.type,
             structure.demandesCoordinateur[0].dossier.numero,

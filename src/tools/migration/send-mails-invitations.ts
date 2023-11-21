@@ -67,7 +67,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     .limit(limit);
 
   if (users.length === 0) {
-    logger.info(`Aucun compte user restant à inviter pour ce rôle`);
+    exit();
     return;
   }
 

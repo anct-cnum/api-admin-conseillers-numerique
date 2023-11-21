@@ -9,10 +9,11 @@ import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import { PhaseConventionnement } from '../../../ts/enum';
 import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+  checkQuotaRecrutementCoordinateur,
+  checkStructurePhase2,
+} from '../../structures/repository/structures.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -133,6 +134,29 @@ const validationRecrutementContrat =
         });
         return;
       }
+      if (miseEnRelationVerif?.contratCoordinateur) {
+        const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
+          await checkQuotaRecrutementCoordinateur(
+            app,
+            req,
+            structure,
+            miseEnRelationVerif._id,
+          );
+        if (!demandeCoordinateurValider) {
+          res.status(404).json({
+            message:
+              'Action non autorisée : vous ne possédez aucun poste coordinateur au sein de votre structure',
+          });
+          return;
+        }
+        if (quotaCoordinateurDisponible < 0) {
+          res.status(409).json({
+            message:
+              'Action non autorisée : quota atteint de coordinateurs validés par rapport au nombre de postes attribués',
+          });
+          return;
+        }
+      }
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
       await updateConseillersPG(pool)(
@@ -222,8 +246,10 @@ const validationRecrutementContrat =
               updatedAt,
               userCreated: true,
               estRecrute: true,
-              datePrisePoste: null,
-              dateFinDeFormation: null,
+              datePrisePoste:
+                miseEnRelationVerif.conseillerObj.datePrisePoste ?? null,
+              dateFinDeFormation:
+                miseEnRelationVerif.conseillerObj.dateFinDeFormation ?? null,
               structureId: miseEnRelationVerif.structureObj._id,
               codeRegionStructure: miseEnRelationVerif.structureObj.codeRegion,
               codeDepartementStructure:
@@ -251,10 +277,7 @@ const validationRecrutementContrat =
           conseillerObj: conseillerUpdated.value,
         },
       };
-      if (
-        miseEnRelationVerif?.structureObj?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         Object.assign(objectMiseEnRelationUpdated.$set, {
           phaseConventionnement: PhaseConventionnement.PHASE_2,
         });
@@ -328,7 +351,7 @@ const validationRecrutementContrat =
             $set: {
               structure: new DBRef(
                 'structures',
-                miseEnRelationUpdated?.value?.structure?.oid,
+                miseEnRelationVerif.structureObj._id,
                 database,
               ),
             },

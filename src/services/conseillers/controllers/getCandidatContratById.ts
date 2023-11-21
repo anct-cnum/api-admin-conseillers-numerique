@@ -4,8 +4,11 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
-import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  getTypeDossierDemarcheSimplifiee,
+  getUrlDossierDSAdmin,
+} from '../../structures/repository/reconventionnement.repository';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getCandidatContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -50,23 +53,24 @@ const getCandidatContratById =
         .findOne({
           _id: conseillerFormat.miseEnRelation?.structureObj?._id,
         });
-      const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.unite_legale?.forme_juridique?.libelle,
-      );
-      if (typeDossierDs === null) {
-        res.status(404).json({
+      const typeDossierDS: ITypeDossierDS | undefined =
+        getTypeDossierDemarcheSimplifiee(
+          structure?.insee?.unite_legale?.forme_juridique?.libelle,
+        );
+      if (typeDossierDS === null) {
+        res.status(500).json({
           message: 'Erreur lors de la récupération du type de la structure',
         });
         return;
       }
-      if (
-        structure?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
-        conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
-      } else {
-        conseillerFormat.url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
-      }
+      conseillerFormat.url = getUrlDossierDSAdmin(
+        app,
+        structure,
+        conseillerFormat.miseEnRelation?.contratCoordinateur,
+        conseillerFormat.miseEnRelation?._id?.toString(),
+        typeDossierDS,
+      );
+
       res.status(200).json(conseillerFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

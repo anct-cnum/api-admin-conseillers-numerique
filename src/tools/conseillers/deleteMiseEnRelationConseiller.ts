@@ -7,18 +7,19 @@ import execute from '../utils';
 import service from '../../helpers/services';
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const dateMoins1Jours = new Date();
-  dateMoins1Jours.setDate(dateMoins1Jours.getDate() - 1);
+  const dateMoins2Jours = new Date();
+  dateMoins2Jours.setDate(dateMoins2Jours.getDate() - 2);
   const conseillers = await app.service(service.conseillers).Model.find({
     disponible: false,
     statut: 'RECRUTE',
     updatedAt: {
-      $gte: dateMoins1Jours,
+      $gte: dateMoins2Jours,
       $lte: new Date(),
     },
   });
   if (conseillers.length === 0) {
     exit();
+    return;
   }
   let countDeleteMiseEnRelation = 0;
   let countDeleteDoublonConseillers = 0;
