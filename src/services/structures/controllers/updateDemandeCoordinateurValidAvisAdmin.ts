@@ -128,7 +128,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
         })
         .select({ _id: 1 });
       if (miseEnRelations.length > 0) {
-        const demandesCoordinateurValider = await app
+        const structureWithDemandeCoordoValider = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
           .findOne(
@@ -145,7 +145,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
               demandesCoordinateur: 1,
             },
           );
-        if (!demandesCoordinateurValider) {
+        if (!structureWithDemandeCoordoValider) {
           Object.assign(updatedDemandeCoordinateur.$set, {
             'demandesCoordinateur.$.miseEnRelationId': miseEnRelations[0]._id,
           });
@@ -155,7 +155,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           });
         } else {
           const miseEnRelationId = miseEnRelations.find((miseEnRelation) => {
-            return demandesCoordinateurValider.demandesCoordinateur.every(
+            return structureWithDemandeCoordoValider.demandesCoordinateur.every(
               (demandeCoordinateur) =>
                 demandeCoordinateur?.miseEnRelationId?.toString() !==
                 miseEnRelation._id.toString(),
