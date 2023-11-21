@@ -7,18 +7,31 @@
     <mj-wrapper css-class="wrapper">
       <mj-section>
         <mj-column>
-          <mj-text>
+          <mj-text align="left">
             Madame, Monsieur,
           </mj-text>
           <mj-text align="left">
-            Suite à votre dépôt de dossier à l’Appel à candidature Conseiller numérique coordinateur,
-            votre structure s’est vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
-            numérique coordinateur.
+            Nous avons le plaisir de vous informer qu’à la suite de votre dépôt de dossier à
+            l’Appel à candidature Conseiller numérique Coordinateur, <strong>votre structure s’est
+              vu attribuer <%= nombreCoordinateursCoselec %> poste de Conseiller
+              numérique coordinateur.</strong>
+          </mj-text>
+          <mj-text align="left">
+            Nous vous invitons à effectuer votre recrutement de conseiller Coordinateur
+            depuis votre Tableau de pilotage.
+          </mj-text>
+          <mj-text align="left">
+            Comment faire ?
+          </mj-text>
+          <mj-text align="left">
+            Si vous êtes une nouvelle structure qui ne bénéficie pas du dispositif,
+            on vous explique tout ici
+          </mj-text>
+          <mj-text align="left">
+            Si vous êtes une structure qui bénéficie déjà du dispositif, on vous explique tout ici
           </mj-text>
           <mj-text align="left">
             L’instruction de votre dossier est désormais opérée sur la messagerie Démarches-Simplifiées.
-          </mj-text>
-          <mj-text align="left">
             Merci de bien vouloir déposer les pièces suivantes, dans les meilleurs délais :
             <% if(typeStructure == 'PRIVATE') { %>
               <%- include('../commun/piece-justificatif-structure-private.mjml.ejs'); %>
