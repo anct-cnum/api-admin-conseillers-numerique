@@ -16,7 +16,7 @@ const { Pool } = require('pg');
 program.option('-id, --idPG <idPG>', 'idPG de la structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
-program.option('-fs, --franceService <franceService>', 'label France Service');
+program.option('-fs, --franceService', 'label France Service');
 program.option(
   '-st, --statut <statut>',
   'nouveau statut de la structure (ANNULEE, ABANDON)',
@@ -80,7 +80,9 @@ execute(__filename, async ({ app, logger, exit }) => {
     $set: {
       updatedAt,
       coselecAt: updatedAt,
-      estLabelliseFranceServices: 'NON',
+      ...(structure?.estLabelliseFranceServices !== 'OUI' && {
+        estLabelliseFranceServices: 'NON',
+      }),
     },
     $push: {
       coselec: {
@@ -95,7 +97,9 @@ execute(__filename, async ({ app, logger, exit }) => {
     $set: {
       'structureObj.updatedAt': updatedAt,
       'structureObj.coselecAt': updatedAt,
-      'structureObj.estLabelliseFranceServices': 'NON',
+      ...(structure?.estLabelliseFranceServices !== 'OUI' && {
+        'structureObj.estLabelliseFranceServices': 'NON',
+      }),
     },
     $push: {
       'structureObj.coselec': {
