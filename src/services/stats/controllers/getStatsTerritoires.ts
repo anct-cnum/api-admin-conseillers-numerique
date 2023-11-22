@@ -11,6 +11,7 @@ import {
   getTauxActivation,
 } from '../../statsTerritoires/statsTerritoires.repository';
 import { checkAccessRequestCras } from '../../cras/cras.repository';
+import { getNombreCra } from '../stats.repository';
 
 const getTotalDepartements =
   (app: Application, req: IRequest) => async (date: string) =>
@@ -28,13 +29,6 @@ const getTotalRegions =
         { $group: { _id: { codeRegion: '$codeRegion' } } },
         { $project: { _id: 0 } },
       ]);
-
-const getNombreCra =
-  (app: Application, req: IRequest) => async (query: object) =>
-    app
-      .service(service.cras)
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments(query);
 
 const getPersonnesRecurrentes =
   (app: Application, checkRoleAccessCras) => async (query: object) =>
@@ -209,7 +203,7 @@ const getStatsTerritoires =
 
             item.personnesRecurrentes =
               countRecurrentes.length > 0 ? countRecurrentes[0]?.count : 0;
-            item.CRAEnregistres = await getNombreCra(app, req)(query);
+            item.CRAEnregistres = await getNombreCra(query, app);
           } else {
             item.personnesAccompagnees = 0;
             item.CRAEnregistres = 0;
