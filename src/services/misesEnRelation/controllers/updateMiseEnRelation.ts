@@ -7,6 +7,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -141,7 +142,7 @@ const updateMiseEnRelation =
           date: new Date(),
         };
       }
-      const miseEnRelation: IMisesEnRelation = await app
+      const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
@@ -150,9 +151,29 @@ const updateMiseEnRelation =
             $set: update,
             $unset: remove,
           },
-          { new: true },
+          { new: true, rawResult: true },
         );
-      res.status(200).json(miseEnRelation);
+      if (miseEnRelation.lastErrorObject.n === 0) {
+        res.status(404).json({
+          message: "Le contrat n'a pas été mise à jour",
+        });
+        return;
+      }
+      if (req.body.statut === 'interessee') {
+        const miseEnRelationFormat = miseEnRelation.value.toObject();
+        const { quotaCoordinateurDisponible } =
+          await checkQuotaRecrutementCoordinateur(
+            app,
+            req,
+            structure,
+            miseEnRelationVerif._id,
+          );
+        miseEnRelationFormat.quotaCoordinateur =
+          quotaCoordinateurDisponible > 0;
+        res.status(200).json({ miseEnRelation: miseEnRelationFormat });
+        return;
+      }
+      res.status(200).json({ miseEnRelation: miseEnRelation.value });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
