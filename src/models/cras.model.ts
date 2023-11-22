@@ -68,7 +68,7 @@ export default function (app: Application): Model<any> {
 
       conseiller: { type: DBRef },
 
-      structure: { type: DBRef },
+      structure: { type: Schema.Types.Mixed },
 
       createdAt: { type: Date },
     },
