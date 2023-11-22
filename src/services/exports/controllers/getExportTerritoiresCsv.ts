@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvTerritoires } from '../exports.repository';
+import { action } from '../../../helpers/accessControl/accessList';
 import { validExportTerritoires } from '../../../schemas/territoires.schemas';
 import {
   checkAccessRequestStatsTerritoires,
@@ -11,6 +12,13 @@ import {
   getTauxActivation,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
+
+const getNombreCra =
+  (app: Application, req: IRequest) => async (query: object) =>
+    app
+      .service(service.cras)
+      .Model.accessibleBy(req.ability, action.read)
+      .countDocuments(query);
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -131,6 +139,7 @@ const getExportTerritoiresCsv =
               req,
               query,
             );
+            item.CRAEnregistres = await getNombreCra(app, req)(query);
             item.personnesRecurrentes = await countPersonnesRecurrentes(
               app,
               req,
@@ -138,6 +147,7 @@ const getExportTerritoiresCsv =
             );
           } else {
             item.personnesAccompagnees = 0;
+            item.CRAEnregistres = 0;
             item.personnesRecurrentes = 0;
           }
 

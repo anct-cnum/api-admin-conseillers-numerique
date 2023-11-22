@@ -663,6 +663,7 @@ const generateCsvTerritoires = async (
     const fileHeaders = [
       'Code',
       'Nom',
+      'CRA enregistrés',
       'Personnes accompagnées',
       "Nombre d'accompagnement",
       'Dotation de conseillers',
@@ -676,6 +677,7 @@ const generateCsvTerritoires = async (
         ...statsTerritoires.map((statsTerritoire) =>
           [
             ...codeAndNomTerritoire(territoire, statsTerritoire),
+            statsTerritoire.CRAEnregistres,
             statsTerritoire.personnesAccompagnees -
               statsTerritoire.personnesRecurrentes,
             statsTerritoire.personnesAccompagnees,
