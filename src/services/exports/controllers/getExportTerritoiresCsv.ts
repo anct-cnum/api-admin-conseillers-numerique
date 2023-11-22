@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvTerritoires } from '../exports.repository';
-import { action } from '../../../helpers/accessControl/accessList';
+import { getNombreCra } from '../../stats/stats.repository';
 import { validExportTerritoires } from '../../../schemas/territoires.schemas';
 import {
   checkAccessRequestStatsTerritoires,
@@ -12,13 +12,6 @@ import {
   getTauxActivation,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
-
-const getNombreCra =
-  (app: Application, req: IRequest) => async (query: object) =>
-    app
-      .service(service.cras)
-      .Model.accessibleBy(req.ability, action.read)
-      .countDocuments(query);
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -139,7 +132,7 @@ const getExportTerritoiresCsv =
               req,
               query,
             );
-            item.CRAEnregistres = await getNombreCra(app, req)(query);
+            item.CRAEnregistres = await getNombreCra(query, app);
             item.personnesRecurrentes = await countPersonnesRecurrentes(
               app,
               req,
