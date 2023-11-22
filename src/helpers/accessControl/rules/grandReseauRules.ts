@@ -55,4 +55,7 @@ export default async function grandReseauRules(
       $in: conseillersIds,
     },
   });
+  can([action.read], ressource.conseillersRuptures, {
+    structureId: { $in: structuresIds },
+  });
 }
