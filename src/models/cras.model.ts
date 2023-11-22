@@ -12,7 +12,6 @@ export default function (app: Application): Model<any> {
   const modelName = 'cras';
   const mongooseClient: Mongoose = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const { DBRef } = mongoose.SchemaTypes;
 
   const ageSchema = new Schema(
     {
@@ -66,7 +65,7 @@ export default function (app: Application): Model<any> {
     {
       cra: { type: craSchema },
 
-      conseiller: { type: DBRef },
+      conseiller: { type: Schema.Types.Mixed },
 
       structure: { type: Schema.Types.Mixed },
 

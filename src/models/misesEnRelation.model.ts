@@ -11,12 +11,12 @@ const loaded = dbref.install(mongoose);
 export default function (app: Application): Model<any> {
   const modelName = 'misesEnRelation';
   const mongooseClient: Mongoose = app.get('mongooseClient');
-  const { DBRef } = mongoose.SchemaTypes;
+  const { Schema } = mongooseClient;
   const schema = new mongooseClient.Schema<IMisesEnRelation>(
     {
-      conseiller: { type: DBRef },
+      conseiller: { type: Schema.Types.Mixed },
 
-      structure: { type: DBRef },
+      structure: { type: Schema.Types.Mixed },
 
       conseillerCreatedAt: { type: Date },
 
