@@ -112,6 +112,8 @@ export interface IMisesEnRelation {
 
   salaire: number | undefined;
 
+  banniereAjoutRoleCoordinateur: boolean | undefined;
+
   contratCoordinateur: boolean | undefined;
 }
 export interface IConseillers {

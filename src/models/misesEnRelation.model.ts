@@ -40,6 +40,8 @@ export default function (app: Application): Model<any> {
 
       salaire: { type: Number },
 
+      banniereAjoutRoleCoordinateur: { type: Boolean },
+
       contratCoordinateur: { type: Boolean },
     },
     {
