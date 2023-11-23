@@ -48,6 +48,11 @@ const candidatRelanceInvitation =
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
           { returnOriginal: false, rawResult: true },
         );
+      if (users.lastErrorObject.n === 0) {
+        res.status(409).json({
+          message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
+        });
+      }
       const mailerInstance = mailer(app);
       const message = creationCompteCandidat(app, mailerInstance, req);
       const errorSmtpMail = await message
