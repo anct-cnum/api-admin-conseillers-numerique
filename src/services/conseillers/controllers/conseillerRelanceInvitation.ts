@@ -63,6 +63,7 @@ const conseillerRelanceInvitation =
         res.status(409).json({
           message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
         });
+        return;
       }
       const mailerInstance = mailer(app);
       const message = relanceCreationCompteConseiller(app, mailerInstance, req);
