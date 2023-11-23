@@ -46,7 +46,7 @@ const candidatRelanceInvitation =
         .findOneAndUpdate(
           { _id: conseillerUser._id },
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
-          { returnOriginal: false },
+          { returnOriginal: false, rawResult: true },
         );
       const mailerInstance = mailer(app);
       const message = creationCompteCandidat(app, mailerInstance, req);
