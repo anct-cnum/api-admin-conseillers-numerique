@@ -9,13 +9,14 @@ import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
+import { getCoselec } from '../../utils';
 
 const { Pool } = require('pg');
 
 program.option('-id, --idPG <idPG>', 'idPG de la structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
-program.option('-fs, --franceService <franceService>', 'label France Service');
+program.option('-fs, --franceService', 'label France Service');
 program.option(
   '-st, --statut <statut>',
   'nouveau statut de la structure (ANNULEE, ABANDON)',
@@ -56,13 +57,32 @@ execute(__filename, async ({ app, logger, exit }) => {
     logger.error(`Structure non trouvée.`);
     exit();
   }
+  const coselec = getCoselec(structure);
+  const nbDePosteCoselec: number = coselec?.nombreConseillersCoselec ?? 0;
+  if (nbDePosteCoselec > Number(options.quota)) {
+    const nbMiseEnRelationRecruter: number = await app
+      .service(service.misesEnRelation)
+      .Model.countDocuments({
+        statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
+        'structure.$id': structure._id,
+      });
+    if (nbMiseEnRelationRecruter > Number(options.quota)) {
+      logger.error(
+        'Le nombre de postes rendus ne peut pas être supérieur ou égal au nombre de conseillers en poste',
+      );
+      exit();
+      return;
+    }
+  }
   const updatedAt = new Date();
   const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
   const objectUpdated = {
     $set: {
       updatedAt,
       coselecAt: updatedAt,
-      estLabelliseFranceServices: 'NON',
+      ...(structure?.estLabelliseFranceServices !== 'OUI' && {
+        estLabelliseFranceServices: 'NON',
+      }),
     },
     $push: {
       coselec: {
@@ -77,7 +97,9 @@ execute(__filename, async ({ app, logger, exit }) => {
     $set: {
       'structureObj.updatedAt': updatedAt,
       'structureObj.coselecAt': updatedAt,
-      'structureObj.estLabelliseFranceServices': 'NON',
+      ...(structure?.estLabelliseFranceServices !== 'OUI' && {
+        'structureObj.estLabelliseFranceServices': 'NON',
+      }),
     },
     $push: {
       'structureObj.coselec': {
@@ -88,7 +110,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     },
   };
-  if (structure.statut === 'CREEE') {
+  if (Number(options.quota) > 0 && structure.statut !== 'VALIDATION_COSELEC') {
     Object.assign(objectUpdated.$set, {
       'conventionnement.statut':
         StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
@@ -104,19 +126,6 @@ execute(__filename, async ({ app, logger, exit }) => {
     Number(options.quota) === 0 &&
     structure.statut === 'VALIDATION_COSELEC'
   ) {
-    const nbMiseEnRelationRecruter = await app
-      .service(service.misesEnRelation)
-      .Model.countDocuments({
-        statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
-        'structure.$id': structure._id,
-      });
-    if (nbMiseEnRelationRecruter > 0) {
-      logger.error(
-        `La structure ${structure._id} possède des conseillers recrutés`,
-      );
-      exit();
-      return;
-    }
     if (!['ANNULEE', 'ABANDON'].includes(options.statut)) {
       logger.error(
         `Le statut ${options.statut} n'est pas valide pour cette structure`,

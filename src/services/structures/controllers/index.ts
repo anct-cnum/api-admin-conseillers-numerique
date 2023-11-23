@@ -20,6 +20,7 @@ import updateDemandeCoordinateurAvisPrefet from './updateDemandeCoordinateurAvis
 import closeBannerParcoursCoordinateur from './closeBannerParcoursCoordinateur';
 import updateDemandeCoordinateurRefusAvisAdmin from './updateDemandeCoordinateurRefusAvisAdmin';
 import updateDemandeCoordinateurValidAvisAdmin from './updateDemandeCoordinateurValidAvisAdmin';
+import addRoleCoordinateur from './addRoleCoordinateur';
 
 export {
   getStructures,
@@ -44,4 +45,5 @@ export {
   closeBannerParcoursCoordinateur,
   updateDemandeCoordinateurRefusAvisAdmin,
   updateDemandeCoordinateurValidAvisAdmin,
+  addRoleCoordinateur,
 };

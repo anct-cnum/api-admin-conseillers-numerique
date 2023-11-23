@@ -9,3 +9,10 @@ export interface IDepartement {
   dep_name: string;
   region_name: string;
 }
+
+export interface ITypeDossierDS {
+  type: string;
+  numero_demarche_reconventionnement: string;
+  numero_demarche_conventionnement: string;
+  categorie: [string];
+}

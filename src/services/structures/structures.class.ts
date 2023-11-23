@@ -24,6 +24,7 @@ import {
   closeBannerParcoursCoordinateur,
   updateDemandeCoordinateurRefusAvisAdmin,
   updateDemandeCoordinateurValidAvisAdmin,
+  addRoleCoordinateur,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -175,6 +176,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateAvenantRenduPoste(app),
+    );
+    app.patch(
+      '/structure/add-role-coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      addRoleCoordinateur(app),
     );
   }
 }
