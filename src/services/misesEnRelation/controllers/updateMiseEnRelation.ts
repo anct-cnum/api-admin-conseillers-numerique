@@ -155,7 +155,7 @@ const updateMiseEnRelation =
         );
       if (miseEnRelation.lastErrorObject.n === 0) {
         res.status(404).json({
-          message: "Le contrat n'a pas été mise à jour",
+          message: "Le contrat n'a pas été mis à jour",
         });
         return;
       }
