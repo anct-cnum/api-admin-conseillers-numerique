@@ -12,7 +12,6 @@ const loaded = dbref.install(mongoose);
 export default function (app: Application): Model<any> {
   const modelName = 'permanences';
   const mongooseClient: Mongoose = app.get('mongooseClient');
-  const { DBRef } = mongoose.SchemaTypes;
   const { Schema } = mongooseClient;
   const schema = new Schema<IPermanences>(
     {
@@ -40,7 +39,7 @@ export default function (app: Application): Model<any> {
 
       conseillersItinerants: [ObjectId],
 
-      structure: { type: DBRef },
+      structure: { type: Schema.Types.Mixed },
 
       updatedAt: { type: Date },
 
