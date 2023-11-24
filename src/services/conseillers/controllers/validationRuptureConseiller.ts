@@ -115,6 +115,17 @@ const updateCoordinateurRupture =
                       },
                     },
                   );
+                await app
+                  .service(service.misesEnRelation)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateMany(
+                    { 'conseiller.$id': conseillerCoordonnee._id },
+                    {
+                      $unset: {
+                        coordinateurs: '',
+                      },
+                    },
+                  );
               } else {
                 await app
                   .service(service.conseillers)
@@ -124,6 +135,19 @@ const updateCoordinateurRupture =
                     {
                       $pull: {
                         coordinateurs: {
+                          id: conseillerId,
+                        },
+                      },
+                    },
+                  );
+                await app
+                  .service(service.misesEnRelation)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateMany(
+                    { 'conseiller.$id': conseillerCoordonnee._id },
+                    {
+                      $pull: {
+                        'conseillerObj.coordinateurs': {
                           id: conseillerId,
                         },
                       },
