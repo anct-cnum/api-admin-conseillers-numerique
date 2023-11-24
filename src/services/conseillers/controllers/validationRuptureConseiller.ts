@@ -332,6 +332,52 @@ const validationRuptureConseiller =
         dateFinDeContrat,
         updatedAt,
       );
+      if (conseiller?.estCoordinateur) {
+        const structureUpdated = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: structure._id,
+              demandesCoordinateur: {
+                $elemMatch: {
+                  statut: 'validee',
+                  miseEnRelationId: miseEnRelation._id,
+                },
+              },
+            },
+            {
+              $unset: {
+                'demandesCoordinateur.$.miseEnRelationId': '',
+              },
+            },
+          );
+        if (structureUpdated.modifiedCount === 0) {
+          res.status(404).json({
+            message: "La structure n'a pas été mise à jour",
+          });
+          return;
+        }
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            {
+              'structure.$id': structure._id,
+              'structureObj.demandesCoordinateur': {
+                $elemMatch: {
+                  statut: 'validee',
+                  miseEnRelationId: miseEnRelation._id,
+                },
+              },
+            },
+            {
+              $unset: {
+                'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
+              },
+            },
+          );
+      }
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
         .service(service.users)
