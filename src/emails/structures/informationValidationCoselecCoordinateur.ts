@@ -14,6 +14,7 @@ export default function (app: Application, mailer) {
     return mailer.render(__dirname, templateName, {
       structure,
       nombreCoordinateursCoselec,
+      mail: app.get('smtp').replyTo,
     });
   };
 
