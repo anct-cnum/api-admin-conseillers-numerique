@@ -122,7 +122,7 @@ const updateCoordinateurRupture =
                     { 'conseiller.$id': conseillerCoordonnee._id },
                     {
                       $unset: {
-                        coordinateurs: '',
+                        'conseillerObj.coordinateurs': '',
                       },
                     },
                   );
