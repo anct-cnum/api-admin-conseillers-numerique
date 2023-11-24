@@ -136,7 +136,10 @@ const updateMiseEnRelation =
           });
           return;
         }
-        update.dossierIncompletRupture = true;
+        // Etat initiale: dossierIncompletRupture = false -> afin de définir le flag 'Nouvelle demande'
+        // Etat intermédiaire : dossierIncompletRupture = true -> afin de définir le flag 'En attente de document'
+        // Etat finale unset de dossierIncompletRupture -> afin de définir le flag 'Complet'
+        update.dossierIncompletRupture = false;
         update.emetteurRupture = {
           email: req.user.name,
           date: new Date(),

@@ -161,6 +161,9 @@ const filtrePiecesManquantes = (piecesManquantes: string) => {
     return { dossierIncompletRupture: true };
   }
   if (piecesManquantes === 'false') {
+    return { dossierIncompletRupture: false };
+  }
+  if (piecesManquantes === 'null') {
     return { dossierIncompletRupture: { $exists: false } };
   }
   return {};
