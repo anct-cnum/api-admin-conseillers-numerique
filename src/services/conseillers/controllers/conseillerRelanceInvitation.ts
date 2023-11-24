@@ -59,15 +59,16 @@ const conseillerRelanceInvitation =
             rawResult: true,
           },
         );
-      if (users.modifiedCount === 0) {
+      if (users.lastErrorObject.n === 0) {
         res.status(409).json({
           message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
         });
+        return;
       }
       const mailerInstance = mailer(app);
       const message = relanceCreationCompteConseiller(app, mailerInstance, req);
       const errorSmtpMail = await message
-        .send(users)
+        .send(users.value)
         .catch((errSmtp: Error) => {
           return errSmtp;
         });

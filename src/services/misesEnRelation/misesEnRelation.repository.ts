@@ -161,6 +161,9 @@ const filtrePiecesManquantes = (piecesManquantes: string) => {
     return { dossierIncompletRupture: true };
   }
   if (piecesManquantes === 'false') {
+    return { dossierIncompletRupture: false };
+  }
+  if (piecesManquantes === 'null') {
     return { dossierIncompletRupture: { $exists: false } };
   }
   return {};
@@ -291,6 +294,23 @@ const countConseillersRecrutees = async (
       statut: { $in: ['recrutee', 'finalisee'] },
     });
 
+const countCoordinateurRecrutees = async (
+  app: Application,
+  req: IRequest,
+  structureId: ObjectId,
+): Promise<number> =>
+  app
+    .service(service.misesEnRelation)
+    .Model.accessibleBy(req.ability, action.read)
+    .countDocuments({
+      'structure.$id': structureId,
+      statut: { $in: ['recrutee', 'finalisee'] },
+      $or: [
+        { contratCoordinateur: true },
+        { 'conseillerObj.estCoordinateur': true },
+      ],
+    });
+
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
@@ -307,5 +327,6 @@ export {
   totalHistoriqueContrat,
   totalContrat,
   countConseillersRecrutees,
+  countCoordinateurRecrutees,
   filtrePiecesManquantes,
 };

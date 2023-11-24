@@ -56,6 +56,11 @@ export default function (app: Application): Model<any> {
       dossier: Object,
       avisPrefet: String,
       statut: String,
+      emetteurValidation: Object,
+      banniereInformationAvisStructure: Boolean,
+      banniereValidationAvisPrefet: Boolean,
+      banniereValidationAvisAdmin: Boolean,
+      miseEnRelationId: { type: 'ObjectId' },
     },
     { _id: false, strict: false },
   );

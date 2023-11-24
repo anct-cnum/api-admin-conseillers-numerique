@@ -116,6 +116,7 @@ const getDetailStructureById =
             conventionnement: 1,
             demandesCoselec: 1,
             lastDemandeCoselec: { $arrayElemAt: ['$demandesCoselec', -1] },
+            demandesCoordinateur: 1,
           },
         },
       ]);
