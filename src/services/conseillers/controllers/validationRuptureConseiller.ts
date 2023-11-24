@@ -78,6 +78,110 @@ const conseillerRecruteReinscription =
     }
   };
 
+const updateCoordinateurRupture =
+  (app: Application, req: IRequest) =>
+  async (
+    conseillerId: ObjectId,
+    structureId: ObjectId,
+    miseEnRelationId: ObjectId,
+  ) => {
+    try {
+      const conseillers: IConseillers[] = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          coordinateurs: {
+            $elemMatch: {
+              id: conseillerId,
+            },
+          },
+        })
+        .select({ coordinateurs: 1 });
+      if (conseillers.length > 0) {
+        const promises: Promise<void>[] = [];
+        conseillers.forEach(async (conseillerCoordonnee: IConseillers) => {
+          // eslint-disable-next-line no-async-promise-executor
+          const p = new Promise<void>(async (resolve, reject) => {
+            try {
+              if (conseillerCoordonnee.coordinateurs.length === 1) {
+                await app
+                  .service(service.conseillers)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateOne(
+                    { _id: conseillerCoordonnee._id },
+                    {
+                      $unset: {
+                        coordinateurs: '',
+                      },
+                    },
+                  );
+              } else {
+                await app
+                  .service(service.conseillers)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateOne(
+                    { _id: conseillerCoordonnee._id },
+                    {
+                      $pull: {
+                        coordinateurs: {
+                          id: conseillerId,
+                        },
+                      },
+                    },
+                  );
+              }
+              resolve(p);
+            } catch (e) {
+              reject(e);
+            }
+          });
+          promises.push(p);
+        });
+        await Promise.allSettled(promises);
+      }
+      await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: structureId,
+            demandesCoordinateur: {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId,
+              },
+            },
+          },
+          {
+            $unset: {
+              'demandesCoordinateur.$.miseEnRelationId': '',
+            },
+          },
+        );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': structureId,
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId,
+              },
+            },
+          },
+          {
+            $unset: {
+              'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
+            },
+          },
+        );
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
 const updateConseillerRupture =
   (app, req) =>
   async (
@@ -333,50 +437,11 @@ const validationRuptureConseiller =
         updatedAt,
       );
       if (conseiller?.estCoordinateur) {
-        const structureUpdated = await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            {
-              _id: structure._id,
-              demandesCoordinateur: {
-                $elemMatch: {
-                  statut: 'validee',
-                  miseEnRelationId: miseEnRelation._id,
-                },
-              },
-            },
-            {
-              $unset: {
-                'demandesCoordinateur.$.miseEnRelationId': '',
-              },
-            },
-          );
-        if (structureUpdated.modifiedCount === 0) {
-          res.status(404).json({
-            message: "La structure n'a pas été mise à jour",
-          });
-          return;
-        }
-        await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateMany(
-            {
-              'structure.$id': structure._id,
-              'structureObj.demandesCoordinateur': {
-                $elemMatch: {
-                  statut: 'validee',
-                  miseEnRelationId: miseEnRelation._id,
-                },
-              },
-            },
-            {
-              $unset: {
-                'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
-              },
-            },
-          );
+        await updateCoordinateurRupture(app, req)(
+          conseiller._id,
+          structure._id,
+          miseEnRelation._id,
+        );
       }
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
