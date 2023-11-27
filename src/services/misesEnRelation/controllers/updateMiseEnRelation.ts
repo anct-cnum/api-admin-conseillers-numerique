@@ -137,9 +137,8 @@ const updateMiseEnRelation =
           return;
         }
         if (
-          miseEnRelationVerif?.dateFinDeContrat !== null &&
           new Date(req.body.dateRupture) >=
-            new Date(miseEnRelationVerif?.dateFinDeContrat)
+          new Date(miseEnRelationVerif?.dateFinDeContrat)
         ) {
           res.status(409).json({
             message:

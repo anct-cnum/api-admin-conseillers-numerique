@@ -293,7 +293,6 @@ const validationRuptureConseiller =
         return;
       }
       if (
-        miseEnRelation?.dateFinDeContrat !== null &&
         new Date(dateFinDeContrat) >= new Date(miseEnRelation?.dateFinDeContrat)
       ) {
         res.status(409).json({
