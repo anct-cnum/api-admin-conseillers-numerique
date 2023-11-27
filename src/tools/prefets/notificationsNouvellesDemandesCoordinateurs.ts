@@ -15,6 +15,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           statut: { $eq: 'en_cours' },
           avisPrefet: { $exists: false },
           mailSendDatePrefet: { $exists: false },
+          codeDepartement: { $ne: '00' }
         },
       },
     },
