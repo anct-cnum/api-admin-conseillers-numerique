@@ -135,6 +135,7 @@ const getConseillerById =
               dateFinFormation: 1,
               dateDisponibilite: 1,
               datePrisePoste: 1,
+              supHierarchique: 1,
               statut: 1,
               sexe: 1,
               structureId: 1,

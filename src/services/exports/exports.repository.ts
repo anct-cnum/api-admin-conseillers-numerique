@@ -738,10 +738,14 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
   try {
     const fileHeaders = [
       'Id conseiller',
-      'Id long de la structure',
       'Id de la structure',
       'Nom de la structure',
       'Code postal de la structure',
+      'Nom du supérieur hiérarchique',
+      'Prénom du supérieur hiérarchique',
+      'Email du supérieur hiérarchique',
+      'Fonction du supérieur hiérarchique',
+      'Téléphone du supérieur hiérarchique',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -765,10 +769,14 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
         ...misesEnRelation.map((miseEnRelation) =>
           [
             miseEnRelation.conseillerObj.idPG,
-            miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
             miseEnRelation.structureObj.nom?.replaceAll(/["',]/g, ' '),
             miseEnRelation.structureObj.codePostal,
+            miseEnRelation.conseillerObj?.supHierarchique?.nom,
+            miseEnRelation.conseillerObj?.supHierarchique?.prenom,
+            miseEnRelation.conseillerObj?.supHierarchique?.email,
+            miseEnRelation.conseillerObj?.supHierarchique?.fonction,
+            miseEnRelation.conseillerObj?.supHierarchique?.numeroTelephone,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
