@@ -51,4 +51,7 @@ export default async function grandReseauRules(
     },
   });
   can([action.read], ressource.statsTerritoires);
+  can([action.read], ressource.conseillersRuptures, {
+    structureId: { $in: structuresIds },
+  });
 }

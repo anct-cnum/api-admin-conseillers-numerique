@@ -10,55 +10,6 @@ const checkAccessRequestCras = async (app: Application, req: IRequest) =>
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const getConseillersIdsRecruterByStructure = async (
-  app: Application,
-  req: IRequest,
-  idStructure: ObjectId,
-) => {
-  const miseEnRelations = await app
-    .service(service.misesEnRelation)
-    .Model.accessibleBy(req.ability, action.read)
-    .find(
-      {
-        'structure.$id': idStructure,
-        statut: { $in: ['finalisee', 'nouvelle_rupture'] },
-      },
-      {
-        'conseillerObj._id': 1,
-        _id: 0,
-      },
-    );
-  const conseillerIds = [];
-  miseEnRelations.forEach((miseEnRelation) => {
-    conseillerIds.push(miseEnRelation?.conseillerObj._id);
-  });
-  return conseillerIds;
-};
-
-const getConseillersIdsRuptureByStructure = async (
-  app: Application,
-  req: IRequest,
-  idStructure: ObjectId,
-) => {
-  const conseillersRuptures = await app
-    .service(service.conseillersRuptures)
-    .Model.accessibleBy(req.ability, action.read)
-    .find(
-      {
-        structureId: idStructure,
-      },
-      {
-        conseillerId: 1,
-        _id: 0,
-      },
-    );
-  const conseillerIds = [];
-  conseillersRuptures.forEach((conseillerRupture) => {
-    conseillerIds.push(conseillerRupture?.conseillerId);
-  });
-  return conseillerIds;
-};
-
 const getNombreCras =
   (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
     app
@@ -156,6 +107,38 @@ const getCodesPostauxStatistiquesCras =
         },
       },
     ]);
+const getCodesPostauxStatistiquesCrasByStructure =
+  (app, checkAccess) => async (structureId: ObjectId) =>
+    app.service(service.cras).Model.aggregate([
+      {
+        $match: {
+          'structure.$id': { $eq: structureId },
+          'cra.codeCommune': { $ne: null },
+          $and: [checkAccess],
+        },
+      },
+      {
+        $group: {
+          _id: '$cra.codePostal',
+          villes: { $addToSet: '$cra.nomCommune' },
+          codeCommune: {
+            $addToSet: {
+              ville: '$cra.nomCommune',
+              codeCommune: '$cra.codeCommune',
+            },
+          },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          villes: '$villes',
+          codeCommune: '$codeCommune',
+        },
+      },
+    ]);
 
 const createArrayForFiltreCodePostaux = (
   listCodePostaux: Array<{
@@ -181,9 +164,8 @@ const createArrayForFiltreCodePostaux = (
 
 export {
   checkAccessRequestCras,
-  getConseillersIdsRecruterByStructure,
-  getConseillersIdsRuptureByStructure,
-  getStructuresIdsByTerritoire,
+  getCodesPostauxStatistiquesCrasByStructure,
+  getConseillersIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
   getNombreCrasByStructureId,
