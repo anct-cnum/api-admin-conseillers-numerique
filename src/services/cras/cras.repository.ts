@@ -165,7 +165,7 @@ const createArrayForFiltreCodePostaux = (
 export {
   checkAccessRequestCras,
   getCodesPostauxStatistiquesCrasByStructure,
-  getConseillersIdsByTerritoire,
+  getStructuresIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
   getNombreCrasByStructureId,
