@@ -10,12 +10,12 @@ import { informationNouvelleCandidatureCoordinateur } from '../../emails';
 execute(__filename, async ({ app, mailer, logger, exit }) => {
   const structures = await app.service(service.structures).Model.find(
     {
+      codeDepartement: { $ne: '00' },
       demandesCoordinateur: {
         $elemMatch: {
           statut: { $eq: 'en_cours' },
           avisPrefet: { $exists: false },
-          mailSendDatePrefet: { $exists: false },
-          codeDepartement: { $ne: '00' }
+          mailSendDatePrefet: { $exists: false }
         },
       },
     },
