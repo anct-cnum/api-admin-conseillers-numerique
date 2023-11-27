@@ -136,6 +136,17 @@ const updateMiseEnRelation =
           });
           return;
         }
+        if (
+          miseEnRelationVerif?.dateFinDeContrat !== null &&
+          new Date(req.body.dateRupture) >=
+            new Date(miseEnRelationVerif?.dateFinDeContrat)
+        ) {
+          res.status(400).json({
+            message:
+              'La date de rupture doit être antérieure à la date de fin contrat',
+          });
+          return;
+        }
         // Etat initiale: dossierIncompletRupture = false -> afin de définir le flag 'Nouvelle demande'
         // Etat intermédiaire : dossierIncompletRupture = true -> afin de définir le flag 'En attente de document'
         // Etat finale unset de dossierIncompletRupture -> afin de définir le flag 'Complet'

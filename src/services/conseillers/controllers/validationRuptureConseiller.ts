@@ -292,6 +292,16 @@ const validationRuptureConseiller =
         });
         return;
       }
+      if (
+        miseEnRelation?.dateFinDeContrat !== null &&
+        new Date(dateFinDeContrat) >= new Date(miseEnRelation?.dateFinDeContrat)
+      ) {
+        res.status(400).json({
+          message:
+            'La date de rupture doit être antérieure à la date de fin contrat',
+        });
+        return;
+      }
       if (!miseEnRelation.motifRupture) {
         res.status(409).json({
           message: 'Aucun motif de rupture renseigné',
