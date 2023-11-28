@@ -502,7 +502,7 @@ const formatAvenantForDossierConventionnement = (structures) =>
 const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
   structures
     .filter((structure) => structure?.demandesCoselec?.length > 0)
-    .map((structure) => {
+    .flatMap((structure) => {
       let avenants = [];
       if (type === 'avenantAjoutPoste') {
         avenants = structure.demandesCoselec.filter(
@@ -526,7 +526,7 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
       if (!avenants) {
         return [];
       }
-      avenants.map((avenant) => {
+      return avenants.map((avenant) => {
         const item = avenant;
         item.dateSorted = avenant.emetteurAvenant.date;
         item.typeConvention =
@@ -537,7 +537,6 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
 
         return item;
       });
-      return avenants;
     });
 
 const formatReconventionnementForDossierConventionnement = (
@@ -616,7 +615,6 @@ const sortHistoriqueDossierConventionnement = (
       structures,
       type,
     );
-    avenantSort = avenantSort.flat(1);
   }
   if (type === 'reconventionnement' || type === 'toutes') {
     reconventionnement = formatReconventionnementForDossierConventionnement(
