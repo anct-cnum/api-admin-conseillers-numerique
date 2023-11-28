@@ -28,7 +28,7 @@ const formatStatutDemandeCoordinateur = (statut: string) => {
   }
 };
 
-const filterAvisPrefet = (avisPrefet) => {
+const filterAvisPrefet = (avisPrefet: string | undefined) => {
   if (avisPrefet === undefined) {
     return {};
   }
@@ -38,7 +38,10 @@ const filterAvisPrefet = (avisPrefet) => {
   return { avisPrefet: { $eq: avisPrefet } };
 };
 
-const checkAvisPrefet = (filtreAvisPrefet: string, avisPrefet: string) => {
+const checkAvisPrefet = (
+  filtreAvisPrefet: string,
+  avisPrefet: string | undefined,
+) => {
   if (filtreAvisPrefet === 'sans-avis' && avisPrefet === undefined) {
     return true;
   }
