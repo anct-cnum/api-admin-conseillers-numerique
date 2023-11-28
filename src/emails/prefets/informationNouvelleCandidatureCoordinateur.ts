@@ -10,15 +10,15 @@ export default function (app: Application, mailer) {
 
   return {
     render,
-    send: async (demandeCoordinateurWithPrefets) => {
+    send: async (demandeCoordinateurPrefet) => {
       const onSuccess = async () => {
         await app.service(service.structures).Model.updateOne(
           {
-            _id: demandeCoordinateurWithPrefets.demandeCoordinateur.idStructure,
+            _id: demandeCoordinateurPrefet.demandeCoordinateur.idStructure,
             demandesCoordinateur: {
               $elemMatch: {
                 id: {
-                  $eq: demandeCoordinateurWithPrefets.demandeCoordinateur.id,
+                  $eq: demandeCoordinateurPrefet.demandeCoordinateur.id,
                 },
               },
             },
@@ -37,11 +37,11 @@ export default function (app: Application, mailer) {
       const onError = async (err: Error) => {
         await app.service(service.structures).Model.updateOne(
           {
-            _id: demandeCoordinateurWithPrefets.demandeCoordinateur.idStructure,
+            _id: demandeCoordinateurPrefet.demandeCoordinateur.idStructure,
             demandesCoordinateur: {
               $elemMatch: {
                 id: {
-                  $eq: demandeCoordinateurWithPrefets.demandeCoordinateur.id,
+                  $eq: demandeCoordinateurPrefet.demandeCoordinateur.id,
                 },
               },
             },
@@ -56,7 +56,7 @@ export default function (app: Application, mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(demandeCoordinateurWithPrefets.name, {
+        .sendEmail(demandeCoordinateurPrefet.name, {
           subject:
             'Nouvelle candidature pour un poste de Conseiller numérique coordinateur',
           body: await render(),

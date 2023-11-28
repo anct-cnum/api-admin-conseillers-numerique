@@ -60,42 +60,42 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       return item;
     });
   });
-  const demandesCoordinateursWithPrefets = demandesCoordinateurs.map(
+  const demandesCoordinateurPrefets = demandesCoordinateurs.flatMap(
     (demandeCoordinateur) => {
-      const prefet = prefets.find(
-        (pref) =>
-          pref.departement === demandeCoordinateur.codeDepartementStructure,
-      );
-      return {
-        ...prefet._doc,
-        demandeCoordinateur,
-      };
+      return prefets
+        .filter(
+          (prefet) =>
+            prefet.departement === demandeCoordinateur.codeDepartementStructure,
+        )
+        .map((prefet) => {
+          const item = prefet.toObject();
+          item.demandeCoordinateur = demandeCoordinateur;
+          return item;
+        });
     },
   );
   const messageAvisCandidaturePosteCoordinateur =
     informationNouvelleCandidatureCoordinateur(app, mailer);
   const promises: Promise<void>[] = [];
   let count = 0;
-  demandesCoordinateursWithPrefets.forEach(
-    async (demandeCoordinateurWithPrefet) => {
-      // eslint-disable-next-line no-async-promise-executor
-      const p = new Promise<void>(async (resolve, reject) => {
-        const errorSmtpMailCandidaturePosteCoordinateur =
-          await messageAvisCandidaturePosteCoordinateur
-            .send(demandeCoordinateurWithPrefet)
-            .catch((errSmtp: Error) => {
-              return errSmtp;
-            });
-        if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
-          reject();
-          return;
-        }
-        count += 1;
-        resolve(p);
-      });
-      promises.push(p);
-    },
-  );
+  demandesCoordinateurPrefets.forEach(async (demandeCoordinateurPrefet) => {
+    // eslint-disable-next-line no-async-promise-executor
+    const p = new Promise<void>(async (resolve, reject) => {
+      const errorSmtpMailCandidaturePosteCoordinateur =
+        await messageAvisCandidaturePosteCoordinateur
+          .send(demandeCoordinateurPrefet)
+          .catch((errSmtp: Error) => {
+            return errSmtp;
+          });
+      if (errorSmtpMailCandidaturePosteCoordinateur instanceof Error) {
+        reject();
+        return;
+      }
+      count += 1;
+      resolve(p);
+    });
+    promises.push(p);
+  });
   await Promise.allSettled(promises);
   logger.info(
     `Nombre de mails envoyés pour les notifications de candidature coordinateur : ${count}`,
