@@ -8,10 +8,14 @@ import {
   filterSearchBar,
   filterRegion,
   filterDepartement,
-  filterStatutAndAvisPrefetDemandesCoordinateur,
-  checkAvisPrefet,
 } from '../repository/structures.repository';
-import { getTimestampByDate } from '../../../utils';
+import {
+  ExtendedDemandesCoordinateur,
+  checkAvisPrefet,
+  sortDemandesCoordinateurs,
+  filterStatutAndAvisPrefetDemandesCoordinateur,
+} from '../repository/coordinateurs.repository';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const totalParStatutDemandesCoordinateur = async (
   app: Application,
@@ -142,13 +146,10 @@ const getDemandesCoordinateur =
         skip: 0,
       };
       const checkAccess = await checkAccessReadRequestStructures(app, req);
-      const structures = await getDemandesCoordo(app, checkAccess)(
-        statut,
-        search,
-        region,
-        departement,
-        avisPrefet,
-      );
+      const structures: IStructures[] = await getDemandesCoordo(
+        app,
+        checkAccess,
+      )(statut, search, region, departement, avisPrefet);
       const demandesCoordinateurs = structures.flatMap((structure) => {
         const structureFormat = structure;
         // si une structure possède deux demandes coordinateurs avec des statuts différents
@@ -168,7 +169,7 @@ const getDemandesCoordinateur =
             );
         }
         return structureFormat.demandesCoordinateur.map((demande) => {
-          const item = demande;
+          const item: ExtendedDemandesCoordinateur = demande;
           item.nomStructure = structure.nom;
           item.codePostal = structure.codePostal;
           item.idPG = structure.idPG;
@@ -177,34 +178,15 @@ const getDemandesCoordinateur =
           return item;
         });
       });
-      demandesCoordinateurs.sort((a, b) => {
-        if (nomOrdre === 'codePostal') {
-          if (a.codePostal < b.codePostal) {
-            return ordre < 0 ? 1 : -1;
-          }
-          if (a.codePostal > b.codePostal) {
-            return ordre;
-          }
-          return 0;
-        }
-        if (
-          getTimestampByDate(a.dossier.dateDeCreation) <
-          getTimestampByDate(b.dossier.dateDeCreation)
-        ) {
-          return ordre < 0 ? 1 : -1;
-        }
-        if (
-          getTimestampByDate(a.dossier.dateDeCreation) >
-          getTimestampByDate(b.dossier.dateDeCreation)
-        ) {
-          return ordre;
-        }
-        return 0;
-      });
-      items.total = demandesCoordinateurs.length;
+      const demandesCoordinateurSort = sortDemandesCoordinateurs(
+        demandesCoordinateurs,
+        nomOrdre,
+        ordre,
+      );
+      items.total = demandesCoordinateurSort.length;
       items.totalParDemandesCoordinateur =
         await totalParStatutDemandesCoordinateur(app, checkAccess);
-      items.data = demandesCoordinateurs.slice(
+      items.data = demandesCoordinateurSort.slice(
         (page - 1) * options.paginate.default,
         page * options.paginate.default,
       );
