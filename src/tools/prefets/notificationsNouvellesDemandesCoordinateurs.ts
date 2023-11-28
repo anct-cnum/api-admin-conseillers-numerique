@@ -53,7 +53,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           !demande?.mailSendDatePrefet,
       );
     return structureFormat.demandesCoordinateur.map((demande) => {
-      const item: any = demande.toObject();
+      const item = demande.toObject();
       item.idStructure = structure._id;
       item.codeDepartementStructure = structure.codeDepartement;
 
@@ -70,6 +70,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
         .map((prefet) => {
           const item = prefet.toObject();
           item.demandeCoordinateur = demandeCoordinateur;
+
           return item;
         });
     },
