@@ -52,12 +52,11 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           !demande?.avisPrefet &&
           !demande?.mailSendDatePrefet,
       );
-    return structureFormat.demandesCoordinateur.map((demande) =>
-      Object.assign(demande.toObject(), {
-        idStructure: structure._id,
-        codeDepartementStructure: structure.codeDepartement,
-      }),
-    );
+    return structureFormat.demandesCoordinateur.map((demande) => ({
+      ...demande._doc,
+      idStructure: structure._id,
+      codeDepartementStructure: structure.codeDepartement,
+    }));
   });
   const demandesCoordinateurPrefets = demandesCoordinateurs.flatMap(
     (demandeCoordinateur) =>
@@ -66,11 +65,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           (prefet) =>
             prefet.departement === demandeCoordinateur.codeDepartementStructure,
         )
-        .map((prefet) =>
-          Object.assign(prefet.toObject(), {
-            demandeCoordinateur,
-          }),
-        ),
+        .map((prefet) => ({ ...prefet._doc, demandeCoordinateur })),
   );
   const messageAvisCandidaturePosteCoordinateur =
     informationNouvelleCandidatureCoordinateur(app, mailer);
