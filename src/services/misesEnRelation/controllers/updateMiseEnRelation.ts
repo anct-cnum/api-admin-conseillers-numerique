@@ -7,7 +7,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
-import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/coordinateurs.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {

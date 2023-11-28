@@ -16,7 +16,7 @@ import {
   formatStatutDemandeCoordinateur,
   sortDemandesCoordinateurs,
   filterStatutAndAvisPrefetDemandesCoordinateur,
-} from '../../structures/repository/coordinateurs.repository';
+} from '../../conseillers/repository/coordinateurs.repository';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const getDemandesCoordo =

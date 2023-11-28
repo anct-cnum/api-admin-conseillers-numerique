@@ -13,7 +13,7 @@ import {
   filterIsRuptureMisesEnRelation,
   checkAccessReadRequestConseillers,
   filterDepartement,
-} from '../../conseillers/conseillers.repository';
+} from '../../conseillers/repository/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';

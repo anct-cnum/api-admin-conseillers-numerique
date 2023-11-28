@@ -9,7 +9,7 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
-import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/coordinateurs.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
 const getMiseEnRelationConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {

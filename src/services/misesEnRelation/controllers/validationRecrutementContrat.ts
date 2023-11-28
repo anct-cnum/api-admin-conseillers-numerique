@@ -11,7 +11,7 @@ import { IUser } from '../../../ts/interfaces/db.interfaces';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
-import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/coordinateurs.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');

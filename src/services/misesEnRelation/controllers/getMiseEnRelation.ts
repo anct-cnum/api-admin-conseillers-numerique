@@ -10,7 +10,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
-import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/coordinateurs.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
 const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {

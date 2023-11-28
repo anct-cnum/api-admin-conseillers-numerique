@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { checkAccessReadRequestConseillers } from '../conseillers.repository';
+import { checkAccessReadRequestConseillers } from '../repository/conseillers.repository';
 import {
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierDSAdmin,

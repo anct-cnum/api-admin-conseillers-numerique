@@ -14,7 +14,7 @@ import {
   checkAvisPrefet,
   sortDemandesCoordinateurs,
   filterStatutAndAvisPrefetDemandesCoordinateur,
-} from '../repository/coordinateurs.repository';
+} from '../../conseillers/repository/coordinateurs.repository';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const totalParStatutDemandesCoordinateur = async (

@@ -14,7 +14,7 @@ import {
   filterCv,
   filterDiplome,
   filterCCP1,
-} from '../conseillers.repository';
+} from '../repository/conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 

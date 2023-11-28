@@ -15,7 +15,7 @@ export interface ExtendedDemandesCoordinateur extends IDemandesCoordinateur {
   idStructure?: ObjectId;
 }
 
-const formatStatutDemandeCoordinateur = (statut: string) => {
+const formatStatutDemandeCoordinateur = (statut: string): string => {
   switch (statut) {
     case 'en_cours':
       return 'Nouvelle candidature';
@@ -41,7 +41,7 @@ const filterAvisPrefet = (avisPrefet: string | undefined) => {
 const checkAvisPrefet = (
   filtreAvisPrefet: string,
   avisPrefet: string | undefined,
-) => {
+): boolean => {
   if (filtreAvisPrefet === 'sans-avis' && avisPrefet === undefined) {
     return true;
   }
@@ -55,7 +55,7 @@ const sortDemandesCoordinateurs = (
   demandesCoordinateurs: ExtendedDemandesCoordinateur[],
   nomOrdre: string,
   ordre: number,
-) =>
+): ExtendedDemandesCoordinateur[] =>
   demandesCoordinateurs.sort((a, b) => {
     if (nomOrdre === 'codePostal') {
       if (a.codePostal < b.codePostal) {
