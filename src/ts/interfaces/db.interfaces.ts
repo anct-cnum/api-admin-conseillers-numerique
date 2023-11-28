@@ -405,6 +405,8 @@ export interface IDemandesCoordinateur {
   banniereValidationAvisAdmin?: boolean;
   miseEnRelationId?: ObjectId;
   mailSendDatePrefet?: Date;
+  mailErrorSentPrefet?: string;
+  mailErrorDetailSentPrefet?: string;
   emetteurValidation?: {
     date: Date;
     email: string;

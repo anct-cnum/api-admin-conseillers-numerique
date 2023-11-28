@@ -15,7 +15,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
         $elemMatch: {
           statut: { $eq: 'en_cours' },
           avisPrefet: { $exists: false },
-          mailSendDatePrefet: { $exists: false }
+          mailSendDatePrefet: { $exists: false },
         },
       },
     },
@@ -28,7 +28,9 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     exit();
     return;
   }
-  const departements = structures.map((structure) => structure.codeDepartement);
+  const departements = [
+    ...new Set(structures.map((structure) => structure.codeDepartement)),
+  ];
   const prefets = await app.service(service.users).Model.find(
     {
       departement: { $in: departements },
