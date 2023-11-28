@@ -10,7 +10,10 @@ import {
   countPersonnesAccompagnees,
   getTauxActivation,
 } from '../../statsTerritoires/statsTerritoires.repository';
-import { checkAccessRequestCras } from '../../cras/cras.repository';
+import {
+  checkAccessRequestCras,
+  getStructuresIdsByTerritoire,
+} from '../../cras/cras.repository';
 import { getNombreCra } from '../stats.repository';
 
 const getTotalDepartements =
@@ -175,7 +178,13 @@ const getStatsTerritoires =
 
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const item = { ...ligneStats };
+          const listStructureId = await getStructuresIdsByTerritoire(
+            territoire,
+            ligneStats[territoire],
+            app,
+          );
+          const item = ligneStats ?? {};
+          item.structureIds = listStructureId;
           item.personnesAccompagnees = 0;
           item.CRAEnregistres = 0;
           item.tauxActivation = getTauxActivation(
@@ -183,9 +192,9 @@ const getStatsTerritoires =
             item.cnfsActives,
           );
 
-          if (item.conseillerIds?.length > 0) {
+          if (item.structureIds?.length > 0) {
             const query = {
-              'conseiller.$id': { $in: item.conseillerIds },
+              'structure.$id': { $in: item.structureIds },
               'cra.dateAccompagnement': {
                 $gte: dateDebut,
                 $lte: dateFin,

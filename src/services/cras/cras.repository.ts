@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import dayjs from 'dayjs';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -54,16 +53,26 @@ const getNombreCrasByStructureId =
         'structure.$id': { $eq: structureId },
       });
 
-const getConseillersIdsByTerritoire = async (dateFin, type, idType, app) => {
-  const query = {
-    date: dayjs(dateFin).format('DD/MM/YYYY'),
-    [type]: idType,
+const getStructuresIdsByTerritoire = async (type, idType, app) => {
+  let query = {
+    statut: { $ne: 'CREEE' },
   };
-  const conseillersIds = await app
-    .service(service.statsTerritoires)
+  if (['978'].includes(idType)) {
+    query = {
+      ...query,
+      ...{ codeCom: { $eq: idType } },
+    };
+  } else {
+    query = {
+      ...query,
+      [type]: idType,
+    };
+  }
+  const structuresIds = await app
+    .service(service.structures)
     .Model.find(query)
-    .distinct('conseillerIds');
-  return conseillersIds;
+    .distinct('_id');
+  return structuresIds;
 };
 
 const getCodesPostauxStatistiquesCras =
@@ -156,7 +165,7 @@ const createArrayForFiltreCodePostaux = (
 export {
   checkAccessRequestCras,
   getCodesPostauxStatistiquesCrasByStructure,
-  getConseillersIdsByTerritoire,
+  getStructuresIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
   getNombreCrasByStructureId,
