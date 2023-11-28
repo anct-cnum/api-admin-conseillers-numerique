@@ -5,7 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from '../../stats/controllers/getStatsGlobales';
 import { generateCsvStatistiques } from '../exports.repository';
-import { getConseillersIdsByTerritoire } from '../../cras/cras.repository';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 import service from '../../../helpers/services';
 import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 import { validStatCsv } from '../../../schemas/stats.schemas';
@@ -13,7 +13,7 @@ import { formatDateGMT } from '../../../utils';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let { idType, nom, conseillerIds } = req.query;
+    let { idType, nom, structureIds } = req.query;
     const {
       codePostal,
       ville,
@@ -21,7 +21,7 @@ const getExportStatistiquesCsv =
       codeRegion,
       prenom,
       numeroDepartement,
-      structureIds,
+      conseillerIds,
     } = req.query;
     const { type } = req.query;
     const dateDebut = new Date(req.query.dateDebut);
@@ -122,19 +122,13 @@ const getExportStatistiquesCsv =
           break;
         case 'codeDepartement':
         case 'codeRegion':
-          conseillerIds = await getConseillersIdsByTerritoire(
-            dateFinFormat,
-            type,
-            idType,
-            app,
-          );
-
+          structureIds = await getStructuresIdsByTerritoire(type, idType, app);
           query = {
             'cra.dateAccompagnement': {
               $gte: dateDebutFormat,
               $lte: dateFinFormat,
             },
-            'conseiller.$id': { $in: conseillerIds },
+            'structure.$id': { $in: structureIds },
           };
           statistiques = await getStatsGlobales(
             query,

@@ -213,9 +213,8 @@ const getStructuresMisesEnRelations =
         items.total = totalMiseEnRelation[0]?.countMiseEnRelation;
         items.limit = options.paginate.default;
         items.skip = Number(skip);
-        items.coselec = getCoselec(structure);
       }
-
+      items.coselec = getCoselec(structure);
       return res.send(items);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

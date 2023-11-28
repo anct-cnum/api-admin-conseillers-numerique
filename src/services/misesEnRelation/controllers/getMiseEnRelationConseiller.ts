@@ -1,20 +1,22 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
-import {
-  getTypeDossierDemarcheSimplifiee,
-  getUrlDossierConventionnement,
-} from '../../structures/repository/reconventionnement.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
+import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
 
 const getMiseEnRelationConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
-
+    const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+      'demarche_simplifiee',
+    );
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -57,6 +59,7 @@ const getMiseEnRelationConseiller =
               typeDeContrat: 1,
               dateRupture: 1,
               motifRupture: 1,
+              contratCoordinateur: 1,
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',
@@ -88,9 +91,13 @@ const getMiseEnRelationConseiller =
         res.status(404).json({ message: 'Candidat non trouvé' });
         return;
       }
-      const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.entreprise?.forme_juridique,
-      );
+      const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
+        await checkQuotaRecrutementCoordinateur(
+          app,
+          req,
+          structure,
+          candidat[0]._id,
+        );
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -102,12 +109,15 @@ const getMiseEnRelationConseiller =
           dateFinDeContrat: candidat[0].dateFinDeContrat,
           salaire: candidat[0].salaire,
           typeDeContrat: candidat[0].typeDeContrat,
+          contratCoordinateur: candidat[0]?.contratCoordinateur,
+          quotaCoordinateur: quotaCoordinateurDisponible > 0,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
-        urlDossierConventionnement: getUrlDossierConventionnement(
-          structure.idPG,
-          typeStructure?.type,
+        urlDossierDS: getUrlDossierDepotPieceDS(
+          demandeCoordinateurValider,
+          candidat[0]?.contratCoordinateur,
+          structure,
           demarcheSimplifiee,
         ),
       };

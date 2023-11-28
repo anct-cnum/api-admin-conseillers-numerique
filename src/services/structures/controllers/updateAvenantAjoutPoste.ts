@@ -1,14 +1,15 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
+import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../repository/structures.repository';
+
+const { Pool } = require('pg');
 
 interface IUpdateStructureAvenant {
   $push?: {
@@ -20,6 +21,8 @@ interface IUpdateStructureAvenant {
     };
   };
   $set?: {
+    coselecAt?: Date;
+    updatedAt?: Date;
     'demandesCoselec.$.statut': string;
     'demandesCoselec.$.nombreDePostesAccordes'?: number;
     'demandesCoselec.$.banniereValidationAvenant'?: boolean;
@@ -36,15 +39,33 @@ interface IUpdateMiseEnRelationAvenant {
     };
   };
   $set?: {
+    'structureObj.coselecAt'?: Date;
+    'structureObj.updatedAt'?: Date;
     'structureObj.demandesCoselec.$.statut': string;
     'structureObj.demandesCoselec.$.nombreDePostesAccordes'?: number;
     'structureObj.demandesCoselec.$.banniereValidationAvenant'?: boolean;
   };
 }
 
+const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
+  try {
+    await pool.query(
+      `
+        UPDATE djapp_hostorganization
+        SET updated = $2
+        WHERE id = $1
+      `,
+      [idPG, datePG],
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const updateAvenantAjoutPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const pool = new Pool();
     const { statut, nbDePosteAccorder, nbDePosteCoselec } = req.body;
     const paramsUpdateCollectionStructure: IUpdateStructureAvenant = {};
     const paramsUpdateCollectionMiseEnRelation: IUpdateMiseEnRelationAvenant =
@@ -80,7 +101,11 @@ const updateAvenantAjoutPoste =
         return;
       }
       if (statut === 'POSITIF') {
+        const dateCoselec = new Date();
+        const datePG = dayjs(dateCoselec).format('YYYY-MM-DD');
         paramsUpdateCollectionStructure.$set = {
+          coselecAt: dateCoselec,
+          updatedAt: dateCoselec,
           'demandesCoselec.$.statut': 'validee',
           'demandesCoselec.$.nombreDePostesAccordes': Number(nbDePosteAccorder),
           'demandesCoselec.$.banniereValidationAvenant': true,
@@ -90,10 +115,12 @@ const updateAvenantAjoutPoste =
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',
-            insertedAt: new Date(),
+            insertedAt: dateCoselec,
           },
         };
         paramsUpdateCollectionMiseEnRelation.$set = {
+          'structureObj.coselecAt': dateCoselec,
+          'structureObj.updatedAt': dateCoselec,
           'structureObj.demandesCoselec.$.statut': 'validee',
           'structureObj.demandesCoselec.$.nombreDePostesAccordes':
             Number(nbDePosteAccorder),
@@ -104,19 +131,10 @@ const updateAvenantAjoutPoste =
             nombreConseillersCoselec:
               Number(nbDePosteAccorder) + Number(nbDePosteCoselec),
             avisCoselec: 'POSITIF',
-            insertedAt: new Date(),
+            insertedAt: dateCoselec,
           },
         };
-        if (
-          structure?.conventionnement?.statut ===
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-        ) {
-          paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
-            PhaseConventionnement.PHASE_2;
-          paramsUpdateCollectionMiseEnRelation.$push[
-            'structureObj.coselec'
-          ].phaseConventionnement = PhaseConventionnement.PHASE_2;
-        }
+        await updateStructurePG(pool)(structure.idPG, datePG);
       }
       if (statut === 'NÉGATIF') {
         paramsUpdateCollectionStructure.$set = {
@@ -141,6 +159,16 @@ const updateAvenantAjoutPoste =
             insertedAt: new Date(),
           },
         };
+      }
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+        paramsUpdateCollectionStructure.$push.coselec.phaseConventionnement =
+          PhaseConventionnement.PHASE_2;
+        Object.assign(
+          paramsUpdateCollectionMiseEnRelation.$push['structureObj.coselec'],
+          {
+            phaseConventionnement: PhaseConventionnement.PHASE_2,
+          },
+        );
       }
       const structureUpdated = await app
         .service(service.structures)

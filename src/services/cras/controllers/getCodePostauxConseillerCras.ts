@@ -12,8 +12,10 @@ import {
 const getCodePostauxConseillerCras =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
+      if (!ObjectId.isValid(req.query.id)) {
+        return res.status(400).json({ message: 'Id incorrect' });
+      }
       const idConseiller = new ObjectId(req.query.id);
-
       const checkAccess = checkAccessRequestCras(app, req);
       const listCodePostaux = await getCodesPostauxStatistiquesCras(
         app,

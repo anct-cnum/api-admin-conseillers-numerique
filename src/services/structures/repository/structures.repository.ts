@@ -1,8 +1,14 @@
 import { Application } from '@feathersjs/express';
+import { ObjectId } from 'mongodb';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { PhaseConventionnement } from '../../../ts/enum';
+import { StatutConventionnement } from '../../../ts/enum';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
+import { countCoordinateurRecrutees } from '../../misesEnRelation/misesEnRelation.repository';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -49,6 +55,48 @@ const filterSearchBar = (input: string) => {
     };
   }
   return {};
+};
+
+const checkStructurePhase2 = (statut: string) => {
+  if (statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ) {
+    return true;
+  }
+  if (statut === StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2) {
+    return true;
+  }
+  return false;
+};
+
+const checkQuotaRecrutementCoordinateur = async (
+  app: Application,
+  req: IRequest,
+  structure: IStructures,
+  idMiseEnRelation: ObjectId,
+) => {
+  const demandeCoordinateurValider: IDemandesCoordinateur[] | undefined =
+    structure?.demandesCoordinateur?.filter(
+      (demande) => demande.statut === 'validee',
+    );
+  if (demandeCoordinateurValider?.length > 0) {
+    const countCoordinateurs = await countCoordinateurRecrutees(
+      app,
+      req,
+      structure._id,
+    );
+    const quotaCoordinateurDisponible =
+      demandeCoordinateurValider.length - countCoordinateurs;
+    return {
+      demandeCoordinateurValider: demandeCoordinateurValider.find(
+        (demande) =>
+          demande?.miseEnRelationId?.toString() === idMiseEnRelation.toString(),
+      ),
+      quotaCoordinateurDisponible,
+    };
+  }
+  return {
+    demandeCoordinateurValider: undefined,
+    quotaCoordinateurDisponible: 0,
+  };
 };
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
@@ -112,41 +160,12 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const getConseillersValider = (conseillers) => {
-  const conseillersValiderReconventionnement = conseillers?.filter(
+const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
+  return conseillers.filter(
     (conseiller) =>
-      conseiller.statut === 'recrutee' &&
-      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2,
+      statuts.includes(conseiller.statut) &&
+      conseiller.phaseConventionnement === phase,
   );
-  const conseillersValiderConventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.statut === 'recrutee' &&
-      conseiller?.phaseConventionnement === undefined,
-  );
-  return {
-    conseillersValiderReconventionnement,
-    conseillersValiderConventionnement,
-  };
-};
-
-const getConseillersRecruter = (conseillers) => {
-  const conseillersRecruterConventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller?.phaseConventionnement === undefined &&
-      (conseiller.statut === 'finalisee' ||
-        conseiller.statut === 'nouvelle_rupture' ||
-        conseiller.statut === 'terminee'),
-  );
-  const conseillersRecruterReconventionnement = conseillers?.filter(
-    (conseiller) =>
-      conseiller.phaseConventionnement === PhaseConventionnement.PHASE_2 &&
-      (conseiller.statut === 'finalisee' ||
-        conseiller.statut === 'nouvelle_rupture'),
-  );
-  return {
-    conseillersRecruterConventionnement,
-    conseillersRecruterReconventionnement,
-  };
 };
 
 const filterAvisPrefet = (avisPrefet) => {
@@ -183,6 +202,16 @@ const filterStatutAndAvisPrefetDemandesCoordinateur = (
   };
 };
 
+const checkAvisPrefet = (filtreAvisPrefet: string, avisPrefet: string) => {
+  if (filtreAvisPrefet === 'sans-avis' && avisPrefet === undefined) {
+    return true;
+  }
+  if (avisPrefet === filtreAvisPrefet || filtreAvisPrefet === undefined) {
+    return true;
+  }
+  return false;
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -198,7 +227,9 @@ export {
   formatType,
   filterSortColonne,
   getNameStructure,
-  getConseillersValider,
-  getConseillersRecruter,
+  getConseillersByStatus,
   filterStatutAndAvisPrefetDemandesCoordinateur,
+  checkStructurePhase2,
+  checkAvisPrefet,
+  checkQuotaRecrutementCoordinateur,
 };

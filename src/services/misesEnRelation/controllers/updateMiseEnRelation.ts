@@ -7,6 +7,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -60,18 +61,64 @@ const updateMiseEnRelation =
           emetteurRupture: '',
           dateRupture: '',
           motifRupture: '',
+          dossierIncompletRupture: '',
         };
       }
       if (
         req.body.statut === 'interessee' &&
         miseEnRelationVerif.statut === 'recrutee'
       ) {
+        if (miseEnRelationVerif?.contratCoordinateur) {
+          const structureUpdated = await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateOne(
+              {
+                _id: structure._id,
+                demandesCoordinateur: {
+                  $elemMatch: {
+                    miseEnRelationId: miseEnRelationVerif._id,
+                  },
+                },
+              },
+              {
+                $unset: {
+                  'demandesCoordinateur.$.miseEnRelationId': '',
+                },
+              },
+            );
+          if (structureUpdated.modifiedCount === 0) {
+            res.status(400).json({
+              message: "la structure n'a pas pu être mise à jour",
+            });
+            return;
+          }
+          await app
+            .service(service.misesEnRelation)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateMany(
+              {
+                'structure.$id': structure._id,
+                'structureObj.demandesCoordinateur': {
+                  $elemMatch: {
+                    miseEnRelationId: miseEnRelationVerif._id,
+                  },
+                },
+              },
+              {
+                $unset: {
+                  'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
+                },
+              },
+            );
+        }
         remove = {
           dateDebutDeContrat: '',
           dateFinDeContrat: '',
           typeDeContrat: '',
           salaire: '',
           emetteurRecrutement: '',
+          contratCoordinateur: '',
         };
       }
       if (req.body.statut === 'nouvelle_rupture') {
@@ -89,12 +136,26 @@ const updateMiseEnRelation =
           });
           return;
         }
+        if (
+          new Date(req.body.dateRupture) >=
+          new Date(miseEnRelationVerif?.dateFinDeContrat)
+        ) {
+          res.status(409).json({
+            message:
+              'La date de rupture doit être antérieure à la date de fin contrat',
+          });
+          return;
+        }
+        // Etat initiale: dossierIncompletRupture = false -> afin de définir le flag 'Nouvelle demande'
+        // Etat intermédiaire : dossierIncompletRupture = true -> afin de définir le flag 'En attente de document'
+        // Etat finale unset de dossierIncompletRupture -> afin de définir le flag 'Complet'
+        update.dossierIncompletRupture = false;
         update.emetteurRupture = {
           email: req.user.name,
           date: new Date(),
         };
       }
-      const miseEnRelation: IMisesEnRelation = await app
+      const miseEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
@@ -103,9 +164,29 @@ const updateMiseEnRelation =
             $set: update,
             $unset: remove,
           },
-          { new: true },
+          { new: true, rawResult: true },
         );
-      res.status(200).json(miseEnRelation);
+      if (miseEnRelation.lastErrorObject.n === 0) {
+        res.status(404).json({
+          message: "Le contrat n'a pas été mis à jour",
+        });
+        return;
+      }
+      if (req.body.statut === 'interessee') {
+        const miseEnRelationFormat = miseEnRelation.value.toObject();
+        const { quotaCoordinateurDisponible } =
+          await checkQuotaRecrutementCoordinateur(
+            app,
+            req,
+            structure,
+            miseEnRelationVerif._id,
+          );
+        miseEnRelationFormat.quotaCoordinateur =
+          quotaCoordinateurDisponible > 0;
+        res.status(200).json({ miseEnRelation: miseEnRelationFormat });
+        return;
+      }
+      res.status(200).json({ miseEnRelation: miseEnRelation.value });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

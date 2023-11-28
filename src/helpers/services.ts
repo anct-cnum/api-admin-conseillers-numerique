@@ -9,6 +9,8 @@ const service = {
   permanences: 'permanences',
   conseillersSupprimes: 'conseillersSupprimes',
   conseillersRuptures: 'conseillersRuptures',
+  communes: 'communes',
+  qpv: 'qpv',
 };
 
 export default service;

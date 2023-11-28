@@ -96,6 +96,7 @@ const miseEnRelationConseillerStructure =
           'conseillerObj.prenom': 1,
           'conseillerObj._id': 1,
           reconventionnement: 1,
+          phaseConventionnement: 1,
           dateFinDeContrat: 1,
           dateDebutDeContrat: 1,
           typeDeContrat: 1,

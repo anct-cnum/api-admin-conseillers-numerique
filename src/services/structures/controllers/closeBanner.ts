@@ -8,15 +8,60 @@ import getDetailStructureById from './getDetailStructureById';
 
 const closeBanner =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type } = req.query;
+    const { type, conseillerId } = req.query;
     const filter = { _id: req.params.id };
 
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
-
+    const typeValidation = [
+      'reconventionnement',
+      'renouvellement',
+      'avenant',
+      'ajoutRoleCoordinateur',
+    ];
+    if (!typeValidation.includes(type)) {
+      res.status(400).json({ message: 'Type incorrect' });
+      return;
+    }
     try {
+      if (type === 'reconventionnement') {
+        const structure = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(req.params.id),
+            },
+            {
+              $set: {
+                'conventionnement.dossierReconventionnement.banniereValidation':
+                  false,
+              },
+            },
+          );
+        if (structure.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "La structure n'a pas été mise à jour" });
+          return;
+        }
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(
+            {
+              'structure.$id': new ObjectId(req.params.id),
+            },
+            {
+              $set: {
+                'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
+                  false,
+              },
+            },
+          );
+      }
       if (type === 'renouvellement') {
         const miseEnRelation = await app
           .service(service.misesEnRelation)
@@ -38,11 +83,8 @@ const closeBanner =
         }
 
         req.params.id = req?.user?.entity?.oid;
-        const structure = await getDetailStructureById(app)(req, res);
-        res.status(200).json(structure);
       }
-      // s'il s'agit d'un avenant de contrat
-      else {
+      if (type === 'avenant') {
         const getStructure = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
@@ -92,9 +134,23 @@ const closeBanner =
               arrayFilters: [{ 'elem.statut': 'validee' }],
             },
           );
-
-        await getDetailStructureById(app)(req, res);
       }
+
+      if (type === 'ajoutRoleCoordinateur' && conseillerId) {
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              'conseiller.$id': new ObjectId(conseillerId),
+              'structure.$id': new ObjectId(req.params.id),
+              statut: 'finalisee',
+            },
+            { $set: { banniereAjoutRoleCoordinateur: false } },
+          );
+      }
+
+      await getDetailStructureById(app)(req, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

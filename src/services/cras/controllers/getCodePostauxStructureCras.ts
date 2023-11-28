@@ -4,36 +4,23 @@ import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
 import {
-  getConseillersIdsRecruterByStructure,
-  getCodesPostauxStatistiquesCras,
+  getCodesPostauxStatistiquesCrasByStructure,
   checkAccessRequestCras,
   createArrayForFiltreCodePostaux,
-  getConseillersIdsRuptureByStructure,
 } from '../cras.repository';
 
 const getCodePostauxStructureCras =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idStructure = new ObjectId(req.query.id);
-
-      const conseillersIdsRecruter = await getConseillersIdsRecruterByStructure(
-        app,
-        req,
-        idStructure,
-      );
-      const conseillersIdsRupture = await getConseillersIdsRuptureByStructure(
-        app,
-        req,
-        idStructure,
-      );
-      const conseillersIds = conseillersIdsRecruter.concat(
-        conseillersIdsRupture,
-      );
+      if (!ObjectId.isValid(req.query.id)) {
+        return res.status(400).json({ message: 'Id incorrect' });
+      }
+      const structureId = new ObjectId(req.query.id);
       const checkAccess = checkAccessRequestCras(app, req);
-      const listCodePostaux = await getCodesPostauxStatistiquesCras(
+      const listCodePostaux = await getCodesPostauxStatistiquesCrasByStructure(
         app,
         checkAccess,
-      )(conseillersIds);
+      )(structureId);
 
       const listeDefinitive = createArrayForFiltreCodePostaux(listCodePostaux);
 

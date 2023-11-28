@@ -4,9 +4,12 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../conseillers.repository';
-import { getTypeDossierDemarcheSimplifiee } from '../../structures/repository/reconventionnement.repository';
+import {
+  getTypeDossierDemarcheSimplifiee,
+  getUrlDossierDSAdmin,
+} from '../../structures/repository/reconventionnement.repository';
 import { action } from '../../../helpers/accessControl/accessList';
-import { StatutConventionnement } from '../../../ts/enum';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getConseillerContratById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -72,10 +75,12 @@ const getConseillerContratById =
                     dateDebutDeContrat: 1,
                     typeDeContrat: 1,
                     motifRupture: 1,
+                    contratCoordinateur: 1,
                     dossierIncompletRupture: 1,
                     emetteurRupture: 1,
                     emetteurRenouvellement: 1,
                     salaire: 1,
+                    phaseConventionnement: 1,
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
                     'structureObj._id': 1,
@@ -153,23 +158,24 @@ const getConseillerContratById =
         .findOne({
           _id: new ObjectId(conseiller[0].contrat?.structureObj?._id),
         });
-      const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.unite_legale?.forme_juridique?.libelle,
-      );
-      if (typeDossierDs === null) {
+      const typeDossierDS: ITypeDossierDS | undefined =
+        getTypeDossierDemarcheSimplifiee(
+          structure?.insee?.unite_legale?.forme_juridique?.libelle,
+        );
+      if (typeDossierDS === null) {
         res.status(500).json({
           message: 'Erreur lors de la récupération du type de la structure',
         });
         return;
       }
-      if (
-        structure?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
-        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
-      } else {
-        conseiller[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
-      }
+      conseiller[0].url = getUrlDossierDSAdmin(
+        app,
+        structure,
+        conseiller[0].contrat?.contratCoordinateur,
+        conseiller[0].contrat?._id?.toString(),
+        typeDossierDS,
+      );
+
       res.status(200).json(conseiller[0]);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

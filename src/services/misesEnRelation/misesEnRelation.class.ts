@@ -12,8 +12,9 @@ import getHistoriqueContrats from './controllers/getHistoriqueContrats';
 import createContrat from './controllers/createContrat';
 import updateContrat from './controllers/updateContrat';
 import getMiseEnRelationConseiller from './controllers/getMiseEnRelationConseiller';
-import updateContratRecrutement from './controllers/updateContratRecrutement';
+import updateContratRecrutementStructure from './controllers/updateContratRecrutementStructure';
 import validationRecrutementContrat from './controllers/validationRecrutementContrat';
+import updateContratRecrutementAdmin from './controllers/updateContratRecrutementAdmin';
 
 export default class MisesEnRelation extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -43,10 +44,16 @@ export default class MisesEnRelation extends Service {
       createContrat(app),
     );
     app.patch(
-      '/recrutement/contrat/:id',
+      '/structure/recrutement/contrat/:id',
       authenticateMode(app),
       createAbilities(app),
-      updateContratRecrutement(app),
+      updateContratRecrutementStructure(app),
+    );
+    app.patch(
+      '/admin/recrutement/contrat/:idMiseEnRelation/:idConseiller',
+      authenticateMode(app),
+      createAbilities(app),
+      updateContratRecrutementAdmin(app),
     );
     app.patch(
       '/contrat/:id',

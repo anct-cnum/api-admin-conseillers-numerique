@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import dayjs from 'dayjs';
 import { action } from '../../helpers/accessControl/accessList';
 import service from '../../helpers/services';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
@@ -10,55 +9,6 @@ const checkAccessRequestCras = async (app: Application, req: IRequest) =>
     .service(service.cras)
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
-
-const getConseillersIdsRecruterByStructure = async (
-  app: Application,
-  req: IRequest,
-  idStructure: ObjectId,
-) => {
-  const miseEnRelations = await app
-    .service(service.misesEnRelation)
-    .Model.accessibleBy(req.ability, action.read)
-    .find(
-      {
-        'structure.$id': idStructure,
-        statut: { $in: ['finalisee', 'nouvelle_rupture'] },
-      },
-      {
-        'conseillerObj._id': 1,
-        _id: 0,
-      },
-    );
-  const conseillerIds = [];
-  miseEnRelations.forEach((miseEnRelation) => {
-    conseillerIds.push(miseEnRelation?.conseillerObj._id);
-  });
-  return conseillerIds;
-};
-
-const getConseillersIdsRuptureByStructure = async (
-  app: Application,
-  req: IRequest,
-  idStructure: ObjectId,
-) => {
-  const conseillersRuptures = await app
-    .service(service.conseillersRuptures)
-    .Model.accessibleBy(req.ability, action.read)
-    .find(
-      {
-        structureId: idStructure,
-      },
-      {
-        conseillerId: 1,
-        _id: 0,
-      },
-    );
-  const conseillerIds = [];
-  conseillersRuptures.forEach((conseillerRupture) => {
-    conseillerIds.push(conseillerRupture?.conseillerId);
-  });
-  return conseillerIds;
-};
 
 const getNombreCras =
   (app: Application, req: IRequest) => async (conseillerId: ObjectId) =>
@@ -103,16 +53,26 @@ const getNombreCrasByStructureId =
         'structure.$id': { $eq: structureId },
       });
 
-const getConseillersIdsByTerritoire = async (dateFin, type, idType, app) => {
-  const query = {
-    date: dayjs(dateFin).format('DD/MM/YYYY'),
-    [type]: idType,
+const getStructuresIdsByTerritoire = async (type, idType, app) => {
+  let query = {
+    statut: { $ne: 'CREEE' },
   };
-  const conseillersIds = await app
-    .service(service.statsTerritoires)
+  if (['978'].includes(idType)) {
+    query = {
+      ...query,
+      ...{ codeCom: { $eq: idType } },
+    };
+  } else {
+    query = {
+      ...query,
+      [type]: idType,
+    };
+  }
+  const structuresIds = await app
+    .service(service.structures)
     .Model.find(query)
-    .distinct('conseillerIds');
-  return conseillersIds;
+    .distinct('_id');
+  return structuresIds;
 };
 
 const getCodesPostauxStatistiquesCras =
@@ -121,6 +81,38 @@ const getCodesPostauxStatistiquesCras =
       {
         $match: {
           'conseiller.$id': { $in: conseillersId },
+          'cra.codeCommune': { $ne: null },
+          $and: [checkAccess],
+        },
+      },
+      {
+        $group: {
+          _id: '$cra.codePostal',
+          villes: { $addToSet: '$cra.nomCommune' },
+          codeCommune: {
+            $addToSet: {
+              ville: '$cra.nomCommune',
+              codeCommune: '$cra.codeCommune',
+            },
+          },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          villes: '$villes',
+          codeCommune: '$codeCommune',
+        },
+      },
+    ]);
+const getCodesPostauxStatistiquesCrasByStructure =
+  (app, checkAccess) => async (structureId: ObjectId) =>
+    app.service(service.cras).Model.aggregate([
+      {
+        $match: {
+          'structure.$id': { $eq: structureId },
           'cra.codeCommune': { $ne: null },
           $and: [checkAccess],
         },
@@ -172,9 +164,8 @@ const createArrayForFiltreCodePostaux = (
 
 export {
   checkAccessRequestCras,
-  getConseillersIdsRecruterByStructure,
-  getConseillersIdsRuptureByStructure,
-  getConseillersIdsByTerritoire,
+  getCodesPostauxStatistiquesCrasByStructure,
+  getStructuresIdsByTerritoire,
   getCodesPostauxStatistiquesCras,
   getNombreCras,
   getNombreCrasByStructureId,

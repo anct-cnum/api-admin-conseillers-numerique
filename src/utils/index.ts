@@ -57,8 +57,8 @@ const getLastCoselec = (structure) => {
   if ('coselec' in structure && structure.coselec !== null) {
     coselecs = structure.coselec.sort((a, b) =>
       a.numero !== null && b.numero !== null
-        ? ~~a.numero.replace('COSELEC ', '') -
-          ~~b.numero.replace('COSELEC ', '')
+        ? ~~a.numero?.replace('COSELEC ', '') -
+          ~~b.numero?.replace('COSELEC ', '')
         : -1,
     );
   }

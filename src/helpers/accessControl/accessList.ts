@@ -25,6 +25,8 @@ const ressource: Ressource = {
   permanences: 'permanences',
   conseillersSupprimes: 'conseillersSupprimes',
   conseillersRuptures: 'conseillersRuptures',
+  qpv: 'qpv',
+  communes: 'communes',
 };
 
 const functionnality: Functionnality = {

@@ -1,0 +1,31 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Nous avons le regret de vous informer que votre demande de poste de <strong>Conseiller
+              numérique coordinateur, n’a pas été retenue</strong> par l’ANCT.
+          </mj-text>
+          <%- include('../commun/justification-refus-candidature-coordinateur.mjml.ejs'); %>
+          <mj-text align="left">
+            Votre Préfecture de département se tient à votre disposition pour
+            répondre à l’ensemble de vos questions.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

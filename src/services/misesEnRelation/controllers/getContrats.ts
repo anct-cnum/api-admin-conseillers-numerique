@@ -152,6 +152,7 @@ const getMisesEnRelations =
           'conseillerObj.idPG': 1,
           'conseillerObj._id': 1,
           dossierIncompletRupture: 1,
+          contratCoordinateur: 1,
           statut: 1,
         },
       },

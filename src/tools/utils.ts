@@ -93,6 +93,7 @@ const execute = async (name: string, job: any) => {
     app,
     Sentry,
     graphQLClient,
+    demarcheSimplifiee,
   };
 
   try {

@@ -14,13 +14,17 @@ import {
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
-  decisionReconventionnement,
   createAvenant,
   closeBanner,
   updateAvenantAjoutPoste,
   updateAvenantRenduPoste,
   getDetailDemandeCoordinateur,
   getDemandesCoordinateur,
+  updateDemandeCoordinateurAvisPrefet,
+  closeBannerParcoursCoordinateur,
+  updateDemandeCoordinateurRefusAvisAdmin,
+  updateDemandeCoordinateurValidAvisAdmin,
+  addRoleCoordinateur,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -101,6 +105,30 @@ export default class Structures extends Service {
       createAbilities(app),
       getDetailDemandeCoordinateur(app),
     );
+    app.patch(
+      '/avis/prefet/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDemandeCoordinateurAvisPrefet(app),
+    );
+    app.patch(
+      '/avis/admin/refus/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDemandeCoordinateurRefusAvisAdmin(app),
+    );
+    app.patch(
+      '/avis/admin/valid/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDemandeCoordinateurValidAvisAdmin(app),
+    );
+    app.patch(
+      '/banner/coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerParcoursCoordinateur(app),
+    );
     app.get(
       '/conventions/',
       authenticateMode(app),
@@ -118,12 +146,6 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getDetailDossierConvention(app),
-    );
-    app.patch(
-      '/decision/reconventionnement/:id',
-      authenticateMode(app),
-      createAbilities(app),
-      decisionReconventionnement(app),
     );
     app.patch(
       '/reconventionnement',
@@ -154,6 +176,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateAvenantRenduPoste(app),
+    );
+    app.patch(
+      '/structure/add-role-coordinateur/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      addRoleCoordinateur(app),
     );
   }
 }

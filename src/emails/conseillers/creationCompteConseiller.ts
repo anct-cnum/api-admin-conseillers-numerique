@@ -35,8 +35,10 @@ export default function (app: Application, mailer) {
         await app.service(service.users).Model.updateOne(
           { _id: user._id },
           {
-            mailError: 'smtpError',
-            mailErrorDetail: err.message,
+            $set: {
+              mailError: 'smtpError',
+              mailErrorDetail: err.message,
+            },
           },
         );
         throw err;
@@ -46,7 +48,7 @@ export default function (app: Application, mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Veuillez activer votre compte Coop des Conseillers numériques France Services',
+            'Veuillez activer votre compte Coop des conseillers numériques',
           body: await render(user),
         })
         .then(onSuccess)

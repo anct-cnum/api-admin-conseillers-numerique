@@ -54,6 +54,7 @@
 		"@feathersjs/transport-commons": "^4.5.15",
 		"@sentry/node": "^7.59.3",
 		"@sentry/tracing": "^7.59.3",
+		"@turf/circle": "^6.5.0",
 		"@types/bcrypt": "^5.0.0",
 		"axios": "^1.4.0",
 		"bcrypt": "^5.1.0",

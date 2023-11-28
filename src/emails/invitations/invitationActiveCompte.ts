@@ -12,6 +12,7 @@ export default function (app: Application, mailer, req: IRequest = null) {
     return mailer.render(__dirname, templateName, {
       user,
       link: utils.getDashboardUrl(`/invitation/${user.token}`),
+      mail: app.get('smtp').replyTo,
     });
   };
 
@@ -82,7 +83,7 @@ export default function (app: Application, mailer, req: IRequest = null) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique France Services',
+            'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique',
           body: await render(user),
         })
         .then(onSuccess)

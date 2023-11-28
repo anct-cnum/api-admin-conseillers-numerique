@@ -2,25 +2,16 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import validDemandesCoordinateur from '../../../schemas/coordinateur.schemas';
+import { validDemandesCoordinateur } from '../../../schemas/coordinateur.schemas';
 import {
   checkAccessReadRequestStructures,
   filterSearchBar,
   filterRegion,
   filterDepartement,
   filterStatutAndAvisPrefetDemandesCoordinateur,
+  checkAvisPrefet,
 } from '../repository/structures.repository';
 import { getTimestampByDate } from '../../../utils';
-
-const checkAvisPrefet = (filtreAvisPrefet: string, avisPrefet: string) => {
-  if (filtreAvisPrefet === 'sans-avis' && avisPrefet === undefined) {
-    return true;
-  }
-  if (avisPrefet === filtreAvisPrefet || filtreAvisPrefet === undefined) {
-    return true;
-  }
-  return false;
-};
 
 const totalParStatutDemandesCoordinateur = async (
   app: Application,
@@ -160,6 +151,9 @@ const getDemandesCoordinateur =
       );
       let demandesCoordo = structures.map((structure) => {
         const structureFormat = structure;
+        // si une structure possède deux demandes coordinateurs avec des statuts différents
+        // la requête renvoie toute les demandes coordinateurs de la structure sans prendre en compte le filtre statut
+        // dans l'aggregate on ne peut pas récupérer seulement l'élément du tableau qui match avec le filtre
         if (statut === 'toutes') {
           structureFormat.demandesCoordinateur =
             structure.demandesCoordinateur.filter((demande) =>
@@ -176,7 +170,7 @@ const getDemandesCoordinateur =
         const demandesCoordinateur = structureFormat.demandesCoordinateur.map(
           (demande) => {
             const item = demande;
-            item.nom = structure.nom;
+            item.nomStructure = structure.nom;
             item.codePostal = structure.codePostal;
             item.idPG = structure.idPG;
             item.idStructure = structure._id;

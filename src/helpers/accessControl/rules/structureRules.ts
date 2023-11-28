@@ -35,6 +35,9 @@ export default async function structureRules(
       'entity.$id': user?.entity.oid,
     },
   );
+  can([action.read, action.update], ressource.users, {
+    'entity.$id': conseillersIds,
+  });
 
   can([action.read], ressource.cras, {
     'structure.$id': {
@@ -50,5 +53,13 @@ export default async function structureRules(
 
   can([action.read], ressource.conseillersRuptures, {
     structureId: user?.entity.oid,
+  });
+  can([action.read, action.update], ressource.users, {
+    'entity.$id': {
+      $in: conseillersIds,
+    },
+    roles: {
+      $in: ['conseiller'],
+    },
   });
 }

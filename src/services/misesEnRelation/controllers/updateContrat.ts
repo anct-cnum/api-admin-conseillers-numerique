@@ -32,13 +32,17 @@ const updateContrat =
         $set: {
           typeDeContrat,
           dateDebutDeContrat: new Date(dateDebutDeContrat),
-          salaire: Number(salaire.replace(',', '.')),
         },
       };
       if (dateFinDeContrat !== null) {
         contratUpdated.$set.dateFinDeContrat = new Date(dateFinDeContrat);
       } else {
         contratUpdated.$unset = { dateFinDeContrat: '' };
+      }
+      if (salaire) {
+        contratUpdated.$set.salaire = Number(salaire.replace(',', '.'));
+      } else {
+        contratUpdated.$unset = { salaire: '' };
       }
       const miseEnRelation = await app
         .service(service.misesEnRelation)

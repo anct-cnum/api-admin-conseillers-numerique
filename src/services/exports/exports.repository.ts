@@ -12,6 +12,7 @@ import {
   IUser,
 } from '../../ts/interfaces/db.interfaces';
 import {
+  checkStructurePhase2,
   formatAdresseStructure,
   formatQpv,
 } from '../structures/repository/structures.repository';
@@ -135,6 +136,45 @@ const generateCsvCandidatByStructure = async (
             miseEnrelation.conseillerObj?.aUneExperienceMedNum ? 'oui' : 'non',
             miseEnrelation.conseillerObj?.pix === undefined ? 'non' : 'oui',
             miseEnrelation.conseillerObj?.cv === undefined ? 'non' : 'oui',
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+
+const generateCsvCandidaturesCoordinateur = async (
+  candidaturesCoordinateurs,
+  res: Response,
+) => {
+  try {
+    const fileHeaders = [
+      'Id de la structure',
+      'Nom de la structure',
+      'Code postal',
+      'Numéro de dossier',
+      'Statut de la demande',
+      'Date de candidature',
+      'Avis préfet',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...candidaturesCoordinateurs.map((candidature) =>
+          [
+            candidature.idPG,
+            candidature.nomStructure,
+            candidature.codePostal,
+            candidature.dossier.numero,
+            candidature.statut,
+            formatDate(candidature.dossier.dateDeCreation),
+            candidature?.avisPrefet,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -623,7 +663,9 @@ const generateCsvTerritoires = async (
     const fileHeaders = [
       'Code',
       'Nom',
+      'CRA enregistrés',
       'Personnes accompagnées',
+      "Nombre d'accompagnement",
       'Dotation de conseillers',
       "CnFS activé sur l'espace coop",
       "CnFS en attente d'activation",
@@ -635,8 +677,10 @@ const generateCsvTerritoires = async (
         ...statsTerritoires.map((statsTerritoire) =>
           [
             ...codeAndNomTerritoire(territoire, statsTerritoire),
+            statsTerritoire.CRAEnregistres,
             statsTerritoire.personnesAccompagnees -
               statsTerritoire.personnesRecurrentes,
+            statsTerritoire.personnesAccompagnees,
             statsTerritoire.nombreConseillersCoselec,
             statsTerritoire.cnfsActives,
             statsTerritoire.cnfsInactives,
@@ -701,6 +745,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Nom',
       'Prénom',
       'Email Professionnelle',
+      'Compte Coop activé',
       'Téléphone professionnel',
       'Email personnelle',
       'Statut',
@@ -722,12 +767,16 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.conseillerObj.idPG,
             miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
-            miseEnRelation.structureObj.nom,
+            miseEnRelation.structureObj.nom?.replaceAll(/["',]/g, ' '),
             miseEnRelation.structureObj.codePostal,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
-              'compte COOP non créé',
+              `compte COOP non créé (${formatStatutMisesEnRelation(
+                miseEnRelation.statut,
+                miseEnRelation?.dossierIncompletRupture,
+              )})`,
+            miseEnRelation.conseillerObj?.mattermost?.login ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
             formatStatutMisesEnRelation(
@@ -774,6 +823,7 @@ const generateCsvListeStructures = async (structures, res: Response) => {
       'Zone rurale',
       'Nombre de CRA total cumulés',
       'Candidats recrutés',
+      'Conventionnement phase 2',
     ];
     res.write(
       [
@@ -795,6 +845,9 @@ const generateCsvListeStructures = async (structures, res: Response) => {
             formatQpv(structure?.qpvStatut),
             structure.craCount,
             `${structure.conseillersRecruter}/${structure.posteValiderCoselec}`,
+            checkStructurePhase2(structure?.conventionnement?.statut)
+              ? 'Oui'
+              : 'Non',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -827,7 +880,7 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
         fileHeaders.join(csvCellSeparator),
         ...gestionnaires.map((gestionnaire) =>
           [
-            gestionnaire._id,
+            gestionnaire.idStructure,
             `"${gestionnaire.roles.join(',')}"`,
             gestionnaire.name,
             gestionnaire.reseau,
@@ -960,6 +1013,7 @@ export {
   generateCsvConseillersWithoutCRA,
   generateCsvStructure,
   generateCsvDemandesRuptures,
+  generateCsvCandidaturesCoordinateur,
   generateCsvConseillersHub,
   generateCsvStatistiques,
   generateCsvTerritoires,

@@ -1,25 +1,28 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
-import {
-  getTypeDossierDemarcheSimplifiee,
-  getUrlDossierConventionnement,
-} from '../../structures/repository/reconventionnement.repository';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
+import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
 
 const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
-
+    const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+      'demarche_simplifiee',
+    );
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         return res.status(400).json({ message: 'Id incorrect' });
       }
-      const structure = await app
+      const structure: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne();
@@ -55,6 +58,7 @@ const getMiseEnRelation =
               dateFinDeContrat: 1,
               salaire: 1,
               typeDeContrat: 1,
+              contratCoordinateur: 1,
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',
@@ -81,9 +85,13 @@ const getMiseEnRelation =
       if (candidat.length === 0) {
         return res.status(404).json({ message: 'Candidat non trouvé' });
       }
-      const typeStructure = getTypeDossierDemarcheSimplifiee(
-        structure?.insee?.unite_legale?.forme_juridique?.libelle,
-      );
+      const { demandeCoordinateurValider, quotaCoordinateurDisponible } =
+        await checkQuotaRecrutementCoordinateur(
+          app,
+          req,
+          structure,
+          candidat[0]._id,
+        );
       const candidatFormat = {
         ...candidat[0],
         miseEnRelation: {
@@ -95,12 +103,15 @@ const getMiseEnRelation =
           dateFinDeContrat: candidat[0]?.dateFinDeContrat,
           salaire: candidat[0]?.salaire,
           typeDeContrat: candidat[0]?.typeDeContrat,
+          contratCoordinateur: candidat[0]?.contratCoordinateur,
+          quotaCoordinateur: quotaCoordinateurDisponible > 0,
         },
         _id: candidat[0].idConseiller,
         coselec: getCoselec(structure),
-        urlDossierConventionnement: getUrlDossierConventionnement(
-          structure.idPG,
-          typeStructure?.type,
+        urlDossierDS: getUrlDossierDepotPieceDS(
+          demandeCoordinateurValider,
+          candidat[0]?.contratCoordinateur,
+          structure,
           demarcheSimplifiee,
         ),
       };
@@ -112,7 +123,7 @@ const getMiseEnRelation =
       delete candidatFormat.dateFinDeContrat;
       delete candidatFormat.salaire;
       delete candidatFormat.typeDeContrat;
-
+      delete candidatFormat.contratCoordinateur;
       return res.status(200).json(candidatFormat);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

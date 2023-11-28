@@ -72,10 +72,9 @@ const getDetailDemandeCoordinateur =
         ?.slice(5)
         ?.filter(
           (champ) =>
-            champ.id !== 'Q2hhbXAtMzQ4MzAzOQ==' &&
             champ.id !== 'Q2hhbXAtMzI3MTQ1MA==' &&
             champ.id !== 'Q2hhbXAtMzI3MTQ0OQ==' &&
-            champ.id !== 'Q2hhbXAtMzI3MTQxNQ==',
+            champ.id !== 'Q2hhbXAtMzI3MTM1OQ==',
         );
       const structureFormat = structure.toObject();
       structureFormat.questionnaire = [];
@@ -89,10 +88,25 @@ const getDetailDemandeCoordinateur =
         if (champ?.stringValue === '') {
           Object.assign(champ, { stringValue: 'Sans réponse' });
         }
-        structureFormat.questionnaire.push({
-          question: champ.label,
-          reponse: champ.stringValue,
-        });
+        if (champ?.id === 'Q2hhbXAtMzI3MTQxOA==') {
+          structureFormat.questionnaire.push({
+            enoncer: champ.label,
+            reponse: champ.primaryValue,
+            files: champ?.files,
+          });
+          structureFormat.questionnaire.push({
+            enoncer:
+              'Opérez vous déjà une action de coordination sur les actions de médiation numérique de votre territoire ?',
+            reponse: champ.secondaryValue,
+            files: champ?.files,
+          });
+        } else {
+          structureFormat.questionnaire.push({
+            enoncer: champ.label,
+            reponse: champ.stringValue,
+            files: champ?.files,
+          });
+        }
       });
       res.status(200).json(structureFormat);
     } catch (error) {

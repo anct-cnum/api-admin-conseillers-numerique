@@ -6,7 +6,6 @@ import getStatsTerritoire from './getStatsTerritoire';
 import getStatsTerritoireCra from './getStatsTerritoireCra';
 import getStatsConseiller from './getStatsConseiller';
 import getStatsNationalesGrandReseau from './getStatsNationalesGrandReseau';
-import getStatsTerritoiresPrefet from './getStatsTerritoiresPrefet';
 import getStatsConseillerParcoursRecrutement from './getStatsConseillerParcoursRecrutement';
 
 export {
@@ -19,5 +18,4 @@ export {
   getStatsConseillerParcoursRecrutement,
   getDatasStructures,
   getStatsNationalesGrandReseau,
-  getStatsTerritoiresPrefet,
 };

@@ -6,6 +6,7 @@ import service from '../../../helpers/services';
 import { validTerritoireDetails } from '../../../schemas/territoires.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
 import { checkAccessRequestStatsTerritoires } from '../../statsTerritoires/statsTerritoires.repository';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 
 const getDepartement =
   (app: Application, req: IRequest) =>
@@ -73,15 +74,24 @@ const getStatsTerritoire =
       return;
     }
     try {
-      let territoire: any[];
+      let territoire: { structureIds: any[] };
       const checkRoleAccessStatsTerritoires =
         await checkAccessRequestStatsTerritoires(app, req);
+      const listStructureId = await getStructuresIdsByTerritoire(
+        typeTerritoire,
+        idTerritoire,
+        app,
+      );
       if (typeTerritoire === 'codeDepartement') {
         territoire = await getDepartement(app, req)(
           dateFinFormat,
           typeTerritoire,
           String(idTerritoire),
         );
+        territoire = {
+          ...territoire[`${'_doc'}`],
+          structureIds: listStructureId,
+        };
         res.status(200).json(territoire);
       } else if (typeTerritoire === 'codeRegion') {
         territoire = await getRegion(app, checkRoleAccessStatsTerritoires)(
@@ -89,7 +99,11 @@ const getStatsTerritoire =
           typeTerritoire,
           String(idTerritoire),
         );
-        res.status(200).json(territoire[0]);
+        territoire = {
+          ...territoire[`${'_doc'}`],
+          structureIds: listStructureId,
+        };
+        res.status(200).json(territoire);
       } else {
         res.status(400).json('le type de territoire est invalide');
       }

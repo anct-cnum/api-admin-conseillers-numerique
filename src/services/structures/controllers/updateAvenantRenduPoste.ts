@@ -5,10 +5,9 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { avenantRenduPoste } from '../../../schemas/structures.schemas';
-import {
-  PhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { PhaseConventionnement } from '../../../ts/enum';
+import { checkStructurePhase2 } from '../repository/structures.repository';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
 
 interface ICoselecObject {
   nombreConseillersCoselec: number;
@@ -72,11 +71,56 @@ const updateAvenantRenduPoste =
         avisCoselec: 'POSITIF',
         insertedAt: new Date(),
       };
-      if (
-        structure?.conventionnement?.statut ===
-        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-      ) {
+      const structureObject = {
+        'demandesCoselec.$.statut': 'validee',
+        'demandesCoselec.$.banniereValidationAvenant': true,
+      };
+      const structureObjectMiseEnRelation = {
+        'structureObj.demandesCoselec.$.statut': 'validee',
+        'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
+      };
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         coselecObject.phaseConventionnement = PhaseConventionnement.PHASE_2;
+      }
+      if (coselecObject.nombreConseillersCoselec === 0) {
+        Object.assign(structureObject, {
+          statut: 'ABANDON',
+          userCreated: false,
+        });
+        Object.assign(structureObjectMiseEnRelation, {
+          'structureObj.statut': 'ABANDON',
+          'structureObj.userCreated': false,
+        });
+        const userIds: IUser[] = await app
+          .service(service.users)
+          .Model.find({
+            'entity.$id': structure._id,
+            $and: [
+              { roles: { $elemMatch: { $eq: 'structure' } } },
+              { roles: { $elemMatch: { $eq: 'grandReseau' } } },
+            ],
+          })
+          .select({ _id: 1 });
+        if (userIds.length > 0) {
+          await app.service(service.users).Model.updateMany(
+            {
+              _id: { $in: userIds },
+            },
+            {
+              $unset: {
+                entity: '',
+              },
+              $pull: {
+                roles: { $in: ['structure', 'structure_coop'] },
+              },
+            },
+          );
+        }
+        await app.service(service.users).Model.deleteMany({
+          _id: { $nin: userIds },
+          'entity.$id': structure._id,
+          roles: { $in: ['structure'] },
+        });
       }
       const structureUpdated = await app
         .service(service.structures)
@@ -93,10 +137,7 @@ const updateAvenantRenduPoste =
             statut: 'VALIDATION_COSELEC',
           },
           {
-            $set: {
-              'demandesCoselec.$.statut': 'validee',
-              'demandesCoselec.$.banniereValidationAvenant': true,
-            },
+            $set: structureObject,
             $push: {
               coselec: coselecObject,
             },
@@ -121,10 +162,7 @@ const updateAvenantRenduPoste =
             'structureObj.statut': 'VALIDATION_COSELEC',
           },
           {
-            $set: {
-              'structureObj.demandesCoselec.$.statut': 'validee',
-              'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
-            },
+            $set: structureObjectMiseEnRelation,
             $push: {
               'structureObj.coselec': coselecObject,
             },

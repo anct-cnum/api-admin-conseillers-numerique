@@ -53,6 +53,12 @@ export interface IUser {
 
   mailErrorDetailSentCoselec?: string;
 
+  mailSentCoselecCoordinateurDate?: Date;
+
+  mailErrorSentCoselecCoordinateur?: string;
+
+  mailErrorDetailSentCoselecCoordinateur?: string;
+
   tokenCreatedAt?: Date;
 
   lastLogin?: Date;
@@ -105,6 +111,10 @@ export interface IMisesEnRelation {
   typeDeContrat: string | undefined;
 
   salaire: number | undefined;
+
+  banniereAjoutRoleCoordinateur: boolean | undefined;
+
+  contratCoordinateur: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -297,6 +307,13 @@ export interface IStructures {
     coordinates: number[];
   };
 
+  coordonneesInsee: {
+    type: string;
+    coordinates: number[];
+  };
+
+  adresseInsee2Ban: object;
+
   nomCommune: string;
 
   codeCommune: string;
@@ -355,6 +372,7 @@ export interface IStructures {
       nbPostesAttribuees: number;
       statut: string;
       dateDernierModification: Date;
+      banniereValidation?: boolean;
     };
     dossierConventionnement: {
       numero: number;
@@ -380,10 +398,18 @@ interface IDemandesCoselec {
   banniereValidationAvenant: boolean;
 }
 
-interface IDemandesCoordinateur {
+export interface IDemandesCoordinateur {
   id: ObjectId;
   statut: string;
   avisPrefet?: string;
+  banniereInformationAvisStructure?: boolean;
+  banniereValidationAvisPrefet?: boolean;
+  banniereValidationAvisAdmin?: boolean;
+  miseEnRelationId?: ObjectId;
+  emetteurValidation?: {
+    date: Date;
+    email: string;
+  };
   dossier: {
     numero: number;
     dateDeCreation: Date;
@@ -589,6 +615,32 @@ export interface IStatsConseillersCras {
   2022: [Object];
   2023: [Object];
   2024: [Object];
+}
+
+export interface ICommunes {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: number[];
+  };
+  properties: {
+    code: string;
+    nom: string;
+  };
+}
+
+export interface IQpv {
+  type: string;
+  properties: {
+    CODE_QP: string;
+    NOM_QP: string;
+    COMMUNE_QP: string;
+    correction?: string;
+  };
+  geometry: {
+    type: string;
+    coordinates: number[];
+  };
 }
 
 export function isArrayConseillers(item: any): item is IConseillers[] {

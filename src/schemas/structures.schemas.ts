@@ -91,6 +91,22 @@ const avenantRenduPoste = Joi.object({
     .error(new Error('Le nombre de postes coselec est invalide')),
 });
 
+const validExportCandidatsCoordinateurs = Joi.object({
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  statut: Joi.string().error(new Error('Le filtre statut est invalide')),
+  search: Joi.string().error(new Error('La recherche par nom est invalide')),
+  departement: Joi.string().error(
+    new Error('Le filtre département est invalide'),
+  ),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
+  avisPrefet: Joi.string().error(
+    new Error('Le filtre avis préfet est invalide'),
+  ),
+});
+
 export {
   validStructures,
   validExportStructures,
@@ -99,4 +115,5 @@ export {
   updateContact,
   avenantAjoutPoste,
   avenantRenduPoste,
+  validExportCandidatsCoordinateurs,
 };

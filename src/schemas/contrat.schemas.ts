@@ -31,9 +31,13 @@ const validCreationContrat = Joi.object({
     .required()
     .error(new Error('Le type de contrat est invalide')),
   salaire: Joi.string()
+    .allow(null, '')
     .regex(/^(\d+(?:[\\.\\,]\d*)?)$/)
     .required()
     .error(new Error('Le salaire du contrat est invalide')),
+  isRecrutementCoordinateur: Joi.boolean().error(
+    new Error('Le recrutement coordinateur est invalide'),
+  ),
 });
 
 const validHistoriqueContrat = Joi.object({

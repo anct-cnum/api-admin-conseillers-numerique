@@ -46,6 +46,18 @@ export default function (app: Application): Model<any> {
 
       mailSentDate: { type: Date },
 
+      mailSentCoselecDate: { type: Date },
+
+      mailErrorSentCoselec: { type: String },
+
+      mailErrorDetailSentCoselec: { type: String },
+
+      mailSentCoselecCoordinateurDate: { type: Date },
+
+      mailErrorSentCoselecCoordinateur: { type: String },
+
+      mailErrorDetailSentCoselecCoordinateur: { type: String },
+
       tokenCreatedAt: { type: Date },
 
       lastLogin: { type: Date },

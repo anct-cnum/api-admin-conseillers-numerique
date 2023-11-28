@@ -10,13 +10,17 @@ import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
-import decisionReconventionnement from './decisionReconventionnement';
 import closeBanner from './closeBanner';
 import createAvenant from './createAvenant';
 import updateAvenantAjoutPoste from './updateAvenantAjoutPoste';
 import updateAvenantRenduPoste from './updateAvenantRenduPoste';
 import getDetailDemandeCoordinateur from './getDetailDemandeCoordinateur';
 import getDemandesCoordinateur from './getDemandesCoordinateur';
+import updateDemandeCoordinateurAvisPrefet from './updateDemandeCoordinateurAvisPrefet';
+import closeBannerParcoursCoordinateur from './closeBannerParcoursCoordinateur';
+import updateDemandeCoordinateurRefusAvisAdmin from './updateDemandeCoordinateurRefusAvisAdmin';
+import updateDemandeCoordinateurValidAvisAdmin from './updateDemandeCoordinateurValidAvisAdmin';
+import addRoleCoordinateur from './addRoleCoordinateur';
 
 export {
   getStructures,
@@ -31,11 +35,15 @@ export {
   getDossiersConvention,
   getDetailDossierConvention,
   getHistoriqueDossiersConvention,
-  decisionReconventionnement,
   closeBanner,
   createAvenant,
   updateAvenantAjoutPoste,
   updateAvenantRenduPoste,
   getDetailDemandeCoordinateur,
   getDemandesCoordinateur,
+  updateDemandeCoordinateurAvisPrefet,
+  closeBannerParcoursCoordinateur,
+  updateDemandeCoordinateurRefusAvisAdmin,
+  updateDemandeCoordinateurValidAvisAdmin,
+  addRoleCoordinateur,
 };

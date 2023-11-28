@@ -10,8 +10,16 @@ import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
 } from '../../../ts/interfaces/global.interfaces';
-import { checkAccessReadRequestStructures } from './structures.repository';
+import {
+  checkAccessReadRequestStructures,
+  checkStructurePhase2,
+} from './structures.repository';
 import { getCoselecConventionnement, getTimestampByDate } from '../../../utils';
+import {
+  IDemandesCoordinateur,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const categoriesCorrespondances = require('../../../../datas/categorieFormCorrespondances.json');
 
@@ -136,6 +144,14 @@ const queryGetDossierDemarcheSimplifiee = () => gql`
     ... on MultipleDropDownListChamp {
       values
     }
+    ... on PieceJustificativeChamp {
+      id
+      label
+      files {
+        url
+        filename
+      }
+    }
   }
 `;
 
@@ -182,12 +198,6 @@ const getUrlDossierConventionnement = (
 };
 
 const filterStatut = (typeConvention: string) => {
-  if (typeConvention === 'reconventionnement') {
-    return {
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-    };
-  }
   if (typeConvention === 'conventionnement') {
     return {
       'conventionnement.statut':
@@ -219,10 +229,7 @@ const filterStatut = (typeConvention: string) => {
     $or: [
       {
         'conventionnement.statut': {
-          $in: [
-            StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-            StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-          ],
+          $eq: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
         },
       },
       {
@@ -252,12 +259,8 @@ const filterDateDemandeAndStatutHistorique = (
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
-      'conventionnement.statut': {
-        $in: [
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-          StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-        ],
-      },
+      'conventionnement.statut':
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
       'conventionnement.dossierReconventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
@@ -305,12 +308,8 @@ const filterDateDemandeAndStatutHistorique = (
   return {
     $or: [
       {
-        'conventionnement.statut': {
-          $in: [
-            StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-            StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-          ],
-        },
+        'conventionnement.statut':
+          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
         'conventionnement.dossierReconventionnement.dateDeCreation': {
           $gte: dateDebut,
           $lte: dateFin,
@@ -353,13 +352,6 @@ const filterDateDemandeAndStatutHistorique = (
 };
 
 const totalParConvention = async (app: Application, req: IRequest) => {
-  const reconventionnement = await app
-    .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      'conventionnement.statut':
-        StatutConventionnement.RECONVENTIONNEMENT_EN_COURS,
-    });
   const conventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
@@ -393,14 +385,10 @@ const totalParConvention = async (app: Application, req: IRequest) => {
   const totalAvenantRenduPoste =
     countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
-    conventionnement +
-    reconventionnement +
-    totalAvenantAjoutPoste +
-    totalAvenantRenduPoste;
+    conventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
 
   return {
     conventionnement,
-    reconventionnement,
     avenantAjoutPoste: totalAvenantAjoutPoste,
     avenantRenduPoste: totalAvenantRenduPoste,
     total,
@@ -417,12 +405,8 @@ const totalParHistoriqueConvention = async (
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': {
-        $in: [
-          StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-          StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ,
-        ],
-      },
+      'conventionnement.statut':
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
       'conventionnement.dossierReconventionnement.dateDeCreation': {
         $gte: dateDebut,
         $lte: dateFin,
@@ -558,10 +542,13 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
 
 const formatReconventionnementForDossierConventionnement = (
   structures,
-  regex: RegExp,
+  statutConventionnement,
 ) =>
   structures
-    .filter((structure) => structure?.conventionnement?.statut?.match(regex))
+    .filter(
+      (structure) =>
+        structure?.conventionnement?.statut === statutConventionnement,
+    )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
@@ -602,19 +589,8 @@ const sortDossierConventionnement = (
 ) => {
   let avenantSort: any = [];
   let conventionnement: any = [];
-  let reconventionnement: any = [];
   if (type.includes('avenant') || type === 'toutes') {
     avenantSort = formatAvenantForDossierConventionnement(structures);
-  }
-  if (type === 'reconventionnement' || type === 'toutes') {
-    const regex = new RegExp(
-      `${StatutConventionnement.RECONVENTIONNEMENT_EN_COURS}$`,
-      'i',
-    );
-    reconventionnement = formatReconventionnementForDossierConventionnement(
-      structures,
-      regex,
-    );
   }
   if (type === 'conventionnement' || type === 'toutes') {
     conventionnement = formatConventionnementForDossierConventionnement(
@@ -622,10 +598,7 @@ const sortDossierConventionnement = (
       StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
     );
   }
-  const structureFormat = avenantSort.concat(
-    reconventionnement,
-    conventionnement,
-  );
+  const structureFormat = avenantSort.concat(conventionnement);
 
   return sortArrayConventionnement(structureFormat, ordre);
 };
@@ -646,13 +619,9 @@ const sortHistoriqueDossierConventionnement = (
     avenantSort = avenantSort.flat(1);
   }
   if (type === 'reconventionnement' || type === 'toutes') {
-    const regex = new RegExp(
-      `(?:${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}|${StatutConventionnement.RECONVENTIONNEMENT_REFUSÉ})$`,
-      'i',
-    );
     reconventionnement = formatReconventionnementForDossierConventionnement(
       structures,
-      regex,
+      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
     );
   }
   if (type === 'conventionnement' || type === 'toutes') {
@@ -669,6 +638,59 @@ const sortHistoriqueDossierConventionnement = (
   return sortArrayConventionnement(structureFormat, ordre);
 };
 
+const getUrlDossierDepotPieceDS = (
+  demandeCoordinateurValider: IDemandesCoordinateur | undefined,
+  isRecrutementCoordinateur: boolean,
+  structure: IStructures,
+  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
+): string => {
+  const typeDossierDS: ITypeDossierDS | undefined =
+    getTypeDossierDemarcheSimplifiee(
+      structure?.insee?.unite_legale?.forme_juridique?.libelle,
+    );
+  if (demandeCoordinateurValider && isRecrutementCoordinateur) {
+    return `https://www.demarches-simplifiees.fr/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
+  }
+  if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+    return structure?.conventionnement?.dossierReconventionnement?.numero
+      ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`
+      : getUrlDossierReconventionnement(
+          structure.idPG,
+          typeDossierDS?.type,
+          demarcheSimplifiee,
+        );
+  }
+  return structure?.conventionnement?.dossierConventionnement?.numero
+    ? `https://www.demarches-simplifiees.fr/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`
+    : getUrlDossierConventionnement(
+        structure.idPG,
+        typeDossierDS?.type,
+        demarcheSimplifiee,
+      );
+};
+
+const getUrlDossierDSAdmin = (
+  app: Application,
+  structure: IStructures,
+  isRecrutementCoordinateur: boolean,
+  idMiseEnRelation: string | undefined,
+  typeDossierDS: ITypeDossierDS | undefined,
+): string => {
+  if (isRecrutementCoordinateur) {
+    const demandeCoordinateurValider = structure?.demandesCoordinateur?.find(
+      (demande) => demande?.miseEnRelationId?.toString() === idMiseEnRelation,
+    );
+    const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+      'demarche_simplifiee',
+    );
+    return `https://www.demarches-simplifiees.fr/procedures/${demarcheSimplifiee.numero_demarche_recrutement_coordinateur}/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
+  }
+  if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+    return `https://www.demarches-simplifiees.fr/procedures/${typeDossierDS?.numero_demarche_reconventionnement}/dossiers/${structure?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
+  }
+  return `https://www.demarches-simplifiees.fr/procedures/${typeDossierDS?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
+};
+
 export {
   queryGetDemarcheDemarcheSimplifiee,
   queryGetDossierDemarcheSimplifiee,
@@ -682,4 +704,6 @@ export {
   sortDossierConventionnement,
   sortHistoriqueDossierConventionnement,
   sortArrayConventionnement,
+  getUrlDossierDepotPieceDS,
+  getUrlDossierDSAdmin,
 };
