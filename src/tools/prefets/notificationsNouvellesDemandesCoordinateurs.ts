@@ -52,28 +52,25 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
           !demande?.avisPrefet &&
           !demande?.mailSendDatePrefet,
       );
-    return structureFormat.demandesCoordinateur.map((demande) => {
-      const item = demande.toObject();
-      item.idStructure = structure._id;
-      item.codeDepartementStructure = structure.codeDepartement;
-
-      return item;
-    });
+    return structureFormat.demandesCoordinateur.map((demande) =>
+      Object.assign(demande.toObject(), {
+        idStructure: structure._id,
+        codeDepartementStructure: structure.codeDepartement,
+      }),
+    );
   });
   const demandesCoordinateurPrefets = demandesCoordinateurs.flatMap(
-    (demandeCoordinateur) => {
-      return prefets
+    (demandeCoordinateur) =>
+      prefets
         .filter(
           (prefet) =>
             prefet.departement === demandeCoordinateur.codeDepartementStructure,
         )
-        .map((prefet) => {
-          const item = prefet.toObject();
-          item.demandeCoordinateur = demandeCoordinateur;
-
-          return item;
-        });
-    },
+        .map((prefet) =>
+          Object.assign(prefet.toObject(), {
+            demandeCoordinateur,
+          }),
+        ),
   );
   const messageAvisCandidaturePosteCoordinateur =
     informationNouvelleCandidatureCoordinateur(app, mailer);
