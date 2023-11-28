@@ -168,15 +168,16 @@ const getDemandesCoordinateur =
                 checkAvisPrefet(avisPrefet, demande.avisPrefet),
             );
         }
-        return structureFormat.demandesCoordinateur.map((demande) => {
-          const item: ExtendedDemandesCoordinateur = demande;
-          item.nomStructure = structure.nom;
-          item.codePostal = structure.codePostal;
-          item.idPG = structure.idPG;
-          item.idStructure = structure._id;
-
-          return item;
-        });
+        return structureFormat.demandesCoordinateur.map(
+          (demande) =>
+            ({
+              ...demande,
+              nomStructure: structure.nom,
+              codePostal: structure.codePostal,
+              idPG: structure.idPG,
+              idStructure: structure._id,
+            }) as ExtendedDemandesCoordinateur,
+        );
       });
       const demandesCoordinateurSort = sortDemandesCoordinateurs(
         demandesCoordinateurs,

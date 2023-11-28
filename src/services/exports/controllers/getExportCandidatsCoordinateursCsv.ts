@@ -98,15 +98,16 @@ const getExportCandidatsCoordinateursCsv =
                   checkAvisPrefet(avisPrefet, demande.avisPrefet),
               );
           }
-          return structureFormat.demandesCoordinateur.map((demande) => {
-            const item: ExtendedDemandesCoordinateur = demande;
-            item.nomStructure = structure.nom;
-            item.codePostal = structure.codePostal;
-            item.idPG = structure.idPG;
-            item.statut = formatStatutDemandeCoordinateur(demande.statut);
-
-            return item;
-          });
+          return structureFormat.demandesCoordinateur.map(
+            (demande) =>
+              ({
+                ...demande,
+                nomStructure: structure.nom,
+                codePostal: structure.codePostal,
+                idPG: structure.idPG,
+                statut: formatStatutDemandeCoordinateur(demande.statut),
+              }) as ExtendedDemandesCoordinateur,
+          );
         },
       );
       const demandesCoordinateurSort = sortDemandesCoordinateurs(
