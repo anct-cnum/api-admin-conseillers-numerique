@@ -526,17 +526,17 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
       if (!avenants) {
         return [];
       }
-      return avenants.map((avenant) => {
-        const item = avenant;
-        item.dateSorted = avenant.emetteurAvenant.date;
-        item.typeConvention =
-          item.type === 'retrait' ? 'avenantRenduPoste' : 'avenantAjoutPoste';
-        item.idPG = structure.idPG;
-        item.nom = structure.nom;
-        item.idStructure = structure._id;
-
-        return item;
-      });
+      return avenants.map((avenant) => ({
+        ...avenant,
+        dateSorted: avenant.emetteurAvenant.date,
+        typeConvention:
+          avenant.type === 'retrait'
+            ? 'avenantRenduPoste'
+            : 'avenantAjoutPoste',
+        idPG: structure.idPG,
+        nom: structure.nom,
+        idStructure: structure._id,
+      }));
     });
 
 const formatReconventionnementForDossierConventionnement = (
