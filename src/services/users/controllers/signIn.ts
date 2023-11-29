@@ -5,7 +5,7 @@ import {
   createAccessToken,
   createRefreshToken,
 } from '../../../helpers/auth/createTokens';
-import { IUser } from '../../../ts/interfaces/db.interfaces';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 
 const allowedRoles = [
@@ -123,7 +123,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             )
             .select({ password: 0, refreshToken: 0 });
           if (user.roles.includes('structure')) {
-            const structure = await app
+            const structure: IStructures = await app
               .service(service.structures)
               .Model.findOne(
                 { _id: user.entity.oid },
@@ -141,50 +141,16 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                   true,
               );
             if (countDemandesCoordinateurValider > 0) {
-              const coordinateurs = await app
+              const countCoordinateurs: number = await app
                 .service(service.conseillers)
-                .Model.aggregate([
-                  {
-                    $match: {
-                      structureId: structure._id,
-                      statut: 'RECRUTE',
-                      estCoordinateur: true,
-                    },
-                  },
-                  {
-                    $lookup: {
-                      from: 'users',
-                      let: { idConseiller: '$_id' },
-                      as: 'users',
-                      pipeline: [
-                        {
-                          $match: {
-                            $and: [
-                              {
-                                $expr: {
-                                  $eq: ['$$idConseiller', '$entity.oid'],
-                                },
-                              },
-                              {
-                                $expr: { $in: ['coordinateur_coop', '$roles'] },
-                              },
-                            ],
-                          },
-                        },
-                      ],
-                    },
-                  },
-                  {
-                    $group: {
-                      _id: null,
-                      count: { $sum: 1 },
-                    },
-                  },
-                ]);
-              const countCoordinateur =
-                coordinateurs.length > 0 ? coordinateurs[0].count : 0;
+                .Model.countDocuments({
+                  structureId: structure._id,
+                  statut: 'RECRUTE',
+                  estCoordinateur: true,
+                });
+
               user._doc.displayBannerPosteCoordinateurStructure =
-                countCoordinateur < countDemandesCoordinateurValider;
+                countCoordinateurs < countDemandesCoordinateurValider;
             }
             if (demandesCoordinateurBannerInformation?.length > 0) {
               user._doc.demandesCoordinateurBannerInformation =

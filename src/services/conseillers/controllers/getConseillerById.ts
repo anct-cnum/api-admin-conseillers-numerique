@@ -144,7 +144,6 @@ const getConseillerById =
               pix: 1,
               distanceMax: 1,
               estCoordinateur: 1,
-              listeSubordonnes: 1,
               emailPro: 1,
               misesEnRelation: '$misesEnRelation',
               permanences: '$permanences',

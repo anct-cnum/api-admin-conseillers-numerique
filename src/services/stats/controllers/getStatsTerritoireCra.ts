@@ -1,10 +1,10 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { validTerritoireCra } from '../../../schemas/territoires.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
 import getStatsGlobales from './getStatsGlobales';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 
 const getStatsTerritoireCra =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -12,9 +12,10 @@ const getStatsTerritoireCra =
     const dateDebut: Date = new Date(req.query.dateDebut);
     dateDebut.setUTCHours(0, 0, 0, 0);
     dateFin.setUTCHours(23, 59, 59, 59);
-    const conseillerIds = JSON.parse(req.query?.conseillerIds as string);
+    const { typeTerritoire, idTerritoire } = req.query;
     const statsValidation = validTerritoireCra.validate({
-      conseillerIds,
+      typeTerritoire,
+      idTerritoire,
       dateDebut,
       dateFin,
     });
@@ -23,15 +24,19 @@ const getStatsTerritoireCra =
       res.status(400).end();
       return;
     }
+    const structureIds = await getStructuresIdsByTerritoire(
+      typeTerritoire,
+      idTerritoire,
+      app,
+    );
     try {
-      if (conseillerIds) {
-        const ids = conseillerIds.map((id: string) => new ObjectId(id));
+      if (structureIds) {
         const query = {
           'cra.dateAccompagnement': {
             $gte: dateDebut,
             $lte: dateFin,
           },
-          'conseiller.$id': { $in: ids },
+          'structure.$id': { $in: structureIds },
         };
         const stats = await getStatsGlobales(
           query,

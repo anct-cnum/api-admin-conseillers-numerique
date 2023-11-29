@@ -7,7 +7,7 @@ import service from '../../../helpers/services';
 import mailer from '../../../mailer';
 import {
   refusCandidaturePosteCoordinateur,
-  avisCandidaturePosteCoordinateurPrefet,
+  refusCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 
@@ -26,12 +26,20 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       $set: {
         'demandesCoordinateur.$.statut': 'refusee',
         'demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'demandesCoordinateur.$.emetteurValidation': {
+          email: req.user?.name,
+          date: new Date(),
+        },
       },
     };
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.statut': 'refusee',
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
+        'structureObj.demandesCoordinateur.$.emetteurValidation': {
+          email: req.user?.name,
+          date: new Date(),
+        },
       },
     };
     try {
@@ -125,7 +133,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
       if (prefets.length > 0) {
         const promises: Promise<void>[] = [];
         const messageAvisCandidaturePosteCoordinateur =
-          avisCandidaturePosteCoordinateurPrefet(mailerInstance);
+          refusCandidaturePosteCoordinateurPrefet(mailerInstance);
         await prefets.forEach(async (prefet) => {
           // eslint-disable-next-line no-async-promise-executor
           const p = new Promise<void>(async (resolve, reject) => {

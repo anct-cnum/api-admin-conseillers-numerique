@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvTerritoires } from '../exports.repository';
+import { getNombreCra } from '../../stats/stats.repository';
 import { validExportTerritoires } from '../../../schemas/territoires.schemas';
 import {
   checkAccessRequestStatsTerritoires,
@@ -11,6 +12,7 @@ import {
   getTauxActivation,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -112,15 +114,20 @@ const getExportTerritoiresCsv =
       }
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const item = { ...ligneStats };
+          const listStructureId = await getStructuresIdsByTerritoire(
+            territoire,
+            ligneStats[territoire],
+            app,
+          );
+          const item = ligneStats ?? {};
+          item.structureIds = listStructureId;
           item.tauxActivation = getTauxActivation(
             item.nombreConseillersCoselec,
             item.cnfsActives,
           );
-
-          if (item.conseillerIds?.length > 0) {
+          if (item.structureIds?.length > 0) {
             const query = {
-              'conseiller.$id': { $in: item.conseillerIds },
+              'structure.$id': { $in: item.structureIds },
               'cra.dateAccompagnement': {
                 $gte: dateDebut,
                 $lte: dateFin,
@@ -131,6 +138,7 @@ const getExportTerritoiresCsv =
               req,
               query,
             );
+            item.CRAEnregistres = await getNombreCra(query, app);
             item.personnesRecurrentes = await countPersonnesRecurrentes(
               app,
               req,
@@ -138,6 +146,7 @@ const getExportTerritoiresCsv =
             );
           } else {
             item.personnesAccompagnees = 0;
+            item.CRAEnregistres = 0;
             item.personnesRecurrentes = 0;
           }
 

@@ -8,9 +8,10 @@ import conseillerRuptureStructure from './structures/conseillerRuptureStructure'
 import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
 import informationValidationCoselecCoordinateur from './structures/informationValidationCoselecCoordinateur';
-import avisCandidaturePosteCoordinateurPrefet from './prefets/avisCandidaturePosteCoordinateurPrefet';
 import refusCandidaturePosteCoordinateur from './structures/refusCandidaturePosteCoordinateur';
 import validationCandidaturePosteCoordinateur from './structures/validationCandidaturePosteCoordinateur';
+import validationCandidaturePosteCoordinateurPrefet from './prefets/validationCandidaturePosteCoordinateurPrefet';
+import refusCandidaturePosteCoordinateurPrefet from './prefets/refusCandidaturePosteCoordinateurPrefet';
 
 export {
   creationCompteCandidat,
@@ -23,7 +24,8 @@ export {
   candidatSupprimePix,
   informationValidationCoselec,
   informationValidationCoselecCoordinateur,
-  avisCandidaturePosteCoordinateurPrefet,
   refusCandidaturePosteCoordinateur,
   validationCandidaturePosteCoordinateur,
+  validationCandidaturePosteCoordinateurPrefet,
+  refusCandidaturePosteCoordinateurPrefet,
 };

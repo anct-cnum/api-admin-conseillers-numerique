@@ -8,14 +8,19 @@ import getDetailStructureById from './getDetailStructureById';
 
 const closeBanner =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type } = req.query;
+    const { type, conseillerId } = req.query;
     const filter = { _id: req.params.id };
 
     if (!ObjectId.isValid(req.params.id)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
-    const typeValidation = ['reconventionnement', 'renouvellement', 'avenant'];
+    const typeValidation = [
+      'reconventionnement',
+      'renouvellement',
+      'avenant',
+      'ajoutRoleCoordinateur',
+    ];
     if (!typeValidation.includes(type)) {
       res.status(400).json({ message: 'Type incorrect' });
       return;
@@ -130,6 +135,21 @@ const closeBanner =
             },
           );
       }
+
+      if (type === 'ajoutRoleCoordinateur' && conseillerId) {
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              'conseiller.$id': new ObjectId(conseillerId),
+              'structure.$id': new ObjectId(req.params.id),
+              statut: 'finalisee',
+            },
+            { $set: { banniereAjoutRoleCoordinateur: false } },
+          );
+      }
+
       await getDetailStructureById(app)(req, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

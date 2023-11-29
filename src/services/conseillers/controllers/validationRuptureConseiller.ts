@@ -78,6 +78,134 @@ const conseillerRecruteReinscription =
     }
   };
 
+const updateCoordinateurRupture =
+  (app: Application, req: IRequest) =>
+  async (
+    conseillerId: ObjectId,
+    structureId: ObjectId,
+    miseEnRelationId: ObjectId,
+  ) => {
+    try {
+      const conseillers: IConseillers[] = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          coordinateurs: {
+            $elemMatch: {
+              id: conseillerId,
+            },
+          },
+        })
+        .select({ coordinateurs: 1 });
+      if (conseillers.length > 0) {
+        const promises: Promise<void>[] = [];
+        conseillers.forEach(async (conseillerCoordonnee: IConseillers) => {
+          // eslint-disable-next-line no-async-promise-executor
+          const p = new Promise<void>(async (resolve, reject) => {
+            try {
+              if (conseillerCoordonnee.coordinateurs.length === 1) {
+                await app
+                  .service(service.conseillers)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateOne(
+                    { _id: conseillerCoordonnee._id },
+                    {
+                      $unset: {
+                        coordinateurs: '',
+                      },
+                    },
+                  );
+                await app
+                  .service(service.misesEnRelation)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateMany(
+                    { 'conseiller.$id': conseillerCoordonnee._id },
+                    {
+                      $unset: {
+                        'conseillerObj.coordinateurs': '',
+                      },
+                    },
+                  );
+              } else {
+                await app
+                  .service(service.conseillers)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateOne(
+                    { _id: conseillerCoordonnee._id },
+                    {
+                      $pull: {
+                        coordinateurs: {
+                          id: conseillerId,
+                        },
+                      },
+                    },
+                  );
+                await app
+                  .service(service.misesEnRelation)
+                  .Model.accessibleBy(req.ability, action.update)
+                  .updateMany(
+                    { 'conseiller.$id': conseillerCoordonnee._id },
+                    {
+                      $pull: {
+                        'conseillerObj.coordinateurs': {
+                          id: conseillerId,
+                        },
+                      },
+                    },
+                  );
+              }
+              resolve(p);
+            } catch (e) {
+              reject(e);
+            }
+          });
+          promises.push(p);
+        });
+        await Promise.allSettled(promises);
+      }
+      await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: structureId,
+            demandesCoordinateur: {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId,
+              },
+            },
+          },
+          {
+            $unset: {
+              'demandesCoordinateur.$.miseEnRelationId': '',
+            },
+          },
+        );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': structureId,
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId,
+              },
+            },
+          },
+          {
+            $unset: {
+              'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
+            },
+          },
+        );
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
 const updateConseillerRupture =
   (app, req) =>
   async (
@@ -255,7 +383,6 @@ const validationRuptureConseiller =
         });
         return;
       }
-
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -272,7 +399,6 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-
       const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -280,19 +406,22 @@ const validationRuptureConseiller =
           'conseiller.$id': conseiller._id,
           'structure.$id': structure._id,
           statut: { $eq: 'nouvelle_rupture' },
-          dateFinDeContrat: {
-            $gte: new Date(dateFinDeContrat), // recherche de la nouvelle rupture qui a une fin de contrat >= à la date de rupture
-          },
         });
-
       if (!miseEnRelation) {
-        res.status(400).json({
-          message:
-            'La date de rupture doit être antérieure à la date de fin de contrat',
+        res.status(404).json({
+          message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
         });
         return;
       }
-
+      if (
+        new Date(dateFinDeContrat) >= new Date(miseEnRelation?.dateFinDeContrat)
+      ) {
+        res.status(409).json({
+          message:
+            'La date de rupture doit être antérieure à la date de fin contrat',
+        });
+        return;
+      }
       if (!miseEnRelation.motifRupture) {
         res.status(409).json({
           message: 'Aucun motif de rupture renseigné',
@@ -333,6 +462,13 @@ const validationRuptureConseiller =
         dateFinDeContrat,
         updatedAt,
       );
+      if (conseiller?.estCoordinateur) {
+        await updateCoordinateurRupture(app, req)(
+          conseiller._id,
+          structure._id,
+          miseEnRelation._id,
+        );
+      }
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
         .service(service.users)

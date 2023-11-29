@@ -45,55 +45,33 @@ const getStatsGlobales = async (
 
       conseillers = await getConseillers(query, ability, action, app);
     }
-    const nbAccompagnement = await getNombreCra(query, app);
-
-    const statsAccompagnements = await getStatsAccompagnements(
-      query,
-      ability,
-      action,
-      app,
-    );
-
-    const statsRecurrence = await getPersonnesRecurrentes(
-      query,
-      ability,
-      action,
-      app,
-    );
-
-    const statsTempsAccompagnement = await getStatsTempsAccompagnement(
-      query,
-      ability,
-      action,
-      app,
-    );
-
-    const statsActivites = await getStatsActivites(query, ability, action, app);
-
-    const statsThemes = await getStatsThemes(query, ability, action, app);
-
-    const statsLieux = await getStatsLieux(query, ability, action, app);
-
-    const statsDurees = await getStatsDurees(query, ability, action, app);
-
-    const statsAges = await getStatsAges(query, ability, action, app);
-
-    const statsUsagers = await getStatsStatuts(query, ability, action, app);
-
-    const statsReorientations = await getStatsReorientations(
-      query,
-      ability,
-      action,
-      app,
-    );
-
-    const statsEvolutions = await getStatsEvolutions(
-      query,
-      ability,
-      action,
-      app,
-    );
-
+    const [
+      nbAccompagnement,
+      statsAccompagnements,
+      statsRecurrence,
+      statsTempsAccompagnement,
+      statsActivites,
+      statsThemes,
+      statsLieux,
+      statsDurees,
+      statsAges,
+      statsUsagers,
+      statsReorientations,
+      statsEvolutions,
+    ] = await Promise.all([
+      getNombreCra(query, app),
+      getStatsAccompagnements(query, ability, action, app),
+      getPersonnesRecurrentes(query, ability, action, app),
+      getStatsTempsAccompagnement(query, ability, action, app),
+      getStatsActivites(query, ability, action, app),
+      getStatsThemes(query, ability, action, app),
+      getStatsLieux(query, ability, action, app),
+      getStatsDurees(query, ability, action, app),
+      getStatsAges(query, ability, action, app),
+      getStatsStatuts(query, ability, action, app),
+      getStatsReorientations(query, ability, action, app),
+      getStatsEvolutions(query, ability, action, app),
+    ]);
     const donneesStats = {
       nbAccompagnement,
       nbAteliers:
@@ -129,38 +107,39 @@ const getStatsGlobales = async (
     };
 
     const totalParticipants = await getStatsTotalParticipants(donneesStats);
-
-    donneesStats.nbUsagersBeneficiantSuivi = await getNbUsagersBeneficiantSuivi(
-      donneesStats,
-    );
-
+    const [
+      nbUsagersBeneficiantSuivi,
+      statsLieuxPourcentage,
+      statsTempsAccompagnementPourcentage,
+      statsAgesPourcentage,
+      statsUsagersPourcentage,
+    ] = await Promise.all([
+      getNbUsagersBeneficiantSuivi(donneesStats),
+      conversionPourcentage(
+        donneesStats.statsLieux,
+        donneesStats.nbAccompagnement,
+      ),
+      conversionPourcentage(
+        donneesStats.statsTempsAccompagnement,
+        donneesStats.statsTempsAccompagnement.find(
+          (temps) => temps.nom === 'total',
+        ).valeur,
+      ),
+      conversionPourcentage(donneesStats.statsAges, totalParticipants),
+      conversionPourcentage(donneesStats.statsUsagers, totalParticipants),
+    ]);
     donneesStats.tauxTotalUsagersAccompagnes = Math.round(
       await getStatsTauxAccompagnements(
-        donneesStats.nbUsagersBeneficiantSuivi,
+        nbUsagersBeneficiantSuivi,
         totalParticipants,
       ),
     );
-
+    donneesStats.nbUsagersBeneficiantSuivi = nbUsagersBeneficiantSuivi;
     // Conversion en %
-    donneesStats.statsLieux = await conversionPourcentage(
-      donneesStats.statsLieux,
-      donneesStats.nbAccompagnement,
-    );
-    donneesStats.statsTempsAccompagnement = await conversionPourcentage(
-      donneesStats.statsTempsAccompagnement,
-      donneesStats.statsTempsAccompagnement.find(
-        (temps) => temps.nom === 'total',
-      ).valeur,
-    );
-    donneesStats.statsAges = await conversionPourcentage(
-      donneesStats.statsAges,
-      totalParticipants,
-    );
-    donneesStats.statsUsagers = await conversionPourcentage(
-      donneesStats.statsUsagers,
-      totalParticipants,
-    );
-
+    donneesStats.statsLieux = statsLieuxPourcentage;
+    donneesStats.statsTempsAccompagnement = statsTempsAccompagnementPourcentage;
+    donneesStats.statsAges = statsAgesPourcentage;
+    donneesStats.statsUsagers = statsUsagersPourcentage;
     return donneesStats;
   } catch (error) {
     throw new Error(error);
