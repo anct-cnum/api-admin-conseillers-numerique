@@ -15,13 +15,6 @@ const dossierIncompletRuptureConseiller =
       });
       return;
     }
-    if (new Date(dateFinDeContrat) > new Date()) {
-      res.status(400).json({
-        message:
-          'La date de fin de contrat doit être antérieure à la date du jour',
-      });
-      return;
-    }
     try {
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
@@ -30,6 +23,9 @@ const dossierIncompletRuptureConseiller =
           {
             'conseiller.$id': new ObjectId(idConseiller),
             statut: 'nouvelle_rupture',
+            dateFinDeContrat: {
+              $gte: new Date(dateFinDeContrat), // recherche de la nouvelle rupture qui a une fin de contrat >= à la date de rupture
+            },
           },
           {
             $set: {
@@ -41,7 +37,13 @@ const dossierIncompletRuptureConseiller =
             new: true,
           },
         );
-
+      if (miseEnRelationUpdated === null) {
+        res.status(400).json({
+          message:
+            'La date de rupture doit être antérieure à la date de fin de contrat',
+        });
+        return;
+      }
       res.status(200).json(miseEnRelationUpdated);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

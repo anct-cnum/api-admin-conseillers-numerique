@@ -255,13 +255,7 @@ const validationRuptureConseiller =
         });
         return;
       }
-      if (new Date(dateFinDeContrat) > new Date()) {
-        res.status(400).json({
-          message:
-            'La date de fin de contrat doit être antérieure à la date du jour',
-        });
-        return;
-      }
+
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -278,6 +272,7 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
+
       const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -285,13 +280,19 @@ const validationRuptureConseiller =
           'conseiller.$id': conseiller._id,
           'structure.$id': structure._id,
           statut: { $eq: 'nouvelle_rupture' },
+          dateFinDeContrat: {
+            $gte: new Date(dateFinDeContrat), // recherche de la nouvelle rupture qui a une fin de contrat >= à la date de rupture
+          },
         });
+
       if (!miseEnRelation) {
-        res.status(404).json({
-          message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
+        res.status(400).json({
+          message:
+            'La date de rupture doit être antérieure à la date de fin de contrat',
         });
         return;
       }
+
       if (!miseEnRelation.motifRupture) {
         res.status(409).json({
           message: 'Aucun motif de rupture renseigné',
