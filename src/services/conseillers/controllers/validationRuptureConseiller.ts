@@ -383,6 +383,13 @@ const validationRuptureConseiller =
         });
         return;
       }
+      if (new Date(dateFinDeContrat) > new Date()) {
+        res.status(400).json({
+          message:
+            'La date de fin de contrat doit être antérieure à la date du jour',
+        });
+        return;
+      }
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
