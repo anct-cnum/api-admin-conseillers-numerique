@@ -52,11 +52,6 @@ const getConseillerById =
               from: 'misesEnRelation',
               let: {
                 idConseiller: '$_id',
-                statutMisesEnrelation: [
-                  'nouvelle_rupture',
-                  'finalisee',
-                  'finalisee_rupture',
-                ],
               },
               as: 'misesEnRelation',
               pipeline: [
@@ -74,6 +69,7 @@ const getConseillerById =
                             { $eq: ['finalisee', '$statut'] },
                             { $eq: ['nouvelle_rupture', '$statut'] },
                             { $eq: ['finalisee_rupture', '$statut'] },
+                            { $eq: ['terminee_naturel', '$statut'] },
                           ],
                         },
                       },
