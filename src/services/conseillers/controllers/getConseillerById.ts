@@ -69,7 +69,7 @@ const getConseillerById =
                             { $eq: ['finalisee', '$statut'] },
                             { $eq: ['nouvelle_rupture', '$statut'] },
                             { $eq: ['finalisee_rupture', '$statut'] },
-                            { $eq: ['terminee_naturel', '$statut'] },
+                            { $eq: ['terminee_naturelle', '$statut'] },
                           ],
                         },
                       },
