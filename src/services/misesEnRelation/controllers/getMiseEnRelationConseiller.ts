@@ -8,8 +8,8 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
-import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
+import { getUrlDossierDepotPieceDS } from '../../structures/repository/demarchesSimplifiees.repository';
 
 const getMiseEnRelationConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {

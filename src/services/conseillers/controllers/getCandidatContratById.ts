@@ -4,11 +4,12 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
+
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 import {
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierDSAdmin,
-} from '../../structures/repository/reconventionnement.repository';
-import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
+} from '../../structures/repository/demarchesSimplifiees.repository';
 
 const getCandidatContratById =
   (app: Application) => async (req: IRequest, res: Response) => {

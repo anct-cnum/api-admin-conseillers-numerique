@@ -4,12 +4,12 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../repository/conseillers.repository';
+import { action } from '../../../helpers/accessControl/accessList';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 import {
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierDSAdmin,
-} from '../../structures/repository/reconventionnement.repository';
-import { action } from '../../../helpers/accessControl/accessList';
-import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
+} from '../../structures/repository/demarchesSimplifiees.repository';
 
 const getConseillerContratById =
   (app: Application) => async (req: IRequest, res: Response) => {

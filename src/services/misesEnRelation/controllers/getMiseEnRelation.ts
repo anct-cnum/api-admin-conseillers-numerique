@@ -9,8 +9,8 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
-import { getUrlDossierDepotPieceDS } from '../../structures/repository/reconventionnement.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
+import { getUrlDossierDepotPieceDS } from '../../structures/repository/demarchesSimplifiees.repository';
 
 const getMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
