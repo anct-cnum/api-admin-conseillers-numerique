@@ -3,65 +3,79 @@
 import fs from 'fs';
 import path from 'path';
 import execute from '../utils';
+import { getCoselec } from '../../utils';
 
 // ts-node src/tools/scripts/detect-structure-sans-coselec-active.ts
 
 execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
     const structures = await app.service('structures').Model.find({
-      $expr: {
-        $eq: [{ $arrayElemAt: ['$coselec.nombreConseillersCoselec', -1] }, 0],
-      },
-      statut: { $ne: 'ABANDON' },
+      statut: 'VALIDATION_COSELEC',
     });
 
-    if (structures.length === 0) {
+    const structuresATraiter = [];
+    for (const structure of structures) {
+      const coselec = getCoselec(structure);
+      const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
+      if (nombreConseillersCoselec === 0) {
+        logger.warn(
+          `La structure ${structure.idPG} n'a pas de conseiller COSELEC`,
+        );
+        structuresATraiter.push(structure);
+      }
+    }
+
+    if (structuresATraiter.length === 0) {
       logger.info('Aucune structure à traiter');
       return;
     }
 
-    logger.info(`Nombre de structures à traiter: ${structures.length}`);
+    logger.info(`Nombre de structures à traiter: ${structuresATraiter.length}`);
     const csvFilePath = path.join(
       __dirname,
-      `../../../datas/exports/structures-sans-coselec-${Date.now()}.csv`,
+      `../../../datas/exports/structures-sans-poste_coselec-${Date.now()}.csv`,
     );
     let csvBuild =
-      'ID; Nom de la Structure; Contrat(s) Finalisé(s); Contrat(s) en rupture; CDI; CDD\n';
-    const promises = [];
+      'ID structure; Nom de la Structure; Contrat(s) Finalisé(s); Contrat(s) en rupture; CDI; Autres; Non renseigné\n';
 
-    for (const structure of structures) {
-      const promise = app
-        .service('misesEnRelation')
-        .Model.find({
-          'structure.$id': structure._id,
-          statut: { $in: ['finalisee', 'nouvelle_rupture'] },
-        })
-        .then((misesEnRelation) => {
-          if (misesEnRelation) {
-            logger.warn(
-              `La structure ${structure.idPG} a une mise en relation finalisée ou en rupture, nous ne déclarons pas la structure comme inactive`,
-            );
-          }
-          const misesEnRelationFinalisee = misesEnRelation.filter(
-            (miseEnRelation) => miseEnRelation.statut === 'finalisee',
-          ).length;
-          const misesEnRelationNouvelleRupture = misesEnRelation.filter(
-            (miseEnRelation) => miseEnRelation.statut === 'nouvelle_rupture',
-          ).length;
-          const nombreCDI = misesEnRelation.filter(
-            (miseEnRelation) => miseEnRelation.typeDeContrat === 'CDI',
-          ).length;
-          const nombreCDD = misesEnRelation.filter(
-            (miseEnRelation) => miseEnRelation.typeDeContrat === 'CDD',
-          ).length;
-          return `${structure.idPG}; ${structure.nom}; ${misesEnRelationFinalisee}; ${misesEnRelationNouvelleRupture}; ${nombreCDI}; ${nombreCDD}\n`;
-        });
+    for (const structure of structuresATraiter) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const misesEnRelation = await app
+          .service('misesEnRelation')
+          .Model.find({
+            'structure.$id': structure._id,
+            statut: { $in: ['finalisee', 'nouvelle_rupture'] },
+          });
 
-      promises.push(promise);
+        if (misesEnRelation && misesEnRelation.length > 0) {
+          logger.warn(
+            `La structure sans poste ${structure.idPG} a une mise en relation finalisée ou en notification de rupture`,
+          );
+        }
+
+        const misesEnRelationFinalisee = misesEnRelation.filter(
+          (miseEnRelation) => miseEnRelation?.statut === 'finalisee',
+        ).length;
+        const misesEnRelationNouvelleRupture = misesEnRelation.filter(
+          (miseEnRelation) => miseEnRelation?.statut === 'nouvelle_rupture',
+        ).length;
+        const nombreCDI = misesEnRelation.filter(
+          (miseEnRelation) => miseEnRelation?.typeDeContrat === 'CDI',
+        ).length;
+        const autres = misesEnRelation.filter(
+          (miseEnRelation) => miseEnRelation?.typeDeContrat !== 'CDI',
+        ).length;
+        const nonRenseigne = misesEnRelation.filter(
+          (miseEnRelation) => !miseEnRelation?.typeDeContrat,
+        ).length;
+        csvBuild += `${structure.idPG};${structure.nom};${misesEnRelationFinalisee};${misesEnRelationNouvelleRupture};${nombreCDI};${autres};${nonRenseigne}\n`;
+      } catch (error) {
+        logger.error(
+          `Erreur lors du traitement de la structure ${structure.idPG}: ${error}`,
+        );
+      }
     }
-
-    const results = await Promise.all(promises);
-    csvBuild += results.join('');
     fs.writeFileSync(csvFilePath, csvBuild);
     logger.info(`Fichier CSV généré à l'emplacement: ${csvFilePath}`);
     exit();
