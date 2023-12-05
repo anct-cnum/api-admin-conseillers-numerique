@@ -101,12 +101,12 @@ const filterDiplome = (diplome: string) => {
 const filterCCP1 = (ccp1: string) => {
   if (ccp1 === 'true') {
     return {
-      statut: { $in: ['RECRUTE', 'RUPTURE'] },
+      statut: { $in: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   if (ccp1 === 'false') {
     return {
-      statut: { $nin: ['RECRUTE', 'RUPTURE'] },
+      statut: { $nin: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   return {};
@@ -133,24 +133,17 @@ const filterDepartement = (departement: string) => {
   return {};
 };
 
-const filtrePiecesManquantes = (piecesManquantes: boolean) => {
-  if (piecesManquantes === true) {
-    return { dossierIncompletRupture: true };
-  }
-  if (piecesManquantes === false) {
-    return { dossierIncompletRupture: false };
-  }
-  if (piecesManquantes === null) {
-    return { dossierIncompletRupture: { $exists: false } };
-  }
-  return {};
-};
+const filtrePiecesManquantes = (piecesManquantes: boolean) =>
+  piecesManquantes
+    ? { dossierIncompletRupture: true }
+    : { dossierIncompletRupture: { $exists: false } };
 
 const filterIsRuptureMisesEnRelation = (
   rupture: string,
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
   conseillerIdsRupture: ObjectId[],
+  conseillerTerminerNaturelle: ObjectId[],
   piecesManquantes: boolean,
 ) => {
   switch (rupture) {
@@ -166,6 +159,11 @@ const filterIsRuptureMisesEnRelation = (
         statut: { $eq: rupture },
         'conseiller.$id': { $in: conseillerIdsRupture },
       };
+    case 'terminee_naturelle':
+      return {
+        statut: { $eq: rupture },
+        'conseiller.$id': { $in: conseillerTerminerNaturelle },
+      };
     case 'contrat':
       return {
         statut: { $eq: 'finalisee' },
@@ -179,6 +177,12 @@ const filterIsRuptureMisesEnRelation = (
             $and: [
               { statut: { $eq: 'finalisee_rupture' } },
               { 'conseiller.$id': { $in: conseillerIdsRupture } },
+            ],
+          },
+          {
+            $and: [
+              { statut: { $eq: 'terminee_naturelle' } },
+              { 'conseiller.$id': { $in: conseillerTerminerNaturelle } },
             ],
           },
           {

@@ -67,6 +67,7 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
     sortColonne: object,
   ) =>
@@ -78,6 +79,7 @@ const getMisesEnRelationRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -109,7 +111,6 @@ const getMisesEnRelationRecruter =
           'conseillerObj.dateFinFormation': 1,
           'conseillerObj.disponible': 1,
           'conseillerObj.estCoordinateur': 1,
-          'conseillerObj.supHierarchique': 1,
         },
       },
       { $sort: sortColonne },
@@ -176,6 +177,9 @@ const getExportConseillersCsv =
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+      const conseillerTerminerNaturelle = conseillers.filter(
+        (conseiller) => conseiller.statut === 'TERMINE',
+      );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
@@ -185,6 +189,7 @@ const getExportConseillersCsv =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
         piecesManquantes as boolean,
         sortColonne,
       );

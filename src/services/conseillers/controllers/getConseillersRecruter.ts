@@ -26,6 +26,7 @@ const getTotalConseillersRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -36,6 +37,7 @@ const getTotalConseillersRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -95,6 +97,7 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
     sortColonne: object,
     skip: string,
@@ -108,6 +111,7 @@ const getMisesEnRelationRecruter =
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -208,6 +212,9 @@ const getConseillersStatutRecrute =
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+      const conseillerTerminerNaturelle = conseillers.filter(
+        (conseiller) => conseiller.statut === 'TERMINE',
+      );
 
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
@@ -218,6 +225,7 @@ const getConseillersStatutRecrute =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
         piecesManquantes as boolean,
         sortColonne,
         skip as string,
@@ -253,6 +261,7 @@ const getConseillersStatutRecrute =
           conseillers.map((conseiller) => conseiller.structureId),
           conseillerRecruter.map((conseiller) => conseiller._id),
           conseillerRupture.map((conseiller) => conseiller._id),
+          conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
           piecesManquantes as boolean,
         );
         items.data = misesEnRelation;

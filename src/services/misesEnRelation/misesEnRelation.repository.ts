@@ -112,12 +112,12 @@ const filterDiplome = (diplome: string) => {
 const filterCCP1 = (ccp1: string) => {
   if (ccp1 === 'true') {
     return {
-      'conseillerObj.statut': { $in: ['RECRUTE', 'RUPTURE'] },
+      'conseillerObj.statut': { $in: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   if (ccp1 === 'false') {
     return {
-      'conseillerObj.statut': { $nin: ['RECRUTE', 'RUPTURE'] },
+      'conseillerObj.statut': { $nin: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   return {};
@@ -140,7 +140,7 @@ const filterStatut = (statut: string) => {
   }
   return {
     statut: {
-      $nin: ['renouvellement_initiee', 'terminee'],
+      $nin: ['renouvellement_initiee', 'terminee', 'terminee_naturelle'],
     },
   };
 };
@@ -151,7 +151,12 @@ const filterStatutContrat = (statut: string) => {
   }
   return {
     statut: {
-      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
+      $in: [
+        'recrutee',
+        'nouvelle_rupture',
+        'renouvellement_initiee',
+        'terminee_naturelle',
+      ],
     },
   };
 };
@@ -161,9 +166,6 @@ const filtrePiecesManquantes = (piecesManquantes: string) => {
     return { dossierIncompletRupture: true };
   }
   if (piecesManquantes === 'false') {
-    return { dossierIncompletRupture: false };
-  }
-  if (piecesManquantes === 'null') {
     return { dossierIncompletRupture: { $exists: false } };
   }
   return {};
@@ -187,9 +189,14 @@ const filterStatutContratHistorique = (statut: string) => {
       statut: 'finalisee_rupture',
     };
   }
+  if (statut === 'terminee_naturelle') {
+    return {
+      statut: 'terminee_naturelle',
+    };
+  }
   return {
     statut: {
-      $in: ['finalisee', 'finalisee_rupture'],
+      $in: ['finalisee', 'finalisee_rupture', 'terminee_naturelle'],
     },
   };
 };
@@ -201,7 +208,7 @@ const totalHistoriqueContrat = async (app: Application, checkAccess) => {
       $match: {
         $and: [checkAccess],
         statut: {
-          $in: ['finalisee_rupture', 'finalisee'],
+          $in: ['finalisee_rupture', 'finalisee', 'terminee_naturelle'],
         },
       },
     },
