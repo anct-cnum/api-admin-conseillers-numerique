@@ -36,7 +36,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       `../../../datas/exports/structures-sans-poste_coselec-${Date.now()}.csv`,
     );
     let csvBuild =
-      'ID structure; Nom de la Structure; Contrat(s) Finalisé(s); Contrat(s) en rupture; CDI; Autres; Non renseigné\n';
+      'ID structure; Nom de la Structure; Contrat(s) Finalisé(s); Contrat(s) en rupture; CDI; Autres\n';
 
     for (const structure of structuresATraiter) {
       try {
@@ -48,7 +48,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
             statut: { $in: ['finalisee', 'nouvelle_rupture'] },
           });
 
-        if (misesEnRelation && misesEnRelation.length > 0) {
+        if (misesEnRelation.length > 0) {
           logger.warn(
             `La structure sans poste ${structure.idPG} a une mise en relation finalisée ou en notification de rupture`,
           );
@@ -66,10 +66,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
         const autres = misesEnRelation.filter(
           (miseEnRelation) => miseEnRelation?.typeDeContrat !== 'CDI',
         ).length;
-        const nonRenseigne = misesEnRelation.filter(
-          (miseEnRelation) => !miseEnRelation?.typeDeContrat,
-        ).length;
-        csvBuild += `${structure.idPG};${structure.nom};${misesEnRelationFinalisee};${misesEnRelationNouvelleRupture};${nombreCDI};${autres};${nonRenseigne}\n`;
+        csvBuild += `${structure.idPG};${structure.nom};${misesEnRelationFinalisee};${misesEnRelationNouvelleRupture};${nombreCDI};${autres}\n`;
       } catch (error) {
         logger.error(
           `Erreur lors du traitement de la structure ${structure.idPG}: ${error}`,
