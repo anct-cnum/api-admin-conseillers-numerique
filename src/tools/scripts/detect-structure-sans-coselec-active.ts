@@ -4,12 +4,13 @@ import fs from 'fs';
 import path from 'path';
 import execute from '../utils';
 import { getCoselec } from '../../utils';
+import service from '../../helpers/services';
 
 // ts-node src/tools/scripts/detect-structure-sans-coselec-active.ts
 
 execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
-    const structures = await app.service('structures').Model.find({
+    const structures = await app.service(service.structures).Model.find({
       statut: 'VALIDATION_COSELEC',
     });
 
@@ -42,7 +43,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       try {
         // eslint-disable-next-line no-await-in-loop
         const misesEnRelation = await app
-          .service('misesEnRelation')
+          .service(service.misesEnRelation)
           .Model.find({
             'structure.$id': structure._id,
             statut: { $in: ['finalisee', 'nouvelle_rupture'] },
