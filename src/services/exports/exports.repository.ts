@@ -16,7 +16,7 @@ import {
   formatAdresseStructure,
   formatQpv,
 } from '../structures/repository/structures.repository';
-import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
+import { formatStatutMisesEnRelation } from '../conseillers/repository/conseillers.repository';
 
 dayjs.extend(utc);
 
