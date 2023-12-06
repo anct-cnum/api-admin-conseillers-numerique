@@ -57,25 +57,25 @@ const sortDemandesCoordinateurs = (
   ordre: number,
 ): ExtendedDemandesCoordinateur[] =>
   demandesCoordinateurs.sort((a, b) => {
-    if (nomOrdre === 'codePostal') {
-      if (a.codePostal < b.codePostal) {
+    if (nomOrdre === 'dateCandidature') {
+      if (
+        getTimestampByDate(a.dossier.dateDeCreation) <
+        getTimestampByDate(b.dossier.dateDeCreation)
+      ) {
         return ordre < 0 ? 1 : -1;
       }
-      if (a.codePostal > b.codePostal) {
+      if (
+        getTimestampByDate(a.dossier.dateDeCreation) >
+        getTimestampByDate(b.dossier.dateDeCreation)
+      ) {
         return ordre;
       }
       return 0;
     }
-    if (
-      getTimestampByDate(a.dossier.dateDeCreation) <
-      getTimestampByDate(b.dossier.dateDeCreation)
-    ) {
+    if (a.codePostal < b.codePostal) {
       return ordre < 0 ? 1 : -1;
     }
-    if (
-      getTimestampByDate(a.dossier.dateDeCreation) >
-      getTimestampByDate(b.dossier.dateDeCreation)
-    ) {
+    if (a.codePostal > b.codePostal) {
       return ordre;
     }
     return 0;
