@@ -4,13 +4,14 @@ import relanceCreationCompteConseiller from './conseillers/relanceCreationCompte
 import invitationActiveCompte from './invitations/invitationActiveCompte';
 import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
 import conseillerRupturePix from './pix/conseillerRupturePix';
+import conseillerFinContratNaturelle from './pix/conseillerFinContratNaturelle';
 import conseillerRuptureStructure from './structures/conseillerRuptureStructure';
+import conseillerFinContratStructure from './structures/conseillerFinContratStructure';
 import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
 import informationValidationCoselecCoordinateur from './structures/informationValidationCoselecCoordinateur';
 import refusCandidaturePosteCoordinateur from './structures/refusCandidaturePosteCoordinateur';
 import validationCandidaturePosteCoordinateur from './structures/validationCandidaturePosteCoordinateur';
-import informationNouvelleCandidatureCoordinateur from './prefets/informationNouvelleCandidatureCoordinateur';
 import validationCandidaturePosteCoordinateurPrefet from './prefets/validationCandidaturePosteCoordinateurPrefet';
 import refusCandidaturePosteCoordinateurPrefet from './prefets/refusCandidaturePosteCoordinateurPrefet';
 
@@ -21,13 +22,14 @@ export {
   invitationActiveCompte,
   invitationMultiRoleCompte,
   conseillerRupturePix,
+  conseillerFinContratNaturelle,
   conseillerRuptureStructure,
+  conseillerFinContratStructure,
   candidatSupprimePix,
   informationValidationCoselec,
   informationValidationCoselecCoordinateur,
   refusCandidaturePosteCoordinateur,
   validationCandidaturePosteCoordinateur,
-  informationNouvelleCandidatureCoordinateur,
   validationCandidaturePosteCoordinateurPrefet,
   refusCandidaturePosteCoordinateurPrefet,
 };
