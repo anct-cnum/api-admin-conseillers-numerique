@@ -7,7 +7,7 @@ import {
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
-import { checkAccessReadRequestConseillers } from '../conseillers.repository';
+import { checkAccessReadRequestConseillers } from '../repository/conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 
 const getConseillerById =
@@ -135,6 +135,7 @@ const getConseillerById =
               dateFinFormation: 1,
               dateDisponibilite: 1,
               datePrisePoste: 1,
+              supHierarchique: 1,
               statut: 1,
               sexe: 1,
               structureId: 1,

@@ -12,6 +12,7 @@ import {
   getTauxActivation,
   countPersonnesRecurrentes,
 } from '../../statsTerritoires/statsTerritoires.repository';
+import { getStructuresIdsByTerritoire } from '../../cras/cras.repository';
 
 const getRegion =
   (app: Application, checkRoleAccessStatsTerritoires) =>
@@ -113,15 +114,20 @@ const getExportTerritoiresCsv =
       }
       statsTerritoires = await Promise.all(
         statsTerritoires.map(async (ligneStats) => {
-          const item = { ...ligneStats };
+          const listStructureId = await getStructuresIdsByTerritoire(
+            territoire,
+            ligneStats[territoire],
+            app,
+          );
+          const item = ligneStats ?? {};
+          item.structureIds = listStructureId;
           item.tauxActivation = getTauxActivation(
             item.nombreConseillersCoselec,
             item.cnfsActives,
           );
-
-          if (item.conseillerIds?.length > 0) {
+          if (item.structureIds?.length > 0) {
             const query = {
-              'conseiller.$id': { $in: item.conseillerIds },
+              'structure.$id': { $in: item.structureIds },
               'cra.dateAccompagnement': {
                 $gte: dateDebut,
                 $lte: dateFin,

@@ -2,5 +2,6 @@
   "0 4 * * * $ROOT/src/tools/jobs/demarchesSimplifiees.sh",
   "*/15 * * * * $ROOT/src/tools/jobs/onboardingConseiller.sh",
   "0 2 * * * $ROOT/src/tools/jobs/deleteMiseEnRelation.sh",
-  "0 * * * * $ROOT/src/tools/jobs/onboardingStructure.sh"
+  "0 * * * * $ROOT/src/tools/jobs/onboardingStructure.sh",
+  "0 9 * * * $ROOT/src/tools/jobs/notifications.sh"
 ]

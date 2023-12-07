@@ -1,9 +1,9 @@
 /* eslint-disable prefer-template */
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { action } from '../../helpers/accessControl/accessList';
-import service from '../../helpers/services';
-import { IRequest } from '../../ts/interfaces/global.interfaces';
+import { action } from '../../../helpers/accessControl/accessList';
+import service from '../../../helpers/services';
+import { IRequest } from '../../../ts/interfaces/global.interfaces';
 
 const checkAccessReadRequestConseillers = async (
   app: Application,
@@ -133,10 +133,18 @@ const filterDepartement = (departement: string) => {
   return {};
 };
 
-const filtrePiecesManquantes = (piecesManquantes: boolean) =>
-  piecesManquantes
-    ? { dossierIncompletRupture: true }
-    : { dossierIncompletRupture: { $exists: false } };
+const filtrePiecesManquantes = (piecesManquantes: boolean) => {
+  if (piecesManquantes === true) {
+    return { dossierIncompletRupture: true };
+  }
+  if (piecesManquantes === false) {
+    return { dossierIncompletRupture: false };
+  }
+  if (piecesManquantes === null) {
+    return { dossierIncompletRupture: { $exists: false } };
+  }
+  return {};
+};
 
 const filterIsRuptureMisesEnRelation = (
   rupture: string,

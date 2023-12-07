@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
+import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 
 const dossierIncompletRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -15,14 +16,25 @@ const dossierIncompletRuptureConseiller =
       });
       return;
     }
-    if (new Date(dateFinDeContrat) > new Date()) {
-      res.status(400).json({
-        message:
-          'La date de fin de contrat doit être antérieure à la date du jour',
-      });
-      return;
-    }
+
     try {
+      const miseEnRelationVerif: IMisesEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          'conseiller.$id': new ObjectId(idConseiller),
+          statut: 'nouvelle_rupture',
+        });
+      if (
+        new Date(dateFinDeContrat) >=
+        new Date(miseEnRelationVerif?.dateFinDeContrat)
+      ) {
+        res.status(409).json({
+          message:
+            'La date de rupture doit être antérieure à la date de fin contrat',
+        });
+        return;
+      }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)

@@ -12,6 +12,7 @@ export default function (app: Application, mailer, req: IRequest = null) {
     return mailer.render(__dirname, templateName, {
       user,
       link: utils.getDashboardUrl(`/invitation/${user.token}`),
+      mail: app.get('smtp').replyTo,
     });
   };
 

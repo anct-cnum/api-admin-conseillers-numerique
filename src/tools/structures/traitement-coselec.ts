@@ -84,6 +84,9 @@ execute(__filename, async ({ app, logger, exit }) => {
         estLabelliseFranceServices: 'NON',
       }),
     },
+    $unset: {
+      'contact.inactivite': '',
+    },
     $push: {
       coselec: {
         nombreConseillersCoselec: Number(options.quota),
@@ -100,6 +103,9 @@ execute(__filename, async ({ app, logger, exit }) => {
       ...(structure?.estLabelliseFranceServices !== 'OUI' && {
         'structureObj.estLabelliseFranceServices': 'NON',
       }),
+    },
+    $unset: {
+      'structureObj.contact.inactivite': '',
     },
     $push: {
       'structureObj.coselec': {

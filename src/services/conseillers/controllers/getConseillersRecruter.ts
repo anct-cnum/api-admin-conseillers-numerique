@@ -14,7 +14,7 @@ import {
   filterRegion,
   formatStatutMisesEnRelation,
   filterDepartement,
-} from '../conseillers.repository';
+} from '../repository/conseillers.repository';
 import { getNombreCras } from '../../cras/cras.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
