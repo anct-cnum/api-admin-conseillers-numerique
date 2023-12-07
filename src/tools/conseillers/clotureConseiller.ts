@@ -7,10 +7,19 @@ import { program } from 'commander';
 import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
-import { deleteMailbox } from '../../utils/gandi';
-import deleteAccount from '../../utils/mattermost';
 import mailer from '../../mailer';
-import { conseillerRupturePix, conseillerRuptureStructure } from '../../emails';
+import {
+  conseillerFinContratNaturelle,
+  conseillerFinContratStructure,
+} from '../../emails';
+import {
+  deleteConseillerInCoordinateurs,
+  deletePermanences,
+  updatePermanences,
+  deletePermanencesInCras,
+  deleteMattermostAccount,
+  deleteMailbox,
+} from '../../utils/functionsDeleteConseiller';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -58,22 +67,6 @@ const updateConseiller = (app) => async (conseiller, updatedAt) =>
     },
   );
 
-const deleteConseillerInCoordinateurs = (app) => async (conseiller) =>
-  app.service(service.conseillers).Model.updateMany(
-    {
-      estCoordinateur: true,
-      'listeSubordonnes.type': 'conseillers',
-      'listeSubordonnes.liste': {
-        $elemMatch: { $eq: conseiller._id },
-      },
-    },
-    {
-      $pull: {
-        'listeSubordonnes.liste': conseiller._id,
-      },
-    },
-  );
-
 const getUser = (app) => async (idConseiller) =>
   app.service(service.users).Model.find({
     'entity.$id': idConseiller,
@@ -97,34 +90,6 @@ const updateUser = (app) => async (idUser, email) =>
     },
   );
 
-const deletePermanences = (app) => async (idConseiller) =>
-  app.service(service.permanences).Model.deleteMany({
-    conseillers: {
-      $eq: [idConseiller],
-    },
-  });
-
-const updatePermanences = (app) => async (idConseiller) =>
-  app.service(service.users).Model.updateMany(
-    { conseillers: { $elemMatch: { $eq: idConseiller } } },
-    {
-      $pull: {
-        conseillers: idConseiller,
-        lieuPrincipalPour: idConseiller,
-        conseillersItinerants: idConseiller,
-      },
-    },
-  );
-
-const deletePermanencesInCras = (app) => async (idConseiller, updatedAt) =>
-  app.service(service.cras).Model.updateMany(
-    {
-      'conseiller.$id': idConseiller._id,
-    },
-    { $set: { updatedAt } },
-    { $unset: { permanence: '' } },
-  );
-
 program
   .option(
     '-f, --fix',
@@ -132,7 +97,7 @@ program
   )
   .parse(process.argv);
 
-execute(__filename, async ({ app, logger, exit, req }) => {
+execute(__filename, async ({ app, logger, exit }) => {
   try {
     const options = program.opts();
     const { fix } = options;
@@ -202,49 +167,44 @@ execute(__filename, async ({ app, logger, exit, req }) => {
         });
 
         // suppression des outils (Mattermost, Gandi, PIX)
-        await deleteAccount(
-          app,
-          req,
-        )(conseiller).then(async () => {
+        await deleteMattermostAccount(app)(conseiller).then(async () => {
           logger.info(
             `Le compte Mattermost du conseiller (id: ${conseiller._id} a été supprimé`,
           );
         });
-        await deleteMailbox(app, req)(conseiller._id, user.name).then(
-          async () => {
-            logger.info(
-              `Le compte Gandi du conseiller (id: ${conseiller._id} a été supprimé`,
-            );
-          },
-        );
-
+        await deleteMailbox(app)(conseiller._id, user.name).then(async () => {
+          logger.info(
+            `Le compte Gandi du conseiller (id: ${conseiller._id} a été supprimé`,
+          );
+        });
         const mailerInstance = mailer(app);
-        const messageRupturePix = conseillerRupturePix(mailerInstance);
-        const errorSmtpMailRupturePix = await messageRupturePix
+        const messageFinContratPix =
+          conseillerFinContratNaturelle(mailerInstance);
+        const errorSmtpMailFinContratPix = await messageFinContratPix
           .send(conseiller)
           .catch((errSmtp: Error) => {
             logger.error(errSmtp);
           });
-        if (errorSmtpMailRupturePix instanceof Error) {
-          logger.error(errorSmtpMailRupturePix.message);
+        if (errorSmtpMailFinContratPix instanceof Error) {
+          logger.error(errorSmtpMailFinContratPix.message);
         }
-        const messageRuptureStructure = conseillerRuptureStructure(
+        const messageFinContratStructure = conseillerFinContratStructure(
           app,
           mailerInstance,
-          req,
         );
-        const errorSmtpMailRuptureStructure = await messageRuptureStructure
-          .send(finaliseeNaturelle, finaliseeNaturelle.structureObj)
-          .catch((errSmtp: Error) => {
-            logger.error(errSmtp);
-          });
-        if (errorSmtpMailRuptureStructure instanceof Error) {
-          logger.error(errorSmtpMailRuptureStructure.message);
+        const errorSmtpMailFinContratStructure =
+          await messageFinContratStructure
+            .send(finaliseeNaturelle, finaliseeNaturelle.structureObj)
+            .catch((errSmtp: Error) => {
+              logger.error(errSmtp);
+            });
+        if (errorSmtpMailFinContratStructure instanceof Error) {
+          logger.error(errorSmtpMailFinContratStructure.message);
         }
         // mise aux normes de l'utilisateur
         await updateUser(app)(user._id, conseiller.email).then(async () => {
           logger.info(
-            `Le user a été passé en candidat avec son adresse email d/'origine (id: ${user._id}`,
+            `Le user a été passé en candidat avec son adresse email d'origine (id: ${user._id}`,
           );
         });
       }

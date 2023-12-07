@@ -7,6 +7,7 @@ import { program } from 'commander';
 import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
+import { updateConseillersPG } from '../../utils/functionsDeleteConseiller';
 
 const { Pool } = require('pg');
 
@@ -16,7 +17,6 @@ const getMisesEnRelationsFinContrat = (app) => async (dateDuJour) =>
     statut: 'finalisee',
     typeDeContrat: { $ne: 'CDI' },
   });
-
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
 // avant de les passer en terminer à M+2 de la fin de contrat
@@ -62,25 +62,6 @@ const updateConseiller = (app) => async (idConseiller, updatedAt) =>
     },
   );
 
-const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-      [email, disponible, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 program
   .option(
     '-f, --fix',
@@ -118,11 +99,11 @@ execute(__filename, async ({ app, logger, exit }) => {
 
       if (fix) {
         await updateConseiller(app)(
-          miseEnRelationFinContrat.conseiller.$id,
+          miseEnRelationFinContrat.conseiller.oid,
           dateDuJour,
         ).then(async () => {
           logger.info(
-            `Le conseiller a été passée en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.$id})`,
+            `Le conseiller a été passée en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.oid})`,
           );
           const pool = new Pool();
           const datePG = dayjs(dateDuJour).format('YYYY-MM-DD');
