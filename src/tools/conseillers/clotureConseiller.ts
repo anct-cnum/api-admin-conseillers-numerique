@@ -9,7 +9,7 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import mailer from '../../mailer';
 import {
-  conseillerFinContratNaturelle,
+  conseillerFinContratNaturellePix,
   conseillerFinContratStructure,
 } from '../../emails';
 import {
@@ -179,7 +179,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         });
         const mailerInstance = mailer(app);
         const messageFinContratPix =
-          conseillerFinContratNaturelle(mailerInstance);
+          conseillerFinContratNaturellePix(mailerInstance);
         const errorSmtpMailFinContratPix = await messageFinContratPix
           .send(conseiller)
           .catch((errSmtp: Error) => {

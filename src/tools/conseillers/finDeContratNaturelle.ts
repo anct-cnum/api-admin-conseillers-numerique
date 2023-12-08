@@ -6,8 +6,10 @@
 import { program } from 'commander';
 import dayjs from 'dayjs';
 import execute from '../utils';
+import mailer from '../../mailer';
 import service from '../../helpers/services';
 import { updateConseillersPG } from '../../utils/functionsDeleteConseiller';
+import { conseillerFinContratNaturelle } from '../../emails';
 
 const { Pool } = require('pg');
 
@@ -126,6 +128,17 @@ execute(__filename, async ({ app, logger, exit }) => {
             `La mise en relation a été passée en statut 'terminee_naturelle' (id: ${miseEnRelationFinContrat._id})`,
           );
         });
+        // Envoie de mail conseiller
+        const mailerInstance = mailer(app);
+        const messageFinContrat = conseillerFinContratNaturelle(mailerInstance);
+        const errorSmtpMailFinContratPix = await messageFinContrat
+          .send(miseEnRelationFinContrat.conseillerObj)
+          .catch((errSmtp: Error) => {
+            logger.error(errSmtp);
+          });
+        if (errorSmtpMailFinContratPix instanceof Error) {
+          logger.error(errorSmtpMailFinContratPix.message);
+        }
       }
     }
   } catch (error) {

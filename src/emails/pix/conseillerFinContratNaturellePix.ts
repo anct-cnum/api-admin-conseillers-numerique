@@ -2,7 +2,7 @@ import logger from '../../logger';
 
 export default function (mailer) {
   const { utils } = mailer;
-  const templateName = 'conseillerFinContratNaturelle';
+  const templateName = 'conseillerFinContratNaturellePix';
 
   const render = async (conseiller) => {
     return mailer.render(__dirname, templateName, { conseiller });

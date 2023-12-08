@@ -1,0 +1,40 @@
+<mjml>
+
+  <%- include('../commun/head.mjml.ejs'); %>
+  <mj-body background-color="#f0f0f0">
+
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+      <mj-wrapper css-class="wrapper">
+
+          <mj-column>
+            <mj-text css-class="text-primary">
+              Conseillers en fin de contrat
+            </mj-text>
+            <mj-text align="left">
+              Bonjour <%= conseiller.prenom %>,
+            </mj-text>
+            <mj-text align="left">
+              Un petit mot pour te rappeler que lorsque tu as sign&eacute; ton contrat Conseiller num&eacute;rique, ta date de fin de
+              mission a &eacute;t&eacute; d&eacute;finie pour le <%= conseiller.dateFinDeContrat %>. Cette date est pour bientôt !
+            </mj-text>
+            <mj-text align="left">
+              Si la date est incorrecte, elle a pu être renseign&eacute;e sans avoir d&rsquo;info sur la date r&eacute;elle de fin, ou alors
+              la date de fin a &eacute;t&eacute; revue), contact nous sur le mail support pour rester membre de la communaut&eacute;
+              Conseiller num&eacute;rique et b&eacute;n&eacute;ficier de tes acc&egrave;s &agrave; l’outillage.
+            </mj-text>
+            <mj-text align="left">
+              Si la date est correcte et que ta mission se termine, tu peux retrouver toutes les offres sur : voir si on renvoi au guide
+              de Cl&eacute;mence ?
+              // EN ATTENTE DE REPONSE //
+            </mj-text>
+             <mj-text align="left">
+              Bonne journée,
+            </mj-text>
+            <mj-text align="left">
+              L&rsquo;&eacute;quipe Conseiller Num&eacute;rique France Services
+            </mj-text>
+          </mj-column>
+      </mj-wrapper>
+  </mj-body>
+</mjml>
