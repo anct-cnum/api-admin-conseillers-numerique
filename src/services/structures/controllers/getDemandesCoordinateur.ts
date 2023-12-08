@@ -8,10 +8,14 @@ import {
   filterSearchBar,
   filterRegion,
   filterDepartement,
-  filterStatutAndAvisPrefetDemandesCoordinateur,
-  checkAvisPrefet,
 } from '../repository/structures.repository';
-import { getTimestampByDate } from '../../../utils';
+import {
+  ExtendedDemandesCoordinateur,
+  checkAvisPrefet,
+  sortDemandesCoordinateurs,
+  filterStatutAndAvisPrefetDemandesCoordinateur,
+} from '../../conseillers/repository/coordinateurs.repository';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const totalParStatutDemandesCoordinateur = async (
   app: Application,
@@ -142,14 +146,11 @@ const getDemandesCoordinateur =
         skip: 0,
       };
       const checkAccess = await checkAccessReadRequestStructures(app, req);
-      const structures = await getDemandesCoordo(app, checkAccess)(
-        statut,
-        search,
-        region,
-        departement,
-        avisPrefet,
-      );
-      let demandesCoordo = structures.map((structure) => {
+      const structures: IStructures[] = await getDemandesCoordo(
+        app,
+        checkAccess,
+      )(statut, search, region, departement, avisPrefet);
+      const demandesCoordinateurs = structures.flatMap((structure) => {
         const structureFormat = structure;
         // si une structure possède deux demandes coordinateurs avec des statuts différents
         // la requête renvoie toute les demandes coordinateurs de la structure sans prendre en compte le filtre statut
@@ -167,39 +168,26 @@ const getDemandesCoordinateur =
                 checkAvisPrefet(avisPrefet, demande.avisPrefet),
             );
         }
-        const demandesCoordinateur = structureFormat.demandesCoordinateur.map(
-          (demande) => {
-            const item = demande;
-            item.nomStructure = structure.nom;
-            item.codePostal = structure.codePostal;
-            item.idPG = structure.idPG;
-            item.idStructure = structure._id;
-            return item;
-          },
+        return structureFormat.demandesCoordinateur.map(
+          (demande) =>
+            ({
+              ...demande,
+              nomStructure: structure.nom,
+              codePostal: structure.codePostal,
+              idPG: structure.idPG,
+              idStructure: structure._id,
+            }) as ExtendedDemandesCoordinateur,
         );
-
-        return demandesCoordinateur;
       });
-      demandesCoordo = demandesCoordo.flat(1);
-      demandesCoordo.sort((a, b) => {
-        if (
-          getTimestampByDate(a.dossier.dateDeCreation) <
-          getTimestampByDate(b.dossier.dateDeCreation)
-        ) {
-          return ordre < 0 ? 1 : -1;
-        }
-        if (
-          getTimestampByDate(a.dossier.dateDeCreation) >
-          getTimestampByDate(b.dossier.dateDeCreation)
-        ) {
-          return ordre;
-        }
-        return 0;
-      });
-      items.total = demandesCoordo.length;
+      const demandesCoordinateurSort = sortDemandesCoordinateurs(
+        demandesCoordinateurs,
+        nomOrdre,
+        ordre,
+      );
+      items.total = demandesCoordinateurSort.length;
       items.totalParDemandesCoordinateur =
         await totalParStatutDemandesCoordinateur(app, checkAccess);
-      items.data = demandesCoordo.slice(
+      items.data = demandesCoordinateurSort.slice(
         (page - 1) * options.paginate.default,
         page * options.paginate.default,
       );
