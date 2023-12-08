@@ -23,6 +23,8 @@ const formatStatutMisesEnRelation = (
       return dossierIncompletRupture ? 'Pièces manquantes' : 'Rupture en cours';
     case 'finalisee_rupture':
       return 'Sans mission';
+    case 'terminee_naturelle':
+      return 'Sans mission';
     case 'finalisee':
       return 'En activité';
     default:

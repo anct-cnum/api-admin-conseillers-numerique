@@ -44,6 +44,7 @@ const updateConseillerDisponibilite = (app) => async (email, updatedAt) =>
     {
       $set: {
         disponible: true,
+        dateDisponibilite: updatedAt,
         updatedAt,
       },
     },

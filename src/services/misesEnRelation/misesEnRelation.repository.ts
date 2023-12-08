@@ -140,7 +140,7 @@ const filterStatut = (statut: string) => {
   }
   return {
     statut: {
-      $nin: ['renouvellement_initiee', 'terminee', 'terminee_naturelle'],
+      $nin: ['renouvellement_initiee', 'terminee'],
     },
   };
 };
