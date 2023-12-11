@@ -16,6 +16,13 @@ const dossierIncompletRuptureConseiller =
       });
       return;
     }
+    if (new Date(dateFinDeContrat) > new Date()) {
+      res.status(400).json({
+        message:
+          'La date de fin de contrat doit être antérieure à la date du jour',
+      });
+      return;
+    }
 
     try {
       const miseEnRelationVerif: IMisesEnRelation = await app

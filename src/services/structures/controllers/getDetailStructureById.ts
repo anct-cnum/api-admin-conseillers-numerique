@@ -17,15 +17,15 @@ import {
   getNombreAccompagnementsByStructureId,
   getNombreCrasByStructureId,
 } from '../../cras/cras.repository';
+import {
+  getUrlDossierConventionnement,
+  getUrlDossierReconventionnement,
+  getTypeDossierDemarcheSimplifiee,
+} from '../repository/reconventionnement.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import { PhaseConventionnement } from '../../../ts/enum';
-import {
-  getTypeDossierDemarcheSimplifiee,
-  getUrlDossierConventionnement,
-  getUrlDossierReconventionnement,
-} from '../repository/demarchesSimplifiees.repository';
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {

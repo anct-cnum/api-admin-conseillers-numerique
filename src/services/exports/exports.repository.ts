@@ -16,7 +16,7 @@ import {
   formatAdresseStructure,
   formatQpv,
 } from '../structures/repository/structures.repository';
-import { formatStatutMisesEnRelation } from '../conseillers/repository/conseillers.repository';
+import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
 
 dayjs.extend(utc);
 
@@ -667,8 +667,8 @@ const generateCsvTerritoires = async (
       'Personnes accompagnées',
       "Nombre d'accompagnement",
       'Dotation de conseillers',
-      "Conum activé sur l'espace coop",
-      "Conum en attente d'activation",
+      "CnFS activé sur l'espace coop",
+      "CnFS en attente d'activation",
       "Taux d'activation",
     ];
     res.write(
@@ -738,6 +738,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
   try {
     const fileHeaders = [
       'Id conseiller',
+      'Id long de la structure',
       'Id de la structure',
       'Nom de la structure',
       'Code postal de la structure',
@@ -757,11 +758,6 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Disponibilité',
       'Coordinateur',
       'CRA Saisis',
-      'Nom du supérieur hiérarchique',
-      'Prénom du supérieur hiérarchique',
-      'Email du supérieur hiérarchique',
-      'Fonction du supérieur hiérarchique',
-      'Téléphone du supérieur hiérarchique',
     ];
     res.write(
       [
@@ -769,6 +765,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
         ...misesEnRelation.map((miseEnRelation) =>
           [
             miseEnRelation.conseillerObj.idPG,
+            miseEnRelation.structureObj._id,
             miseEnRelation.structureObj.idPG,
             miseEnRelation.structureObj.nom?.replaceAll(/["',]/g, ' '),
             miseEnRelation.structureObj.codePostal,
@@ -795,16 +792,6 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.conseillerObj.disponible ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj.estCoordinateur ? 'Oui' : 'Non',
             miseEnRelation.craCount,
-            miseEnRelation.conseillerObj?.supHierarchique?.nom ??
-              'Non renseigné',
-            miseEnRelation.conseillerObj?.supHierarchique?.prenom ??
-              'Non renseigné',
-            miseEnRelation.conseillerObj?.supHierarchique?.email ??
-              'Non renseigné',
-            miseEnRelation.conseillerObj?.supHierarchique?.fonction ??
-              'Non renseignée',
-            miseEnRelation.conseillerObj?.supHierarchique?.numeroTelephone ??
-              'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

@@ -1,9 +1,9 @@
 /* eslint-disable prefer-template */
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { action } from '../../../helpers/accessControl/accessList';
-import service from '../../../helpers/services';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import { action } from '../../helpers/accessControl/accessList';
+import service from '../../helpers/services';
+import { IRequest } from '../../ts/interfaces/global.interfaces';
 
 const checkAccessReadRequestConseillers = async (
   app: Application,

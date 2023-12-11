@@ -7,11 +7,11 @@ import { GraphQLClient } from 'graphql-request';
 import { ObjectId } from 'mongodb';
 import execute from '../utils';
 import service from '../../helpers/services';
+import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/reconventionnement.repository';
 import {
   IConfigurationDemarcheSimplifiee,
   IDossierDS,
 } from '../../ts/interfaces/global.interfaces';
-import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/demarchesSimplifiees.repository';
 
 const requestGraphQLForGetDemarcheDS = (
   graphQLClient: GraphQLClient,

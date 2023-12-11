@@ -8,7 +8,7 @@ import {
 } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
-import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
+import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 
 const getDetailDemandeCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {

@@ -10,8 +10,8 @@ import {
   TypeDossierReconventionnement,
   StatutConventionnement,
 } from '../../ts/enum';
+import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/reconventionnement.repository';
 import { IDossierDS } from '../../ts/interfaces/global.interfaces';
-import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/demarchesSimplifiees.repository';
 
 const categoriesCorrespondances = require('../../../datas/categorieFormCorrespondances.json');
 

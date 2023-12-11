@@ -3,13 +3,13 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { checkAccessReadRequestConseillers } from '../repository/conseillers.repository';
-import { action } from '../../../helpers/accessControl/accessList';
-import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
+import { checkAccessReadRequestConseillers } from '../conseillers.repository';
 import {
   getTypeDossierDemarcheSimplifiee,
   getUrlDossierDSAdmin,
-} from '../../structures/repository/demarchesSimplifiees.repository';
+} from '../../structures/repository/reconventionnement.repository';
+import { action } from '../../../helpers/accessControl/accessList';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getConseillerContratById =
   (app: Application) => async (req: IRequest, res: Response) => {

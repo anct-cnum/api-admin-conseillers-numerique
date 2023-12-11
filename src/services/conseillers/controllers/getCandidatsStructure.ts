@@ -14,7 +14,7 @@ import {
   filterCv,
   filterDiplome,
   filterCCP1,
-} from '../repository/conseillers.repository';
+} from '../conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 import { getCoselec } from '../../../utils';
 
@@ -127,7 +127,7 @@ const getCandidatsStructure =
     const structure: IStructures = await app
       .service(service.structures)
       .Model.accessibleBy(req.ability, action.read)
-      .findOne();
+      .findOne({ _id: new ObjectId(structureId) });
     if (structure === null) {
       res.status(404).json({ message: "La structure n'existe pas" });
       return;

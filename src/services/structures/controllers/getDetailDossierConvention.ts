@@ -4,9 +4,9 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
+import { getTypeDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
-import { getTypeDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>

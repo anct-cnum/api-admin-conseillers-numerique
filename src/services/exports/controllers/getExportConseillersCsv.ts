@@ -13,7 +13,7 @@ import {
   filterIsRuptureMisesEnRelation,
   checkAccessReadRequestConseillers,
   filterDepartement,
-} from '../../conseillers/repository/conseillers.repository';
+} from '../../conseillers/conseillers.repository';
 import { generateCsvConseillers } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
@@ -109,7 +109,6 @@ const getMisesEnRelationRecruter =
           'conseillerObj.dateFinFormation': 1,
           'conseillerObj.disponible': 1,
           'conseillerObj.estCoordinateur': 1,
-          'conseillerObj.supHierarchique': 1,
         },
       },
       { $sort: sortColonne },

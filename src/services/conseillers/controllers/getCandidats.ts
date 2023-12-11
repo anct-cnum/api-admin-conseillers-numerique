@@ -9,7 +9,7 @@ import {
   filterRegion,
   filterNomConseiller,
   checkAccessReadRequestConseillers,
-} from '../repository/conseillers.repository';
+} from '../conseillers.repository';
 
 const getTotalCandidats =
   (app: Application, checkAccess) =>
