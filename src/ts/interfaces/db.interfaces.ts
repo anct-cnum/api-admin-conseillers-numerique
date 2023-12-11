@@ -115,6 +115,8 @@ export interface IMisesEnRelation {
   banniereAjoutRoleCoordinateur: boolean | undefined;
 
   contratCoordinateur: boolean | undefined;
+
+  banniereRefusRecrutement: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
