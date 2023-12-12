@@ -103,6 +103,7 @@ const getMisesEnRelationRecruter =
           'structureObj._id': 1,
           'structureObj.nom': 1,
           'structureObj.codePostal': 1,
+          'structureObj.insee': 1,
           'conseillerObj.telephonePro': 1,
           'conseillerObj.email': 1,
           'conseillerObj.datePrisePoste': 1,
