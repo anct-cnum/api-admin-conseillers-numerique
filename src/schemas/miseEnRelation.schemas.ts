@@ -27,4 +27,15 @@ const validMiseEnRelation = Joi.object({
   diplome: Joi.string().error(new Error('Le filtre diplôme est invalide')),
 });
 
-export default validMiseEnRelation;
+
+const validUpdateMisesEnRelation = Joi.object({
+  statut: Joi.string().allow(null, '').error(new Error('Le statut est invalide')),
+  motifRupture: Joi.string().allow(null, '').error(new Error('Le motifRupture est invalide')),
+  dateRupture: Joi.date().allow(null, '').error(new Error('Le dateRupture est invalide')),
+  banniereRefusRecrutement: Joi.number().allow(null, '').error(new Error('Le banniereRefusRecrutement est invalide')),
+});
+
+export {
+  validMiseEnRelation,
+  validUpdateMisesEnRelation,
+};
