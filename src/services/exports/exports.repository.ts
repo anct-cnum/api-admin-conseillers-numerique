@@ -742,6 +742,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Nom de la structure',
       'Code postal de la structure',
       'Adresse postale de la structure',
+      'Contact principal de la structure',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -776,6 +777,7 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.structureObj.insee
               ? formatAdresseStructure(miseEnRelation.structureObj.insee)
               : '',
+            miseEnRelation.structureObj.contact?.email,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
