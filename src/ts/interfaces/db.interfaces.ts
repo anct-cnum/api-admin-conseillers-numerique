@@ -594,6 +594,13 @@ export interface ConseillersRuptures {
   dateRupture: Date;
   motifRupture: string;
 }
+
+export interface IConseillersTermines {
+  _id: ObjectId;
+  conseillerId: Types.ObjectId;
+  structureId: Types.ObjectId;
+  dateFinContrat: Date;
+}
 export interface AccessLogs {
   createdAt: Date;
   name: string;

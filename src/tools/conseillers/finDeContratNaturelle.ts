@@ -9,7 +9,10 @@ import execute from '../utils';
 import mailer from '../../mailer';
 import service from '../../helpers/services';
 import { updateConseillersPG } from '../../utils/functionsDeleteConseiller';
-import { conseillerFinContratNaturelle } from '../../emails';
+import {
+  conseillerFinContratNaturelle,
+  conseillerFutureFinContrat,
+} from '../../emails';
 
 const { Pool } = require('pg');
 
@@ -38,7 +41,7 @@ const updateMiseEnRelation = (app) => async (id, updatedAt) =>
     },
   );
 
-const updateConseillerDisponibilite = (app) => async (email, updatedAt) =>
+const updateConseillersDisponibilite = (app) => async (email, updatedAt) =>
   app.service(service.conseillers).Model.updateOne(
     {
       email,
@@ -115,7 +118,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             true,
             datePG,
           );
-          await updateConseillerDisponibilite(app)(
+          await updateConseillersDisponibilite(app)(
             miseEnRelationFinContrat.conseillerObj.email,
             dateDuJour,
           );
@@ -128,16 +131,30 @@ execute(__filename, async ({ app, logger, exit }) => {
             `La mise en relation a été passée en statut 'terminee_naturelle' (id: ${miseEnRelationFinContrat._id})`,
           );
         });
-        // Envoie de mail conseiller
+        // Envoie de mail conseiller et structure
         const mailerInstance = mailer(app);
         const messageFinContrat = conseillerFinContratNaturelle(mailerInstance);
-        const errorSmtpMailFinContratPix = await messageFinContrat
+        const errorSmtpMailFinContratNaturelle = await messageFinContrat
           .send(miseEnRelationFinContrat.conseillerObj)
           .catch((errSmtp: Error) => {
             logger.error(errSmtp);
           });
-        if (errorSmtpMailFinContratPix instanceof Error) {
-          logger.error(errorSmtpMailFinContratPix.message);
+        if (errorSmtpMailFinContratNaturelle instanceof Error) {
+          logger.error(errorSmtpMailFinContratNaturelle.message);
+        }
+
+        const messageFutureFinContrat =
+          conseillerFutureFinContrat(mailerInstance);
+        const errorSmtpMailFutureFinContrat = await messageFutureFinContrat
+          .send(
+            miseEnRelationFinContrat.conseillerObj,
+            miseEnRelationFinContrat.structureObj,
+          )
+          .catch((errSmtp: Error) => {
+            logger.error(errSmtp);
+          });
+        if (errorSmtpMailFutureFinContrat instanceof Error) {
+          logger.error(errorSmtpMailFutureFinContrat.message);
         }
       }
     }

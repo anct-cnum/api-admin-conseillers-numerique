@@ -11,6 +11,7 @@ import mailer from '../../mailer';
 import {
   conseillerFinContratNaturellePix,
   conseillerFinContratStructure,
+  conseillerFinContrat,
 } from '../../emails';
 import {
   deleteConseillerInCoordinateurs,
@@ -33,7 +34,7 @@ const getMisesEnRelationsFinaliseesNaturelles = (app) => async (date) =>
     .limit(1);
 
 const getConseiller = (app) => async (id) =>
-  app.service(service.conseillers).Model.find({
+  app.service(service.conseillers).Model.findOne({
     _id: id,
   });
 
@@ -90,6 +91,13 @@ const updateUser = (app) => async (idUser, email) =>
     },
   );
 
+const createConseillersTermines = (app) => async (conseiller, dateFincontrat) =>
+  app.service(service.conseillersTermines).Model.create({
+    conseillerId: conseiller._id,
+    structureId: conseiller.structureId,
+    dateFinContrat: dateFincontrat,
+  });
+
 program
   .option(
     '-f, --fix',
@@ -124,7 +132,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         `Le conseiller (idPG: ${finaliseeNaturelle.conseillerObj.idPG}) va être traité.`,
       );
       const conseiller = await getConseiller(app)(
-        finaliseeNaturelle.conseiller.$id,
+        finaliseeNaturelle.conseiller.oid,
       );
       const user = await getUser(app)(conseiller._id);
 
@@ -132,7 +140,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         // suppression du conseiller dans les permanences
         await deletePermanences(app)(conseiller._id).then(async () => {
           logger.info(
-            `Les permanences comportant le conseiller (id: ${conseiller._id}) ont été supprimées`,
+            `Les permanences comportant uniquement le conseiller (id: ${conseiller._id}) ont été supprimées`,
           );
         });
         await updatePermanences(app)(conseiller._id).then(async () => {
@@ -165,8 +173,9 @@ execute(__filename, async ({ app, logger, exit }) => {
             `Le conseiller a été remis à zéro (id: ${conseiller._id}`,
           );
         });
+        await createConseillersTermines(app)(conseiller, dateMoins2Mois);
 
-        // suppression des outils (Mattermost, Gandi, PIX)
+        // suppression des outils (Mattermost, Gandi)
         await deleteMattermostAccount(app)(conseiller).then(async () => {
           logger.info(
             `Le compte Mattermost du conseiller (id: ${conseiller._id} a été supprimé`,
@@ -177,7 +186,9 @@ execute(__filename, async ({ app, logger, exit }) => {
             `Le compte Gandi du conseiller (id: ${conseiller._id} a été supprimé`,
           );
         });
+        // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
         const mailerInstance = mailer(app);
+
         const messageFinContratPix =
           conseillerFinContratNaturellePix(mailerInstance);
         const errorSmtpMailFinContratPix = await messageFinContratPix
@@ -188,6 +199,18 @@ execute(__filename, async ({ app, logger, exit }) => {
         if (errorSmtpMailFinContratPix instanceof Error) {
           logger.error(errorSmtpMailFinContratPix.message);
         }
+
+        const messageFinContratConseiller =
+          conseillerFinContrat(mailerInstance);
+        const errorSmtpMailFinContrat = await messageFinContratConseiller
+          .send(conseiller)
+          .catch((errSmtp: Error) => {
+            logger.error(errSmtp);
+          });
+        if (errorSmtpMailFinContrat instanceof Error) {
+          logger.error(errorSmtpMailFinContrat.message);
+        }
+
         const messageFinContratStructure = conseillerFinContratStructure(
           app,
           mailerInstance,
@@ -201,6 +224,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         if (errorSmtpMailFinContratStructure instanceof Error) {
           logger.error(errorSmtpMailFinContratStructure.message);
         }
+
         // mise aux normes de l'utilisateur
         await updateUser(app)(user._id, conseiller.email).then(async () => {
           logger.info(

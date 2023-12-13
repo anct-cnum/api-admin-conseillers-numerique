@@ -35,6 +35,7 @@ export interface Ressource {
   permanences: string;
   conseillersSupprimes: string;
   conseillersRuptures: string;
+  conseillersTermines: string;
   qpv: string;
   communes: string;
 }
