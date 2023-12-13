@@ -237,7 +237,9 @@ const getConseillersStatutRecrute =
           item.address = item.conseillerObj?.emailCN?.address;
           item.estCoordinateur = item.conseillerObj?.estCoordinateur;
           item.nomStructure = item.structureObj?.nom;
-          item.compteCoopActif = !!item.conseillerObj?.mattermost?.login;
+          item.compteCoopActif =
+            item.conseillerObj?.emailCN?.address &&
+            !item.conseillerObj?.mattermost?.id;
           item.craCount = await getNombreCras(app, req)(item._id);
 
           return item;
