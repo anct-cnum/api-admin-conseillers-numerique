@@ -18,7 +18,7 @@ const { Pool } = require('pg');
 
 const getMisesEnRelationsFinContrat = (app) => async (dateDuJour) =>
   app.service(service.misesEnRelation).Model.find({
-    dateFinDeContrat: { $lte: dateDuJour },
+    dateFinDeContrat: { $lt: dateDuJour },
     statut: 'finalisee',
     typeDeContrat: { $ne: 'CDI' },
   });
