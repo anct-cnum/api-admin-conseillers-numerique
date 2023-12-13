@@ -109,7 +109,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           dateDuJour,
         ).then(async () => {
           logger.info(
-            `Le conseiller a été passée en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.oid})`,
+            `Le conseiller a été passé en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.oid})`,
           );
           const pool = new Pool();
           const datePG = dayjs(dateDuJour).format('YYYY-MM-DD');
