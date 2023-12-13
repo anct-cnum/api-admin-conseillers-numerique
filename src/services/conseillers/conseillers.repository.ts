@@ -205,7 +205,8 @@ const filterIsRuptureConseiller = (
   dateFin: Date,
 ) => {
   switch (rupture) {
-    case '[finalisee_rupture,terminee_naturelle]':
+    case 'finalisee_rupture':
+    case 'terminee_naturelle':
       return { statut: { $in: ['RUPTURE', 'TERMINE'] } };
     default: // contrat / nouvelle_rupture / finalisee_rupture
       return {
