@@ -29,6 +29,7 @@ const validMiseEnRelation = Joi.object({
 
 const validUpdateMisesEnRelation = Joi.object({
   statut: Joi.string()
+    .valid('finalisee', 'interessee', 'recrutee', 'nouvelle_rupture')
     .allow(null, '')
     .error(new Error('Le statut est invalide')),
   motifRupture: Joi.string()
@@ -37,7 +38,7 @@ const validUpdateMisesEnRelation = Joi.object({
   dateRupture: Joi.date()
     .allow(null, '')
     .error(new Error('Le dateRupture est invalide')),
-  banniereRefusRecrutement: Joi.number()
+  banniereRefusRecrutement: Joi.boolean()
     .allow(null, '')
     .error(new Error('Le banniereRefusRecrutement est invalide')),
 });
