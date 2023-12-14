@@ -928,20 +928,15 @@ const generateCsvHistoriqueDossiersConvention = async (
 ) => {
   try {
     const fileHeaders = [
-      'Id de la structure',
-      'Nom de la structure',
-      'Type de la structure',
-      'Région',
-      'Département',
-      'Statut',
-      'Nombre de postes attribués',
-      'Date de la demande',
+      'ID',
+      'Siret plateforme',
+      'Nombre de postes avant COSELEC',
+      'Nombre de postes après COSELEC',
+      'Variation',
       'Type de la demande',
-      'Nombre de CNFS souhaités',
-      'Nombre de contrat validés',
-      'Nombre de postes renouvelés',
-      'Date de fin du premier contrat',
-      'État de la demande',
+      'N° DS',
+      'Code département',
+      'Code région',
     ];
 
     res.write(
@@ -950,19 +945,19 @@ const generateCsvHistoriqueDossiersConvention = async (
         ...structures.map((structure) =>
           [
             structure?.idPG,
-            structure?.nom,
-            structure?.type === 'PRIVATE' ? 'privée' : 'publique',
-            structure?.codeRegion,
+            structure?.siret,
+            structure?.nbPostesAvantCoselec ?? 'Non renseigné',
+            structure?.nbPostesApresCoselec ?? 'Non renseigné',
+            structure?.nbPostesApresCoselec !== undefined &&
+            structure?.nbPostesAvantCoselec !== undefined
+              ? structure.nbPostesApresCoselec - structure.nbPostesAvantCoselec
+              : 'Non renseigné',
+            structure?.statut === 'Avenant - ajout de poste'
+              ? 'ajout'
+              : 'retrait',
+            structure?.numeroDossierDS,
             structure?.codeDepartement,
-            structure?.statutStructure,
-            structure?.nbPostesAttribuees ?? 'Non renseigné',
-            formatDate(structure?.dateSorted),
-            structure?.statut,
-            structure?.nbPostesSouhaites ?? '',
-            structure?.nbContratsValides ?? 'Non renseigné',
-            structure?.nbContratsRenouveles ?? 'Non renseigné',
-            formatDate(structure?.dateFinPremierContrat),
-            structure?.statutDemande,
+            structure?.codeRegion,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

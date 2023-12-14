@@ -61,7 +61,9 @@ const getContratsRecruterRenouveler =
 const formatAvenant = (avenant, structure, coselec, misesEnRelation) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
-  item.nom = structure.nom;
+  item.siret = structure.siret;
+  item.nbPostesAvantCoselec = avenant.nbPostesAvantCoselec;
+  item.nbPostesApresCoselec = avenant.nbPostesApresCoselec;
   item.nbPostesAttribuees = coselec?.nombreConseillersCoselec ?? 0;
   item.dateDeCreation = avenant.emetteurAvenant.date;
   item.dateSorted = avenant.emetteurAvenant.date;
@@ -71,6 +73,11 @@ const formatAvenant = (avenant, structure, coselec, misesEnRelation) => {
   item.statutStructure = structure.statut;
   item.nbContratsValides = countContratValider(misesEnRelation);
   item.nbContratsRenouveles = countContratRenouveler(misesEnRelation);
+  item.numeroDossierDS =
+    structure.conventionnement?.statut ===
+    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+      ? structure.conventionnement?.dossierConventionnement?.numero
+      : structure.conventionnement?.dossierReconventionnement?.numero;
 
   return item;
 };
@@ -122,7 +129,7 @@ const getExportHistoriqueDossiersConventionCsv =
           {
             $project: {
               _id: 1,
-              nom: 1,
+              siret: 1,
               idPG: 1,
               type: 1,
               codeRegion: 1,
