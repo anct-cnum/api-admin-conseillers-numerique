@@ -3,40 +3,38 @@ import execute from '../utils';
 import { getCoselec } from '../../utils';
 import service from '../../helpers/services';
 
-// ts-node src/tools/scripts/fix-quotas-validation-coselec.ts
+// ts-node src/tools/scripts/add-quotas-demandes-coselec.ts
 
 execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
-    const structures = await app.service(service.structures).Model.find({
-      statut: 'VALIDATION_COSELEC',
-    });
-
-    const structuresATraiter = [];
-
-    for (const structure of structures) {
-      const demandeEnCours = structure.demandesCoselec?.filter(
-        (demande) => demande.statut === 'en_cours',
-      );
-      if (demandeEnCours?.length === 1) {
-        logger.info(
-          `La structure ${structure.idPG} a une demande coselec en cours`,
-        );
-        structuresATraiter.push(structure);
-      }
-    }
+    const structuresATraiter = await app
+      .service(service.structures)
+      .Model.find({
+        demandesCoselec: {
+          $exists: true,
+          $size: 1,
+          $elemMatch: { statut: 'en_cours' },
+        },
+      });
 
     logger.info(
       `Nombre de structures à traiter: ${structuresATraiter?.length}`,
     );
+
     for (const structure of structuresATraiter) {
       try {
+        const coselec = getCoselec(structure).nombreConseillersCoselec;
+        if (coselec === 0) {
+          logger.warn(
+            `La structure ${structure.idPG} n'a pas de conseiller COSELEC`,
+          );
+        }
         // eslint-disable-next-line no-await-in-loop
         await app.service(service.structures).Model.updateOne(
           { _id: structure._id },
           {
             $set: {
-              'demandesCoselec.0.nbPostesAvantDemande':
-                getCoselec(structure)?.nombreConseillersCoselec,
+              'demandesCoselec.0.nbPostesAvantDemande': coselec,
             },
           },
         );
