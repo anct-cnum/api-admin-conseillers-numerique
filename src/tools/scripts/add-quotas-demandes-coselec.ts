@@ -28,6 +28,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           logger.warn(
             `La structure ${structure.idPG} n'a pas de conseiller COSELEC`,
           );
+          return;
         }
         // eslint-disable-next-line no-await-in-loop
         await app.service(service.structures).Model.updateOne(
