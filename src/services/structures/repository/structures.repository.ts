@@ -97,7 +97,7 @@ const formatAdresseStructure = (insee) => {
     insee?.adresse?.libelle_commune ?? ''
   }`;
 
-  return adresse.replace(/["']/g, '');
+  return adresse.replace(/["',]/g, '');
 };
 
 const filterSortColonne = (nomOrdre: string, ordre: number) => {

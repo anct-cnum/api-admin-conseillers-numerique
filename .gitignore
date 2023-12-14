@@ -2,7 +2,7 @@ node_modules/
 coverage/
 .env
 config/local.json
-data/exports/*
+datas/exports/*
 .DS_Store
 .clever.json
 .idea/
