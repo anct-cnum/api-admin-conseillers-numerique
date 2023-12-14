@@ -77,8 +77,8 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.conseiller?.statut ? 'oui' : 'non'};
-          ${miseEnrelation.structure?.siret};${miseEnrelation.structure
+          };${checkIfCcp1(miseEnrelation.conseiller?.statut)};${miseEnrelation
+            .structure?.siret};${miseEnrelation.structure
             ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
             ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
             .structure?.codeCommune};${miseEnrelation.structure
