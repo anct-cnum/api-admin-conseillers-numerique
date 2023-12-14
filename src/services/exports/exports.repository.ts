@@ -54,7 +54,7 @@ const checkIfCcp1 = (statut) =>
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
   );
   try {
     await Promise.all(
@@ -77,7 +77,8 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.structure?.siret};${miseEnrelation.structure
+          };${miseEnrelation.conseiller?.statut ? 'oui' : 'non'};
+          ${miseEnrelation.structure?.siret};${miseEnrelation.structure
             ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
             ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
             .structure?.codeCommune};${miseEnrelation.structure
