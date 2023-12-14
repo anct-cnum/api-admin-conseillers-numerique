@@ -21,4 +21,5 @@ jobs:
         type: now
         from_branch: recette
         target_branch: staging
+        message: Merge auto recette into staging
         github_token: ${{ secrets.GITHUB_TOKEN }} #automatically created
