@@ -421,7 +421,7 @@ const validationRuptureConseiller =
         return;
       }
       if (
-        new Date(dateFinDeContrat) >= new Date(miseEnRelation?.dateFinDeContrat)
+        new Date(dateFinDeContrat) > new Date(miseEnRelation?.dateFinDeContrat)
       ) {
         res.status(409).json({
           message:

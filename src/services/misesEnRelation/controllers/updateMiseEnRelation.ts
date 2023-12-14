@@ -137,7 +137,7 @@ const updateMiseEnRelation =
           return;
         }
         if (
-          new Date(req.body.dateRupture) >=
+          new Date(req.body.dateRupture) >
           new Date(miseEnRelationVerif?.dateFinDeContrat)
         ) {
           res.status(409).json({
