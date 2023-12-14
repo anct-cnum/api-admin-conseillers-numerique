@@ -35,7 +35,6 @@ const updateMiseEnRelation = (app) => async (id, updatedAt) =>
         statut: 'terminee_naturelle',
         'conseillerObj.statut': 'TERMINE',
         'conseillerObj.disponible': true,
-        'conseillerObj.nonAffichageCarto': true,
         'conseillerObj.updatedAt': updatedAt,
       },
     },
