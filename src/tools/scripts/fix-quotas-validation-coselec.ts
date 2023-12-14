@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-
-import fs from 'fs';
-import path from 'path';
 import execute from '../utils';
 import { getCoselec } from '../../utils';
 import service from '../../helpers/services';
@@ -17,7 +14,9 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
     const structuresATraiter = [];
 
     for (const structure of structures) {
-      const demandeEnCours = structure.demandesCoselec?.filter(demande => demande.statut === 'en_cours');
+      const demandeEnCours = structure.demandesCoselec?.filter(
+        (demande) => demande.statut === 'en_cours',
+      );
       if (demandeEnCours?.length === 1) {
         logger.info(
           `La structure ${structure.idPG} a une demande coselec en cours`,
@@ -26,7 +25,9 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       }
     }
 
-    logger.info(`Nombre de structures à traiter: ${structuresATraiter?.length}`);
+    logger.info(
+      `Nombre de structures à traiter: ${structuresATraiter?.length}`,
+    );
     for (const structure of structuresATraiter) {
       try {
         // eslint-disable-next-line no-await-in-loop
@@ -34,13 +35,12 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           { _id: structure._id },
           {
             $set: {
-              'demandesCoselec.0.nbPostesAvantDemande': getCoselec(structure)?.nombreConseillersCoselec,
+              'demandesCoselec.0.nbPostesAvantDemande':
+                getCoselec(structure)?.nombreConseillersCoselec,
             },
           },
         );
-        logger.info(
-          `La structure ${structure.idPG} a été mise à jour`,
-        );
+        logger.info(`La structure ${structure.idPG} a été mise à jour`);
       } catch (error) {
         logger.error(
           `Erreur lors du traitement de la structure ${structure.idPG}: ${error}`,
