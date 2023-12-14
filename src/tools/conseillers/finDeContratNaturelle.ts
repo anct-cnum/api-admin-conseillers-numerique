@@ -42,7 +42,7 @@ const updateMiseEnRelation = (app) => async (id, updatedAt) =>
   );
 
 const updateConseillersDisponibilite = (app) => async (email, updatedAt) =>
-  app.service(service.conseillers).Model.updateOne(
+  app.service(service.conseillers).Model.updateMany(
     {
       email,
     },
@@ -81,10 +81,6 @@ execute(__filename, async ({ app, logger, exit }) => {
     const dateDuJour = new Date();
     const { fix } = options;
 
-    logger.info(
-      'Recherche des contrats encore en cours alors que la date de fin de contrat est passée.',
-    );
-
     const misesEnRelationsFinContrat = await getMisesEnRelationsFinContrat(app)(
       dateDuJour,
     );
@@ -104,23 +100,23 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
 
       if (fix) {
-        await updateConseiller(app)(
-          miseEnRelationFinContrat.conseiller.oid,
-          dateDuJour,
+        const pool = new Pool();
+        const datePG = dayjs(dateDuJour).format('YYYY-MM-DD');
+        await updateConseillersPG(pool)(
+          miseEnRelationFinContrat.conseillerObj.email,
+          true,
+          datePG,
         ).then(async () => {
-          logger.info(
-            `Le conseiller a été passé en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.oid})`,
-          );
-          const pool = new Pool();
-          const datePG = dayjs(dateDuJour).format('YYYY-MM-DD');
-          await updateConseillersPG(pool)(
-            miseEnRelationFinContrat.conseillerObj.email,
-            true,
-            datePG,
+          await updateConseiller(app)(
+            miseEnRelationFinContrat.conseiller.oid,
+            dateDuJour,
           );
           await updateConseillersDisponibilite(app)(
             miseEnRelationFinContrat.conseillerObj.email,
             dateDuJour,
+          );
+          logger.info(
+            `Le conseiller a été passé en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.oid})`,
           );
         });
         await updateMiseEnRelation(app)(

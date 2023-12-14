@@ -99,7 +99,7 @@ const createConseillersTermines = (app) => async (conseiller, dateFincontrat) =>
 program
   .option(
     '-f, --fix',
-    'fix: mise à jour des mises en relation en statut terminee_naturelle',
+    'fix: cloture des comptes de conseillers avec un statut terminee_naturelle',
   )
   .parse(process.argv);
 
@@ -111,28 +111,28 @@ execute(__filename, async ({ app, logger, exit }) => {
     const dateMoins2Mois = dayjs(updatedAt).subtract(2, 'month');
 
     logger.info('Cloture des contrats passer en statut terminee_naturelle');
-    const finaliseesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
+    const termineesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
       app,
     )(dateMoins2Mois);
 
-    if (finaliseesNaturelles.length === 0) {
+    if (termineesNaturelles.length === 0) {
       logger.info(`Fin de contrat naturelle : aucun contrat à clôturer`);
       exit();
       return;
     }
 
     logger.info(
-      `Il y a ${finaliseesNaturelles.length} conseillers comportant le statut terminee_naturelle.`,
+      `Il y a ${termineesNaturelles.length} conseillers comportant le statut terminee_naturelle.`,
     );
-    for (const finaliseeNaturelle of finaliseesNaturelles) {
+    for (const termineeNaturelle of termineesNaturelles) {
       logger.info(
         // eslint-disable-next-line
-        `Le conseiller (idPG: ${finaliseeNaturelle.conseillerObj.idPG}) va être traité.`,
+        `Le conseiller (idPG: ${termineeNaturelle.conseillerObj.idPG}) va être traité.`,
       );
       const conseiller = await getConseiller(app)(
-        finaliseeNaturelle.conseiller.oid,
+        termineeNaturelle.conseiller.oid,
       );
-      const user = await getUser(app)(finaliseeNaturelle.conseiller.oid);
+      const user = await getUser(app)(termineeNaturelle.conseiller.oid);
 
       if (fix) {
         // suppression du conseiller dans les permanences
@@ -207,7 +207,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         );
         const errorSmtpMailFinContratStructure =
           await messageFinContratStructure
-            .send(finaliseeNaturelle, finaliseeNaturelle.structureObj)
+            .send(termineeNaturelle, termineeNaturelle.structureObj)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
             });
