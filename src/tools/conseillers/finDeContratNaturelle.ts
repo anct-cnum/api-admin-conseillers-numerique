@@ -62,7 +62,6 @@ const updateConseiller = (app) => async (idConseiller, updatedAt) =>
     {
       $set: {
         statut: 'TERMINE',
-        nonAffichageCarto: true,
         updatedAt,
       },
     },
