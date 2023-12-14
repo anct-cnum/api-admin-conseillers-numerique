@@ -116,7 +116,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     )(dateMoins2Mois);
 
     if (finaliseesNaturelles.length === 0) {
-      logger.info(`Aucun contrat n'a été trouvé`);
+      logger.info(`Fin de contrat naturelle : aucun contrat à clôturer`);
       exit();
       return;
     }
