@@ -597,6 +597,8 @@ export interface IConseillersTermines {
   _id: ObjectId;
   conseillerId: Types.ObjectId;
   structureId: Types.ObjectId;
+  typeContrat: String;
+  dateDebutContrat: Date;
   dateFinContrat: Date;
 }
 export interface AccessLogs {

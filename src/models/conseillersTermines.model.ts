@@ -9,6 +9,8 @@ export default function (app: Application): Model<any> {
     {
       conseillerId: { type: 'ObjectId' },
       structureId: { type: 'ObjectId' },
+      typeContrat: { type: String },
+      dateDebutContrat: { type: Date },
       dateFinContrat: { type: Date },
     },
     { strict: false, collection: 'conseillersTermines', versionKey: false },

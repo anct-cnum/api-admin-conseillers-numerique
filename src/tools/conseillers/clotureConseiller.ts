@@ -89,11 +89,13 @@ const updateUser = (app) => async (idUser, email) =>
     },
   );
 
-const createConseillersTermines = (app) => async (conseiller, dateFincontrat) =>
+const createConseillersTermines = (app) => async (conseiller, miseEnRelation) =>
   app.service(service.conseillersTermines).Model.create({
     conseillerId: conseiller._id,
     structureId: conseiller.structureId,
-    dateFinContrat: dateFincontrat,
+    typeContrat: miseEnRelation.typeDeContrat,
+    dateDebutContrat: miseEnRelation.dateDebutDeContrat,
+    dateFinContrat: miseEnRelation.dateFinDeContrat,
   });
 
 program
@@ -221,10 +223,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             `Le conseiller a été remis à zéro (id: ${conseiller._id}`,
           );
         });
-        await createConseillersTermines(app)(
-          conseiller,
-          termineeNaturelle.dateFinDeContrat,
-        );
+        await createConseillersTermines(app)(conseiller, termineeNaturelle);
 
         // mise aux normes de l'utilisateur
         await updateUser(app)(user._id, conseiller.email).then(async () => {
