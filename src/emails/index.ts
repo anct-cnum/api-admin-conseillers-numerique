@@ -1,15 +1,15 @@
 import creationCompteCandidat from './candidats/creationCompteCandidat';
 import creationCompteConseiller from './conseillers/creationCompteConseiller';
 import relanceCreationCompteConseiller from './conseillers/relanceCreationCompteConseiller';
-import conseillerFinContratNaturelle from './conseillers/conseillerFinContratNaturelle';
-import conseillerFinContrat from './conseillers/conseillerFinContrat';
+import preventionSuppressionConseiller from './conseillers/preventionSuppressionConseiller';
+import suppressionCompteConseiller from './conseillers/suppressionCompteConseiller';
 import invitationActiveCompte from './invitations/invitationActiveCompte';
 import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
 import conseillerRupturePix from './pix/conseillerRupturePix';
 import conseillerFinContratNaturellePix from './pix/conseillerFinContratNaturellePix';
 import conseillerRuptureStructure from './structures/conseillerRuptureStructure';
-import conseillerFutureFinContrat from './structures/conseillerFutureFinContrat';
-import conseillerFinContratStructure from './structures/conseillerFinContratStructure';
+import prenventionSuppressionConseillerStructure from './structures/prenventionSuppressionConseillerStructure';
+import suppressionCompteConseillerStructure from './structures/suppressionCompteConseillerStructure';
 import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
 import informationValidationCoselecCoordinateur from './structures/informationValidationCoselecCoordinateur';
@@ -22,15 +22,15 @@ export {
   creationCompteCandidat,
   creationCompteConseiller,
   relanceCreationCompteConseiller,
-  conseillerFinContratNaturelle,
-  conseillerFinContrat,
+  preventionSuppressionConseiller,
+  suppressionCompteConseiller,
   invitationActiveCompte,
   invitationMultiRoleCompte,
   conseillerRupturePix,
   conseillerFinContratNaturellePix,
   conseillerRuptureStructure,
-  conseillerFutureFinContrat,
-  conseillerFinContratStructure,
+  prenventionSuppressionConseillerStructure,
+  suppressionCompteConseillerStructure,
   candidatSupprimePix,
   informationValidationCoselec,
   informationValidationCoselecCoordinateur,

@@ -100,8 +100,6 @@ export interface IMisesEnRelation {
 
   resendMailCnfsRupture: boolean | undefined;
 
-  resendMailCnfsFinContrat: boolean | undefined;
-
   dossierIncompletRupture: boolean | undefined;
 
   reconventionnement: boolean | undefined;

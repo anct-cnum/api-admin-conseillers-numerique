@@ -8,10 +8,10 @@ import dayjs from 'dayjs';
 import execute from '../utils';
 import mailer from '../../mailer';
 import service from '../../helpers/services';
-import { updateConseillersPG } from '../../utils/functionsDeleteConseiller';
+import { updateConseillersPG } from '../../utils/functionsDeleteRoleConseiller';
 import {
-  conseillerFinContratNaturelle,
-  conseillerFutureFinContrat,
+  preventionSuppressionConseiller,
+  prenventionSuppressionConseillerStructure,
 } from '../../emails';
 
 const { Pool } = require('pg');
@@ -127,28 +127,31 @@ execute(__filename, async ({ app, logger, exit }) => {
         });
         // Envoie de mail conseiller et structure
         const mailerInstance = mailer(app);
-        const messageFinContrat = conseillerFinContratNaturelle(mailerInstance);
-        const errorSmtpMailFinContratNaturelle = await messageFinContrat
-          .send(miseEnRelationFinContrat.conseillerObj)
-          .catch((errSmtp: Error) => {
-            logger.error(errSmtp);
-          });
-        if (errorSmtpMailFinContratNaturelle instanceof Error) {
-          logger.error(errorSmtpMailFinContratNaturelle.message);
+        const messagePreventionFinContrat =
+          preventionSuppressionConseiller(mailerInstance);
+        const errorSmtpMailPreventionFinContratNaturelle =
+          await messagePreventionFinContrat
+            .send(miseEnRelationFinContrat.conseillerObj)
+            .catch((errSmtp: Error) => {
+              logger.error(errSmtp);
+            });
+        if (errorSmtpMailPreventionFinContratNaturelle instanceof Error) {
+          logger.error(errorSmtpMailPreventionFinContratNaturelle.message);
         }
 
-        const messageFutureFinContrat =
-          conseillerFutureFinContrat(mailerInstance);
-        const errorSmtpMailFutureFinContrat = await messageFutureFinContrat
-          .send(
-            miseEnRelationFinContrat.conseillerObj,
-            miseEnRelationFinContrat.structureObj,
-          )
-          .catch((errSmtp: Error) => {
-            logger.error(errSmtp);
-          });
-        if (errorSmtpMailFutureFinContrat instanceof Error) {
-          logger.error(errorSmtpMailFutureFinContrat.message);
+        const messagePreventionFinContratStructure =
+          prenventionSuppressionConseillerStructure(mailerInstance);
+        const errorSmtpMailPreventionFinContratStructure =
+          await messagePreventionFinContratStructure
+            .send(
+              miseEnRelationFinContrat.conseillerObj,
+              miseEnRelationFinContrat.structureObj,
+            )
+            .catch((errSmtp: Error) => {
+              logger.error(errSmtp);
+            });
+        if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
+          logger.error(errorSmtpMailPreventionFinContratStructure.message);
         }
       }
     }

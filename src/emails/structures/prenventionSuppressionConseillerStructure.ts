@@ -2,7 +2,7 @@ import logger from '../../logger';
 
 export default function (mailer) {
   const { utils } = mailer;
-  const templateName = 'conseillerFinContrat';
+  const templateName = 'prenventionSuppressionConseillerStructure';
 
   const render = async (conseiller) => {
     return mailer.render(__dirname, templateName, { conseiller });
@@ -10,10 +10,10 @@ export default function (mailer) {
 
   return {
     render,
-    send: async (conseiller) => {
+    send: async (conseiller, structure) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour prévenir de la suppression définitive du conseiller ${conseiller.nom} ${conseiller.prenom}`,
+          `Email envoyé avec succès pour prévenir de la suppression du conseiller idPG ${conseiller.idPG}`,
         );
       };
       const onError = async (err: Error) => {
@@ -23,9 +23,9 @@ export default function (mailer) {
       return mailer
         .createMailer()
         .sendEmail(
-          conseiller.email,
+          structure.contact.email,
           {
-            subject: 'Au revoir',
+            subject: 'Départ dans 2 mois',
             body: await render(conseiller),
           },
           {},

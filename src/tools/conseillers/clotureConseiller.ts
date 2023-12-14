@@ -10,8 +10,8 @@ import service from '../../helpers/services';
 import mailer from '../../mailer';
 import {
   conseillerFinContratNaturellePix,
-  conseillerFinContratStructure,
-  conseillerFinContrat,
+  suppressionCompteConseillerStructure,
+  suppressionCompteConseiller,
 } from '../../emails';
 import {
   deleteConseillerInCoordinateurs,
@@ -20,7 +20,7 @@ import {
   deletePermanencesInCras,
   deleteMattermostAccount,
   deleteMailbox,
-} from '../../utils/functionsDeleteConseiller';
+} from '../../utils/functionsDeleteRoleConseiller';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -191,7 +191,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         }
 
         const messageFinContratConseiller =
-          conseillerFinContrat(mailerInstance);
+          suppressionCompteConseiller(mailerInstance);
         const errorSmtpMailFinContrat = await messageFinContratConseiller
           .send(conseiller)
           .catch((errSmtp: Error) => {
@@ -201,7 +201,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           logger.error(errorSmtpMailFinContrat.message);
         }
 
-        const messageFinContratStructure = conseillerFinContratStructure(
+        const messageFinContratStructure = suppressionCompteConseillerStructure(
           app,
           mailerInstance,
         );
@@ -221,7 +221,10 @@ execute(__filename, async ({ app, logger, exit }) => {
             `Le conseiller a été remis à zéro (id: ${conseiller._id}`,
           );
         });
-        await createConseillersTermines(app)(conseiller, dateMoins2Mois);
+        await createConseillersTermines(app)(
+          conseiller,
+          termineeNaturelle.dateFinDeContrat,
+        );
 
         // mise aux normes de l'utilisateur
         await updateUser(app)(user._id, conseiller.email).then(async () => {

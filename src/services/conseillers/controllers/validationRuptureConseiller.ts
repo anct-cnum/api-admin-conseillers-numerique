@@ -18,7 +18,7 @@ import {
   conseillerRupturePix,
   conseillerRuptureStructure,
 } from '../../../emails';
-import { updateConseillersPG } from '../../../utils/functionsDeleteConseiller';
+import { updateConseillersPG } from '../../../utils/functionsDeleteRoleConseiller';
 
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
