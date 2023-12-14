@@ -8,6 +8,7 @@ import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
+import { validUpdateMisesEnRelation } from '../../../schemas/miseEnRelation.schemas';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -20,6 +21,13 @@ const updateMiseEnRelation =
     let remove = {};
 
     try {
+      const validationUpdateStatutAndBanniere =
+        await validUpdateMisesEnRelation.validate(update);
+      if (validationUpdateStatutAndBanniere.error) {
+        res.statusMessage = validationUpdateStatutAndBanniere.error.message;
+        res.status(400).end();
+        return;
+      }
       const miseEnRelationVerif: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
