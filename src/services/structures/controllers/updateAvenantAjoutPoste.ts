@@ -26,6 +26,7 @@ interface IUpdateStructureAvenant {
     'demandesCoselec.$.statut': string;
     'demandesCoselec.$.nombreDePostesAccordes'?: number;
     'demandesCoselec.$.banniereValidationAvenant'?: boolean;
+    'demandesCoselec.$.validateurAvenant'?: object;
   };
 }
 
@@ -44,6 +45,7 @@ interface IUpdateMiseEnRelationAvenant {
     'structureObj.demandesCoselec.$.statut': string;
     'structureObj.demandesCoselec.$.nombreDePostesAccordes'?: number;
     'structureObj.demandesCoselec.$.banniereValidationAvenant'?: boolean;
+    'structureObj.demandesCoselec.$.validateurAvenant'?: object;
   };
 }
 
@@ -109,6 +111,10 @@ const updateAvenantAjoutPoste =
           'demandesCoselec.$.statut': 'validee',
           'demandesCoselec.$.nombreDePostesAccordes': Number(nbDePosteAccorder),
           'demandesCoselec.$.banniereValidationAvenant': true,
+          'demandesCoselec.$.validateurAvenant': {
+            email: req.user?.name,
+            date: dateCoselec,
+          },
         };
         paramsUpdateCollectionStructure.$push = {
           coselec: {
@@ -125,6 +131,10 @@ const updateAvenantAjoutPoste =
           'structureObj.demandesCoselec.$.nombreDePostesAccordes':
             Number(nbDePosteAccorder),
           'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
+          'structureObj.demandesCoselec.$.validateurAvenant': {
+            email: req.user?.name,
+            date: dateCoselec,
+          },
         };
         paramsUpdateCollectionMiseEnRelation.$push = {
           'structureObj.coselec': {

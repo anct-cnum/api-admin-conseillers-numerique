@@ -8,6 +8,7 @@ import { validCreationAvenant } from '../../../schemas/structures.schemas';
 import getDetailStructureById from './getDetailStructureById';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
+import { getCoselec } from '../../../utils';
 
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -69,6 +70,7 @@ const createAvenant =
       statut: 'en_cours',
       banniereValidationAvenant: false,
       phaseConventionnement,
+      nbPostesAvantDemande: getCoselec(getStructure).nombreConseillersCoselec,
     };
 
     try {
