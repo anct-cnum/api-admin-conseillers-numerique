@@ -9,7 +9,7 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import mailer from '../../mailer';
 import {
-  conseillerFinContratNaturellePix,
+  conseillerRupturePix,
   suppressionCompteConseillerStructure,
   suppressionCompteConseiller,
 } from '../../emails';
@@ -181,8 +181,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
         // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
         const mailerInstance = mailer(app);
-        const messageFinContratPix =
-          conseillerFinContratNaturellePix(mailerInstance);
+        const messageFinContratPix = conseillerRupturePix(mailerInstance);
         const errorSmtpMailFinContratPix = await messageFinContratPix
           .send(conseiller)
           .catch((errSmtp: Error) => {

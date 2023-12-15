@@ -6,7 +6,6 @@ import suppressionCompteConseiller from './conseillers/suppressionCompteConseill
 import invitationActiveCompte from './invitations/invitationActiveCompte';
 import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
 import conseillerRupturePix from './pix/conseillerRupturePix';
-import conseillerFinContratNaturellePix from './pix/conseillerFinContratNaturellePix';
 import conseillerRuptureStructure from './structures/conseillerRuptureStructure';
 import prenventionSuppressionConseillerStructure from './structures/prenventionSuppressionConseillerStructure';
 import suppressionCompteConseillerStructure from './structures/suppressionCompteConseillerStructure';
@@ -27,7 +26,6 @@ export {
   invitationActiveCompte,
   invitationMultiRoleCompte,
   conseillerRupturePix,
-  conseillerFinContratNaturellePix,
   conseillerRuptureStructure,
   prenventionSuppressionConseillerStructure,
   suppressionCompteConseillerStructure,
