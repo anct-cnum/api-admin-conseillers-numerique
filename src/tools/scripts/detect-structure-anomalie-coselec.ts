@@ -36,7 +36,10 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
             statut: { $in: ['finalisee', 'nouvelle_rupture'] },
           });
 
-        if (misesEnRelation.length === 0 && nombreConseillersCoselec === 0) {
+        if (
+          (misesEnRelation.length === 0 && nombreConseillersCoselec === 0) ||
+          coselec?.avisCoselec !== 'POSITIF'
+        ) {
           countOk += 1;
         } else {
           const anomalie = `${nombreConseillersCoselec} Poste(s) / ${misesEnRelation.length} contrat(s)`;
