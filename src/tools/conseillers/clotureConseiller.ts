@@ -96,6 +96,10 @@ const createConseillersTermines = (app) => async (conseiller, miseEnRelation) =>
     typeContrat: miseEnRelation.typeDeContrat,
     dateDebutContrat: miseEnRelation.dateDebutDeContrat,
     dateFinContrat: miseEnRelation.dateFinDeContrat,
+    phaseConventionnement: miseEnRelation?.phaseConventionnement ?? null,
+    reconventionnement: miseEnRelation?.reconventionnement ?? false,
+    numeroDSContrat: miseEnRelation?.numeroDSContrat ?? null,
+    dureeEffectiveContrat: miseEnRelation?.dureeEffectiveContrat ?? null,
   });
 
 program

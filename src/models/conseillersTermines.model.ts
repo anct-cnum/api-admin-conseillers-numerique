@@ -12,6 +12,10 @@ export default function (app: Application): Model<any> {
       typeContrat: { type: String },
       dateDebutContrat: { type: Date },
       dateFinContrat: { type: Date },
+      phaseConventionnement: { type: String },
+      reconventionnement: { type: Boolean },
+      numeroDSContrat: { type: String },
+      dureeEffectiveContrat: { type: String },
     },
     { strict: false, collection: 'conseillersTermines', versionKey: false },
   );

@@ -600,6 +600,10 @@ export interface IConseillersTermines {
   typeContrat: String;
   dateDebutContrat: Date;
   dateFinContrat: Date;
+  phaseConventionnement: String;
+  reconventionnement: Boolean;
+  numeroDSContrat: String;
+  dureeEffectiveContrat: String;
 }
 export interface AccessLogs {
   createdAt: Date;
