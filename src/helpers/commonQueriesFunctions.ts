@@ -39,20 +39,26 @@ const getConseillersById = (app: Application) => async (structuresIds: any) => {
   }
 };
 
-const findRegionNameByNumDepartement = (departement: string) => {
+const findRegionNameByNumDepartement = (
+  departement: string,
+  codeCom: string,
+) => {
   if (departement === '00') {
     return departementRegionTom.find(
-      (dep: IDepartement) => dep.num_dep === departement,
+      (dep: IDepartement) => dep.num_dep === codeCom,
     ).region_name;
   }
   return departements.find((dep: IDepartement) => dep.num_dep === departement)
     .region_name;
 };
 
-const findDepartementNameByNumDepartement = (departement: string) => {
+const findDepartementNameByNumDepartement = (
+  departement: string,
+  codeCom: string,
+) => {
   if (departement === '00') {
     return departementRegionTom.find(
-      (dep: IDepartement) => dep.num_dep === departement,
+      (dep: IDepartement) => dep.num_dep === codeCom,
     ).dep_name;
   }
   return departements.find((dep: IDepartement) => dep.num_dep === departement)

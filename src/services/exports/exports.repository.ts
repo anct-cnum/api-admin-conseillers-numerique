@@ -949,12 +949,10 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure?.idPG,
             structure?.siret,
             formatDate(structure?.dateDeValidation),
-            structure?.nbPostesAvantDemande ?? 'Non renseigné',
-            structure?.nbPostesApresDemande ?? 'Non renseigné',
-            structure?.variation ?? 'Non renseigné',
-            structure?.statut === 'Avenant - ajout de poste'
-              ? 'ajout'
-              : 'retrait',
+            structure?.nbPostesAvantDemande,
+            structure?.nbPostesApresDemande,
+            structure?.variation,
+            structure?.type,
             structure?.numeroDossierDS,
             structure?.codeDepartement,
             structure?.departement,
