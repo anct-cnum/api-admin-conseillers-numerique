@@ -90,5 +90,6 @@
     "domain": "GANDI_DOMAIN",
     "type": "GANDI_TYPE"
   },
-  "sib_api_key": "SIB_API_KEY"
+  "sib_api_key": "SIB_API_KEY",
+  "contrat_smic": "CONTRAT_SMIC"
 }

@@ -69,6 +69,13 @@ const updateContratRecrutementAdmin =
         contratUpdated.$unset = { dateFinDeContrat: '' };
       }
       if (salaire) {
+        if (Number(salaire) < app.get('contrat_smic')) {
+          res.status(400).json({
+            message:
+              'Le salaire doit être égale ou plus élévé que le minimum brut légal',
+          });
+          return;
+        }
         contratUpdated.$set.salaire = Number(salaire.replace(',', '.'));
       } else {
         contratUpdated.$unset = { salaire: '' };
