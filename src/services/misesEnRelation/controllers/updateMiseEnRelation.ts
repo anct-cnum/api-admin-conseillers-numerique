@@ -55,6 +55,8 @@ const updateMiseEnRelation =
             return;
           }
         }
+      }
+      if (req.body.statut === 'finalisee') {
         remove = {
           emetteurRupture: '',
           dateRupture: '',
