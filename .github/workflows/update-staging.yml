@@ -1,0 +1,25 @@
+name: Mise à jour de la branche staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ recette ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.9.0]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Merge recette -> staging
+      uses: devmasx/merge-branch@master
+      with:
+        type: now
+        from_branch: recette
+        target_branch: staging
+        message: Merge auto recette into staging
+        github_token: ${{ secrets.GITHUB_TOKEN }} #automatically created
