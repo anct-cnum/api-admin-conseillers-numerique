@@ -47,6 +47,7 @@ export default function (app: Application): Model<any> {
       nombreDePostesAccordes: Number,
       nombreDePostesRendus: Number,
       validateurAvenant: Object,
+      nbPostesAvantDemande: Number,
     },
     { _id: false, strict: false },
   );
