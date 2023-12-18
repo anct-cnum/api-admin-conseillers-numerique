@@ -5,6 +5,7 @@ import service from './services';
 
 const hubs = require('../../datas/imports/hubs.json');
 const departements = require('../../datas/imports/departements-region.json');
+const departementRegionTom = require('../../datas/imports/departements-region-tom.json');
 
 // Récupération du hub correspondant (département ou région) dans la liste des hubs (fichier hub.json)
 const findDepartementOrRegion = (nomHub: string) => {
@@ -38,8 +39,30 @@ const getConseillersById = (app: Application) => async (structuresIds: any) => {
   }
 };
 
+const findRegionNameByNumDepartement = (departement: string) => {
+  if (departement === '00') {
+    return departementRegionTom.find(
+      (dep: IDepartement) => dep.num_dep === departement,
+    ).region_name;
+  }
+  return departements.find((dep: IDepartement) => dep.num_dep === departement)
+    .region_name;
+};
+
+const findDepartementNameByNumDepartement = (departement: string) => {
+  if (departement === '00') {
+    return departementRegionTom.find(
+      (dep: IDepartement) => dep.num_dep === departement,
+    ).dep_name;
+  }
+  return departements.find((dep: IDepartement) => dep.num_dep === departement)
+    .dep_name;
+};
+
 export {
   findDepartementOrRegion,
   findNumDepartementsByRegion,
   getConseillersById,
+  findRegionNameByNumDepartement,
+  findDepartementNameByNumDepartement,
 };

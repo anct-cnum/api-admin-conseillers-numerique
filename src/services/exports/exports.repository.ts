@@ -930,13 +930,15 @@ const generateCsvHistoriqueDossiersConvention = async (
     const fileHeaders = [
       'ID',
       'Siret plateforme',
+      'Date COSELEC',
       'Nombre de postes avant COSELEC',
       'Nombre de postes après COSELEC',
       'Variation',
       'Type de la demande',
       'N° DS',
       'Code département',
-      'Code région',
+      'Département',
+      'Région',
     ];
 
     res.write(
@@ -946,18 +948,17 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure?.idPG,
             structure?.siret,
-            structure?.nbPostesAvantCoselec ?? 'Non renseigné',
-            structure?.nbPostesApresCoselec ?? 'Non renseigné',
-            structure?.nbPostesApresCoselec !== undefined &&
-            structure?.nbPostesAvantCoselec !== undefined
-              ? structure.nbPostesApresCoselec - structure.nbPostesAvantCoselec
-              : 'Non renseigné',
+            formatDate(structure?.dateDeValidation),
+            structure?.nbPostesAvantDemande ?? 'Non renseigné',
+            structure?.nbPostesApresDemande ?? 'Non renseigné',
+            structure?.variation ?? 'Non renseigné',
             structure?.statut === 'Avenant - ajout de poste'
               ? 'ajout'
               : 'retrait',
             structure?.numeroDossierDS,
             structure?.codeDepartement,
-            structure?.codeRegion,
+            structure?.departement,
+            structure?.region,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
