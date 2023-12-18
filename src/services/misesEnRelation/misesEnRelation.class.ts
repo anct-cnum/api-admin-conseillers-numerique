@@ -17,6 +17,7 @@ import {
   getContrats,
   getHistoriqueContrats,
   annulationRecrutementContrat,
+  closeBannerAnnulationRecrutementContrat,
 } from './controllers';
 
 export default class MisesEnRelation extends Service {
@@ -45,6 +46,12 @@ export default class MisesEnRelation extends Service {
       authenticateMode(app),
       createAbilities(app),
       annulationRecrutementContrat(app),
+    );
+    app.patch(
+      '/banner/annulation-recrutement/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerAnnulationRecrutementContrat(app),
     );
     app.post(
       '/renouvellement/contrat',

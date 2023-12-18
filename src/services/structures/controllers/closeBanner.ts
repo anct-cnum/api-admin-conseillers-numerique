@@ -20,7 +20,6 @@ const closeBanner =
       'renouvellement',
       'avenant',
       'ajoutRoleCoordinateur',
-      'refusRecrutement',
     ];
     if (!typeValidation.includes(type)) {
       res.status(400).json({ message: 'Type incorrect' });
@@ -148,20 +147,6 @@ const closeBanner =
               statut: 'finalisee',
             },
             { $set: { banniereAjoutRoleCoordinateur: false } },
-          );
-      }
-
-      if (type === 'refusRecrutement' && conseillerId) {
-        await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateOne(
-            {
-              'conseiller.$id': new ObjectId(conseillerId),
-              'structure.$id': new ObjectId(req.params.id),
-              banniereRefusRecrutement: { $exists: true },
-            },
-            { $set: { banniereRefusRecrutement: false } },
           );
       }
 

@@ -5,7 +5,11 @@ import {
   createAccessToken,
   createRefreshToken,
 } from '../../../helpers/auth/createTokens';
-import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
+import {
+  IMisesEnRelation,
+  IStructures,
+  IUser,
+} from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
 
 const allowedRoles = [
@@ -129,6 +133,12 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 { _id: user.entity.oid },
                 { nom: 1, demandesCoordinateur: 1 },
               );
+            const miseEnRelationRefusRecrutement: IMisesEnRelation[] = await app
+              .service(service.misesEnRelation)
+              .Model.find({
+                'structure.$id': user.entity.oid,
+                banniereRefusRecrutement: true,
+              });
             const countDemandesCoordinateurValider =
               structure?.demandesCoordinateur?.filter(
                 (demandeCoordinateur) =>
@@ -148,13 +158,16 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                   statut: 'RECRUTE',
                   estCoordinateur: true,
                 });
-
               user._doc.displayBannerPosteCoordinateurStructure =
                 countCoordinateurs < countDemandesCoordinateurValider;
             }
             if (demandesCoordinateurBannerInformation?.length > 0) {
               user._doc.demandesCoordinateurBannerInformation =
                 demandesCoordinateurBannerInformation;
+            }
+            if (miseEnRelationRefusRecrutement?.length > 0) {
+              user._doc.miseEnRelationRefusRecrutement =
+                miseEnRelationRefusRecrutement;
             }
             user._doc.nomStructure = structure.nom;
           }

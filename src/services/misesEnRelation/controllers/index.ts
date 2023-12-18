@@ -12,6 +12,7 @@ import validationRenouvellementContrat from './validationRenouvellementContrat';
 import getHistoriqueContrats from './getHistoriqueContrats';
 import getMisesEnRelationARenouveller from './getMisesEnRelationARenouveller';
 import getContrats from './getContrats';
+import closeBannerAnnulationRecrutementContrat from './closeBannerAnnulationRecrutementContrat';
 
 export {
   annulationRecrutementContrat,
@@ -28,4 +29,5 @@ export {
   getHistoriqueContrats,
   getMisesEnRelationARenouveller,
   getContrats,
+  closeBannerAnnulationRecrutementContrat,
 };
