@@ -396,6 +396,10 @@ interface IDemandesCoselec {
     email: string;
   };
   banniereValidationAvenant: boolean;
+  validateurAvenant?: {
+    date: Date;
+    email: string;
+  };
 }
 
 export interface IDemandesCoordinateur {

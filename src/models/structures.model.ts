@@ -46,6 +46,7 @@ export default function (app: Application): Model<any> {
       phaseConventionnement: String,
       nombreDePostesAccordes: Number,
       nombreDePostesRendus: Number,
+      validateurAvenant: Object,
     },
     { _id: false, strict: false },
   );

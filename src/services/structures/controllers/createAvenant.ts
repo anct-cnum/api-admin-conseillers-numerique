@@ -70,7 +70,7 @@ const createAvenant =
       statut: 'en_cours',
       banniereValidationAvenant: false,
       phaseConventionnement,
-      nbPostesAvantDemande: getCoselec(getStructure).nombreConseillersCoselec,
+      nbPostesAvantDemande: getCoselec(getStructure).nombreConseillersCoselec ?? 0,
     };
 
     try {
