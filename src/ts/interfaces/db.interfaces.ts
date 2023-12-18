@@ -398,6 +398,11 @@ interface IDemandesCoselec {
     email: string;
   };
   banniereValidationAvenant: boolean;
+  nbPostesAvantDemande: number;
+  validateurAvenant?: {
+    date: Date;
+    email: string;
+  };
 }
 
 export interface IDemandesCoordinateur {
