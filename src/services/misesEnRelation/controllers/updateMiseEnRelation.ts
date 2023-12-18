@@ -32,7 +32,10 @@ const updateMiseEnRelation =
         res.status(403).json({ message: "La structure n'existe pas" });
         return;
       }
-      if (req.body.statut === 'finalisee') {
+      if (
+        miseEnRelationVerif.statut === 'recrutee' ||
+        miseEnRelationVerif.statut === 'finalisee'
+      ) {
         const dernierCoselec = getCoselec(structure);
         if (dernierCoselec !== null) {
           // Nombre de candidats déjà recrutés pour cette structure
