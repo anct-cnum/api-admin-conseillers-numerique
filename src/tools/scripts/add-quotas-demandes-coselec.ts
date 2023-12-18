@@ -26,7 +26,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
         const coselec = getCoselec(structure).nombreConseillersCoselec;
         if (coselec === 0) {
           logger.warn(
-            `La structure ${structure.idPG} n'a pas de conseiller COSELEC`,
+            `La structure ${structure.idPG} n'a pas de poste validé COSELEC`,
           );
           return;
         }
