@@ -26,7 +26,7 @@ const dossierIncompletRuptureConseiller =
           statut: 'nouvelle_rupture',
         });
       if (
-        new Date(dateFinDeContrat) >=
+        new Date(dateFinDeContrat) >
         new Date(miseEnRelationVerif?.dateFinDeContrat)
       ) {
         res.status(409).json({

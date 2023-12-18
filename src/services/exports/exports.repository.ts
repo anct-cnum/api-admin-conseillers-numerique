@@ -16,7 +16,7 @@ import {
   formatAdresseStructure,
   formatQpv,
 } from '../structures/repository/structures.repository';
-import { formatStatutMisesEnRelation } from '../conseillers/conseillers.repository';
+import { formatStatutMisesEnRelation } from '../conseillers/repository/conseillers.repository';
 
 dayjs.extend(utc);
 
@@ -54,7 +54,7 @@ const checkIfCcp1 = (statut) =>
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
   );
   try {
     await Promise.all(
@@ -77,7 +77,8 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${miseEnrelation.structure?.siret};${miseEnrelation.structure
+          };${checkIfCcp1(miseEnrelation.conseiller?.statut)};${miseEnrelation
+            .structure?.siret};${miseEnrelation.structure
             ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
             ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
             .structure?.codeCommune};${miseEnrelation.structure
@@ -667,8 +668,8 @@ const generateCsvTerritoires = async (
       'Personnes accompagnées',
       "Nombre d'accompagnement",
       'Dotation de conseillers',
-      "CnFS activé sur l'espace coop",
-      "CnFS en attente d'activation",
+      "Conum activé sur l'espace coop",
+      "Conum en attente d'activation",
       "Taux d'activation",
     ];
     res.write(
@@ -741,6 +742,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Id de la structure',
       'Nom de la structure',
       'Code postal de la structure',
+      'Adresse postale de la structure',
+      'Contact principal de la structure',
       'Nom',
       'Prénom',
       'Email Professionnelle',
@@ -772,6 +775,10 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.structureObj.idPG,
             miseEnRelation.structureObj.nom?.replaceAll(/["',]/g, ' '),
             miseEnRelation.structureObj.codePostal,
+            miseEnRelation.structureObj.insee
+              ? formatAdresseStructure(miseEnRelation.structureObj.insee)
+              : '',
+            miseEnRelation.structureObj.contact?.email,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??

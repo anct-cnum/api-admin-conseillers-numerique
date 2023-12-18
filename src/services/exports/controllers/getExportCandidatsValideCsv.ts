@@ -72,6 +72,7 @@ const getExportCandidatsValideStructureCsv =
                 'conseiller.telephone': 1,
                 'conseiller.nomCommune': 1,
                 'conseiller.codePostal': 1,
+                'conseiller.statut': 1,
                 'conseiller.codeDepartement': 1,
                 'conseiller.pix': 1,
                 'conseiller.datePrisePoste': 1,

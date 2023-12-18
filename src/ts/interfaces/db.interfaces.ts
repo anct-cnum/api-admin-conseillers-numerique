@@ -65,6 +65,8 @@ export interface IUser {
 
   passwordCreated?: boolean;
 
+  resetPasswordCnil?: boolean;
+
   timestamps?: boolean;
 
   hub?: string;

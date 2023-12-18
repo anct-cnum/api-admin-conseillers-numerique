@@ -403,7 +403,7 @@ const validationRuptureConseiller =
         return;
       }
       if (
-        new Date(dateFinDeContrat) >= new Date(miseEnRelation?.dateFinDeContrat)
+        new Date(dateFinDeContrat) > new Date(miseEnRelation?.dateFinDeContrat)
       ) {
         res.status(409).json({
           message:
@@ -499,6 +499,9 @@ const validationRuptureConseiller =
               { _id: userCoop._id },
               {
                 $set: { ...userToUpdate },
+                $unset: {
+                  resetPasswordCnil: '',
+                },
               },
             );
         } else {
@@ -511,6 +514,9 @@ const validationRuptureConseiller =
               { _id: userCoop._id },
               {
                 $set: { ...userWithoutName },
+                $unset: {
+                  resetPasswordCnil: '',
+                },
               },
             );
         }

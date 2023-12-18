@@ -7,7 +7,7 @@ import {
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
-import { checkAccessReadRequestConseillers } from '../conseillers.repository';
+import { checkAccessReadRequestConseillers } from '../repository/conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
 
 const getConseillerById =

@@ -9,7 +9,6 @@ import {
 } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { queryGetDossierDemarcheSimplifiee } from '../repository/reconventionnement.repository';
 import { getCoselec } from '../../../utils';
 import {
   IMisesEnRelation,
@@ -25,6 +24,7 @@ import {
   validationCandidaturePosteCoordinateur,
   validationCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
+import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 
 const { Pool } = require('pg');
 

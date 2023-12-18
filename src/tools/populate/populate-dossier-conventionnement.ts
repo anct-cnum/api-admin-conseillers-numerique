@@ -7,8 +7,8 @@ import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
-import { queryGetDossierDemarcheSimplifiee } from '../../services/structures/repository/reconventionnement.repository';
 import { StatutConventionnement } from '../../ts/enum';
+import { queryGetDossierDemarcheSimplifiee } from '../../services/structures/repository/demarchesSimplifiees.repository';
 
 program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
