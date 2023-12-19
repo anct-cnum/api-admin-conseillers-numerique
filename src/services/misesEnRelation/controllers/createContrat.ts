@@ -53,7 +53,7 @@ const createContrat =
       if (Number(salaire) < app.get('contrat_smic')) {
         res.status(400).json({
           message:
-            'Le salaire doit être égale ou plus élévé que le minimum brut légal',
+            'Le salaire doit être égal ou plus élevé que le minimum brut légal',
         });
         return;
       }
