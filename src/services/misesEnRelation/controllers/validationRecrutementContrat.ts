@@ -221,6 +221,9 @@ const validationRecrutementContrat =
                   database,
                 ),
               },
+              $unset: {
+                resetPasswordCnil: '',
+              },
             },
             { returnOriginal: false, rawResult: true },
           );

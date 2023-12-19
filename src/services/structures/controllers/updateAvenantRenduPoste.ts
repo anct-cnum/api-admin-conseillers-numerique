@@ -20,6 +20,7 @@ const updateAvenantRenduPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { nbDePosteRendu, nbDePosteCoselec } = req.body;
+    const dateValidation = new Date();
     const avenantAJoutPosteValidation = avenantRenduPoste.validate({
       nbDePosteRendu,
       nbDePosteCoselec,
@@ -69,15 +70,23 @@ const updateAvenantRenduPoste =
         nombreConseillersCoselec:
           Number(nbDePosteCoselec) - Number(nbDePosteRendu),
         avisCoselec: 'POSITIF',
-        insertedAt: new Date(),
+        insertedAt: dateValidation,
       };
       const structureObject = {
         'demandesCoselec.$.statut': 'validee',
         'demandesCoselec.$.banniereValidationAvenant': true,
+        'structureObj.demandesCoselec.$.validateurAvenant': {
+          email: req.user?.name,
+          date: dateValidation,
+        },
       };
       const structureObjectMiseEnRelation = {
         'structureObj.demandesCoselec.$.statut': 'validee',
         'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
+        'structureObj.demandesCoselec.$.validateurAvenant': {
+          email: req.user?.name,
+          date: dateValidation,
+        },
       };
       if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         coselecObject.phaseConventionnement = PhaseConventionnement.PHASE_2;
