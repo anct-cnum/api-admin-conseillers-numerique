@@ -24,7 +24,7 @@ const formatAvenant = (avenant, structure) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
   item.siret = structure.siret;
-  item.dateDeValidation = avenant.validateurAvenant?.date;
+  item.dateDeValidation = avenant.validateurAvenant?.date ?? 'non renseignée';
   item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
   item.nbPostesApresDemande =
     avenant.type === 'ajout'
@@ -108,7 +108,7 @@ const getExportHistoriqueDossiersConventionCsv =
               conventionnement: 1,
               coselec: 1,
               demandesCoselec: 1,
-              codeCommune: 1,
+              codeCom: 1,
             },
           },
         ]);
