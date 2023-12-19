@@ -15,6 +15,7 @@ import {
 } from '../../emails';
 import {
   deleteConseillerInCoordinateurs,
+  deleteCoordinateurInConseillers,
   deletePermanences,
   updatePermanences,
   deletePermanencesInCras,
@@ -170,6 +171,7 @@ execute(__filename, async ({ app, logger, exit }) => {
               );
             },
           );
+          await deleteCoordinateurInConseillers(app)(conseiller);
         }
 
         // suppression des outils (Mattermost, Gandi)

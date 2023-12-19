@@ -36,6 +36,59 @@ const deleteConseillerInCoordinateurs = (app) => async (conseiller) =>
     },
   );
 
+const deleteCoordinateurInConseillers = (app) => async (coordinateur) => {
+  const conseillers = await app.service(service.conseillers).Model.find({
+    coordinateurs: {
+      $elemMatch: {
+        id: coordinateur._id,
+      },
+    },
+  });
+  if (conseillers.length > 0) {
+    for (const conseiller of conseillers) {
+      if (conseiller.coordinateurs.length === 1) {
+        app.service(service.conseillers).Model.updateMany(
+          { _id: conseiller._id },
+          {
+            $unset: {
+              coordinateurs: '',
+            },
+          },
+        );
+        app.service(service.misesEnRelation).Model.updateMany(
+          { 'conseiller.$id': conseiller._id },
+          {
+            $unset: {
+              'conseillerObj.coordinateurs': '',
+            },
+          },
+        );
+      } else {
+        app.service(service.conseillers).Model.updateOne(
+          { _id: conseiller._id },
+          {
+            $pull: {
+              coordinateurs: {
+                id: coordinateur._id,
+              },
+            },
+          },
+        );
+        app.service(service.misesEnRelation).Model.updateMany(
+          { 'conseiller.$id': conseiller._id },
+          {
+            $pull: {
+              'conseillerObj.coordinateurs': {
+                id: coordinateur._id,
+              },
+            },
+          },
+        );
+      }
+    }
+  }
+};
+
 const deletePermanences = (app) => async (idConseiller) =>
   app.service(service.permanences).Model.deleteMany({
     conseillers: {
@@ -150,6 +203,7 @@ const deleteMailbox = (app) => async (conseillerId, login) => {
 export {
   updateConseillersPG,
   deleteConseillerInCoordinateurs,
+  deleteCoordinateurInConseillers,
   deletePermanences,
   updatePermanences,
   deletePermanencesInCras,
