@@ -17,7 +17,9 @@ const annulationRecrutementContrat =
         return;
       }
       if (typeof banniereRefusRecrutement !== 'boolean') {
-        res.status(400).json({ message: 'banniereRefusRecrutement manquant' });
+        res
+          .status(400)
+          .json({ message: 'la banniereRefusRecrutement est invalide' });
         return;
       }
       const miseEnRelation: IMisesEnRelation = await app
