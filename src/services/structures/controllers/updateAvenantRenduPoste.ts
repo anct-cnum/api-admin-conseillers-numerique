@@ -77,7 +77,7 @@ const updateAvenantRenduPoste =
         'demandesCoselec.$.banniereValidationAvenant': true,
         'structureObj.demandesCoselec.$.validateurAvenant': {
           email: req.user?.name,
-          dateValidation,
+          date: dateValidation,
         },
       };
       const structureObjectMiseEnRelation = {
@@ -85,7 +85,7 @@ const updateAvenantRenduPoste =
         'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
         'structureObj.demandesCoselec.$.validateurAvenant': {
           email: req.user?.name,
-          dateValidation,
+          date: dateValidation,
         },
       };
       if (checkStructurePhase2(structure?.conventionnement?.statut)) {
