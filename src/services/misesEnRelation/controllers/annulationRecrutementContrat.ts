@@ -5,7 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
-import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/structures.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
 const annulationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -16,7 +16,7 @@ const annulationRecrutementContrat =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      if (banniereRefusRecrutement === undefined) {
+      if (typeof banniereRefusRecrutement !== 'boolean') {
         res.status(400).json({ message: 'banniereRefusRecrutement manquant' });
         return;
       }
