@@ -183,7 +183,7 @@ const filterIsRuptureMisesEnRelation = (
           {
             $and: [
               { statut: { $eq: 'terminee_naturelle' } },
-              { 'conseiller.$id': { $in: conseillerTerminerNaturelle } },
+              { 'conseiller.$id': { $in: conseillerIdsTerminerNaturelle } },
             ],
           },
           {
