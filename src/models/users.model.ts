@@ -38,6 +38,8 @@ export default function (app: Application): Model<any> {
 
       mailAModifier: { type: String },
 
+      resetPasswordCnil: { type: Boolean },
+
       mailConfirmError: { type: String },
 
       mailConfirmErrorDetail: { type: String },

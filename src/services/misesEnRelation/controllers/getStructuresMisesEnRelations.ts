@@ -14,7 +14,7 @@ import {
   filterNomConseiller,
   filterStatut,
 } from '../misesEnRelation.repository';
-import validMiseEnRelation from '../../../schemas/miseEnRelation.schemas';
+import { validMiseEnRelation } from '../../../schemas/miseEnRelation.schemas';
 import { getCoselec } from '../../../utils';
 
 const countMisesEnRelation =

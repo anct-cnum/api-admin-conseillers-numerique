@@ -1,14 +1,8 @@
 import { Application } from '@feathersjs/express';
-import { ObjectId } from 'mongodb';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
-import {
-  IDemandesCoordinateur,
-  IStructures,
-} from '../../../ts/interfaces/db.interfaces';
-import { countCoordinateurRecrutees } from '../../misesEnRelation/misesEnRelation.repository';
 
 const countStructures = async (ability, read, app) =>
   app
@@ -67,38 +61,6 @@ const checkStructurePhase2 = (statut: string) => {
   return false;
 };
 
-const checkQuotaRecrutementCoordinateur = async (
-  app: Application,
-  req: IRequest,
-  structure: IStructures,
-  idMiseEnRelation: ObjectId,
-) => {
-  const demandeCoordinateurValider: IDemandesCoordinateur[] | undefined =
-    structure?.demandesCoordinateur?.filter(
-      (demande) => demande.statut === 'validee',
-    );
-  if (demandeCoordinateurValider?.length > 0) {
-    const countCoordinateurs = await countCoordinateurRecrutees(
-      app,
-      req,
-      structure._id,
-    );
-    const quotaCoordinateurDisponible =
-      demandeCoordinateurValider.length - countCoordinateurs;
-    return {
-      demandeCoordinateurValider: demandeCoordinateurValider.find(
-        (demande) =>
-          demande?.miseEnRelationId?.toString() === idMiseEnRelation.toString(),
-      ),
-      quotaCoordinateurDisponible,
-    };
-  }
-  return {
-    demandeCoordinateurValider: undefined,
-    quotaCoordinateurDisponible: 0,
-  };
-};
-
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
 
 const filterDepartement = (departement: string) => {
@@ -135,7 +97,7 @@ const formatAdresseStructure = (insee) => {
     insee?.adresse?.libelle_commune ?? ''
   }`;
 
-  return adresse.replace(/["']/g, '');
+  return adresse.replace(/["',]/g, '');
 };
 
 const filterSortColonne = (nomOrdre: string, ordre: number) => {
@@ -168,50 +130,6 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
   );
 };
 
-const filterAvisPrefet = (avisPrefet) => {
-  if (avisPrefet === undefined) {
-    return {};
-  }
-  if (avisPrefet === 'sans-avis') {
-    return { avisPrefet: { $exists: false } };
-  }
-  return { avisPrefet: { $eq: avisPrefet } };
-};
-
-const filterStatutAndAvisPrefetDemandesCoordinateur = (
-  statutDemande: string,
-  avisPrefet: string,
-) => {
-  if (statutDemande !== 'toutes') {
-    return {
-      demandesCoordinateur: {
-        $elemMatch: {
-          statut: { $eq: statutDemande },
-          ...filterAvisPrefet(avisPrefet),
-        },
-      },
-    };
-  }
-  return {
-    demandesCoordinateur: {
-      $elemMatch: {
-        statut: { $in: ['en_cours', 'refusee', 'validee'] },
-        ...filterAvisPrefet(avisPrefet),
-      },
-    },
-  };
-};
-
-const checkAvisPrefet = (filtreAvisPrefet: string, avisPrefet: string) => {
-  if (filtreAvisPrefet === 'sans-avis' && avisPrefet === undefined) {
-    return true;
-  }
-  if (avisPrefet === filtreAvisPrefet || filtreAvisPrefet === undefined) {
-    return true;
-  }
-  return false;
-};
-
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -228,8 +146,5 @@ export {
   filterSortColonne,
   getNameStructure,
   getConseillersByStatus,
-  filterStatutAndAvisPrefetDemandesCoordinateur,
   checkStructurePhase2,
-  checkAvisPrefet,
-  checkQuotaRecrutementCoordinateur,
 };

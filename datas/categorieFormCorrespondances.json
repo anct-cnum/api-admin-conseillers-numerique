@@ -12,7 +12,6 @@
       "Société à responsabilité limitée (sans autre indication)",
       "SARL coopérative ouvrière de production (SCOP)",
       "Mutualité sociale agricole",
-      "Établissement d'hospitalisation",
       "Autre SA coopérative à conseil d'administration",
       "Autre SA coopérative à directoire",
       "SA nationale à conseil d'administration",
@@ -42,6 +41,7 @@
     "numero_demarche_reconventionnement": 69665,
     "numero_demarche_conventionnement": 38389,
     "categorie": [
+      "Établissement d'hospitalisation",
       "Commune et commune nouvelle",
       "Syndicat mixte ouvert",
       "Communauté de communes",
