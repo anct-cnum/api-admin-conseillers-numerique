@@ -33,8 +33,7 @@ const formatAvenant = (avenant, structure) => {
       : (avenant.nbPostesAvantDemande || 0) -
         (avenant.nombreDePostesRendus || 0);
   item.variation =
-    (item.nbPostesApresDemande || 0) - (avenant.nbPostesAvantCoselec || 0);
-  item.type = avenant.type;
+    (item.nbPostesApresDemande || 0) - (avenant.nbPostesAvantDemande || 0);
   item.numeroDossierDS =
     structure.conventionnement?.statut ===
     StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
