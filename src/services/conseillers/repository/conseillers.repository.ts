@@ -134,17 +134,25 @@ const filterDepartement = (departement: string) => {
   return {};
 };
 
-const filtrePiecesManquantes = (piecesManquantes: boolean) =>
-  piecesManquantes
-    ? { dossierIncompletRupture: true }
-    : { dossierIncompletRupture: { $exists: false } };
+const filtrePiecesManquantes = (piecesManquantes: boolean) => {
+  if (piecesManquantes === true) {
+    return { dossierIncompletRupture: true };
+  }
+  if (piecesManquantes === false) {
+    return { dossierIncompletRupture: false };
+  }
+  if (piecesManquantes === null) {
+    return { dossierIncompletRupture: { $exists: false } };
+  }
+  return {};
+};
 
 const filterIsRuptureMisesEnRelation = (
   ruptureOuTermine: string,
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
   conseillerIdsRupture: ObjectId[],
-  conseillerTerminerNaturelle: ObjectId[],
+  conseillerIdsTerminerNaturelle: ObjectId[],
   piecesManquantes: boolean,
 ) => {
   switch (ruptureOuTermine) {
@@ -163,7 +171,7 @@ const filterIsRuptureMisesEnRelation = (
     case 'terminee_naturelle':
       return {
         statut: { $eq: ruptureOuTermine },
-        'conseiller.$id': { $in: conseillerTerminerNaturelle },
+        'conseiller.$id': { $in: conseillerIdsTerminerNaturelle },
       };
     case 'contrat':
       return {

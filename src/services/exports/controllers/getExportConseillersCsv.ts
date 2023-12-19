@@ -113,6 +113,7 @@ const getMisesEnRelationRecruter =
           'conseillerObj.dateFinFormation': 1,
           'conseillerObj.disponible': 1,
           'conseillerObj.estCoordinateur': 1,
+          'conseillerObj.supHierarchique': 1,
         },
       },
       { $sort: sortColonne },

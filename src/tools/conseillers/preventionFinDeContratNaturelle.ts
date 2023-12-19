@@ -53,6 +53,21 @@ const updateConseillersDisponibilite = (app) => async (email, updatedAt) =>
       },
     },
   );
+
+const updateMiseEnRelationDisponibilite = (app) => async (email, updatedAt) =>
+  app.service(service.misesEnRelation).Model.updateMany(
+    {
+      'conseillerObj.email': email,
+    },
+    {
+      $set: {
+        'conseillerObj.disponible': true,
+        'conseillerObj.dateDisponibilite': updatedAt,
+        'conseillerObj.updatedAt': updatedAt,
+      },
+    },
+  );
+
 const updateConseiller = (app) => async (idConseiller, updatedAt) =>
   app.service(service.conseillers).Model.updateOne(
     {
@@ -110,6 +125,10 @@ execute(__filename, async ({ app, logger, exit }) => {
             dateDuJour,
           );
           await updateConseillersDisponibilite(app)(
+            miseEnRelationFinContrat.conseillerObj.email,
+            dateDuJour,
+          );
+          await updateMiseEnRelationDisponibilite(app)(
             miseEnRelationFinContrat.conseillerObj.email,
             dateDuJour,
           );

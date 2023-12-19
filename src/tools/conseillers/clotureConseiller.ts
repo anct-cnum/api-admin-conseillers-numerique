@@ -85,6 +85,7 @@ const updateUser = (app) => async (idUser, email) =>
         tokenCreatedAt: new Date(),
         mailSentDate: null,
         passwordCreated: false,
+        resetPasswordCnil: false,
       },
     },
   );
