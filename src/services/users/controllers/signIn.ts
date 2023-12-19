@@ -136,7 +136,8 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             const miseEnRelationRefusRecrutement: IMisesEnRelation[] = await app
               .service(service.misesEnRelation)
               .Model.find({
-                'structure.$id': user.entity.oid,
+                statut: 'interessee',
+                'structure.$id': structure._id,
                 banniereRefusRecrutement: true,
               });
             const countDemandesCoordinateurValider =

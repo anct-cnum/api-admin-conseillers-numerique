@@ -10,9 +10,14 @@ import { checkQuotaRecrutementCoordinateur } from '../../structures/repository/s
 const annulationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
+    const { banniereRefusRecrutement } = req.body;
     try {
       if (!ObjectId.isValid(idMiseEnRelation)) {
         res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
+      if (banniereRefusRecrutement === undefined) {
+        res.status(400).json({ message: 'banniereRefusRecrutement manquant' });
         return;
       }
       const miseEnRelation: IMisesEnRelation = await app
@@ -36,14 +41,6 @@ const annulationRecrutementContrat =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      const objectUpdated = {
-        statut: 'interessee',
-      };
-      if (req.user.roles.includes('admin')) {
-        Object.assign(objectUpdated, {
-          banniereRefusRecrutement: true,
-        });
-      }
       if (miseEnRelation?.contratCoordinateur) {
         const structureUpdated = await app
           .service(service.structures)
@@ -64,7 +61,7 @@ const annulationRecrutementContrat =
             },
           );
         if (structureUpdated.modifiedCount === 0) {
-          res.status(400).json({
+          res.status(404).json({
             message: "la structure n'a pas pu être mise à jour",
           });
           return;
@@ -97,7 +94,12 @@ const annulationRecrutementContrat =
             statut: 'recrutee',
           },
           {
-            $set: objectUpdated,
+            $set: {
+              statut: 'interessee',
+              ...(banniereRefusRecrutement === true && {
+                banniereRefusRecrutement,
+              }),
+            },
             $unset: {
               dateDebutDeContrat: '',
               dateFinDeContrat: '',
@@ -105,6 +107,7 @@ const annulationRecrutementContrat =
               salaire: '',
               contratCoordinateur: '',
               emetteurRecrutement: '',
+              dateRecrutement: '',
             },
           },
           {

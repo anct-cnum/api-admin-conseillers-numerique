@@ -9,12 +9,17 @@ const closeBannerAnnulationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
     try {
+      if (!ObjectId.isValid(idMiseEnRelation)) {
+        res.status(400).json({ message: 'Id incorrect' });
+        return;
+      }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
             _id: new ObjectId(idMiseEnRelation),
+            banniereRefusRecrutement: true,
           },
           {
             $unset: {
