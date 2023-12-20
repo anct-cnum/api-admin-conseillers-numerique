@@ -77,7 +77,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         reject();
       } else {
         trouvees += 1;
-        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].length === 0) {
+        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].length === null) {
           logger.error(
             `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
           );
@@ -93,6 +93,16 @@ execute(__filename, async ({ app, logger, exit }) => {
             0,
             0,
           );
+          if (
+            new Date() < dateDebutObject ||
+            dateDebutObject < new Date('2020-10-01')
+          ) {
+            logger.error(
+              `Date de début incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+            );
+            reject();
+          }
+
           const [jourFin, moisFin, anneeFin] =
             contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
           const dateFinObject = new Date(
@@ -103,6 +113,12 @@ execute(__filename, async ({ app, logger, exit }) => {
             0,
             0,
           );
+          if (dateFinObject < new Date('2020-10-01')) {
+            logger.error(
+              `Date de fin incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+            );
+            reject();
+          }
 
           await app.service(service.misesEnRelation).Model.findOneAndUpdate(
             { _id: match._id },
