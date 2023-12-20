@@ -77,8 +77,10 @@ execute(__filename, async ({ app, logger, exit }) => {
         reject();
       } else {
         trouvees += 1;
-        if (contrat['Date de fin de CT\nJJ/MM/AAAA'] === null) {
-          logger.warn(``);
+        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].length < 0) {
+          logger.warn(
+            `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+          );
         }
         const [jourDebut, moisDebut, anneeDebut] =
           contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
