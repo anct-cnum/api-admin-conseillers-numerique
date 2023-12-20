@@ -163,6 +163,7 @@ const generateCsvCandidaturesCoordinateur = async (
       'Statut de la demande',
       'Date de candidature',
       'Avis préfet',
+      'Date de validation',
     ];
     res.write(
       [
@@ -176,6 +177,7 @@ const generateCsvCandidaturesCoordinateur = async (
             candidature.statut,
             formatDate(candidature.dossier.dateDeCreation),
             candidature?.avisPrefet,
+            formatDate(candidature?.emetteurValidation?.date),
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
