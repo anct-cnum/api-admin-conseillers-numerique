@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/populate/populate-dates-contrats.ts -c <path file>
+// Lancement de ce script : ts-node src/tools/populate/populate-dates-contrats.ts -c <path file> -d
 
 import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
@@ -9,6 +9,7 @@ import execute from '../utils';
 import service from '../../helpers/services';
 
 program.option('-c, --csv <path>', 'CSV file path');
+program.option('-d, --delete <path>', 'clean miseEnRelation collection ');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
@@ -29,7 +30,29 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
       phaseConventionnement: { $exists: false },
     });
-
+  const cleanMiseEnRelation = () =>
+    app.service(service.misesEnRelation).Model.updateMany(
+      {
+        $or: [
+          {
+            dureeEffectiveContrat: {
+              $exists: true,
+            },
+          },
+          {
+            numeroDSContrat: {
+              $exists: true,
+            },
+          },
+        ],
+      },
+      {
+        $unset: {
+          dureeEffectiveContrat: '',
+          numeroDSContrat: '',
+        },
+      },
+    );
   const options = program.opts();
   const contrats = await readCSV(options.csv);
 
@@ -54,6 +77,9 @@ execute(__filename, async ({ app, logger, exit }) => {
         reject();
       } else {
         trouvees += 1;
+        if (contrat['Date de fin de CT\nJJ/MM/AAAA'] === null) {
+          logger.warn(``);
+        }
         const [jourDebut, moisDebut, anneeDebut] =
           contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
         const dateDebutObject = new Date(
@@ -92,5 +118,9 @@ execute(__filename, async ({ app, logger, exit }) => {
   logger.info(`${contrats.length} contrats`);
   logger.info(`${inconnues} inconnues`);
   logger.info(`${trouvees} trouvées`);
+
+  if (options.delete) {
+    await cleanMiseEnRelation();
+  }
   exit(0, 'Migration terminée');
 });
