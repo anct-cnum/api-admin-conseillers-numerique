@@ -72,45 +72,54 @@ execute(__filename, async ({ app, logger, exit }) => {
       if (match === null) {
         inconnues += 1;
         logger.warn(
-          `Contrat inexistant pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+          `Contrat inexistant pour la structure ${contrat['ID SA']} et le conseiller ${contrat['ID CNFS']}`,
         );
         reject();
       } else {
         trouvees += 1;
-        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].length < 0) {
-          logger.warn(
+        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].length === 0) {
+          logger.error(
             `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
           );
-        }
-        const [jourDebut, moisDebut, anneeDebut] =
-          contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
-        const dateDebutObject = new Date(
-          anneeDebut,
-          moisDebut - 1,
-          jourDebut,
-          0,
-          0,
-          0,
-        );
-        const [jourFin, moisFin, anneeFin] =
-          contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
-        const dateFinObject = new Date(anneeFin, moisFin - 1, jourFin, 0, 0, 0);
+          reject();
+        } else {
+          const [jourDebut, moisDebut, anneeDebut] =
+            contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
+          const dateDebutObject = new Date(
+            anneeDebut,
+            moisDebut - 1,
+            jourDebut,
+            0,
+            0,
+            0,
+          );
+          const [jourFin, moisFin, anneeFin] =
+            contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
+          const dateFinObject = new Date(
+            anneeFin,
+            moisFin - 1,
+            jourFin,
+            0,
+            0,
+            0,
+          );
 
-        await app.service(service.misesEnRelation).Model.findOneAndUpdate(
-          { _id: match._id },
-          {
-            $set: {
-              dateDebutDeContrat: dateDebutObject,
-              dateFinDeContrat: dateFinObject,
-              typeDeContrat: contrat['CT V1'],
+          await app.service(service.misesEnRelation).Model.findOneAndUpdate(
+            { _id: match._id },
+            {
+              $set: {
+                dateDebutDeContrat: dateDebutObject,
+                dateFinDeContrat: dateFinObject,
+                typeDeContrat: contrat['CT V1'],
+              },
             },
-          },
-          { returnOriginal: false },
-        );
-        logger.info(
-          `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
-        );
-        logger.info(match._id);
+            { returnOriginal: false },
+          );
+          logger.info(
+            `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+          );
+          logger.info(match._id);
+        }
         resolve(p);
       }
     });
