@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/populate/populate-dates-contrats.ts -c <path file> -d
+// Lancement de ce script : ts-node src/tools/populate/populate-dates-contrats.ts -c <path file> (-d)
 
 import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
