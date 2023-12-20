@@ -59,6 +59,16 @@ const createAvenant =
       return;
     }
 
+    if (
+      getStructure.demandesCoselec?.length > 0 &&
+      getStructure?.lastDemandeCoselec?.statut === 'en_cours'
+    ) {
+      res.status(400).json({
+        message: `Une demande est en cours d'instruction. Vous ne pouvez faire aucune action pendant cette période.`,
+      });
+      return;
+    }
+
     const demandeCoselec = {
       id: new ObjectId(),
       ...(type === 'retrait'
