@@ -77,7 +77,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         reject();
       } else {
         trouvees += 1;
-        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].length === null) {
+        if (contrat['Date de fin de CT\nJJ/MM/AAAA'].trim().length === null) {
           logger.error(
             `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
           );
