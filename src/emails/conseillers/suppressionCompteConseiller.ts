@@ -25,7 +25,7 @@ export default function (mailer) {
         .sendEmail(
           conseiller.email,
           {
-            subject: 'Au revoir',
+            subject: 'Vos accès Coop ont été supprimés',
             body: await render(conseiller),
           },
           {},

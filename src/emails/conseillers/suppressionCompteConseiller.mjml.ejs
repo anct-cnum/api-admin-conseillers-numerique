@@ -1,26 +1,45 @@
 <mjml>
-
   <%- include('../commun/head.mjml.ejs'); %>
-  <mj-body background-color="#f0f0f0">
-
-    <%- include('../commun/header.mjml.ejs', { utils }); %>
-
-      <mj-wrapper css-class="wrapper">
-
-          <mj-column>
-            <mj-text align="left">
-              Bonjour <%= conseiller.prenom %>,
+  <mj-body>
+    <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+      <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
+      src="<%= utils.getPublicUrl('/assets/img/email/header-cloture-conum.png') %>" />
+    </mj-section>
+    <mj-section padding="8px"></mj-section>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Bonjour <%= prenom %>,
             </mj-text>
             <mj-text align="left">
-              // EN ATTENTE DE WORDING //
-            </mj-text>
-             <mj-text align="left">
-              Bonne journée,
+              Nous vous informons que vos accès à l’espace Coop ont été supprimés ce jour en raison de la fin de votre contrat de travail Conseiller numérique.
             </mj-text>
             <mj-text align="left">
-              L&rsquo;&eacute;quipe Conseiller num&eacute;rique
+              Votre <a href="https://candidat.conseiller-numerique.gouv.fr/login" target="blank" rel="noreferrer" >espace candidat</a> est de nouveau accessible. Cet espace permet de mettre à jour vos informations de candidature et de valoriser votre expérience de conseiller numérique. La mise à jour de ces informations permettra aux employeurs de vous identifier comme potentiel candidat et augmentera vos chances d’être mis en relation avec une structure.
             </mj-text>
-          </mj-column>
-      </mj-wrapper>
+            <mj-text align="left">
+              Votre parcours de conseiller numérique arrive à terme, et comme chaque expérience, elle vous a apporté de nouvelles connaissances sur vous et sur l’écosystème de la médiation numérique. C’est pourquoi nous vous proposons de vous accompagner sur votre avenir en mettant à votre disposition :
+            </mj-text>
+            <mj-text align="left">
+              &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Un guide “Je prépare mon futur”, disponible <a href="https://labase.anct.gouv.fr/ressource/1745" target="blank" rel="noreferrer" >ici</a></br>
+            &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Une <a href="https://11d898a2.sibforms.com/serve/MUIFAOeD3-HyKAmhtuJ4f-W4HiQ7qP735LlgpZnUJvEX0wQ5hLQajp7brjV5QVbiD0ewsv-9O-oCoMq1SZdPp9OdKWJiZOOrQERB9UYMo5GI7w5unt7EbeAK91r54fzC4-8PxCbEJM4q_8NIi6c1K4OJXJYq5t81u9MHhx0SdgOQE14W8EkFeAJx8JMb1m8hS0F2X2EeIgGiF_JD" target="blank" rel="noreferrer">newsletter</a> destinée aux conseillers numériques en fin de mission
+          </mj-text>
+          <mj-text align="left">
+            <b>Vous avez des questions ?</b></br>
+            L’équipe d’animation se tient à votre disposition :</br>
+            &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Par email à l’adresse : <a href="mailto:conseiller-numerique@anct.gouv.fr">conseiller-numerique@anct.gouv.fr</a></br>
+          </mj-text>
+          <mj-text align="left">
+            L’équipe Conseiller numérique
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section padding="8px"></mj-section>
+      <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+        <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
+        src="<%= utils.getPublicUrl('/assets/img/email/footer-cloture-prev-conum.png') %>" />
+      </mj-section>
+    </mj-wrapper>
   </mj-body>
 </mjml>
