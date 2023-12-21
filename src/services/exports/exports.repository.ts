@@ -40,7 +40,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 };
 
 const formatDate = (date: Date) => {
-  if (date !== undefined && date !== null && date instanceof Date) {
+  if (date !== undefined && date !== null) {
     return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
