@@ -952,7 +952,7 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.siret,
             structure.dateDeValidation instanceof Date
               ? formatDate(structure.dateDeValidation)
-              : 'Non renseigné',
+              : 'Non renseignée',
             structure.nbPostesAvantDemande,
             structure.nbPostesApresDemande,
             structure.variation,
