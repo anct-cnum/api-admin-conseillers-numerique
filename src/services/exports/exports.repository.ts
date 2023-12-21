@@ -17,6 +17,7 @@ import {
   formatQpv,
 } from '../structures/repository/structures.repository';
 import { formatStatutMisesEnRelation } from '../conseillers/repository/conseillers.repository';
+import { PhaseConventionnement } from '../../ts/enum';
 
 dayjs.extend(utc);
 
@@ -939,6 +940,7 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Code département',
       'Département',
       'Région',
+      'Type de conventionnement',
     ];
 
     res.write(
@@ -948,7 +950,9 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure.idPG,
             structure.siret,
-            formatDate(structure.dateDeValidation) ?? 'Non renseigné',
+            structure.dateDeValidation instanceof Date
+              ? formatDate(structure.dateDeValidation)
+              : 'Non renseigné',
             structure.nbPostesAvantDemande,
             structure.nbPostesApresDemande,
             structure.variation,
@@ -957,6 +961,9 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.codeDepartement,
             structure.departement,
             structure.region,
+            structure.phaseConventionnement === PhaseConventionnement.PHASE_2
+              ? 'Phase 2'
+              : 'Phase 1',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
