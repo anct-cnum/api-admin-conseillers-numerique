@@ -25,7 +25,7 @@ import {
   getExportHistoriqueDossiersConventionCsv,
   getExportHistoriqueContratsCsv,
   getExportStructureNonInteresserReconventionnementCsv,
-  getExportCandidatsCoordinateursCsv,
+  getExportListeDemandesCoordinateursCsv,
 } from './controllers';
 
 interface Data {}
@@ -67,10 +67,10 @@ export class Exports implements ServiceMethods<Data> {
       getExportCandidatsByStructureCsv(app),
     );
     app.get(
-      '/exports/candidatures-coordinateurs-csv',
+      '/exports/demandes-coordinateurs-csv',
       authenticateMode(app),
       createAbilities(app),
-      getExportCandidatsCoordinateursCsv(app),
+      getExportListeDemandesCoordinateursCsv(app),
     );
     app.get(
       '/exports/cnfs-without-cra-csv',
