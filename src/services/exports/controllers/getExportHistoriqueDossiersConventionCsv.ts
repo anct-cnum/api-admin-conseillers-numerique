@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
-import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { generateCsvHistoriqueDossiersConvention } from '../exports.repository';
@@ -15,62 +14,40 @@ import {
   filterDateDemandeAndStatutHistorique,
   sortArrayConventionnement,
 } from '../../structures/repository/reconventionnement.repository';
-import { getCoselec } from '../../../utils';
 import { StatutConventionnement } from '../../../ts/enum';
-import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
+import {
+  findDepartementNameByNumDepartement,
+  findRegionNameByNumDepartement,
+} from '../../../helpers/commonQueriesFunctions';
 
-const formatStatutDemande = (statut: string) => {
-  switch (statut) {
-    case StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ:
-    case StatutConventionnement.CONVENTIONNEMENT_VALIDÉ:
-    case 'validee':
-      return 'Validée';
-    case 'refusee':
-      return 'Refusée';
-    default:
-      return statut;
-  }
-};
-
-const countContratValider = (misesEnRelation) =>
-  misesEnRelation.find((miseEnRelation) => miseEnRelation?._id === 'finalisee')
-    ?.count ?? 0;
-
-const countContratRenouveler = (misesEnRelation) =>
-  misesEnRelation.find((miseEnRelation) => miseEnRelation?._id === 'terminee')
-    ?.count ?? 0;
-
-const getContratsRecruterRenouveler =
-  (app: Application, checkAccess) => async (idStructure: ObjectId) =>
-    app.service(service.misesEnRelation).Model.aggregate([
-      {
-        $match: {
-          $and: [checkAccess],
-          'structure.$id': idStructure,
-          statut: { $in: ['terminee', 'finalisee'] },
-        },
-      },
-      {
-        $group: {
-          _id: '$statut',
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-const formatAvenant = (avenant, structure, coselec, misesEnRelation) => {
+const formatAvenant = (avenant, structure) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
-  item.nom = structure.nom;
-  item.nbPostesAttribuees = coselec?.nombreConseillersCoselec ?? 0;
-  item.dateDeCreation = avenant.emetteurAvenant.date;
-  item.dateSorted = avenant.emetteurAvenant.date;
-  item.statutDemande = formatStatutDemande(avenant.statut);
+  item.siret = structure.siret;
+  item.dateDeValidation = avenant.validateurAvenant?.date;
+  item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
+  item.nbPostesApresDemande =
+    avenant.type === 'ajout'
+      ? (avenant.nbPostesAvantDemande || 0) +
+        (avenant.nombreDePostesAccordes || 0)
+      : (avenant.nbPostesAvantDemande || 0) -
+        (avenant.nombreDePostesRendus || 0);
+  item.variation =
+    (item.nbPostesApresDemande || 0) - (avenant.nbPostesAvantDemande || 0);
+  item.numeroDossierDS =
+    structure.conventionnement?.statut ===
+    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+      ? structure.conventionnement?.dossierConventionnement?.numero
+      : structure.conventionnement?.dossierReconventionnement?.numero;
   item.codeDepartement = structure.codeDepartement;
-  item.codeRegion = structure.codeRegion;
-  item.statutStructure = structure.statut;
-  item.nbContratsValides = countContratValider(misesEnRelation);
-  item.nbContratsRenouveles = countContratRenouveler(misesEnRelation);
+  item.departement = findDepartementNameByNumDepartement(
+    structure.codeDepartement,
+    structure.codeCom,
+  );
+  item.region = findRegionNameByNumDepartement(
+    structure.codeDepartement,
+    structure.codeCom,
+  );
 
   return item;
 };
@@ -122,7 +99,7 @@ const getExportHistoriqueDossiersConventionCsv =
           {
             $project: {
               _id: 1,
-              nom: 1,
+              siret: 1,
               idPG: 1,
               type: 1,
               codeRegion: 1,
@@ -131,10 +108,10 @@ const getExportHistoriqueDossiersConventionCsv =
               conventionnement: 1,
               coselec: 1,
               demandesCoselec: 1,
+              codeCom: 1,
             },
           },
         ]);
-      const checkAccess = checkAccessReadRequestMisesEnRelation(app, req);
       if (type === 'avenantAjoutPoste' || type === 'toutes') {
         const structureWithAvenant = structures.filter(
           (structure) => structure?.demandesCoselec?.length > 0,
@@ -149,18 +126,8 @@ const getExportHistoriqueDossiersConventionCsv =
               if (avenants.length === 0) {
                 return [];
               }
-              const misesEnRelation = await getContratsRecruterRenouveler(
-                app,
-                checkAccess,
-              )(structure._id);
-              const coselec = getCoselec(structure);
               const avenantsFormat = avenants.map((avenant) => {
-                const avenantFormat = formatAvenant(
-                  avenant,
-                  structure,
-                  coselec,
-                  misesEnRelation,
-                );
+                const avenantFormat = formatAvenant(avenant, structure);
                 avenantFormat.nbPostesSouhaites =
                   avenant.nombreDePostesAccordes;
                 avenantFormat.statut = 'Avenant · ajout de poste';
@@ -190,18 +157,8 @@ const getExportHistoriqueDossiersConventionCsv =
               if (avenants.length === 0) {
                 return [];
               }
-              const misesEnRelation = await getContratsRecruterRenouveler(
-                app,
-                checkAccess,
-              )(structure._id);
-              const coselec = getCoselec(structure);
               const avenantsFormat = avenants.map((avenant) => {
-                const avenantFormat = formatAvenant(
-                  avenant,
-                  structure,
-                  coselec,
-                  misesEnRelation,
-                );
+                const avenantFormat = formatAvenant(avenant, structure);
                 avenantFormat.nbPostesSouhaites = avenant.nombreDePostesRendus;
                 avenantFormat.statut = 'Avenant · poste rendu';
 
@@ -214,56 +171,6 @@ const getExportHistoriqueDossiersConventionCsv =
           if (avenantsRenduPosteFlat.length > 0) {
             structuresFormat = structuresFormat.concat(avenantsRenduPosteFlat);
           }
-        }
-      }
-      if (type === 'toutes' || type.includes('tionnement')) {
-        const filterStructures = structures.filter(
-          (structure) =>
-            structure?.conventionnement?.statut ===
-              StatutConventionnement.CONVENTIONNEMENT_VALIDÉ ||
-            structure?.conventionnement?.statut ===
-              StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-        );
-        const conventionnement = await Promise.all(
-          filterStructures.map(async (structure) => {
-            const item = { ...structure };
-            const misesEnRelation = await getContratsRecruterRenouveler(
-              app,
-              checkAccess,
-            )(structure._id);
-            const coselec = getCoselec(item);
-            if (
-              item.conventionnement.statut ===
-              StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
-            ) {
-              item.dateSorted =
-                item.conventionnement?.dossierConventionnement?.dateDeCreation;
-              item.statut = 'Conventionnement';
-            }
-            if (
-              item.conventionnement.statut ===
-              StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ
-            ) {
-              item.dateSorted =
-                item.conventionnement?.dossierReconventionnement
-                  ?.dateDeCreation;
-              item.dateFinPremierContrat =
-                item.conventionnement?.dossierReconventionnement
-                  ?.dateFinProchainContrat;
-              item.statut = 'Reconventionnement';
-            }
-            item.statutDemande = formatStatutDemande(
-              item?.conventionnement?.statut,
-            );
-            item.statutStructure = structure.statut;
-            item.nbPostesAttribuees = coselec?.nombreConseillersCoselec ?? 0;
-            item.nbContratsValides = countContratValider(misesEnRelation);
-            item.nbContratsRenouveles = countContratRenouveler(misesEnRelation);
-            return item;
-          }),
-        );
-        if (conventionnement.length > 0) {
-          structuresFormat = structuresFormat.concat(conventionnement);
         }
       }
       const structureSort = sortArrayConventionnement(structuresFormat, ordre);

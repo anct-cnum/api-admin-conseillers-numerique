@@ -18,8 +18,14 @@ enum PhaseConventionnement {
   PHASE_2 = '2',
 }
 
+enum AffichagePhaseConventionnement {
+  PHASE_1 = 'Phase 1',
+  PHASE_2 = 'Phase 2',
+}
+
 export {
   TypeDossierReconventionnement,
   StatutConventionnement,
   PhaseConventionnement,
+  AffichagePhaseConventionnement,
 };

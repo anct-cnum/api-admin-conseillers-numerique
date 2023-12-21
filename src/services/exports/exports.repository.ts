@@ -17,6 +17,10 @@ import {
   formatQpv,
 } from '../structures/repository/structures.repository';
 import { formatStatutMisesEnRelation } from '../conseillers/repository/conseillers.repository';
+import {
+  PhaseConventionnement,
+  AffichagePhaseConventionnement,
+} from '../../ts/enum';
 
 dayjs.extend(utc);
 
@@ -931,20 +935,18 @@ const generateCsvHistoriqueDossiersConvention = async (
 ) => {
   try {
     const fileHeaders = [
-      'Id de la structure',
-      'Nom de la structure',
-      'Type de la structure',
-      'Région',
-      'Département',
-      'Statut',
-      'Nombre de postes attribués',
-      'Date de la demande',
+      'ID',
+      'Siret plateforme',
+      'Date COSELEC',
+      'Nombre de postes avant COSELEC',
+      'Nombre de postes après COSELEC',
+      'Variation',
       'Type de la demande',
-      'Nombre de CNFS souhaités',
-      'Nombre de contrat validés',
-      'Nombre de postes renouvelés',
-      'Date de fin du premier contrat',
-      'État de la demande',
+      'N° DS',
+      'Code département',
+      'Département',
+      'Région',
+      'Type de conventionnement',
     ];
 
     res.write(
@@ -952,20 +954,20 @@ const generateCsvHistoriqueDossiersConvention = async (
         fileHeaders.join(csvCellSeparator),
         ...structures.map((structure) =>
           [
-            structure?.idPG,
-            structure?.nom,
-            structure?.type === 'PRIVATE' ? 'privée' : 'publique',
-            structure?.codeRegion,
-            structure?.codeDepartement,
-            structure?.statutStructure,
-            structure?.nbPostesAttribuees ?? 'Non renseigné',
-            formatDate(structure?.dateSorted),
-            structure?.statut,
-            structure?.nbPostesSouhaites ?? '',
-            structure?.nbContratsValides ?? 'Non renseigné',
-            structure?.nbContratsRenouveles ?? 'Non renseigné',
-            formatDate(structure?.dateFinPremierContrat),
-            structure?.statutDemande,
+            structure.idPG,
+            structure.siret,
+            formatDate(structure.dateDeValidation),
+            structure.nbPostesAvantDemande,
+            structure.nbPostesApresDemande,
+            structure.variation,
+            structure.type,
+            structure.numeroDossierDS,
+            structure.codeDepartement,
+            structure.departement,
+            structure.region,
+            structure.phaseConventionnement === PhaseConventionnement.PHASE_2
+              ? AffichagePhaseConventionnement.PHASE_2
+              : AffichagePhaseConventionnement.PHASE_1,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
