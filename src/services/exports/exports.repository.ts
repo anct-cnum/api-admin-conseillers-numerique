@@ -17,7 +17,10 @@ import {
   formatQpv,
 } from '../structures/repository/structures.repository';
 import { formatStatutMisesEnRelation } from '../conseillers/repository/conseillers.repository';
-import { PhaseConventionnement } from '../../ts/enum';
+import {
+  PhaseConventionnement,
+  AffichagePhaseConventionnement,
+} from '../../ts/enum';
 
 dayjs.extend(utc);
 
@@ -37,7 +40,7 @@ const codeAndNomTerritoire = (territoire, statTerritoire) => {
 };
 
 const formatDate = (date: Date) => {
-  if (date !== undefined && date !== null) {
+  if (date !== undefined && date !== null && date instanceof Date) {
     return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
   }
   return 'non renseignée';
@@ -950,9 +953,7 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure.idPG,
             structure.siret,
-            structure.dateDeValidation instanceof Date
-              ? formatDate(structure.dateDeValidation)
-              : 'Non renseignée',
+            formatDate(structure.dateDeValidation),
             structure.nbPostesAvantDemande,
             structure.nbPostesApresDemande,
             structure.variation,
@@ -962,8 +963,8 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.departement,
             structure.region,
             structure.phaseConventionnement === PhaseConventionnement.PHASE_2
-              ? 'Phase 2'
-              : 'Phase 1',
+              ? AffichagePhaseConventionnement.PHASE_2
+              : AffichagePhaseConventionnement.PHASE_1,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
