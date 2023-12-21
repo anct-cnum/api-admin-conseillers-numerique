@@ -14,7 +14,7 @@ import getExportConseillersCsv from './getExportConseillersCsv';
 import getExportHistoriqueDossiersConventionCsv from './getExportHistoriqueDossiersConventionCsv';
 import getExportHistoriqueContratsCsv from './getExportHistoriqueContratsCsv';
 import getExportStructureNonInteresserReconventionnementCsv from './getExportStructureNonInteresserReconventionnementCsv';
-import getExportCandidatsCoordinateursCsv from './getExportCandidatsCoordinateursCsv';
+import getExportListeDemandesCoordinateursCsv from './getExportListeDemandesCoordinateursCsv';
 
 export {
   getExportCandidatsByStructureCsv,
@@ -33,5 +33,5 @@ export {
   getExportHistoriqueDossiersConventionCsv,
   getExportHistoriqueContratsCsv,
   getExportStructureNonInteresserReconventionnementCsv,
-  getExportCandidatsCoordinateursCsv,
+  getExportListeDemandesCoordinateursCsv,
 };
