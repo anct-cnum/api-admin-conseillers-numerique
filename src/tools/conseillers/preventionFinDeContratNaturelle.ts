@@ -164,7 +164,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           prenventionSuppressionConseillerStructure(mailerInstance);
         const errorSmtpMailPreventionFinContratStructure =
           await messagePreventionFinContratStructure
-            .send(conseiller, miseEnRelationFinContrat.structureObj)
+            .send(conseiller.idPG, miseEnRelationFinContrat.structureObj.email)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
             });

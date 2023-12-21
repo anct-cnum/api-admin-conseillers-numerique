@@ -1,29 +1,62 @@
 <mjml>
-
   <%- include('../commun/head.mjml.ejs'); %>
   <mj-body background-color="#f0f0f0">
-
-    <%- include('../commun/header.mjml.ejs', { utils }); %>
-
-      <mj-wrapper css-class="wrapper">
-
-          <mj-column>
-            <mj-text css-class="text-primary">
-              Fin de contrat avec votre conseiller numérique dans deux mois
-            </mj-text>
-            <mj-text align="left">
-              Bonjour,
-            </mj-text>
-            <mj-text align="left">
-             EN ATTENTE DE CONTENU
-            </mj-text>
-             <mj-text align="left">
-              Bien cordialement,
-            </mj-text>
-            <mj-text align="left">
-              L'équipe Conseiller Numérique France Services
-            </mj-text>
-          </mj-column>
-      </mj-wrapper>
+    <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+      <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
+      src="<%= utils.getPublicUrl('/assets/img/email/en-tete-structures-2.png') %>" />
+    </mj-section>
+    <mj-section padding="8px"></mj-section>
+   <mj-wrapper css-class="wrapper">
+   	<mj-section>
+    	<mj-column>
+      	<mj-text align="left">
+        	Bonjour,
+        </mj-text>
+        <mj-text align="left">
+        	Vous disposez d’un poste de conseiller numérique pour lequel le contrat se termine dans 2 mois.
+        </mj-text>
+        <mj-text align="left" font-weight="bold">
+        	🔹 Si vous souhaitez renouveler le poste de votre conseiller :
+        </mj-text>
+        <mj-text align="left">
+        	Nous vous invitons dès à présent à effectuer la démarche de renouvellement sur le Tableau de pilotage.
+        </mj-text>
+        <mj-text align="left">
+          <a target="blank" rel="noreferrer" href="https://outline.incubateur.anct.gouv.fr/doc/faire-une-demande-de-reconventionnement-NcomUfJQgk" noreferer>
+            En savoir plus sur “Comment faire la démarche de renouvellement de poste sur le tableau de pilotage”
+          </a>
+        </mj-text>
+        <mj-text align="left">
+          Sans action de votre part, les accès à l’outillage Coop de votre conseiller numérique <b>seront coupés</b> dans deux mois. Le conseiller numérique pourra à ce moment-là, accéder à son espace candidat pour mettre à jour ses informations de candidatures.
+        </br></br>
+        </mj-text>
+				 <mj-text align="left">
+           🔹 <b>Si vous n’avez aucun poste dont la date de contrat arrive à échéance dans 2 mois, cela signifie que les dates affichées dans le tableau de pilotage sont incorrectes.</b> (Elles ont pu être renseignées sans avoir d’information sur la date réelle de fin, ou alors la date de fin a été revue)
+         </mj-text>
+         <mj-text align="left">
+           Dans ce cas, nous vous invitons à nous le faire savoir par email à l’adresse <a href="mailto:conseiller-numerique@anct.gouv.fr">conseiller-numerique@anct.gouv.fr</a> . L'équipe support se chargera de mettre à jour les dates de contrats afin de ne pas couper les accès Coop de votre conseiller numérique.
+         </mj-text>
+         <mj-text align="left">
+           <b>Vous avez des questions ?</b></br>
+           L’équipe d’animation se tient à votre disposition :</br>
+           &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Par email à l’adresse : <a href="mailto:conseiller-numerique@anct.gouv.fr">conseiller-numerique@anct.gouv.fr</a></br>
+  &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Par téléphone au numéro suivant : <a href="tel:+33158508942">01 58 50 89 42</a> le lundi toute la journée</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;et le mercredi et jeudi matin de 9h30 à 12h00
+         </mj-text>
+         <mj-text align="left">
+           Bien cordialement,
+         </mj-text>
+         <mj-text align="left">
+           L’équipe Conseiller numérique
+         </mj-text>
+       </mj-column>
+     </mj-section>
+     <mj-section padding="8px"></mj-section>
+     <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+      <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
+      src="<%= utils.getPublicUrl('/assets/img/email/pied-de-page.png') %>" />
+    </mj-section>
+    </mj-wrapper>
   </mj-body>
 </mjml>
+
