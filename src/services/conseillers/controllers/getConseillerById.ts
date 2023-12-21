@@ -52,12 +52,6 @@ const getConseillerById =
               from: 'misesEnRelation',
               let: {
                 idConseiller: '$_id',
-                statutMisesEnrelation: [
-                  'nouvelle_rupture',
-                  'finalisee',
-                  'finalisee_rupture',
-                  'terminee_naturelle',
-                ],
               },
               as: 'misesEnRelation',
               pipeline: [

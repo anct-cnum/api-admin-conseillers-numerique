@@ -5,7 +5,6 @@
 
 import { program } from 'commander';
 import dayjs from 'dayjs';
-import execute from '../utils';
 import service from '../../helpers/services';
 import mailer from '../../mailer';
 import {
@@ -14,6 +13,7 @@ import {
   suppressionCompteConseiller,
 } from '../../emails';
 import {
+  getConseiller,
   deleteConseillerInCoordinateurs,
   deleteCoordinateurInConseillers,
   deletePermanences,
@@ -24,19 +24,21 @@ import {
 } from '../../utils/functionsDeleteRoleConseiller';
 
 const { v4: uuidv4 } = require('uuid');
+const { execute, delay } = require('../utils');
 
-const getMisesEnRelationsFinaliseesNaturelles = (app) => async (date) =>
+const getMisesEnRelationsFinaliseesNaturelles = (app, limit) => async (date) =>
   app
     .service(service.misesEnRelation)
     .Model.find({
       statut: 'terminee_naturelle',
       dateFinDeContrat: { $lte: date },
     })
-    .limit(1);
+    .limit(limit ?? 1);
 
-const getConseiller = (app) => async (id) =>
-  app.service(service.conseillers).Model.findOne({
-    _id: id,
+const getUser = (app) => async (idConseiller) =>
+  app.service(service.users).Model.findOne({
+    'entity.$id': idConseiller,
+    roles: { $in: ['conseiller'] },
   });
 
 const updateConseiller = (app) => async (conseiller, updatedAt) =>
@@ -61,17 +63,10 @@ const updateConseiller = (app) => async (conseiller, updatedAt) =>
         coordinateurs: '',
         listeSubordonnes: '',
         estCoordinateur: '',
-        nonAffichageCarto: '',
       },
       $set: { updatedAt },
     },
   );
-
-const getUser = (app) => async (idConseiller) =>
-  app.service(service.users).Model.findOne({
-    'entity.$id': idConseiller,
-    roles: { $in: ['conseiller'] },
-  });
 
 const updateUser = (app) => async (idUser, email) =>
   app.service(service.users).Model.updateOne(
@@ -91,6 +86,41 @@ const updateUser = (app) => async (idUser, email) =>
     },
   );
 
+const updateStructure = (app) => async (structureId, miseEnRelationId) => {
+  await app.service(service.structures).Model.updateOne(
+    {
+      _id: structureId,
+      demandesCoordinateur: {
+        $elemMatch: {
+          statut: 'validee',
+          miseEnRelationId,
+        },
+      },
+    },
+    {
+      $unset: {
+        'demandesCoordinateur.$.miseEnRelationId': '',
+      },
+    },
+  );
+  await app.service(service.misesEnRelation).Model.updateMany(
+    {
+      'structure.$id': structureId,
+      'structureObj.demandesCoordinateur': {
+        $elemMatch: {
+          statut: 'validee',
+          miseEnRelationId,
+        },
+      },
+    },
+    {
+      $unset: {
+        'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
+      },
+    },
+  );
+};
+
 const createConseillersTermines = (app) => async (conseiller, miseEnRelation) =>
   app.service(service.conseillersTermines).Model.create({
     conseillerId: conseiller._id,
@@ -100,8 +130,6 @@ const createConseillersTermines = (app) => async (conseiller, miseEnRelation) =>
     dateFinContrat: miseEnRelation.dateFinDeContrat,
     phaseConventionnement: miseEnRelation?.phaseConventionnement ?? null,
     reconventionnement: miseEnRelation?.reconventionnement ?? false,
-    numeroDSContrat: miseEnRelation?.numeroDSContrat ?? null,
-    dureeEffectiveContrat: miseEnRelation?.dureeEffectiveContrat ?? null,
   });
 
 program
@@ -109,18 +137,24 @@ program
     '-f, --fix',
     'fix: cloture des comptes de conseillers avec un statut terminee_naturelle',
   )
+  .option(
+    '-l --limit <limit>',
+    'limite le nombre de traitement (par défaut: 1)',
+    parseInt,
+  )
   .parse(process.argv);
 
-execute(__filename, async ({ app, logger, exit }) => {
+execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
     const options = program.opts();
-    const { fix } = options;
+    const { fix, limit } = options;
     const updatedAt = new Date();
     const dateMoins2Mois = dayjs(updatedAt).subtract(2, 'month');
 
     logger.info('Cloture des contrats passer en statut terminee_naturelle');
     const termineesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
       app,
+      limit,
     )(dateMoins2Mois);
 
     if (termineesNaturelles.length === 0) {
@@ -144,24 +178,21 @@ execute(__filename, async ({ app, logger, exit }) => {
 
       if (fix) {
         // suppression du conseiller dans les permanences
-        await deletePermanences(app)(conseiller._id).then(async () => {
-          logger.info(
-            `Les permanences comportant uniquement le conseiller (id: ${conseiller._id}) ont été supprimées`,
-          );
-        });
-        await updatePermanences(app)(conseiller._id).then(async () => {
-          logger.info(
-            `Le conseiller (id: ${conseiller._id}) a été retiré des permanences dans lesquels il était présent`,
-          );
-        });
-        await deletePermanencesInCras(app)(conseiller._id, updatedAt).then(
-          async () => {
+        await deletePermanences(app)(conseiller._id)
+          .then(async () => {
+            await updatePermanences(app)(conseiller._id);
+          })
+          .then(async () => {
+            await updatePermanences(app)(conseiller._id);
+          })
+          .then(async () => {
+            await deletePermanencesInCras(app)(conseiller._id, updatedAt);
+          })
+          .then(async () => {
             logger.info(
-              `Les permanences du conseiller (id: ${conseiller._id}) ont été retirées des cras`,
+              `Les permanences du conseiller (id: ${conseiller._id}) ont été supprimées et retirées des cras`,
             );
-          },
-        );
-
+          });
         // suppression du conseiller dans les listes de coordinateur
         if (conseiller?.coordinateurs) {
           await deleteConseillerInCoordinateurs(app)(conseiller).then(
@@ -171,21 +202,41 @@ execute(__filename, async ({ app, logger, exit }) => {
               );
             },
           );
-          await deleteCoordinateurInConseillers(app)(conseiller);
         }
-
+        // suppression du coordinateur dans les structures et les conseillers
+        if (conseiller.estCoordinateur) {
+          await deleteCoordinateurInConseillers(app)(conseiller).then(
+            async () => {
+              await updateStructure(app)(
+                termineeNaturelle.structure.oid,
+                termineeNaturelle._id,
+              );
+            },
+          );
+        }
+        // mise aux normes du conseiller et de l'utilisateur
+        await updateConseiller(app)(conseiller, updatedAt)
+          .then(async () => {
+            await createConseillersTermines(app)(conseiller, termineeNaturelle);
+          })
+          .then(async () => {
+            await updateUser(app)(user._id, conseiller.email);
+          })
+          .then(async () => {
+            logger.info(
+              `Le conseiller (id: ${conseiller._id}) a été remis à zéro et le user (id: ${user._id}) a été passé en candidat avec son adresse email d'origine`,
+            );
+          });
         // suppression des outils (Mattermost, Gandi)
-        await deleteMattermostAccount(app)(conseiller).then(async () => {
-          logger.info(
-            `Le compte Mattermost du conseiller (id: ${conseiller._id} a été supprimé`,
-          );
-        });
-        await deleteMailbox(app)(conseiller._id, user.name).then(async () => {
-          logger.info(
-            `Le compte Gandi du conseiller (id: ${conseiller._id} a été supprimé`,
-          );
-        });
-
+        await deleteMattermostAccount(app)(conseiller)
+          .then(async () => {
+            await deleteMailbox(app)(conseiller._id, user.name);
+          })
+          .then(async () => {
+            logger.info(
+              `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
+            );
+          });
         // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
         const mailerInstance = mailer(app);
         const messageFinContratPix = conseillerRupturePix(mailerInstance);
@@ -222,25 +273,12 @@ execute(__filename, async ({ app, logger, exit }) => {
         if (errorSmtpMailFinContratStructure instanceof Error) {
           logger.error(errorSmtpMailFinContratStructure.message);
         }
-
-        // mise aux normes du conseiller
-        await updateConseiller(app)(conseiller, updatedAt).then(async () => {
-          logger.info(
-            `Le conseiller a été remis à zéro (id: ${conseiller._id}`,
-          );
-        });
-        await createConseillersTermines(app)(conseiller, termineeNaturelle);
-
-        // mise aux normes de l'utilisateur
-        await updateUser(app)(user._id, conseiller.email).then(async () => {
-          logger.info(
-            `Le user a été passé en candidat avec son adresse email d'origine (id: ${user._id}`,
-          );
-        });
       }
+      await delay(2000);
     }
   } catch (error) {
     logger.error(error);
+    Sentry.captureException(error);
   }
   exit();
 });

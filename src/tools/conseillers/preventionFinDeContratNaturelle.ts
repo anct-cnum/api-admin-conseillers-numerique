@@ -8,7 +8,10 @@ import dayjs from 'dayjs';
 import execute from '../utils';
 import mailer from '../../mailer';
 import service from '../../helpers/services';
-import { updateConseillersPG } from '../../utils/functionsDeleteRoleConseiller';
+import {
+  getConseiller,
+  updateConseillersPG,
+} from '../../utils/functionsDeleteRoleConseiller';
 import {
   preventionSuppressionConseiller,
   prenventionSuppressionConseillerStructure,
@@ -88,7 +91,7 @@ program
   )
   .parse(process.argv);
 
-execute(__filename, async ({ app, logger, exit }) => {
+execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
     const options = program.opts();
     const dateDuJour = new Date();
@@ -107,35 +110,34 @@ execute(__filename, async ({ app, logger, exit }) => {
       `Il y a ${misesEnRelationsFinContrat.length} contrat(s) encore en cours dont la date de fin de contrat est dépassée.`,
     );
     for (const miseEnRelationFinContrat of misesEnRelationsFinContrat) {
+      const conseiller = await getConseiller(app)(
+        miseEnRelationFinContrat.conseiller.oid,
+      );
       logger.info(
         // eslint-disable-next-line
-        `Le conseiller (idPG: ${miseEnRelationFinContrat.conseillerObj.idPG}) possède un contrat en cours dont la date de fin de contrat est au ${dayjs(miseEnRelationFinContrat.dateFinDeContrat).format('DD-MM-YYYY')}.`,
+        `Le conseiller (idPG: ${conseiller.idPG}) possède un contrat en cours dont la date de fin de contrat est au ${dayjs(miseEnRelationFinContrat.dateFinDeContrat).format('DD-MM-YYYY')}.`,
       );
 
       if (fix) {
         const pool = new Pool();
         const datePG = dayjs(dateDuJour).format('YYYY-MM-DD');
-        await updateConseillersPG(pool)(
-          miseEnRelationFinContrat.conseillerObj.email,
-          true,
-          datePG,
-        ).then(async () => {
-          await updateConseiller(app)(
-            miseEnRelationFinContrat.conseiller.oid,
-            dateDuJour,
-          );
-          await updateConseillersDisponibilite(app)(
-            miseEnRelationFinContrat.conseillerObj.email,
-            dateDuJour,
-          );
-          await updateMiseEnRelationDisponibilite(app)(
-            miseEnRelationFinContrat.conseillerObj.email,
-            dateDuJour,
-          );
-          logger.info(
-            `Le conseiller a été passé en statut 'TERMINE' (id: ${miseEnRelationFinContrat.conseiller.oid})`,
-          );
-        });
+        await updateConseillersPG(pool)(conseiller.email, true, datePG).then(
+          async () => {
+            await updateConseiller(app)(conseiller._id, dateDuJour);
+            await updateConseillersDisponibilite(app)(
+              conseiller.email,
+              dateDuJour,
+            );
+            await updateMiseEnRelationDisponibilite(app)(
+              conseiller.email,
+              dateDuJour,
+            );
+            logger.info(
+              `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
+            );
+          },
+        );
+
         await updateMiseEnRelation(app)(
           miseEnRelationFinContrat._id,
           dateDuJour,
@@ -150,7 +152,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           preventionSuppressionConseiller(mailerInstance);
         const errorSmtpMailPreventionFinContratNaturelle =
           await messagePreventionFinContrat
-            .send(miseEnRelationFinContrat.conseillerObj)
+            .send(conseiller)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
             });
@@ -162,10 +164,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           prenventionSuppressionConseillerStructure(mailerInstance);
         const errorSmtpMailPreventionFinContratStructure =
           await messagePreventionFinContratStructure
-            .send(
-              miseEnRelationFinContrat.conseillerObj,
-              miseEnRelationFinContrat.structureObj,
-            )
+            .send(conseiller, miseEnRelationFinContrat.structureObj)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
             });
@@ -176,6 +175,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     }
   } catch (error) {
     logger.error(error);
+    Sentry.captureException(error);
   }
 
   exit();

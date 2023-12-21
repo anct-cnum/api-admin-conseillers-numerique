@@ -1,6 +1,11 @@
 import axios from 'axios';
 import service from '../helpers/services';
 
+const getConseiller = (app) => async (id) =>
+  app.service(service.conseillers).Model.findOne({
+    _id: id,
+  });
+
 const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
   try {
     await pool.query(
@@ -201,6 +206,7 @@ const deleteMailbox = (app) => async (conseillerId, login) => {
   }
 };
 export {
+  getConseiller,
   updateConseillersPG,
   deleteConseillerInCoordinateurs,
   deleteCoordinateurInConseillers,
