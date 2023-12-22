@@ -2,19 +2,23 @@ import { Service, MongooseServiceOptions } from 'feathers-mongoose';
 import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
-import updateMiseEnRelation from './controllers/updateMiseEnRelation';
-import getMiseEnRelation from './controllers/getMiseEnRelation';
-import getMisesEnRelationStructure from './controllers/getMisesEnRelationStructure';
-import getMisesEnRelationARenouveller from './controllers/getMisesEnRelationARenouveller';
-import getContrats from './controllers/getContrats';
-import validationRenouvellementContrat from './controllers/validationRenouvellementContrat';
-import getHistoriqueContrats from './controllers/getHistoriqueContrats';
-import createContrat from './controllers/createContrat';
-import updateContrat from './controllers/updateContrat';
-import getMiseEnRelationConseiller from './controllers/getMiseEnRelationConseiller';
-import updateContratRecrutementStructure from './controllers/updateContratRecrutementStructure';
-import validationRecrutementContrat from './controllers/validationRecrutementContrat';
-import updateContratRecrutementAdmin from './controllers/updateContratRecrutementAdmin';
+import {
+  updateMiseEnRelation,
+  validationRenouvellementContrat,
+  validationRecrutementContrat,
+  createContrat,
+  updateContratRecrutementStructure,
+  updateContratRecrutementAdmin,
+  updateContrat,
+  getMiseEnRelation,
+  getMiseEnRelationConseiller,
+  getMisesEnRelationStructure,
+  getMisesEnRelationARenouveller,
+  getContrats,
+  getHistoriqueContrats,
+  annulationRecrutementContrat,
+  closeBannerAnnulationRecrutementContrat,
+} from './controllers';
 
 export default class MisesEnRelation extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -36,6 +40,18 @@ export default class MisesEnRelation extends Service {
       authenticateMode(app),
       createAbilities(app),
       validationRecrutementContrat(app),
+    );
+    app.patch(
+      '/contrat/annulation-recrutement/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      annulationRecrutementContrat(app),
+    );
+    app.patch(
+      '/banner/annulation-recrutement/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerAnnulationRecrutementContrat(app),
     );
     app.post(
       '/renouvellement/contrat',
