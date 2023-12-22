@@ -123,7 +123,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             reject();
           }
 
-          await app.service(service.misesEnRelation).Model.findOneAndUpdate(
+          await app.service(service.misesEnRelation).Model.updateOne(
             { _id: match._id },
             {
               $set: {
@@ -132,7 +132,6 @@ execute(__filename, async ({ app, logger, exit }) => {
                 typeDeContrat: contrat['CT V1'],
               },
             },
-            { returnOriginal: false },
           );
           logger.info(
             `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
