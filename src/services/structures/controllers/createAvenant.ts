@@ -8,7 +8,7 @@ import { validCreationAvenant } from '../../../schemas/structures.schemas';
 import getDetailStructureById from './getDetailStructureById';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
-import { getCoselec } from '../../../utils';
+import { getCoselec, getLastCoselec } from '../../../utils';
 
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -59,9 +59,10 @@ const createAvenant =
       return;
     }
 
+    const lastDemandeCoselec = getLastCoselec(getStructure);
     if (
       getStructure.demandesCoselec?.length > 0 &&
-      getStructure?.lastDemandeCoselec?.statut === 'en_cours'
+      lastDemandeCoselec?.statut === 'en_cours'
     ) {
       res.status(409).json({
         message: `Une demande est en cours d'instruction. Vous ne pouvez faire aucune action pendant cette période.`,
