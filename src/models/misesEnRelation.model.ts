@@ -43,6 +43,8 @@ export default function (app: Application): Model<any> {
       banniereAjoutRoleCoordinateur: { type: Boolean },
 
       contratCoordinateur: { type: Boolean },
+
+      banniereRefusRecrutement: { type: Boolean },
     },
     {
       strict: false,

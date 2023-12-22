@@ -45,9 +45,6 @@ const validUpdateMisesEnRelation = Joi.object({
   dateRupture: Joi.date()
     .allow(null, '')
     .error(new Error('Le dateRupture est invalide')),
-  banniereRefusRecrutement: Joi.boolean()
-    .allow(null, '')
-    .error(new Error('Le banniereRefusRecrutement est invalide')),
 });
 
 export { validMiseEnRelation, validUpdateMisesEnRelation };
