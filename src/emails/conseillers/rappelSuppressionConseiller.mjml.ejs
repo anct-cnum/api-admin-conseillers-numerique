@@ -1,0 +1,42 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+  <mj-body>
+    <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+      <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
+      src="<%= utils.getPublicUrl('/assets/img/email/header-cloture-conum.png') %>" />
+    </mj-section>
+    <mj-section padding="8px"></mj-section>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Bonjour <%= prenom %>,
+            </mj-text>
+            <mj-text align="left">
+              Nous vous informons que vos accès à l’espace Coop ont été supprimés dans 7 jours.</br>
+              Ce jour correspond à la date de fin de votre contrat Conseiller numérique.
+            </mj-text>
+            <mj-text align="left">
+              Passé cette date, nous vous recommandons d’utiliser votre <a href="https://candidat.conseiller-numerique.gouv.fr/login" target="blank" rel="noreferrer" ></a>espace candidat</a> pour mettre à jour vos informations de candidature.
+            </mj-text>
+            <mj-text align="left">
+              Si vous êtes identifié(e) dans un processus de recrutement avec une nouvelle structure, vos accès ne seront pas supprimés. Dans ce cas, nous vous invitons à vous assurer auprès de votre futur employeur que la démarche de recrutement a bien été réalisée sur le tableau de pilotage (espace professionnel conseiller numérique pour les employeurs).
+            </mj-text>
+            <mj-text align="left">
+              <b>Vous avez des questions ?</b></br>
+              L’équipe support se tient à votre disposition :</br>
+              &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Par email à l’adresse : <a href="mailto:conseiller-numerique@anct.gouv.fr">conseiller-numerique@anct.gouv.fr</a></br>
+            </mj-text>
+            <mj-text align="left">
+              L’équipe Conseiller numérique
+            </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section padding="8px"></mj-section>
+      <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+        <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
+        src="<%= utils.getPublicUrl('/assets/img/email/footer-cloture-prev-conum.png') %>" />
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

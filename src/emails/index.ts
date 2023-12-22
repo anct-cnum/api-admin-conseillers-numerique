@@ -2,6 +2,7 @@ import creationCompteCandidat from './candidats/creationCompteCandidat';
 import creationCompteConseiller from './conseillers/creationCompteConseiller';
 import relanceCreationCompteConseiller from './conseillers/relanceCreationCompteConseiller';
 import preventionSuppressionConseiller from './conseillers/preventionSuppressionConseiller';
+import rappelSuppressionCompteConseiller from './conseillers/rappelSuppressionConseiller';
 import suppressionCompteConseiller from './conseillers/suppressionCompteConseiller';
 import invitationActiveCompte from './invitations/invitationActiveCompte';
 import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
@@ -22,6 +23,7 @@ export {
   creationCompteConseiller,
   relanceCreationCompteConseiller,
   preventionSuppressionConseiller,
+  rappelSuppressionCompteConseiller,
   suppressionCompteConseiller,
   invitationActiveCompte,
   invitationMultiRoleCompte,

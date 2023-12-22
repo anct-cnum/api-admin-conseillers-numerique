@@ -1,6 +1,15 @@
 import axios from 'axios';
 import service from '../helpers/services';
 
+const getMisesEnRelationsFinaliseesNaturelles = (app, limit) => async (date) =>
+  app
+    .service(service.misesEnRelation)
+    .Model.find({
+      statut: 'terminee_naturelle',
+      dateFinDeContrat: { $lte: date },
+    })
+    .limit(limit ?? 1);
+
 const getConseiller = (app) => async (id) =>
   app.service(service.conseillers).Model.findOne({
     _id: id,
@@ -206,6 +215,7 @@ const deleteMailbox = (app) => async (conseillerId, login) => {
   }
 };
 export {
+  getMisesEnRelationsFinaliseesNaturelles,
   getConseiller,
   updateConseillersPG,
   deleteConseillerInCoordinateurs,

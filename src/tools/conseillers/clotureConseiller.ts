@@ -13,6 +13,7 @@ import {
   suppressionCompteConseiller,
 } from '../../emails';
 import {
+  getMisesEnRelationsFinaliseesNaturelles,
   getConseiller,
   deleteConseillerInCoordinateurs,
   deleteCoordinateurInConseillers,
@@ -25,15 +26,6 @@ import {
 
 const { v4: uuidv4 } = require('uuid');
 const { execute, delay } = require('../utils');
-
-const getMisesEnRelationsFinaliseesNaturelles = (app, limit) => async (date) =>
-  app
-    .service(service.misesEnRelation)
-    .Model.find({
-      statut: 'terminee_naturelle',
-      dateFinDeContrat: { $lte: date },
-    })
-    .limit(limit ?? 1);
 
 const getUser = (app) => async (idConseiller) =>
   app.service(service.users).Model.findOne({
@@ -244,9 +236,11 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           .send(conseiller)
           .catch((errSmtp: Error) => {
             logger.error(errSmtp);
+            Sentry.captureException(errSmtp);
           });
         if (errorSmtpMailFinContratPix instanceof Error) {
           logger.error(errorSmtpMailFinContratPix.message);
+          Sentry.captureException(errorSmtpMailFinContratPix.message);
         }
 
         const messageFinContratConseiller =
@@ -255,9 +249,11 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           .send(conseiller)
           .catch((errSmtp: Error) => {
             logger.error(errSmtp);
+            Sentry.captureException(errSmtp);
           });
         if (errorSmtpMailFinContrat instanceof Error) {
           logger.error(errorSmtpMailFinContrat.message);
+          Sentry.captureException(errorSmtpMailFinContrat.message);
         }
 
         const messageFinContratStructure = suppressionCompteConseillerStructure(
@@ -269,9 +265,11 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
             .send(termineeNaturelle, termineeNaturelle.structureObj)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
+              Sentry.captureException(errSmtp);
             });
         if (errorSmtpMailFinContratStructure instanceof Error) {
           logger.error(errorSmtpMailFinContratStructure.message);
+          Sentry.captureException(errorSmtpMailFinContratStructure.message);
         }
       }
       await delay(2000);

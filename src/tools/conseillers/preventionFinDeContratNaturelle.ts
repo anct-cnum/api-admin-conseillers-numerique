@@ -155,9 +155,13 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
             .send(conseiller)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
+              Sentry.captureException(errSmtp);
             });
         if (errorSmtpMailPreventionFinContratNaturelle instanceof Error) {
           logger.error(errorSmtpMailPreventionFinContratNaturelle.message);
+          Sentry.captureException(
+            errorSmtpMailPreventionFinContratNaturelle.message,
+          );
         }
 
         const messagePreventionFinContratStructure =
@@ -167,9 +171,13 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
             .send(conseiller.idPG, miseEnRelationFinContrat.structureObj.email)
             .catch((errSmtp: Error) => {
               logger.error(errSmtp);
+              Sentry.captureException(errSmtp);
             });
         if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
           logger.error(errorSmtpMailPreventionFinContratStructure.message);
+          Sentry.captureException(
+            errorSmtpMailPreventionFinContratStructure.message,
+          );
         }
       }
     }
