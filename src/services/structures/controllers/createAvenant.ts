@@ -59,7 +59,7 @@ const createAvenant =
       return;
     }
 
-    const lastDemandeCoselec = getLastCoselec(getStructure);
+    const lastDemandeCoselec = getCoselec(getStructure);
     if (
       getStructure.demandesCoselec?.length > 0 &&
       lastDemandeCoselec?.statut === 'en_cours'
