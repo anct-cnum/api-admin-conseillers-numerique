@@ -50,7 +50,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       const conseiller = await getConseiller(app)(
         termineeNaturelle.conseiller.oid,
       );
-      // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
+      // Envoi des emails de rappel de cloture de compte
       const mailerInstance = mailer(app);
       const messageRappelSuppressionConseiller =
         rappelSuppressionCompteConseiller(mailerInstance);
