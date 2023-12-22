@@ -60,7 +60,7 @@ const createAvenant =
     }
 
     if (getStructure.demandesCoselec?.length > 0) {
-      const index = getStructure.demandesCoselec.length;
+      const demandeCoselec = getStructure.demandesCoselec.pop();
       if (getStructure.demandesCoselec[index]?.statut === 'en_cours') {
         res.status(409).json({
           message: `Une demande est en cours d'instruction. Vous ne pouvez faire aucune action pendant cette période.`,
