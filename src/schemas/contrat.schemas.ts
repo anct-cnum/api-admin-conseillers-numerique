@@ -33,7 +33,6 @@ const validCreationContrat = Joi.object({
   salaire: Joi.string()
     .allow(null, '')
     .regex(/^(\d+(?:[\\.\\,]\d*)?)$/)
-    .required()
     .error(new Error('Le salaire du contrat est invalide')),
   isRecrutementCoordinateur: Joi.boolean().error(
     new Error('Le recrutement coordinateur est invalide'),
