@@ -59,15 +59,14 @@ const createAvenant =
       return;
     }
 
-    const lastDemandeCoselec = getCoselec(getStructure);
-    if (
-      getStructure.demandesCoselec?.length > 0 &&
-      lastDemandeCoselec?.statut === 'en_cours'
-    ) {
-      res.status(409).json({
-        message: `Une demande est en cours d'instruction. Vous ne pouvez faire aucune action pendant cette période.`,
-      });
-      return;
+    if (getStructure.demandesCoselec?.length > 0) {
+      const index = getStructure.demandesCoselec.length;
+      if (getStructure.demandesCoselec[index]?.statut === 'en_cours') {
+        res.status(409).json({
+          message: `Une demande est en cours d'instruction. Vous ne pouvez faire aucune action pendant cette période.`,
+        });
+        return;
+      }
     }
 
     const demandeCoselec = {
