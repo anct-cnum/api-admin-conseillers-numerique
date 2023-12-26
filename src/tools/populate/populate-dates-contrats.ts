@@ -77,10 +77,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           reject();
         } else {
           trouvees += 1;
-          if (
-            contrat['Date de début de CT\nJJ/MM/AAAA'].trim().length === 0 &&
-            contrat['CT V1'] !== 'CDI'
-          ) {
+          if (contrat['Date de début de CT\nJJ/MM/AAAA'].trim().length === 0) {
             logger.error(
               `Date de début manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
             );
@@ -124,7 +121,10 @@ execute(__filename, async ({ app, logger, exit }) => {
               0,
               0,
             );
-            if (dateFinObject < new Date('2020-10-01')) {
+            if (
+              dateFinObject < new Date('2020-10-01') &&
+              contrat['CT V1'] !== 'CDI'
+            ) {
               logger.error(
                 `Date de fin incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
               );
