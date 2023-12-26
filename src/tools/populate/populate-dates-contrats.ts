@@ -9,7 +9,7 @@ import execute from '../utils';
 import service from '../../helpers/services';
 
 program.option('-c, --csv <path>', 'CSV file path');
-program.option('-d, --delete <path>', 'clean miseEnRelation collection ');
+program.option('-d, --delete', 'clean miseEnRelation collection ');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
