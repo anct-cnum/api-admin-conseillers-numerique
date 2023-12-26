@@ -145,9 +145,8 @@ execute(__filename, async ({ app, logger, exit }) => {
                 },
               );
               logger.info(
-                `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+                `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']} (${match._id})`,
               );
-              logger.info(match._id);
             }
           }
           resolve(p);
