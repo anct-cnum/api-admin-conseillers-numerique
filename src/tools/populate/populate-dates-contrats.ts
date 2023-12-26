@@ -60,94 +60,106 @@ execute(__filename, async ({ app, logger, exit }) => {
 
   let trouvees = 0;
   let inconnues = 0;
-
-  contrats.forEach(async (contrat) => {
-    // eslint-disable-next-line no-async-promise-executor
-    const p = new Promise<void>(async (resolve, reject) => {
-      const match = await matchContrat(
-        parseInt(contrat['ID SA'], 10),
-        parseInt(contrat['ID CNFS'], 10),
-      );
-
-      if (match === null) {
-        inconnues += 1;
-        logger.warn(
-          `Contrat inexistant pour la structure ${contrat['ID SA']} et le conseiller ${contrat['ID CNFS']}`,
+  if (!options.delete) {
+    contrats.forEach(async (contrat) => {
+      // eslint-disable-next-line no-async-promise-executor
+      const p = new Promise<void>(async (resolve, reject) => {
+        const match = await matchContrat(
+          parseInt(contrat['ID SA'], 10),
+          parseInt(contrat['ID CNFS'], 10),
         );
-        reject();
-      } else {
-        trouvees += 1;
-        if (
-          contrat['Date de fin de CT\nJJ/MM/AAAA'].trim().length === null &&
-          contrat['CT V1'] !== 'CDI'
-        ) {
-          logger.error(
-            `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+
+        if (match === null) {
+          inconnues += 1;
+          logger.warn(
+            `Contrat inexistant pour la structure ${contrat['ID SA']} et le conseiller ${contrat['ID CNFS']}`,
           );
           reject();
         } else {
-          const [jourDebut, moisDebut, anneeDebut] =
-            contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
-          const dateDebutObject = new Date(
-            anneeDebut,
-            moisDebut - 1,
-            jourDebut,
-            0,
-            0,
-            0,
-          );
+          trouvees += 1;
           if (
-            new Date() < dateDebutObject ||
-            dateDebutObject < new Date('2020-10-01')
+            contrat['Date de début de CT\nJJ/MM/AAAA'].trim().length === 0 &&
+            contrat['CT V1'] !== 'CDI'
           ) {
             logger.error(
-              `Date de début incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+              `Date de début manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
             );
             reject();
-          }
-
-          const [jourFin, moisFin, anneeFin] =
-            contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
-          const dateFinObject = new Date(
-            anneeFin,
-            moisFin - 1,
-            jourFin,
-            0,
-            0,
-            0,
-          );
-          if (dateFinObject < new Date('2020-10-01')) {
+          } else if (
+            contrat['Date de fin de CT\nJJ/MM/AAAA'].trim().length === 0 &&
+            contrat['CT V1'] !== 'CDI'
+          ) {
             logger.error(
-              `Date de fin incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+              `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
             );
             reject();
+          } else {
+            const [jourDebut, moisDebut, anneeDebut] =
+              contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
+            const dateDebutObject = new Date(
+              anneeDebut,
+              moisDebut - 1,
+              jourDebut,
+              0,
+              0,
+              0,
+            );
+            if (
+              new Date() < dateDebutObject ||
+              dateDebutObject < new Date('2020-10-01')
+            ) {
+              logger.error(
+                `Date de début incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+              );
+              reject();
+            }
+
+            const [jourFin, moisFin, anneeFin] =
+              contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
+            const dateFinObject = new Date(
+              anneeFin,
+              moisFin - 1,
+              jourFin,
+              0,
+              0,
+              0,
+            );
+            if (dateFinObject < new Date('2020-10-01')) {
+              logger.error(
+                `Date de fin incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+              );
+              reject();
+            }
+            if (
+              new Date(dateDebutObject).toString() !== 'Invalid Date' &&
+              new Date(dateFinObject).toString() !== 'Invalid Date'
+            ) {
+              await app.service(service.misesEnRelation).Model.updateOne(
+                { _id: match._id },
+                {
+                  $set: {
+                    dateDebutDeContrat: dateDebutObject,
+                    dateFinDeContrat: dateFinObject,
+                    typeDeContrat: contrat['CT V1'],
+                  },
+                },
+              );
+              logger.info(
+                `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+              );
+              logger.info(match._id);
+            }
           }
-
-          await app.service(service.misesEnRelation).Model.updateOne(
-            { _id: match._id },
-            {
-              $set: {
-                dateDebutDeContrat: dateDebutObject,
-                dateFinDeContrat: dateFinObject,
-                typeDeContrat: contrat['CT V1'],
-              },
-            },
-          );
-          logger.info(
-            `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
-          );
-          logger.info(match._id);
+          resolve(p);
         }
-        resolve(p);
-      }
+      });
+      promises.push(p);
     });
-    promises.push(p);
-  });
-  await Promise.allSettled(promises);
-  logger.info(`${contrats.length} contrats`);
-  logger.info(`${inconnues} inconnues`);
-  logger.info(`${trouvees} trouvées`);
-
+    await Promise.allSettled(promises);
+    logger.info(`${contrats.length} contrats`);
+    logger.info(`${inconnues} inconnues`);
+    logger.info(`${trouvees} trouvées`);
+  }
   if (options.delete) {
     await cleanMiseEnRelation();
   }
