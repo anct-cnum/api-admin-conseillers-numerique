@@ -14,7 +14,7 @@ const getFinsDeContratNaturelles = async (app) =>
   app
     .service(service.misesEnRelation)
     .Model.find({
-      dateFinDeContrat: { $lte: new Date('2024-01-15') },
+      dateFinDeContrat: { $lte: new Date('2024-01-31') },
       statut: 'finalisee',
       typeDeContrat: { $ne: 'CDI' },
     })
