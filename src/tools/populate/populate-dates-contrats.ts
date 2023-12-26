@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/populate/populate-dates-contrats.ts -c <path file>
+// Lancement de ce script : ts-node src/tools/populate/populate-dates-contrats.ts -c <path file> (-d)
 
 import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
@@ -9,6 +9,7 @@ import execute from '../utils';
 import service from '../../helpers/services';
 
 program.option('-c, --csv <path>', 'CSV file path');
+program.option('-d, --delete <path>', 'clean miseEnRelation collection ');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
@@ -29,7 +30,29 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
       phaseConventionnement: { $exists: false },
     });
-
+  const cleanMiseEnRelation = () =>
+    app.service(service.misesEnRelation).Model.updateMany(
+      {
+        $or: [
+          {
+            dureeEffectiveContrat: {
+              $exists: true,
+            },
+          },
+          {
+            numeroDSContrat: {
+              $exists: true,
+            },
+          },
+        ],
+      },
+      {
+        $unset: {
+          dureeEffectiveContrat: '',
+          numeroDSContrat: '',
+        },
+      },
+    );
   const options = program.opts();
   const contrats = await readCSV(options.csv);
 
@@ -49,42 +72,72 @@ execute(__filename, async ({ app, logger, exit }) => {
       if (match === null) {
         inconnues += 1;
         logger.warn(
-          `Contrat inexistant pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+          `Contrat inexistant pour la structure ${contrat['ID SA']} et le conseiller ${contrat['ID CNFS']}`,
         );
         reject();
       } else {
         trouvees += 1;
-        const [jourDebut, moisDebut, anneeDebut] =
-          contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
-        const dateDebutObject = new Date(
-          anneeDebut,
-          moisDebut - 1,
-          jourDebut,
-          0,
-          0,
-          0,
-        );
-        const [jourFin, moisFin, anneeFin] =
-          contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
-        const dateFinObject = new Date(anneeFin, moisFin - 1, jourFin, 0, 0, 0);
+        if (
+          contrat['Date de fin de CT\nJJ/MM/AAAA'].trim().length === null &&
+          contrat['CT V1'] !== 'CDI'
+        ) {
+          logger.error(
+            `Date de fin manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+          );
+          reject();
+        } else {
+          const [jourDebut, moisDebut, anneeDebut] =
+            contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
+          const dateDebutObject = new Date(
+            anneeDebut,
+            moisDebut - 1,
+            jourDebut,
+            0,
+            0,
+            0,
+          );
+          if (
+            new Date() < dateDebutObject ||
+            dateDebutObject < new Date('2020-10-01')
+          ) {
+            logger.error(
+              `Date de début incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+            );
+            reject();
+          }
 
-        await app.service(service.misesEnRelation).Model.findOneAndUpdate(
-          { _id: match._id },
-          {
-            $set: {
-              dateDebutDeContrat: dateDebutObject,
-              dateFinDeContrat: dateFinObject,
-              typeDeContrat: contrat['CT dans BDD'],
-              dureeEffectiveContrat: contrat['Durée effective \n(mois)'],
-              numeroDSContrat: contrat['N°DS'],
+          const [jourFin, moisFin, anneeFin] =
+            contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
+          const dateFinObject = new Date(
+            anneeFin,
+            moisFin - 1,
+            jourFin,
+            0,
+            0,
+            0,
+          );
+          if (dateFinObject < new Date('2020-10-01')) {
+            logger.error(
+              `Date de fin incorrecte pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
+            );
+            reject();
+          }
+
+          await app.service(service.misesEnRelation).Model.updateOne(
+            { _id: match._id },
+            {
+              $set: {
+                dateDebutDeContrat: dateDebutObject,
+                dateFinDeContrat: dateFinObject,
+                typeDeContrat: contrat['CT V1'],
+              },
             },
-          },
-          { returnOriginal: false },
-        );
-        logger.info(
-          `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
-        );
-        logger.info(match._id);
+          );
+          logger.info(
+            `Contrat mis à jour pour structure ${contrat['ID SA']} et conseiller ${contrat['ID CNFS']}`,
+          );
+          logger.info(match._id);
+        }
         resolve(p);
       }
     });
@@ -94,5 +147,9 @@ execute(__filename, async ({ app, logger, exit }) => {
   logger.info(`${contrats.length} contrats`);
   logger.info(`${inconnues} inconnues`);
   logger.info(`${trouvees} trouvées`);
+
+  if (options.delete) {
+    await cleanMiseEnRelation();
+  }
   exit(0, 'Migration terminée');
 });
