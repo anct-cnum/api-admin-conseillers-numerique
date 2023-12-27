@@ -47,7 +47,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     );
 
     file.write(
-      'Id CNFS;Nom;Prénom;Email;Id Structure;Nom de la structure;Contact principal;Autres administrateur;Date de début de contrat;Date de fin de contrat;\n',
+      'Id CNFS;Nom;Prénom;Email;Id Structure;Nom de la structure;Contact principal;Autres administrateurs;Date de début de contrat;Date de fin de contrat;\n',
     );
     for (const finDeContrat of finsDeContratNaturelles) {
       const conseiller = finDeContrat.conseillerObj;
