@@ -5,7 +5,7 @@ import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
   getCodePostauxStructureCras,
-  getCodePostauxConseillerCras,
+  getFiltresConseillerCras,
 } from './controllers';
 
 export default class Cras extends Service {
@@ -18,10 +18,10 @@ export default class Cras extends Service {
       getCodePostauxStructureCras(app),
     );
     app.get(
-      '/cras/codesPostaux/conseiller',
+      '/cras/filtres/conseiller',
       authenticateMode(app),
       createAbilities(app),
-      getCodePostauxConseillerCras(app),
+      getFiltresConseillerCras(app),
     );
   }
 }
