@@ -13,7 +13,7 @@ export default function (mailer) {
     send: async (conseiller) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour prévenir de la suppression du conseiller idPG ${conseiller.idPG}`,
+          `Email envoyé avec succès pour prévenir de la suppression du conseiller idPG ${conseiller.idPG} dans 2 mois`,
         );
       };
       const onError = async (err: Error) => {

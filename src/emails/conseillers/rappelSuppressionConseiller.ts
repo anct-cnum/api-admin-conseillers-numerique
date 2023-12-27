@@ -13,7 +13,7 @@ export default function (mailer) {
     send: async (conseiller) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour la suppression du compte du conseiller id ${conseiller.idPG}`,
+          `Email envoyé avec succès pour la suppression du compte du conseiller id ${conseiller.idPG} dans 7 jours`,
         );
       };
       const onError = async (err: Error) => {

@@ -22,13 +22,22 @@ const getFinsDeContratNaturelles = async (app) =>
       dateFinDeContrat: 1,
     });
 
-const getUserStructure = (app) => async (idStructure) =>
-  app.service(service.users).Model.find({
-    'entity.$id': idStructure,
-    roles: {
-      $in: ['structure'],
+const getUserStructure = (app) => async (idStructure, emailStructure) =>
+  app.service(service.users).Model.find(
+    {
+      'entity.$id': idStructure,
+      name: {
+        $ne: emailStructure,
+      },
+      roles: {
+        $in: ['structure'],
+      },
     },
-  });
+    {
+      _id: 0,
+      name: 1,
+    },
+  );
 
 execute(__filename, async ({ app, logger, exit }) => {
   try {
@@ -54,12 +63,11 @@ execute(__filename, async ({ app, logger, exit }) => {
       const structure = finDeContrat.structureObj;
       const usersStructureEmail = await getUserStructure(app)(
         finDeContrat.structure.oid,
+        structure.contact.email,
       );
       const tabEmails = [];
       for (const user of usersStructureEmail) {
-        if (user.name !== structure.contact.email) {
-          tabEmails.push(user.name);
-        }
+        tabEmails.push(user.name);
       }
       const dateDebutDeContrat = dayjs(
         new Date(finDeContrat.dateDebutDeContrat),
@@ -70,7 +78,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
       file.write(
         // eslint-disable-next-line
-        `${conseiller.idPG};${conseiller.nom};${conseiller.prenom};${conseiller.email};${structure.idPG};${structure.nom};${structure.contact.email};${String(tabEmails)};${dateDebutDeContrat};${dateFinDeContrat}\n`,
+        `${conseiller.idPG};${conseiller.nom};${conseiller.prenom};${conseiller.email};${structure.idPG};${structure.nom};${structure.contact.email};${String(tabEmails.join("/"))};${dateDebutDeContrat};${dateFinDeContrat}\n`,
       );
     }
     file.close();
