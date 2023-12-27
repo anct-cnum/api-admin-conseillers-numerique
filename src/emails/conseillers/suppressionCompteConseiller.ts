@@ -1,7 +1,6 @@
 import logger from '../../logger';
 
 export default function (mailer) {
-  const { utils } = mailer;
   const templateName = 'suppressionCompteConseiller';
 
   const render = async (conseiller) => {
@@ -22,15 +21,10 @@ export default function (mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(
-          conseiller.email,
-          {
-            subject: 'Vos accès Coop ont été supprimés',
-            body: await render(conseiller),
-          },
-          {},
-          utils.getPixSupportMail(),
-        )
+        .sendEmail(conseiller.email, {
+          subject: 'Vos accès Coop ont été supprimés',
+          body: await render(conseiller),
+        })
         .then(onSuccess)
         .catch(onError);
     },
