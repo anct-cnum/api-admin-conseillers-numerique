@@ -10,12 +10,12 @@ import {
 } from '../../../ts/interfaces/db.interfaces';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
+import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
 interface IObjetMiseEnRelation {
   conseiller: DBRef;
   structure: DBRef;
   statut: string;
-  type: string;
   createdAt: Date;
   conseillerCreatedAt: Date;
   conseillerObj: IConseillers;
@@ -58,7 +58,6 @@ const preSelectionnerCandidat =
         conseiller: new DBRef('conseillers', conseiller._id, database),
         structure: new DBRef('structures', structure._id, database),
         statut: 'interessee',
-        type: 'MANUEL',
         createdAt: new Date(),
         conseillerCreatedAt: conseiller.createdAt,
         conseillerObj: conseiller,
@@ -68,11 +67,18 @@ const preSelectionnerCandidat =
         objMiseEnRelation.phaseConventionnement = PhaseConventionnement.PHASE_2;
       }
 
-      await app.service(service.misesEnRelation).create(objMiseEnRelation);
-
-      res.status(201).send({
-        message: `vous avez présélectionné le candidat ${conseiller.nom} ${conseiller.prenom}`,
-      });
+      const miseEnRelation = await app
+        .service(service.misesEnRelation)
+        .create(objMiseEnRelation);
+      const { quotaCoordinateurDisponible } =
+        await checkQuotaRecrutementCoordinateur(
+          app,
+          req,
+          structure,
+          miseEnRelation._id,
+        );
+      miseEnRelation.quotaCoordinateur = quotaCoordinateurDisponible > 0;
+      res.status(200).json(miseEnRelation);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
