@@ -26,7 +26,7 @@ const getExportStatistiquesCsv =
     const { type } = req.query;
     const dateDebut = new Date(req.query.dateDebut);
     const dateFin = new Date(req.query.dateFin);
-
+    structureIds = structureIds ? JSON.parse(structureIds) : [];
     let idStructure: ObjectId;
     let idConseiller: ObjectId;
     let query: Object;
@@ -108,6 +108,9 @@ const getExportStatistiquesCsv =
           };
           if (codePostal) {
             query['cra.codePostal'] = codePostal;
+          }
+          if (structureIds.length > 0) {
+            query['structure.$id'] = { $eq: new ObjectId(structureIds[0]) };
           }
           if (codeCommune !== 'null' && codeCommune !== '') {
             query['cra.codeCommune'] = codeCommune;
