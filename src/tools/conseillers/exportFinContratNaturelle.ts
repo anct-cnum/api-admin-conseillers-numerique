@@ -43,7 +43,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     });
 
     logger.info(
-      `${finsDeContratNaturelles.length} contrats sont concernés par une fin naturelle jusqu'au 15 janvier 2024`,
+      `${finsDeContratNaturelles.length} contrats sont concernés par une fin naturelle jusqu'au 31 janvier 2024`,
     );
 
     file.write(
