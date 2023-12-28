@@ -67,6 +67,7 @@ const preSelectionnerCandidat =
           conseillerCreatedAt: conseiller.createdAt,
           conseillerObj: conseiller,
           structureObj: structure,
+          type: 'MANUEL',
         });
 
         await app.service(service.misesEnRelation).create(objMiseEnRelation);
