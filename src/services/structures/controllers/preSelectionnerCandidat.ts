@@ -12,17 +12,6 @@ import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 
-interface IObjetMiseEnRelation {
-  conseiller: DBRef;
-  structure: DBRef;
-  statut: string;
-  createdAt: Date;
-  conseillerCreatedAt: Date;
-  conseillerObj: IConseillers;
-  structureObj: IStructures;
-  phaseConventionnement?: string;
-}
-
 const preSelectionnerCandidat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
@@ -42,41 +31,80 @@ const preSelectionnerCandidat =
         res.status(404).json({ message: "Le conseiller n'existe pas" });
         return;
       }
-      const canCreate = req.ability.can(
-        action.create,
-        ressource.misesEnRelation,
-      );
-      if (!canCreate) {
-        res.status(403).json({
-          message: `Accès refusé, vous n'êtes pas autorisé à présélectionner un candidat`,
+      const miseEnRelationExist = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          'conseiller.$id': conseiller._id,
+          'structure.$id': structure._id,
+          statut: 'nouvelle',
+        });
+      const objMiseEnRelation = {
+        statut: 'interessee',
+      };
+      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+        Object.assign(objMiseEnRelation, {
+          phaseConventionnement: PhaseConventionnement.PHASE_2,
+        });
+      }
+      if (!miseEnRelationExist) {
+        const canCreate = req.ability.can(
+          action.create,
+          ressource.misesEnRelation,
+        );
+        if (!canCreate) {
+          res.status(403).json({
+            message: `Accès refusé, vous n'êtes pas autorisé à présélectionner un candidat`,
+          });
+          return;
+        }
+        const connect = app.get('mongodb');
+        const database = connect.substr(connect.lastIndexOf('/') + 1);
+        Object.assign(objMiseEnRelation, {
+          conseiller: new DBRef('conseillers', conseiller._id, database),
+          structure: new DBRef('structures', structure._id, database),
+          createdAt: new Date(),
+          conseillerCreatedAt: conseiller.createdAt,
+          conseillerObj: conseiller,
+          structureObj: structure,
+        });
+
+        await app.service(service.misesEnRelation).create(objMiseEnRelation);
+        res.status(201).send({
+          message: `vous avez présélectionné le candidat ${conseiller.nom} ${conseiller.prenom}`,
         });
         return;
       }
-      const connect = app.get('mongodb');
-      const database = connect.substr(connect.lastIndexOf('/') + 1);
-      const objMiseEnRelation: IObjetMiseEnRelation = {
-        conseiller: new DBRef('conseillers', conseiller._id, database),
-        structure: new DBRef('structures', structure._id, database),
-        statut: 'interessee',
-        createdAt: new Date(),
-        conseillerCreatedAt: conseiller.createdAt,
-        conseillerObj: conseiller,
-        structureObj: structure,
-      };
-      if (checkStructurePhase2(structure?.conventionnement?.statut)) {
-        objMiseEnRelation.phaseConventionnement = PhaseConventionnement.PHASE_2;
-      }
-
-      const miseEnRelation = await app
+      const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
-        .create(objMiseEnRelation);
+        .Model.accessibleBy(req.ability, action.update)
+        .findOneAndUpdate(
+          {
+            _id: miseEnRelationExist._id,
+            statut: 'nouvelle',
+          },
+          {
+            $set: objMiseEnRelation,
+          },
+          {
+            returnOriginal: false,
+            rawResult: true,
+          },
+        );
+      if (miseEnRelationUpdated.lastErrorObject.n === 0) {
+        res.status(404).json({
+          message: "La mise en relation n'a pas été mise à jour",
+        });
+        return;
+      }
       const { quotaCoordinateurDisponible } =
         await checkQuotaRecrutementCoordinateur(
           app,
           req,
           structure,
-          miseEnRelation._id,
+          miseEnRelationUpdated.value._id,
         );
+      const miseEnRelation = miseEnRelationUpdated.value.toObject();
       miseEnRelation.quotaCoordinateur = quotaCoordinateurDisponible > 0;
       res.status(200).json(miseEnRelation);
     } catch (error) {
