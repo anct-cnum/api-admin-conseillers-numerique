@@ -31,7 +31,10 @@
 		"start": "npm run build && npm run copy-files && node dist/",
 		"jest": "jest --forceExit",
 		"copy-files": "copyfiles -u 1 src/**/*.mjml.ejs public/favicon.ico dist/",
-		"build": "shx rm -rf dist/ && tsc && npm run copy-files"
+		"build": "shx rm -rf dist/ && tsc && npm run copy-files",
+		"husky:install": "husky install",
+		"husky:init": "husky add .husky/pre-commit 'npx --no-install git-precommit-checks'",
+		"husky:uninstall": "npm remove husky && git config --unset core.hooksPath"
 	},
 	"standard": {
 		"env": [
@@ -109,6 +112,8 @@
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-node": "^11.1.0",
 		"eslint-plugin-prettier": "^5.0.0",
+		"git-precommit-checks": "^3.1.0",
+		"husky": "^8.0.3",
 		"jest": "^29.6.1",
 		"nodemon": "^3.0.1",
 		"prettier": "3.0.0",
