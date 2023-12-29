@@ -8,7 +8,10 @@ import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import {
+  checkAccessReadRequestMisesEnRelation,
+  countConseillersRecrutees,
+} from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
@@ -333,30 +336,82 @@ const validationRecrutementContrat =
             },
           },
         );
-      const query = conseillerUpdated.value?.ruptures
-        ? { $gt: dateRupture }
-        : { $gte: miseEnRelationUpdated.value?.dateDebutDeContrat };
-      const matchCras = {
-        'conseiller.$id': conseillerUpdated.value?._id,
-        'cra.dateAccompagnement': query,
-      };
-      const countCras: number = await app
-        .service(service.cras)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments(matchCras);
-      if (countCras >= 1) {
-        await app
-          .service(service.cras)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateMany(matchCras, {
-            $set: {
-              structure: new DBRef(
-                'structures',
-                miseEnRelationVerif.structureObj._id,
-                database,
-              ),
+      const miseEnRelationAccess = await checkAccessReadRequestMisesEnRelation(
+        app,
+        req,
+      );
+      // récupération de la date de fin du dernier contrat ou de la date de rupture pour migrer les CRA qui ont été créés après
+      const miseEnRelationTerminee = await app
+        .service(service.misesEnRelation)
+        .Model.aggregate([
+          {
+            $match: {
+              'conseiller.$id': conseillerUpdated.value?._id,
+              $and: [miseEnRelationAccess],
+              $or: [
+                {
+                  statut: 'terminee_naturelle',
+                  dateFinDeContrat: { $exists: true },
+                },
+                { statut: 'finalisee_rupture', dateRupture: { $exists: true } },
+              ],
             },
-          });
+          },
+          {
+            $project: {
+              dateToMigrateCRA: {
+                $max: [
+                  {
+                    $cond: {
+                      if: { $eq: ['$statut', 'terminee_naturelle'] },
+                      then: '$dateFinDeContrat',
+                      else: null,
+                    },
+                  },
+                  {
+                    $cond: {
+                      if: { $eq: ['$statut', 'finalisee_rupture'] },
+                      then: '$dateRupture',
+                      else: null,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            $sort: { dateToMigrateCRA: -1 },
+          },
+          {
+            $limit: 1,
+          },
+        ]);
+      if (miseEnRelationTerminee.length > 0) {
+        // création du match pour récupérer les CRA à migrer (créés après la date de fin de contrat ou de rupture)
+        const matchCras = {
+          'conseiller.$id': conseillerUpdated.value?._id,
+          'cra.dateAccompagnement': {
+            $gt: miseEnRelationTerminee[0].dateToMigrateCRA,
+          },
+        };
+        const countCras: number = await app
+          .service(service.cras)
+          .Model.accessibleBy(req.ability, action.read)
+          .countDocuments(matchCras);
+        if (countCras >= 1) {
+          await app
+            .service(service.cras)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateMany(matchCras, {
+              $set: {
+                structure: new DBRef(
+                  'structures',
+                  miseEnRelationVerif.structureObj._id,
+                  database,
+                ),
+              },
+            });
+        }
       }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {
