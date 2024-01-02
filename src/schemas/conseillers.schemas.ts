@@ -52,10 +52,12 @@ const validExportConseillers = Joi.object({
     new Error('Le filtre coordinateur est invalide'),
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
-  departement: Joi.string().error(
-    new Error('Le filtre département est invalide'),
-  ),
+  region: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le filtre region est invalide')),
+  departement: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le filtre département est invalide')),
   piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
   ),
