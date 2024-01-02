@@ -71,8 +71,8 @@ const preSelectionnerCandidat =
         });
 
         await app.service(service.misesEnRelation).create(objMiseEnRelation);
-        res.status(201).send({
-          message: `vous avez présélectionné le candidat ${conseiller.nom} ${conseiller.prenom}`,
+        res.status(200).json({
+          success: true,
         });
         return;
       }
@@ -107,7 +107,7 @@ const preSelectionnerCandidat =
         );
       const miseEnRelation = miseEnRelationUpdated.value.toObject();
       miseEnRelation.quotaCoordinateur = quotaCoordinateurDisponible > 0;
-      res.status(200).json(miseEnRelation);
+      res.status(200).json({ miseEnRelation });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
