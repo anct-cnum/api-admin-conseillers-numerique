@@ -18,13 +18,13 @@ const getTotalCandidats =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
-          emailStr: '$email',
+          email: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
-          emailStr: '$email',
+          email: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -54,13 +54,13 @@ const getCandidatsAvecFiltre =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
-          emailStr: '$email',
+          email: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
-          emailStr: '$email',
+          email: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },

@@ -48,7 +48,7 @@ const filterNomAndEmailConseiller = (search: string) => {
           },
         },
         {
-          emailStr: {
+          email: {
             $regex: inputSearchBar,
             $options: 'i',
           },
