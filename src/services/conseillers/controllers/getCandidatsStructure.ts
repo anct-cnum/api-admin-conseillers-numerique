@@ -36,13 +36,11 @@ const getTotalCandidatsStructure =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
-          email: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
-          email: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
