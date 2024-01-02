@@ -116,15 +116,64 @@ const validationRecrutementContrat =
       );
       const coselec = getCoselec(structure);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
-      const dateRupture =
-        miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
+      const miseEnRelationAccess = await checkAccessReadRequestMisesEnRelation(
+        app,
+        req,
+      );
+      // récupération de la date de fin du dernier contrat ou de la date de rupture pour migrer les CRA qui ont été créés après
+      const miseEnRelationTerminee = await app
+        .service(service.misesEnRelation)
+        .Model.aggregate([
+          {
+            $match: {
+              'conseiller.$id': miseEnRelationVerif.conseillerObj?._id,
+              $and: [miseEnRelationAccess],
+              $or: [
+                {
+                  statut: 'terminee_naturelle',
+                  dateFinDeContrat: { $exists: true },
+                },
+                { statut: 'finalisee_rupture', dateRupture: { $exists: true } },
+              ],
+            },
+          },
+          {
+            $project: {
+              dateToMigrateCRA: {
+                $max: [
+                  {
+                    $cond: {
+                      if: { $eq: ['$statut', 'terminee_naturelle'] },
+                      then: '$dateFinDeContrat',
+                      else: null,
+                    },
+                  },
+                  {
+                    $cond: {
+                      if: { $eq: ['$statut', 'finalisee_rupture'] },
+                      then: '$dateRupture',
+                      else: null,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            $sort: { dateToMigrateCRA: -1 },
+          },
+          {
+            $limit: 1,
+          },
+        ]);
       if (
-        dateRupture &&
-        dateRupture > miseEnRelationVerif?.dateDebutDeContrat
+        miseEnRelationTerminee.length > 0 &&
+        miseEnRelationTerminee[0].dateToMigrateCRA >
+          miseEnRelationVerif?.dateDebutDeContrat
       ) {
         res.status(400).json({
           message:
-            'La date de rupture est postérieure à la date de début de contrat',
+            'Action non autorisée : la date de début de contrat est antérieure à la date de fin du dernier contrat ou de rupture',
         });
         return;
       }
@@ -336,56 +385,7 @@ const validationRecrutementContrat =
             },
           },
         );
-      const miseEnRelationAccess = await checkAccessReadRequestMisesEnRelation(
-        app,
-        req,
-      );
-      // récupération de la date de fin du dernier contrat ou de la date de rupture pour migrer les CRA qui ont été créés après
-      const miseEnRelationTerminee = await app
-        .service(service.misesEnRelation)
-        .Model.aggregate([
-          {
-            $match: {
-              'conseiller.$id': conseillerUpdated.value?._id,
-              $and: [miseEnRelationAccess],
-              $or: [
-                {
-                  statut: 'terminee_naturelle',
-                  dateFinDeContrat: { $exists: true },
-                },
-                { statut: 'finalisee_rupture', dateRupture: { $exists: true } },
-              ],
-            },
-          },
-          {
-            $project: {
-              dateToMigrateCRA: {
-                $max: [
-                  {
-                    $cond: {
-                      if: { $eq: ['$statut', 'terminee_naturelle'] },
-                      then: '$dateFinDeContrat',
-                      else: null,
-                    },
-                  },
-                  {
-                    $cond: {
-                      if: { $eq: ['$statut', 'finalisee_rupture'] },
-                      then: '$dateRupture',
-                      else: null,
-                    },
-                  },
-                ],
-              },
-            },
-          },
-          {
-            $sort: { dateToMigrateCRA: -1 },
-          },
-          {
-            $limit: 1,
-          },
-        ]);
+
       if (miseEnRelationTerminee.length > 0) {
         // création du match pour récupérer les CRA à migrer (créés après la date de fin de contrat ou de rupture)
         const matchCras = {
