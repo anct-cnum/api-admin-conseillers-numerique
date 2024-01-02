@@ -34,7 +34,7 @@ const countMisesEnRelation =
           nomPrenomStr: {
             $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
           },
-          emailStr: '$email',
+          emailStr: '$conseillerObj.email',
         },
       },
       {
@@ -42,7 +42,7 @@ const countMisesEnRelation =
           prenomNomStr: {
             $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
           },
-          emailStr: '$email',
+          emailStr: '$conseillerObj.email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
