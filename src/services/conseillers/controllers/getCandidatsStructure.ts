@@ -9,7 +9,7 @@ import {
 import service from '../../../helpers/services';
 import { validCandidatsStructure } from '../../../schemas/conseillers.schemas';
 import {
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterPix,
   filterCv,
   filterDiplome,
@@ -36,11 +36,13 @@ const getTotalCandidatsStructure =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+          emailStr: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+          emailStr: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -52,7 +54,7 @@ const getTotalCandidatsStructure =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(searchByName),
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
@@ -76,11 +78,13 @@ const getCandidatsStructureAvecFiltre =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+          emailStr: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+          emailStr: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -92,7 +96,7 @@ const getCandidatsStructureAvecFiltre =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(searchByName),
         },
       },
       {

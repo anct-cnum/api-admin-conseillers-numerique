@@ -9,7 +9,7 @@ import {
   filterIsCoordinateur,
   filterIsRuptureMisesEnRelation,
   filterIsRuptureConseiller,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterNomStructure,
   filterRegion,
   formatStatutMisesEnRelation,
@@ -61,11 +61,13 @@ const getConseillersRecruter =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+          emailStr: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+          emailStr: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -73,7 +75,7 @@ const getConseillersRecruter =
         $match: {
           ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
-          ...filterNomConseiller(searchByConseiller),
+          ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],

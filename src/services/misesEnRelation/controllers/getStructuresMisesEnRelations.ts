@@ -11,7 +11,7 @@ import {
   filterCCP1,
   filterPix,
   checkAccessReadRequestMisesEnRelation,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterStatut,
 } from '../misesEnRelation.repository';
 import { validMiseEnRelation } from '../../../schemas/miseEnRelation.schemas';
@@ -34,6 +34,7 @@ const countMisesEnRelation =
           nomPrenomStr: {
             $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
           },
+          emailStr: '$email',
         },
       },
       {
@@ -41,6 +42,7 @@ const countMisesEnRelation =
           prenomNomStr: {
             $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
           },
+          emailStr: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
@@ -51,7 +53,7 @@ const countMisesEnRelation =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByNom),
+          ...filterNomAndEmailConseiller(searchByNom),
           ...filterStatut(filter),
           $and: [checkAccess],
         },
@@ -94,6 +96,7 @@ const getMisesEnRelation =
           nomPrenomStr: {
             $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
           },
+          emailStr: '$conseillerObj.email',
         },
       },
       {
@@ -101,6 +104,7 @@ const getMisesEnRelation =
           prenomNomStr: {
             $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
           },
+          emailStr: '$conseillerObj.email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
@@ -111,7 +115,7 @@ const getMisesEnRelation =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByNom),
+          ...filterNomAndEmailConseiller(searchByNom),
           ...filterStatut(filter),
           $and: [checkAccess],
         },

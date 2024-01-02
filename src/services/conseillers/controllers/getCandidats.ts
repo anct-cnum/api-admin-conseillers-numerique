@@ -7,22 +7,24 @@ import { validCandidats } from '../../../schemas/conseillers.schemas';
 import {
   filterDepartement,
   filterRegion,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   checkAccessReadRequestConseillers,
 } from '../repository/conseillers.repository';
 
 const getTotalCandidats =
   (app: Application, checkAccess) =>
-  async (region: string, departement: string, searchByName: string) =>
+  async (region: string, departement: string, search: string) =>
     app.service(service.conseillers).Model.aggregate([
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+          emailStr: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+          emailStr: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -32,7 +34,7 @@ const getTotalCandidats =
           $and: [checkAccess],
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
@@ -52,11 +54,13 @@ const getCandidatsAvecFiltre =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
+          emailStr: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
+          emailStr: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -66,7 +70,7 @@ const getCandidatsAvecFiltre =
           $and: [checkAccess],
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(searchByName),
         },
       },
       {
