@@ -121,7 +121,7 @@ const validationRecrutementContrat =
         req,
       );
       // récupération de la date de fin du dernier contrat ou de la date de rupture pour migrer les CRA qui ont été créés après
-      const miseEnRelationTerminee = await app
+      const miseEnRelationSansMission = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
           {
@@ -167,8 +167,8 @@ const validationRecrutementContrat =
           },
         ]);
       if (
-        miseEnRelationTerminee.length > 0 &&
-        miseEnRelationTerminee[0].dateToMigrateCRA >
+        miseEnRelationSansMission.length > 0 &&
+        miseEnRelationSansMission[0].dateToMigrateCRA >
           miseEnRelationVerif?.dateDebutDeContrat
       ) {
         res.status(400).json({
@@ -386,12 +386,12 @@ const validationRecrutementContrat =
           },
         );
 
-      if (miseEnRelationTerminee.length > 0) {
+      if (miseEnRelationSansMission.length > 0) {
         // création du match pour récupérer les CRA à migrer (créés après la date de fin de contrat ou de rupture)
         const matchCras = {
           'conseiller.$id': conseillerUpdated.value?._id,
           'cra.dateAccompagnement': {
-            $gt: miseEnRelationTerminee[0].dateToMigrateCRA,
+            $gt: miseEnRelationSansMission[0].dateToMigrateCRA,
           },
         };
         const countCras: number = await app
