@@ -24,11 +24,11 @@ const getStatsNationalesGrandReseau =
       dateFin.setUTCHours(23, 59, 59, 59);
       const { codePostal, codeCommune, codeRegion, numeroDepartement } =
         req.query;
-      const conseillerIds = req.query.conseillerIds
-        ? JSON.parse(req.query.conseillerIds)
-        : [];
       const structureIds = req.query.structureIds
         ? JSON.parse(req.query.structureIds)
+        : [];
+      const conseillerIds = req.query.conseillerIds
+        ? JSON.parse(req.query.conseillerIds)
         : [];
       if (!exportStats) {
         const statsValidation = validStatGrandReseau.validate({
