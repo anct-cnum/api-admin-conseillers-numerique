@@ -9,7 +9,6 @@ import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
 import conseillerRupturePix from './pix/conseillerRupturePix';
 import conseillerRuptureStructure from './structures/conseillerRuptureStructure';
 import prenventionSuppressionConseillerStructure from './structures/prenventionSuppressionConseillerStructure';
-import suppressionCompteConseillerStructure from './structures/suppressionCompteConseillerStructure';
 import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
 import informationValidationCoselecCoordinateur from './structures/informationValidationCoselecCoordinateur';
@@ -30,7 +29,6 @@ export {
   conseillerRupturePix,
   conseillerRuptureStructure,
   prenventionSuppressionConseillerStructure,
-  suppressionCompteConseillerStructure,
   candidatSupprimePix,
   informationValidationCoselec,
   informationValidationCoselecCoordinateur,

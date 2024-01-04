@@ -9,7 +9,6 @@ import service from '../../helpers/services';
 import mailer from '../../mailer';
 import {
   conseillerRupturePix,
-  suppressionCompteConseillerStructure,
   suppressionCompteConseiller,
 } from '../../emails';
 import {
@@ -252,22 +251,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
         if (errorSmtpMailFinContrat instanceof Error) {
           logger.error(errorSmtpMailFinContrat.message);
           Sentry.captureException(errorSmtpMailFinContrat.message);
-        }
-
-        const messageFinContratStructure = suppressionCompteConseillerStructure(
-          app,
-          mailerInstance,
-        );
-        const errorSmtpMailFinContratStructure =
-          await messageFinContratStructure
-            .send(termineeNaturelle, termineeNaturelle.structureObj)
-            .catch((errSmtp: Error) => {
-              logger.error(errSmtp);
-              Sentry.captureException(errSmtp);
-            });
-        if (errorSmtpMailFinContratStructure instanceof Error) {
-          logger.error(errorSmtpMailFinContratStructure.message);
-          Sentry.captureException(errorSmtpMailFinContratStructure.message);
         }
       }
       await delay(2000);
