@@ -6,6 +6,7 @@ import createAbilities from '../../middleware/createAbilities';
 import {
   getCodePostauxStructureCras,
   getFiltresConseillerCras,
+  getFiltresConseillerCrasParcoursRecrutement,
 } from './controllers';
 
 export default class Cras extends Service {
@@ -22,6 +23,12 @@ export default class Cras extends Service {
       authenticateMode(app),
       createAbilities(app),
       getFiltresConseillerCras(app),
+    );
+    app.get(
+      '/cras/recrutement/filtres/conseiller',
+      authenticateMode(app),
+      createAbilities(app),
+      getFiltresConseillerCrasParcoursRecrutement(app),
     );
   }
 }

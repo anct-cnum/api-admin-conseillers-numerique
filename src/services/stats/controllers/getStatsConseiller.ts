@@ -18,11 +18,17 @@ const getStatsConseiller =
       const statsValidation = validStatConseiller.validate({
         dateDebut,
         dateFin,
-        idConseiller,
         codePostal,
         codeCommune,
-        idStructure,
       });
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: 'idConseiller invalide' });
+        return;
+      }
+      if (idStructure && !ObjectId.isValid(idStructure)) {
+        res.status(400).json({ message: 'idStructure invalide' });
+        return;
+      }
       if (statsValidation.error) {
         res.status(400).json({ message: statsValidation.error.message });
         return;

@@ -20,7 +20,6 @@ const getStatsConseillerParcoursRecrutement =
       const statsValidation = validStatConseiller.validate({
         dateDebut,
         dateFin,
-        idConseiller,
         codePostal,
         codeCommune,
       });
