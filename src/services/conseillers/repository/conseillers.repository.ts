@@ -148,29 +148,29 @@ const filtrePiecesManquantes = (piecesManquantes: boolean) => {
 };
 
 const filterIsRuptureMisesEnRelation = (
-  ruptureOuTermine: string,
+  statutContrat: string,
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
   conseillerIdsRupture: ObjectId[],
   conseillerIdsTerminerNaturelle: ObjectId[],
   piecesManquantes: boolean,
 ) => {
-  switch (ruptureOuTermine) {
+  switch (statutContrat) {
     case 'nouvelle_rupture':
       return {
-        statut: { $eq: ruptureOuTermine },
+        statut: { $eq: statutContrat },
         'conseiller.$id': { $in: conseillerIdsRecruter },
         'structure.$id': { $in: structureIds },
         ...filtrePiecesManquantes(piecesManquantes),
       };
     case 'finalisee_rupture':
       return {
-        statut: { $eq: ruptureOuTermine },
+        statut: { $eq: statutContrat },
         'conseiller.$id': { $in: conseillerIdsRupture },
       };
     case 'terminee_naturelle':
       return {
-        statut: { $eq: ruptureOuTermine },
+        statut: { $eq: statutContrat },
         'conseiller.$id': { $in: conseillerIdsTerminerNaturelle },
       };
     case 'contrat':

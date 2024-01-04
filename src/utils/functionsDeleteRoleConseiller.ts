@@ -103,6 +103,16 @@ const deleteCoordinateurInConseillers = (app) => async (coordinateur) => {
   }
 };
 
+const updateCacheObj = (app) => async (conseiller) =>
+  app.service(service.misesEnRelation).Model.updateMany(
+    { 'conseiller.$id': conseiller._id },
+    {
+      $set: {
+        conseillerObj: conseiller,
+      },
+    },
+  );
+
 const deletePermanences = (app) => async (idConseiller) =>
   app.service(service.permanences).Model.deleteMany({
     conseillers: {
@@ -220,6 +230,7 @@ export {
   updateConseillersPG,
   deleteConseillerInCoordinateurs,
   deleteCoordinateurInConseillers,
+  updateCacheObj,
   deletePermanences,
   updatePermanences,
   deletePermanencesInCras,

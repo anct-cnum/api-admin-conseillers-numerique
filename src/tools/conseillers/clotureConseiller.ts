@@ -17,6 +17,7 @@ import {
   getConseiller,
   deleteConseillerInCoordinateurs,
   deleteCoordinateurInConseillers,
+  updateCacheObj,
   deletePermanences,
   updatePermanences,
   deletePermanencesInCras,
@@ -159,10 +160,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       `Il y a ${termineesNaturelles.length} conseillers comportant le statut terminee_naturelle.`,
     );
     for (const termineeNaturelle of termineesNaturelles) {
-      logger.info(
-        // eslint-disable-next-line
-        `Le conseiller (idPG: ${termineeNaturelle.conseillerObj.idPG}) va être traité.`,
-      );
       const conseiller = await getConseiller(app)(
         termineeNaturelle.conseiller.oid,
       );
@@ -171,9 +168,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       if (fix) {
         // suppression du conseiller dans les permanences
         await deletePermanences(app)(conseiller._id)
-          .then(async () => {
-            await updatePermanences(app)(conseiller._id);
-          })
           .then(async () => {
             await updatePermanences(app)(conseiller._id);
           })
@@ -229,6 +223,10 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
               `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
             );
           });
+
+        // Mise à jour du cache Obj
+        await updateCacheObj(app)(conseiller);
+
         // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
         const mailerInstance = mailer(app);
         const messageFinContratPix = conseillerRupturePix(mailerInstance);

@@ -143,7 +143,11 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           dateDuJour,
         ).then(async () => {
           logger.info(
-            `La mise en relation a été passée en statut 'terminee_naturelle' (id: ${miseEnRelationFinContrat._id})`,
+            `Le conseiller (idPG: ${
+              conseiller.idPG
+            }) passe en fin de contrat naturelle - date de fin de contrat est au ${dayjs(
+              miseEnRelationFinContrat.dateFinDeContrat,
+            ).format('DD-MM-YYYY')}`,
           );
         });
         // Envoie de mail conseiller et structure
