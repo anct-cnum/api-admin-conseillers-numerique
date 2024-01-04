@@ -13,9 +13,19 @@ execute(__filename, async ({ app, logger, exit }) => {
       .service(service.misesEnRelation)
       .Model.updateMany(
         {
-          statut: 'finalisee',
-          miseEnRelationConventionnement: { $exists: true },
           phaseConventionnement: PhaseConventionnement.PHASE_2,
+          reconventionnement: true,
+          $or: [
+            {
+              $and: [
+                { statut: 'finalisee' },
+                { miseEnRelationConventionnement: { $exists: true } },
+              ],
+            },
+            {
+              statut: 'renouvellement_initiee',
+            },
+          ],
         },
         {
           $unset: {
