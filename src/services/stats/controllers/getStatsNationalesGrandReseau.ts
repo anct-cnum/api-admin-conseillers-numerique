@@ -22,15 +22,13 @@ const getStatsNationalesGrandReseau =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const {
-        codePostal,
-        codeCommune,
-        codeRegion,
-        numeroDepartement,
-        structureIds,
-      } = req.query;
+      const { codePostal, codeCommune, codeRegion, numeroDepartement } =
+        req.query;
       const conseillerIds = req.query.conseillerIds
         ? JSON.parse(req.query.conseillerIds)
+        : [];
+      const structureIds = req.query.structureIds
+        ? JSON.parse(req.query.structureIds)
         : [];
       if (!exportStats) {
         const statsValidation = validStatGrandReseau.validate({
