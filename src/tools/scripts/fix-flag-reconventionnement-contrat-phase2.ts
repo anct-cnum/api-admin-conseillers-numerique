@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/scripts/fix-traitement-fin-de-contrat.ts
+// Lancement de ce script : ts-node src/tools/scripts/fix-flag-reconventionnement-contrat-phase2.ts
 
 import execute from '../utils';
 import service from '../../helpers/services';
