@@ -11,9 +11,9 @@ import {
   filterCCP1,
   filterPix,
   checkAccessReadRequestMisesEnRelation,
-  filterNomAndEmailConseiller,
   filterStatut,
 } from '../misesEnRelation.repository';
+import { filterNomAndEmailConseiller } from '../../conseillers/repository/conseillers.repository';
 import { validMiseEnRelation } from '../../../schemas/miseEnRelation.schemas';
 import { getCoselec } from '../../../utils';
 
@@ -26,7 +26,7 @@ const countMisesEnRelation =
     diplome: string,
     ccp1: string,
     filter: string,
-    searchByNom: string,
+    search: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -53,7 +53,7 @@ const countMisesEnRelation =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomAndEmailConseiller(searchByNom),
+          ...filterNomAndEmailConseiller(search),
           ...filterStatut(filter),
           $and: [checkAccess],
         },
@@ -85,7 +85,7 @@ const getMisesEnRelation =
     diplome: string,
     ccp1: string,
     filter: string,
-    searchByNom: string,
+    search: string,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -115,7 +115,7 @@ const getMisesEnRelation =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomAndEmailConseiller(searchByNom),
+          ...filterNomAndEmailConseiller(search),
           ...filterStatut(filter),
           $and: [checkAccess],
         },

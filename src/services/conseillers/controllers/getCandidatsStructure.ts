@@ -30,7 +30,7 @@ const getTotalCandidatsStructure =
     diplome: string,
     cv: string,
     ccp1: string,
-    searchByName: string,
+    search: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
@@ -52,7 +52,7 @@ const getTotalCandidatsStructure =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomAndEmailConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
@@ -67,7 +67,7 @@ const getCandidatsStructureAvecFiltre =
     diplome: string,
     cv: string,
     ccp1: string,
-    searchByName: string,
+    search: string,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -76,13 +76,11 @@ const getCandidatsStructureAvecFiltre =
       {
         $addFields: {
           nomPrenomStr: { $concat: ['$nom', ' ', '$prenom'] },
-          email: '$email',
         },
       },
       {
         $addFields: {
           prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
-          email: '$email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -94,7 +92,7 @@ const getCandidatsStructureAvecFiltre =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomAndEmailConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       {

@@ -49,7 +49,7 @@ const filterNomAndEmailConseiller = (search: string) => {
         },
         {
           email: {
-            $regex: inputSearchBar,
+            $regex: `(?'name'${inputSearchBar}.*$)`,
             $options: 'i',
           },
         },

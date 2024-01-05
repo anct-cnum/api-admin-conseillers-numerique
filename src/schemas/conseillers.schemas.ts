@@ -65,7 +65,7 @@ const validExportConseillers = Joi.object({
 
 const validCandidats = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
-  searchByNomCandidat: Joi.string().error(
+  search: Joi.string().error(
     new Error('La recherche par nom du candidat est invalide'),
   ),
   departement: Joi.string().error(
