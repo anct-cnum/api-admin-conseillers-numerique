@@ -41,7 +41,7 @@ async function defineAbilitiesFor(app: Application, user: IUser, role: Roles) {
     case 'grandReseau':
       await grandReseauRules(app, user, can);
       break;
-    case 'coordinateur_coop':
+    case 'coordinateur':
       await coordinateurRules(app, user, can);
       break;
     default:

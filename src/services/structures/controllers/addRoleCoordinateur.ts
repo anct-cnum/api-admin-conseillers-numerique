@@ -122,7 +122,7 @@ const addRoleCoordinateur =
             'entity.$id': new ObjectId(conseillerId),
             roles: { $in: ['conseiller'] },
           },
-          { $push: { roles: ['coordinateur_coop'] } },
+          { $push: { roles: ['coordinateur'] } },
         );
 
       if (user.modifiedCount === 0) {
