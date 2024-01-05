@@ -17,7 +17,7 @@ import {
 const getFiltresConseillerCrasParcoursRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idConseiller = String(req.query?.id);
+      const idConseiller = req.query?.id;
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
@@ -39,7 +39,9 @@ const getFiltresConseillerCrasParcoursRecrutement =
         statut: 'VALIDATION_COSELEC',
       });
       if (!structure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
+        res
+          .status(404)
+          .json({ message: "La structure n'existe pas ou n'est plus validée" });
         return;
       }
       const checkAccess = checkAccessRequestCras(app, req);

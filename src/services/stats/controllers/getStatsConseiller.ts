@@ -22,11 +22,11 @@ const getStatsConseiller =
         codeCommune,
       });
       if (!ObjectId.isValid(idConseiller)) {
-        res.status(400).json({ message: 'idConseiller invalide' });
+        res.status(400).json({ message: "l'id du conseiller est invalide" });
         return;
       }
       if (idStructure && !ObjectId.isValid(idStructure)) {
-        res.status(400).json({ message: 'idStructure invalide' });
+        res.status(400).json({ message: "l'id de la structure est invalide" });
         return;
       }
       if (statsValidation.error) {
