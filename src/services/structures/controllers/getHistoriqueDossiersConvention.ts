@@ -46,13 +46,14 @@ const getStructures =
       {
         $project: {
           _id: 1,
-          nom: 1,
+          siret: 1,
           idPG: 1,
           nombreConseillersSouhaites: 1,
           demandesCoselec: 1,
           coselec: 1,
           statut: 1,
           conventionnement: 1,
+          codeDepartement: 1,
         },
       },
     ]);
