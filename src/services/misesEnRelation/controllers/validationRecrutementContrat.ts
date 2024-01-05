@@ -394,24 +394,18 @@ const validationRecrutementContrat =
             $gt: miseEnRelationSansMission[0].dateToMigrateCRA,
           },
         };
-        const countCras: number = await app
+        await app
           .service(service.cras)
-          .Model.accessibleBy(req.ability, action.read)
-          .countDocuments(matchCras);
-        if (countCras >= 1) {
-          await app
-            .service(service.cras)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateMany(matchCras, {
-              $set: {
-                structure: new DBRef(
-                  'structures',
-                  miseEnRelationVerif.structureObj._id,
-                  database,
-                ),
-              },
-            });
-        }
+          .Model.accessibleBy(req.ability, action.update)
+          .updateMany(matchCras, {
+            $set: {
+              structure: new DBRef(
+                'structures',
+                miseEnRelationVerif.structureObj._id,
+                database,
+              ),
+            },
+          });
       }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {
