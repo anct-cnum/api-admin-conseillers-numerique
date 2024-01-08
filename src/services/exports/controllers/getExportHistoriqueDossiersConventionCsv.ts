@@ -28,7 +28,7 @@ const formatAvenant = (avenant, structure) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
   item.siret = structure.siret;
-  item.dateSorted = avenant.validateurAvenant?.date;
+  item.date = avenant.validateurAvenant?.date;
   item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
   item.nbPostesApresDemande =
     avenant.type === 'ajout'
@@ -199,7 +199,7 @@ const getExportHistoriqueDossiersConventionCsv =
             ) {
               const dossierConventionnement =
                 item.conventionnement?.dossierConventionnement;
-              item.dateSorted = dossierConventionnement?.dateDeCreation;
+              item.date = dossierConventionnement?.dateDeCreation;
               item.phaseConventionnement = PhaseConventionnement.PHASE_1;
               item.type = 'Conventionnement initial';
               item.numeroDossierDS = dossierConventionnement?.numero;
@@ -214,7 +214,7 @@ const getExportHistoriqueDossiersConventionCsv =
             ) {
               const dossierReconventionnement =
                 item.conventionnement?.dossierReconventionnement;
-              item.dateSorted = dossierReconventionnement?.dateDeCreation;
+              item.date = dossierReconventionnement?.dateDeCreation;
               item.phaseConventionnement = PhaseConventionnement.PHASE_2;
               item.type = 'Reconventionnement';
               item.numeroDossierDS = dossierReconventionnement?.numero;
@@ -226,7 +226,6 @@ const getExportHistoriqueDossiersConventionCsv =
                 (dossierReconventionnement.nbPostesAttribuees ?? 0) -
                 (dossierReconventionnement.nbPostesAvantDemande ?? 0);
             }
-            item.codeDepartement = structure.codeDepartement;
             item.departement = findDepartementNameByNumDepartement(
               structure.codeDepartement,
               structure.codeCom,
