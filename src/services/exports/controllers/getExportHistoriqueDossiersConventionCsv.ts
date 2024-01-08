@@ -177,7 +177,12 @@ const getExportHistoriqueDossiersConventionCsv =
           }
         }
       }
-      if (type === 'toutes' || type.includes('tionnement')) {
+      const conventionnementTypes = [
+        'toutes',
+        'conventionnement',
+        'reconventionnement',
+      ];
+      if (conventionnementTypes.includes(type)) {
         const filterStructures = structures.filter(
           (structure) =>
             structure?.conventionnement?.statut ===
@@ -212,12 +217,9 @@ const getExportHistoriqueDossiersConventionCsv =
               item.dateSorted = dossierReconventionnement?.dateDeCreation;
               item.phaseConventionnement = PhaseConventionnement.PHASE_2;
               item.type = 'Reconventionnement';
-              item.numeroDossierDS =
-                item.conventionnement?.dossierReconventionnement?.numero;
+              item.numeroDossierDS = dossierReconventionnement?.numero;
               item.nbPostesAvantDemande =
-                StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
-                  ? 0
-                  : getCoselec(item)?.nombreConseillersCoselec ?? 0;
+                getCoselec(item)?.nombreConseillersCoselec ?? 0;
               item.nbPostesApresDemande =
                 dossierReconventionnement.nbPostesAttribuees ?? 0;
               item.variation =

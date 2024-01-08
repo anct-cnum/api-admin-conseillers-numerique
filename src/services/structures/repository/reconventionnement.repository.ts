@@ -372,8 +372,8 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
         const phaseConventionnement =
           structure.conventionnement?.statut ===
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
-            ? AffichagePhaseConventionnement.PHASE_2
-            : AffichagePhaseConventionnement.PHASE_1;
+            ? AffichagePhaseConventionnement.PHASE_1
+            : AffichagePhaseConventionnement.PHASE_2;
 
         return {
           ...avenant,
@@ -413,10 +413,7 @@ const formatReconventionnementForDossierConventionnement = (
       item._id = structure._id;
       item.typeConvention = 'reconventionnement';
       item.statutConventionnement = structure.conventionnement.statut;
-      item.nbPostesAvantDemande =
-        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
-          ? 0
-          : getCoselec(structure)?.nbPostes ?? 0;
+      item.nbPostesAvantDemande = getCoselec(structure)?.nbPostes ?? 0;
       item.variation = item.nbPostesAttribuees - item.nbPostesAvantDemande;
       item.codeDepartement = structure.codeDepartement;
       item.departement = findDepartementNameByNumDepartement(
