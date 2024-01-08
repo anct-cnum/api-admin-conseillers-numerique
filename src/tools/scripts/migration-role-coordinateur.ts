@@ -3,24 +3,33 @@
 import execute from '../utils';
 import service from '../../helpers/services';
 
+const { v4: uuidv4 } = require('uuid');
+
 // ts-node src/tools/scripts/migration-role-coordinateur.ts
 
 execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
-    const users = await app
-      .service(service.users)
-      .Model.find({ roles: { $in: ['coordinateur_coop'] } });
+    const users = await app.service(service.users).Model.find({
+      roles: { $in: ['coordinateur_coop'] },
+      passwordCreated: true,
+    });
 
     logger.info(`Nombre d'utilisateurs à traiter: ${users?.length}`);
 
     for (const user of users) {
       try {
-        await app
-          .service(service.users)
-          .Model.updateOne(
-            { _id: user._id },
-            { $pull: { roles: 'coordinateur_coop' } },
-          );
+        await app.service(service.users).Model.updateOne(
+          { _id: user._id },
+          {
+            $pull: { roles: 'coordinateur_coop' },
+            $set: {
+              token: uuidv4(),
+              tokenCreatedAt: new Date(),
+              mailSentDate: null,
+              migrationDashboard: true,
+            },
+          },
+        );
 
         await app
           .service(service.users)
