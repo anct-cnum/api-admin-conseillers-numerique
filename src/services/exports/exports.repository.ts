@@ -953,7 +953,7 @@ const generateCsvHistoriqueDossiersConvention = async (
           [
             structure.idPG,
             structure.siret,
-            formatDate(structure.date),
+            formatDate(structure.dateSorted),
             structure.nbPostesAvantDemande,
             structure.nbPostesApresDemande,
             structure.variation,

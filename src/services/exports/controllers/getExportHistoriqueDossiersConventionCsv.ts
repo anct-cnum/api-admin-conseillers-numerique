@@ -28,7 +28,7 @@ const formatAvenant = (avenant, structure) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
   item.siret = structure.siret;
-  item.date = avenant.validateurAvenant?.date;
+  item.dateSorted = avenant.validateurAvenant?.date;
   item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
   item.nbPostesApresDemande =
     avenant.type === 'ajout'
@@ -199,7 +199,7 @@ const getExportHistoriqueDossiersConventionCsv =
             ) {
               const dossierConventionnement =
                 item.conventionnement?.dossierConventionnement;
-              item.date = dossierConventionnement?.dateDeCreation;
+              item.dateSorted = dossierConventionnement?.dateDeCreation;
               item.phaseConventionnement = PhaseConventionnement.PHASE_1;
               item.type = 'Conventionnement initial';
               item.numeroDossierDS = dossierConventionnement?.numero;
@@ -214,17 +214,15 @@ const getExportHistoriqueDossiersConventionCsv =
             ) {
               const dossierReconventionnement =
                 item.conventionnement?.dossierReconventionnement;
-              item.date = dossierReconventionnement?.dateDeCreation;
+              const valideCoselec =
+                getCoselec(item)?.nombreConseillersCoselec ?? 0;
+              item.dateSorted = dossierReconventionnement?.dateDeCreation;
               item.phaseConventionnement = PhaseConventionnement.PHASE_2;
               item.type = 'Reconventionnement';
               item.numeroDossierDS = dossierReconventionnement?.numero;
-              item.nbPostesAvantDemande =
-                getCoselec(item)?.nombreConseillersCoselec ?? 0;
-              item.nbPostesApresDemande =
-                dossierReconventionnement.nbPostesAttribuees ?? 0;
-              item.variation =
-                (dossierReconventionnement.nbPostesAttribuees ?? 0) -
-                (dossierReconventionnement.nbPostesAvantDemande ?? 0);
+              item.nbPostesAvantDemande = valideCoselec;
+              item.nbPostesApresDemande = valideCoselec;
+              item.variation = 0;
             }
             item.departement = findDepartementNameByNumDepartement(
               structure.codeDepartement,

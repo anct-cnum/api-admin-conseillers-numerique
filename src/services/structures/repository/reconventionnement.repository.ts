@@ -360,7 +360,6 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
             ? structure.conventionnement?.dossierConventionnement?.numero
             : structure.conventionnement?.dossierReconventionnement?.numero;
-        const { codeDepartement } = structure;
         const departement = findDepartementNameByNumDepartement(
           structure.codeDepartement,
           structure.codeCom,
@@ -379,16 +378,16 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
           ...avenant,
           dateSorted: avenant.emetteurAvenant.date,
           typeConvention:
-            avenant.type === 'retrait'
-              ? 'avenantRenduPoste'
-              : 'avenantAjoutPoste',
+            avenant.type === 'ajout'
+              ? 'avenantAjoutPoste'
+              : 'avenantRenduPoste',
           idPG: structure.idPG,
           siret: structure.siret,
           idStructure: structure._id,
           nbPostesApresDemande,
           variation,
           numero,
-          codeDepartement,
+          codeDepartement: structure.codeDepartement,
           departement,
           region,
           phaseConventionnement,
@@ -413,7 +412,8 @@ const formatReconventionnementForDossierConventionnement = (
       item._id = structure._id;
       item.typeConvention = 'reconventionnement';
       item.statutConventionnement = structure.conventionnement.statut;
-      item.nbPostesAvantDemande = getCoselec(structure)?.nbPostes ?? 0;
+      item.nbPostesAvantDemande =
+        getCoselec(structure)?.nombreConseillersCoselec ?? 0;
       item.variation = item.nbPostesAttribuees - item.nbPostesAvantDemande;
       item.codeDepartement = structure.codeDepartement;
       item.departement = findDepartementNameByNumDepartement(
