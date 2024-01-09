@@ -387,6 +387,9 @@ export interface IStructures {
   };
   demandesCoselec: IDemandesCoselec[];
   demandesCoordinateur: IDemandesCoordinateur[];
+  mailErrorDetailSentDatePrefet: string;
+  mailErrorSentDatePrefet: Date;
+  mailSendDatePrefet: Date;
 }
 
 interface IDemandesCoselec {

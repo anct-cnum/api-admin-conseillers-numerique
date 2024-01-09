@@ -1,0 +1,57 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header_structure.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Dans le cadre de <strong>Conseiller numérique</strong>,
+            une candidature a été déposée par <strong><%= nomStructure %></strong>.
+            Préalablement à l’instruction de cette demande d'ouverture de poste par l’ANCT, il <strong>vous est
+              demandé de formuler un avis sur cette candidature.</strong>
+          </mj-text>
+          <mj-text align="left">
+            Pour ce faire, vous devez vous rendre sur votre
+            <a style="color: #0063CB;" target="_blank" href="https://pilotage.conseiller-numerique.gouv.fr">
+              Tableau de pilotage Conseiller numérique
+            </a>
+            et suivre les étapes décrites dans
+            <a style="color: #0063CB;" target="_blank" href="https://outline.incubateur.anct.gouv.fr/s/55ab97ba-b4fc-469e-bdab-91bdb0ca921c">
+              ce guide pas-à-pas
+            </a>.
+          </mj-text>
+          <mj-button href="https://pilotage.conseiller-numerique.gouv.fr/prefet/demandes/conseillers" background-color="#060091" color="white" font-size="16px" font-weight="bold">
+            J'instruis cette demande
+          </mj-button>
+          <mj-text align="left">
+            Pour toute question d’ordre stratégique, le Programme société numérique reste
+            à votre disposition à l’adresse
+            <a target="_blank" style="color: #0063CB;" href="mailto:societe.numerique@anct.gouv.fr">
+              societe.numerique@anct.gouv.fr
+            </a>
+            &nbsp;pour toute question.
+          </mj-text>
+          <mj-text align="left">
+            Pour toute question d’ordre technique, notre support&nbsp;(
+            <a target="_blank" style="color: #0063CB;" href="mailto:<%= mail %>">
+              <%= mail %>
+            </a>
+            )&nbsp;est compétent.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+      <%- include('../commun/footer.mjml.ejs'); %>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
