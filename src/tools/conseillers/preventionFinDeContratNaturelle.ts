@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/conseillers/finDeContratNaturelle.ts
+// Lancement de ce script : ts-node src/tools/conseillers/preventionFinDeContratNaturelle.ts
 
 import { program } from 'commander';
 import dayjs from 'dayjs';
@@ -24,6 +24,7 @@ const getMisesEnRelationsFinContrat = (app) => async (dateDuJour) =>
     dateFinDeContrat: { $lt: dateDuJour },
     statut: 'finalisee',
     typeDeContrat: { $ne: 'CDI' },
+    reconventionnement: { $ne: true },
   });
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum

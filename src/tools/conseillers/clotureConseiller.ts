@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/conseillers/clotureConseiller.ts
+// Lancement de ce script : ts-node src/tools/conseillers/clotureConseiller.ts -f -db
 
 import { program } from 'commander';
 import dayjs from 'dayjs';
+import execute from '../utils';
 import service from '../../helpers/services';
 import mailer from '../../mailer';
 import {
@@ -25,7 +26,6 @@ import {
 } from '../../utils/functionsDeleteRoleConseiller';
 
 const { v4: uuidv4 } = require('uuid');
-const { execute, delay } = require('../utils');
 
 const getUser = (app) => async (idConseiller) =>
   app.service(service.users).Model.findOne({
@@ -130,24 +130,28 @@ program
     'fix: cloture des comptes de conseillers avec un statut terminee_naturelle',
   )
   .option(
-    '-l --limit <limit>',
-    'limite le nombre de traitement (par défaut: 1)',
-    parseInt,
+    '-fdb, --flagDateDebut',
+    'flagDateDebut: prendre la date du début du dispositif',
   )
   .parse(process.argv);
 
-execute(__filename, async ({ app, logger, exit, Sentry }) => {
+execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
   try {
     const options = program.opts();
-    const { fix, limit } = options;
+    const { fix, flagDateDebut } = options;
     const updatedAt = new Date();
     const dateMoins2Mois = dayjs(updatedAt).subtract(2, 'month');
+    const dateMoins2MoisDebut = dayjs(
+      flagDateDebut ? new Date('2020/11/01') : dateMoins2Mois,
+    )
+      .startOf('date')
+      .toDate();
+    const dateMoins2MoisFin = dayjs(dateMoins2Mois).endOf('date').toDate();
 
     logger.info('Cloture des contrats passer en statut terminee_naturelle');
     const termineesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
       app,
-      limit,
-    )(dateMoins2Mois);
+    )(dateMoins2MoisDebut, dateMoins2MoisFin);
 
     if (termineesNaturelles.length === 0) {
       logger.info(`Fin de contrat naturelle : aucun contrat à clôturer`);
@@ -160,9 +164,9 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
     );
     for (const termineeNaturelle of termineesNaturelles) {
       const conseiller = await getConseiller(app)(
-        termineeNaturelle.conseiller.oid,
+        termineeNaturelle.conseillerId,
       );
-      const user = await getUser(app)(termineeNaturelle.conseiller.oid);
+      const user = await getUser(app)(termineeNaturelle.conseillerId);
 
       if (fix) {
         // suppression du conseiller dans les permanences
@@ -193,7 +197,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           await deleteCoordinateurInConseillers(app)(conseiller).then(
             async () => {
               await updateStructure(app)(
-                termineeNaturelle.structure.oid,
+                termineeNaturelle.structureId,
                 termineeNaturelle._id,
               );
             },

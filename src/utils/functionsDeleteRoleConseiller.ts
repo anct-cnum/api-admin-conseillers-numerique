@@ -1,14 +1,94 @@
 import axios from 'axios';
 import service from '../helpers/services';
 
-const getMisesEnRelationsFinaliseesNaturelles = (app, limit) => async (date) =>
-  app
-    .service(service.misesEnRelation)
-    .Model.find({
-      statut: 'terminee_naturelle',
-      dateFinDeContrat: { $lte: date },
-    })
-    .limit(limit ?? 1);
+const getMisesEnRelationsFinaliseesNaturelles =
+  (app) => async (dateDebut, dateFin) =>
+    app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $match: {
+          statut: {
+            $in: ['finalisee', 'recrutee', 'terminee_naturelle'],
+          },
+          dateFinDeContrat: { $gte: dateDebut, $lte: dateFin },
+        },
+      },
+      {
+        $group: {
+          _id: '$conseiller.$id',
+          finalisee: {
+            $sum: {
+              $cond: [
+                {
+                  $eq: ['$statut', 'finalisee'],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          recrutee: {
+            $sum: {
+              $cond: [
+                {
+                  $eq: ['$statut', 'recrutee'],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          terminee_naturelle: {
+            $sum: {
+              $cond: [
+                {
+                  $eq: ['$statut', 'terminee_naturelle'],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          idMiseEnRelation: {
+            $push: {
+              $cond: [
+                {
+                  $eq: ['$statut', 'terminee_naturelle'],
+                },
+                '$_id',
+                null,
+              ],
+            },
+          },
+          structureId: {
+            $push: {
+              $cond: [
+                {
+                  $eq: ['$statut', 'terminee_naturelle'],
+                },
+                '$structure.$id',
+                null,
+              ],
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          finalisee: 0,
+          recrutee: 0,
+          terminee_naturelle: {
+            $gte: 1,
+          },
+        },
+      },
+      {
+        $project: {
+          _id: { $arrayElemAt: ['$idMiseEnRelation', 0] },
+          conseillerId: '$_id',
+          structureId: { $arrayElemAt: ['$structureId', 0] },
+        },
+      },
+    ]);
 
 const getConseiller = (app) => async (id) =>
   app.service(service.conseillers).Model.findOne({

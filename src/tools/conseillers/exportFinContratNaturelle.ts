@@ -17,6 +17,7 @@ const getFinsDeContratNaturelles = async (app) =>
       dateFinDeContrat: { $lte: new Date('2024-01-31') },
       statut: 'finalisee',
       typeDeContrat: { $ne: 'CDI' },
+      reconventionnement: { $ne: true },
     })
     .sort({
       dateFinDeContrat: 1,

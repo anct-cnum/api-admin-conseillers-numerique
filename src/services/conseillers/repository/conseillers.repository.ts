@@ -163,15 +163,12 @@ const filterIsRuptureMisesEnRelation = (
         'structure.$id': { $in: structureIds },
         ...filtrePiecesManquantes(piecesManquantes),
       };
-    case 'finalisee_rupture':
+    case 'sans-mission':
       return {
-        statut: { $eq: statutContrat },
-        'conseiller.$id': { $in: conseillerIdsRupture },
-      };
-    case 'terminee_naturelle':
-      return {
-        statut: { $eq: statutContrat },
-        'conseiller.$id': { $in: conseillerIdsTerminerNaturelle },
+        statut: { $in: ['finalisee_rupture', 'terminee_naturelle'] },
+        'conseiller.$id': {
+          $in: [conseillerIdsRupture, conseillerIdsTerminerNaturelle],
+        },
       };
     case 'contrat':
       return {

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/conseillers/rappelAvantClotureConseiller.ts -l <limit>
+// Lancement de ce script : ts-node src/tools/conseillers/rappelAvantClotureConseiller.ts
 
-import { program } from 'commander';
 import dayjs from 'dayjs';
+import execute from '../utils';
 import mailer from '../../mailer';
 
 import { rappelSuppressionCompteConseiller } from '../../emails';
@@ -13,30 +13,20 @@ import {
   getConseiller,
 } from '../../utils/functionsDeleteRoleConseiller';
 
-const { execute, delay } = require('../utils');
-
-program
-  .option(
-    '-l --limit <limit>',
-    'limite le nombre de traitement (par défaut: 1)',
-    parseInt,
-  )
-  .parse(process.argv);
-
-execute(__filename, async ({ app, logger, exit, Sentry }) => {
+execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
   try {
-    const options = program.opts();
-    const { limit } = options;
     const updatedAt = new Date();
-    const dateMoins7jours = dayjs(updatedAt).subtract(7, 'day');
+    // Obtenir la date de fin de contrat 7 jours avant la cloture (2 mois après la fin de contrat)
+    const dateFinContrat = dayjs(updatedAt).add(7, 'day').subtract(2, 'month');
+    const dateFinContratDebut = dayjs(dateFinContrat).startOf('date').toDate();
+    const dateFinContratFin = dayjs(dateFinContrat).endOf('date').toDate();
 
     logger.info(
       `Envoi d'un rappel par email avant la clôture du contrat des conseillers`,
     );
     const termineesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
       app,
-      limit,
-    )(dateMoins7jours);
+    )(dateFinContratDebut, dateFinContratFin);
 
     if (termineesNaturelles.length === 0) {
       logger.info(
@@ -48,7 +38,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
 
     for (const termineeNaturelle of termineesNaturelles) {
       const conseiller = await getConseiller(app)(
-        termineeNaturelle.conseiller.oid,
+        termineeNaturelle.conseillerId,
       );
       // Envoi des emails de rappel de cloture de compte
       const mailerInstance = mailer(app);
