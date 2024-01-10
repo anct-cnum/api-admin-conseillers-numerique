@@ -28,7 +28,7 @@ const formatAvenant = (avenant, structure) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
   item.siret = structure.siret;
-  item.dateSorted = avenant.validateurAvenant?.date;
+  item.dateSorted = avenant.emetteurAvenant?.date;
   item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
   item.nbPostesApresDemande =
     avenant.type === 'ajout'
