@@ -130,6 +130,16 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
   );
 };
 
+const filterAvisPrefet = (avisPrefet: string | undefined) => {
+  if (avisPrefet === undefined) {
+    return {};
+  }
+  if (avisPrefet === 'sans-avis') {
+    return { avisPrefet: { $exists: false } };
+  }
+  return { avisPrefet: { $eq: avisPrefet } };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -147,4 +157,5 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  filterAvisPrefet,
 };

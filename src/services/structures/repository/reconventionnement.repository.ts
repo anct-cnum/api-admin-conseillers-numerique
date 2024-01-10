@@ -6,22 +6,23 @@ import {
   StatutConventionnement,
 } from '../../../ts/enum';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { checkAccessReadRequestStructures } from './structures.repository';
 import {
-  getCoselec,
-  getCoselecConventionnement,
-  getTimestampByDate,
-} from '../../../utils';
+  checkAccessReadRequestStructures,
+  filterAvisPrefet,
+} from './structures.repository';
+import { getCoselec, getTimestampByDate } from '../../../utils';
 import {
   findDepartementNameByNumDepartement,
   findRegionNameByNumDepartement,
 } from '../../../helpers/commonQueriesFunctions';
 
-const filterStatut = (typeConvention: string) => {
+const filterStatut = (typeConvention: string, avisPrefet: string) => {
   if (typeConvention === 'conventionnement') {
     return {
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+      statut: 'CREEE',
+      coordinateurCandidature: false,
+      'conventionnement.dossierReconventionnement': { $exists: true },
+      ...filterAvisPrefet(avisPrefet),
     };
   }
   if (typeConvention === 'avenantAjoutPoste') {
@@ -48,9 +49,9 @@ const filterStatut = (typeConvention: string) => {
   return {
     $or: [
       {
-        'conventionnement.statut': {
-          $eq: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-        },
+        statut: 'CREEE',
+        coordinateurCandidature: false,
+        'conventionnement.dossierReconventionnement': { $exists: true },
       },
       {
         demandesCoselec: {
@@ -176,8 +177,9 @@ const totalParConvention = async (app: Application, req: IRequest) => {
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+      statut: 'CREEE',
+      coordinateurCandidature: false,
+      'conventionnement.dossierReconventionnement': { $exists: true },
     });
   const checkAccess = await checkAccessReadRequestStructures(app, req);
 
@@ -428,25 +430,21 @@ const formatReconventionnementForDossierConventionnement = (
       return item;
     });
 
-const formatConventionnementForDossierConventionnement = (
-  structures,
-  statutConventionnement,
-) =>
+const formatConventionnementForDossierConventionnement = (structures) =>
   structures
-    .filter(
-      (structure) =>
-        structure?.conventionnement?.statut === statutConventionnement,
-    )
+    .filter((structure) => structure?.statut === 'CREEE')
     .map((structure) => {
-      const item = structure.conventionnement.dossierConventionnement;
+      const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
       item.idPG = structure.idPG;
       item.siret = structure.siret;
       item._id = structure._id;
+      item.nom = structure.nom;
       item.typeConvention = 'conventionnement';
+      item.prefet = structure?.prefet?.length > 0 ? structure.prefet.pop() : {};
       item.statutConventionnement = structure.conventionnement.statut;
       item.nombreConseillersCoselec =
-        getCoselecConventionnement(structure)?.nombreConseillersCoselec ?? 0;
+        getCoselec(structure)?.nombreConseillersCoselec ?? 0;
       item.nbPostesAvantDemande = 0;
       item.variation =
         item.nombreConseillersCoselec - item.nbPostesAvantDemande;
@@ -459,7 +457,7 @@ const formatConventionnementForDossierConventionnement = (
         structure.codeDepartement,
         structure.codeCom,
       );
-      item.phaseConventionnement = AffichagePhaseConventionnement.PHASE_1;
+      item.phaseConventionnement = AffichagePhaseConventionnement.PHASE_2;
       return item;
     });
 
@@ -474,10 +472,8 @@ const sortDossierConventionnement = (
     avenantSort = formatAvenantForDossierConventionnement(structures);
   }
   if (type === 'conventionnement' || type === 'toutes') {
-    conventionnement = formatConventionnementForDossierConventionnement(
-      structures,
-      StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-    );
+    conventionnement =
+      formatConventionnementForDossierConventionnement(structures);
   }
   const structureFormat = avenantSort.concat(conventionnement);
 
@@ -505,10 +501,8 @@ const sortHistoriqueDossierConventionnement = (
     );
   }
   if (type === 'conventionnement' || type === 'toutes') {
-    conventionnement = formatConventionnementForDossierConventionnement(
-      structures,
-      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-    );
+    conventionnement =
+      formatConventionnementForDossierConventionnement(structures);
   }
   const structureFormat = avenantSort.concat(
     reconventionnement,
