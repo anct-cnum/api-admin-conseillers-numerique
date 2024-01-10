@@ -1,10 +1,7 @@
 import { Application } from '@feathersjs/express';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import {
-  AffichagePhaseConventionnement,
-  StatutConventionnement,
-} from '../../../ts/enum';
+import { StatutConventionnement } from '../../../ts/enum';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   checkAccessReadRequestStructures,
@@ -348,53 +345,17 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
       if (!avenants) {
         return [];
       }
-      return avenants.map((avenant) => {
-        const nbPostesApresDemande =
-          avenant.type === 'ajout'
-            ? (avenant.nbPostesAvantDemande || 0) +
-              (avenant.nombreDePostesAccordes || 0)
-            : (avenant.nbPostesAvantDemande || 0) -
-              (avenant.nombreDePostesRendus || 0);
-        const variation =
-          nbPostesApresDemande - (avenant.nbPostesAvantDemande || 0);
-        const numero =
-          structure.conventionnement?.statut ===
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
-            ? structure.conventionnement?.dossierConventionnement?.numero
-            : structure.conventionnement?.dossierReconventionnement?.numero;
-        const departement = findDepartementNameByNumDepartement(
-          structure.codeDepartement,
-          structure.codeCom,
-        );
-        const region = findRegionNameByNumDepartement(
-          structure.codeDepartement,
-          structure.codeCom,
-        );
-        const phaseConventionnement =
-          structure.conventionnement?.statut ===
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
-            ? AffichagePhaseConventionnement.PHASE_1
-            : AffichagePhaseConventionnement.PHASE_2;
-
-        return {
-          ...avenant,
-          dateSorted: avenant.emetteurAvenant.date,
-          typeConvention:
-            avenant.type === 'ajout'
-              ? 'avenantAjoutPoste'
-              : 'avenantRenduPoste',
-          idPG: structure.idPG,
-          siret: structure.siret,
-          idStructure: structure._id,
-          nbPostesApresDemande,
-          variation,
-          numero,
-          codeDepartement: structure.codeDepartement,
-          departement,
-          region,
-          phaseConventionnement,
-        };
-      });
+      return avenants.map((avenant) => ({
+        ...avenant,
+        dateSorted: avenant.emetteurAvenant.date,
+        typeConvention:
+          avenant.type === 'retrait'
+            ? 'avenantRenduPoste'
+            : 'avenantAjoutPoste',
+        idPG: structure.idPG,
+        nom: structure.nom,
+        idStructure: structure._id,
+      }));
     });
 
 const formatReconventionnementForDossierConventionnement = (
@@ -410,23 +371,10 @@ const formatReconventionnementForDossierConventionnement = (
       const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
       item.idPG = structure.idPG;
-      item.siret = structure.siret;
+      item.nom = structure.nom;
       item._id = structure._id;
       item.typeConvention = 'reconventionnement';
       item.statutConventionnement = structure.conventionnement.statut;
-      item.nbPostesAvantDemande =
-        getCoselec(structure)?.nombreConseillersCoselec ?? 0;
-      item.variation = item.nbPostesAttribuees - item.nbPostesAvantDemande;
-      item.codeDepartement = structure.codeDepartement;
-      item.departement = findDepartementNameByNumDepartement(
-        structure.codeDepartement,
-        structure.codeCom,
-      );
-      item.region = findRegionNameByNumDepartement(
-        structure.codeDepartement,
-        structure.codeCom,
-      );
-      item.phaseConventionnement = AffichagePhaseConventionnement.PHASE_2;
       return item;
     });
 
@@ -437,7 +385,7 @@ const formatConventionnementForDossierConventionnement = (structures) =>
       const item = structure.conventionnement.dossierReconventionnement;
       item.dateSorted = item?.dateDeCreation;
       item.idPG = structure.idPG;
-      item.siret = structure.siret;
+      item.nom = structure.nom;
       item._id = structure._id;
       item.nom = structure.nom;
       item.typeConvention = 'conventionnement';
@@ -457,7 +405,6 @@ const formatConventionnementForDossierConventionnement = (structures) =>
         structure.codeDepartement,
         structure.codeCom,
       );
-      item.phaseConventionnement = AffichagePhaseConventionnement.PHASE_2;
       return item;
     });
 
