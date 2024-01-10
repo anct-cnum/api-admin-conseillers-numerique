@@ -34,7 +34,7 @@
 		"build": "shx rm -rf dist/ && tsc && npm run copy-files",
 		"husky:install": "husky install",
 		"husky:init": "husky add .husky/pre-commit 'npx --no-install git-precommit-checks'",
-		"husky:uninstall": "npm remove husky && git config --unset core.hooksPath"
+		"husky:uninstall": "git config --unset core.hooksPath"
 	},
 	"standard": {
 		"env": [
