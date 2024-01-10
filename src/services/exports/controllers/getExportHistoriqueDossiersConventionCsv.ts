@@ -125,7 +125,9 @@ const getExportHistoriqueDossiersConventionCsv =
             structureWithAvenant.map(async (structure) => {
               const avenants = structure.demandesCoselec.filter(
                 (demande) =>
-                  demande.type === 'ajout' && demande.statut === 'validee',
+                  (demande.statut === 'validee' ||
+                    demande.statut === 'refusee') &&
+                  demande.type === 'ajout',
               );
               if (avenants.length === 0) {
                 return [];
