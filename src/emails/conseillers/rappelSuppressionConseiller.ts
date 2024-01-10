@@ -5,7 +5,10 @@ export default function (mailer) {
   const templateName = 'rappelSuppressionConseiller';
 
   const render = async (conseiller) => {
-    return mailer.render(__dirname, templateName, { conseiller });
+    return mailer.render(__dirname, templateName, {
+      conseiller,
+      emailSupport: utils.getSupportMail(),
+    });
   };
 
   return {
@@ -22,15 +25,10 @@ export default function (mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(
-          conseiller.email,
-          {
-            subject: 'Vos accès Coop seront supprimés dans 7 jours',
-            body: await render(conseiller),
-          },
-          {},
-          utils.getPixSupportMail(),
-        )
+        .sendEmail(conseiller.email, {
+          subject: 'Vos accès Coop seront supprimés dans 7 jours',
+          body: await render(conseiller),
+        })
         .then(onSuccess)
         .catch(onError);
     },

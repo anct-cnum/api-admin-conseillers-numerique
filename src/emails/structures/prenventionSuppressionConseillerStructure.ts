@@ -5,7 +5,9 @@ export default function (mailer) {
   const templateName = 'prenventionSuppressionConseillerStructure';
 
   const render = async () => {
-    return mailer.render(__dirname, templateName);
+    return mailer.render(__dirname, templateName, {
+      emailSupport: utils.getSupportMail(),
+    });
   };
 
   return {
@@ -22,15 +24,10 @@ export default function (mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(
-          structureEmail,
-          {
-            subject: 'Votre conseiller arrive en fin de contrat',
-            body: await render(),
-          },
-          {},
-          utils.getPixSupportMail(),
-        )
+        .sendEmail(structureEmail, {
+          subject: 'Votre conseiller arrive en fin de contrat',
+          body: await render(),
+        })
         .then(onSuccess)
         .catch(onError);
     },

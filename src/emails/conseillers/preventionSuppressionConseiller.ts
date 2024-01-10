@@ -2,9 +2,14 @@ import logger from '../../logger';
 
 export default function (mailer) {
   const templateName = 'preventionSuppressionConseiller';
+  const { utils } = mailer;
 
   const render = async (conseiller) => {
-    return mailer.render(__dirname, templateName, { conseiller });
+    return mailer.render(__dirname, templateName, {
+      conseiller,
+      link: utils.getQuestionFinContratUrl(),
+      emailSupport: utils.getSupportMail(),
+    });
   };
 
   return {

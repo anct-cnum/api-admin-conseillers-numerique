@@ -17,7 +17,7 @@
             </mj-text>
             <mj-text align="left">
               <b>Si la date est incorrecte</b>, elle a pu être renseign&eacute;e sans avoir d&rsquo;info sur la date r&eacute;elle de fin, ou alors
-              la date de fin a &eacute;t&eacute; revue), contactez nous sur le mail support <a href="conseiller-numerique@anct.gouv.fr">conseiller-numerique@anct.gouv.fr</a>
+              la date de fin a &eacute;t&eacute; revue), contactez nous sur le mail support <a href="mailto:<%= emailSupport %>"><%= emailSupport %></a>
               pour rester membre de la communaut&eacute; Conseiller num&eacute;rique et b&eacute;n&eacute;ficier de vos acc&egrave;s &agrave; la Coop.
             </mj-text>
             <mj-text align="left">
@@ -27,14 +27,19 @@
               Votre <a href="">espace candidat</a> sera de nouveau accessible pour vous permettre de mettre &agrave; jour vos informations de candidature.
             </mj-text>
              <mj-text align="left">
-              Pour vous accompagner sur votre avenir professionnel, nous vous proposons un guide disponible <a href="https://labase.anct.gouv.fr/ressource/1745">ici</a>
-              et de vous inscrire &agrave; <a href="https://11d898a2.sibforms.com/serve/MUIFAOeD3-HyKAmhtuJ4f-W4HiQ7qP735LlgpZnUJvEX0wQ5hLQajp7brjV5QVbiD0ewsv-9O-oCoMq1SZdPp9OdKWJiZOOrQERB9UYMo5GI7w5unt7EbeAK91r54fzC4-8PxCbEJM4q_8NIi6c1K4OJXJYq5t81u9MHhx0SdgOQE14W8EkFeAJx8JMb1m8hS0F2X2EeIgGiF_JD"
+              Pour vous accompagner sur votre avenir professionnel, nous vous proposons un guide disponible <a href="https://labase.anct.gouv.fr/ressource/1745" target="blank" rel="noopener noreferrer">ici</a>
+              et de vous inscrire &agrave; <a href='<%= link %>' target="blank" rel="noopener noreferrer"
               >la newsletter</a> destin&eacute;e au conseiller num&eacute;rique en fin de mission.
             </mj-text>
             <mj-text align="left">
               L&rsquo;&eacute;quipe Conseiller num&eacute;rique
             </mj-text>
           </mj-column>
+          <mj-section padding="8px"></mj-section>
+          <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+            <mj-image align="left" padding-left="10px" width="256px" alt="Pied de page Conseiller numérique"
+            src="<%= utils.getPublicUrl('/assets/img/email/footer-cloture-prev-conum.png') %>" />
+          </mj-section>
       </mj-wrapper>
   </mj-body>
 </mjml>
