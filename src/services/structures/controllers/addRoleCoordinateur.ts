@@ -1,14 +1,19 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
+import { envoiEmailInvit } from '../../../utils/email';
+import mailer from '../../../mailer';
+import { deleteRoleUser } from '../../../utils';
 
 const addRoleCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { conseillerId } = req.body;
+    let errorSmtpMail: Error | null = null;
 
     if (!ObjectId.isValid(conseillerId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -129,13 +134,36 @@ const addRoleCoordinateur =
             'entity.$id': new ObjectId(conseillerId),
             roles: { $in: ['conseiller'] },
           },
-          { $push: { roles: ['coordinateur'] } },
+          {
+            $push: { roles: ['coordinateur'] },
+            $set: {
+              token: uuidv4(),
+              tokenCreatedAt: new Date(),
+              mailSentDate: null,
+              migrationDashboard: true,
+            },
+          },
         );
 
       if (user.modifiedCount === 0) {
         res
           .status(404)
           .json({ message: "L'utilisateur n'a pas été mis à jour" });
+      }
+      if (!user.sub) {
+        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
+      }
+      if (errorSmtpMail instanceof Error) {
+        await deleteRoleUser(app, req, user.name, {
+          $pull: {
+            roles: 'coordinateur',
+          },
+        });
+        res.status(503).json({
+          message:
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+        });
+        return;
       }
       if (
         demandesCoordinateurValider.some(
