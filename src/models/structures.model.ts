@@ -152,12 +152,6 @@ export default function (app: Application): Model<any> {
         type: [demandeCoordinateurSchema],
         default: undefined,
       },
-
-      mailSendDatePrefet: { type: Date },
-
-      mailErrorSentDatePrefet: { type: Date },
-
-      mailErrorDetailSentDatePrefet: { type: String },
     },
     { strict: false },
   );

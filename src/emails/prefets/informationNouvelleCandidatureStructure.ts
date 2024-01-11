@@ -1,5 +1,5 @@
 import { Application } from '@feathersjs/express';
-import service from '../../helpers/services';
+import logger from '../../logger';
 
 export default function (app: Application, mailer) {
   const templateName = 'informationNouvelleCandidatureStructure';
@@ -15,31 +15,11 @@ export default function (app: Application, mailer) {
     render,
     send: async (prefetWithStructure) => {
       const onSuccess = async () => {
-        await app.service(service.structures).Model.updateOne(
-          {
-            _id: prefetWithStructure.structure._id,
-          },
-          {
-            $set: {
-              mailSendDatePrefet: new Date(),
-            },
-            $unset: {
-              mailErrorSentDatePrefet: '',
-              mailErrorDetailSentDatePrefet: '',
-            },
-          },
+        logger.info(
+          `Email envoyé avec succès pour l'information d'une nouvelle candidature structure au préfet ${prefetWithStructure.name}`,
         );
       };
       const onError = async (err: Error) => {
-        await app.service(service.structures).Model.updateOne(
-          {
-            _id: prefetWithStructure.structure._id,
-          },
-          {
-            mailErrorSentPrefet: 'smtpError',
-            mailErrorDetailSentPrefet: err.message,
-          },
-        );
         throw err;
       };
 

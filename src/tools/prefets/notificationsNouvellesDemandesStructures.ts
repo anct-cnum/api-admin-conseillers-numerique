@@ -17,7 +17,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       {
         statut: 'CREEE',
         coordinateurCandidature: false,
-        mailSendDatePrefet: { $exists: false },
+        createdAt: { $gte: dateMoins1Jours, $lte: new Date() },
         'conventionnement.dossierReconventionnement': { $exists: true },
         codeDepartement: { $ne: '00' },
       },
