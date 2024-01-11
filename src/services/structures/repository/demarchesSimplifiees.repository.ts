@@ -167,7 +167,7 @@ const getTypeDossierDemarcheSimplifiee = (
         numero_demarche_conventionnement:
           demarcheSimplifiee.numero_demarche_entreprise_conventionnement,
       };
-    case 'structure publique':
+    case 'structure_publique':
       return {
         ...categorieCorrespondance,
         numero_demarche_reconventionnement:
