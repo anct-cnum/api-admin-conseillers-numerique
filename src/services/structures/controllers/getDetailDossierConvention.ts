@@ -11,10 +11,13 @@ import { checkAccessReadRequestStructures } from '../repository/structures.repos
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import {
+  filtreChampsInutilesDSPhase2Recrutement,
   getTypeDossierDemarcheSimplifiee,
   queryGetDossierDemarcheSimplifiee,
+  titlePartDSPHase2,
 } from '../repository/demarchesSimplifiees.repository';
 import { StatutConventionnement } from '../../../ts/enum';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -138,8 +141,7 @@ const getDetailDossierConvention =
       const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
         'demarche_simplifiee',
       );
-
-      const typeDossierDs = getTypeDossierDemarcheSimplifiee(
+      const typeDossierDs: ITypeDossierDS = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
         demarcheSimplifiee,
       );
@@ -217,20 +219,12 @@ const getDetailDossierConvention =
         structure[0].prefet =
           structure[0]?.prefet?.length > 0 ? structure[0]?.prefet.pop() : {};
         // les champs à ne pas afficher
-        const champsFormulaire = dossier?.dossier?.champs
-          ?.slice(4)
-          ?.filter(
-            (champ) =>
-              champ.id !== 'Q2hhbXAtMTk5NzEwMg==' &&
-              champ.id !== 'Q2hhbXAtMjg1MTg2Mg==' &&
-              champ.id !== 'Q2hhbXAtMTY4ODg1MQ==' &&
-              champ.id !== 'Q2hhbXAtMTY4ODg1Ng==' &&
-              champ.id !== 'Q2hhbXAtMzQ4NzQxMQ==' &&
-              champ.id !== 'Q2hhbXAtMjk0MDAwNg==' &&
-              champ.id !== 'Q2hhbXAtMTk5NzIwMw==' &&
-              champ.id !== 'Q2hhbXAtMjkzODkzNA==',
-          ); // à modifier quand le formulaire DS sera publié
+        const champsFormulaire = filtreChampsInutilesDSPhase2Recrutement(
+          typeDossierDs.type,
+          dossier?.dossier?.champs,
+        );
         structure[0].questionnaire = [];
+        let numeroPartie = 1;
         champsFormulaire.forEach((champ) => {
           if (champ?.checked === false) {
             Object.assign(champ, { stringValue: 'Non' });
@@ -241,11 +235,23 @@ const getDetailDossierConvention =
           if (champ?.stringValue === '') {
             Object.assign(champ, { stringValue: 'Sans réponse' });
           }
-          structure[0].questionnaire.push({
-            enoncer: champ.label,
-            reponse: champ.stringValue,
-            files: champ?.files,
-          });
+          if (champ?.files?.length > 0) {
+            structure[0].questionnaire.push({
+              enoncer: champ.label,
+              files: champ?.files,
+            });
+          } else if (titlePartDSPHase2(champ.id)) {
+            structure[0].questionnaire.push({
+              titre: `${numeroPartie}. ${champ.label}`,
+              reponse: '',
+            });
+            numeroPartie += 1;
+          } else {
+            structure[0].questionnaire.push({
+              enoncer: champ.label,
+              reponse: champ.stringValue,
+            });
+          }
         });
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
