@@ -56,7 +56,11 @@ const updateConseiller = (app) => async (conseiller, updatedAt) =>
         listeSubordonnes: '',
         estCoordinateur: '',
       },
-      $set: { updatedAt },
+      $set: {
+        disponible: true,
+        dateDisponibilite: updatedAt,
+        updatedAt,
+      },
     },
   );
 
@@ -73,7 +77,9 @@ const updateUser = (app) => async (idUser, email) =>
         tokenCreatedAt: new Date(),
         mailSentDate: null,
         passwordCreated: false,
-        resetPasswordCnil: false,
+      },
+      $unset: {
+        resetPasswordCnil: '',
       },
     },
   );

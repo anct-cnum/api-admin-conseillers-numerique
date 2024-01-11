@@ -15,9 +15,9 @@ import {
 
 execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
   try {
-    const updatedAt = new Date();
+    const today = new Date();
     // Obtenir la date de fin de contrat 7 jours avant la cloture (2 mois après la fin de contrat)
-    const dateFinContrat = dayjs(updatedAt).add(7, 'day').subtract(2, 'month');
+    const dateFinContrat = dayjs(today).add(7, 'day').subtract(2, 'month');
     const dateFinContratDebut = dayjs(dateFinContrat).startOf('date').toDate();
     const dateFinContratFin = dayjs(dateFinContrat).endOf('date').toDate();
 

@@ -183,7 +183,10 @@ const deleteCoordinateurInConseillers = (app) => async (coordinateur) => {
   }
 };
 
-const updateCacheObj = (app) => async (conseiller) =>
+const updateCacheObj = (app) => async (idConseiller) => {
+  const conseiller = await app
+    .service(service.misesEnRelation)
+    .Model.findOne({ _id: idConseiller });
   app.service(service.misesEnRelation).Model.updateMany(
     { 'conseiller.$id': conseiller._id },
     {
@@ -192,6 +195,7 @@ const updateCacheObj = (app) => async (conseiller) =>
       },
     },
   );
+};
 
 const deletePermanences = (app) => async (idConseiller) =>
   app.service(service.permanences).Model.deleteMany({

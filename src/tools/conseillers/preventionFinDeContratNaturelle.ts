@@ -38,35 +38,6 @@ const updateMiseEnRelation = (app) => async (id, updatedAt) =>
       $set: {
         statut: 'terminee_naturelle',
         'conseillerObj.statut': 'TERMINE',
-        'conseillerObj.disponible': true,
-        'conseillerObj.updatedAt': updatedAt,
-      },
-    },
-  );
-
-const updateConseillersDisponibilite = (app) => async (email, updatedAt) =>
-  app.service(service.conseillers).Model.updateMany(
-    {
-      email,
-    },
-    {
-      $set: {
-        disponible: true,
-        dateDisponibilite: updatedAt,
-        updatedAt,
-      },
-    },
-  );
-
-const updateMiseEnRelationDisponibilite = (app) => async (email, updatedAt) =>
-  app.service(service.misesEnRelation).Model.updateMany(
-    {
-      'conseillerObj.email': email,
-    },
-    {
-      $set: {
-        'conseillerObj.disponible': true,
-        'conseillerObj.dateDisponibilite': updatedAt,
         'conseillerObj.updatedAt': updatedAt,
       },
     },
@@ -90,13 +61,17 @@ program
     '-f, --fix',
     'fix: mise à jour des mises en relation en statut terminee_naturelle',
   )
+  .option(
+    '-ee, --envoiEmail',
+    'envoiEmail: Envoyer les emails de prévention de suppression',
+  )
   .parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
     const options = program.opts();
     const dateDuJour = new Date();
-    const { fix } = options;
+    const { fix, envoiEmail } = options;
 
     const misesEnRelationsFinContrat = await getMisesEnRelationsFinContrat(app)(
       dateDuJour,
@@ -125,14 +100,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
         await updateConseillersPG(pool)(conseiller.email, true, datePG).then(
           async () => {
             await updateConseiller(app)(conseiller._id, dateDuJour);
-            await updateConseillersDisponibilite(app)(
-              conseiller.email,
-              dateDuJour,
-            );
-            await updateMiseEnRelationDisponibilite(app)(
-              conseiller.email,
-              dateDuJour,
-            );
             logger.info(
               `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
             );
@@ -152,37 +119,43 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           );
         });
         // Envoie de mail conseiller et structure
-        const mailerInstance = mailer(app);
-        const messagePreventionFinContrat =
-          preventionSuppressionConseiller(mailerInstance);
-        const errorSmtpMailPreventionFinContratNaturelle =
-          await messagePreventionFinContrat
-            .send(conseiller)
-            .catch((errSmtp: Error) => {
-              logger.error(errSmtp);
-              Sentry.captureException(errSmtp);
-            });
-        if (errorSmtpMailPreventionFinContratNaturelle instanceof Error) {
-          logger.error(errorSmtpMailPreventionFinContratNaturelle.message);
-          Sentry.captureException(
-            errorSmtpMailPreventionFinContratNaturelle.message,
-          );
-        }
+        if (envoiEmail) {
+          const mailerInstance = mailer(app);
+          const messagePreventionFinContrat =
+            preventionSuppressionConseiller(mailerInstance);
+          const errorSmtpMailPreventionFinContratNaturelle =
+            await messagePreventionFinContrat
+              .send(conseiller)
+              .catch((errSmtp: Error) => {
+                logger.error(errSmtp);
+                Sentry.captureException(errSmtp);
+              });
+          if (errorSmtpMailPreventionFinContratNaturelle instanceof Error) {
+            logger.error(errorSmtpMailPreventionFinContratNaturelle.message);
+            Sentry.captureException(
+              errorSmtpMailPreventionFinContratNaturelle.message,
+            );
+          }
 
-        const messagePreventionFinContratStructure =
-          prenventionSuppressionConseillerStructure(mailerInstance);
-        const errorSmtpMailPreventionFinContratStructure =
-          await messagePreventionFinContratStructure
-            .send(conseiller.idPG, miseEnRelationFinContrat.structureObj.email)
-            .catch((errSmtp: Error) => {
-              logger.error(errSmtp);
-              Sentry.captureException(errSmtp);
-            });
-        if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
-          logger.error(errorSmtpMailPreventionFinContratStructure.message);
-          Sentry.captureException(
-            errorSmtpMailPreventionFinContratStructure.message,
-          );
+          const messagePreventionFinContratStructure =
+            prenventionSuppressionConseillerStructure(mailerInstance);
+          const errorSmtpMailPreventionFinContratStructure =
+            await messagePreventionFinContratStructure
+              .send(
+                conseiller.idPG,
+                miseEnRelationFinContrat.structureObj.idPG,
+                miseEnRelationFinContrat.structureObj.email,
+              )
+              .catch((errSmtp: Error) => {
+                logger.error(errSmtp);
+                Sentry.captureException(errSmtp);
+              });
+          if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
+            logger.error(errorSmtpMailPreventionFinContratStructure.message);
+            Sentry.captureException(
+              errorSmtpMailPreventionFinContratStructure.message,
+            );
+          }
         }
       }
     }

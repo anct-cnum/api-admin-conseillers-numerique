@@ -25,11 +25,9 @@
             <mj-text align="left">
               <b>Vous avez des questions ?</b></br>
               L&rsquo;&eacute;quipe support se tient &agrave; votre disposition :</br>
-              &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Par email &agrave; l&rsquo;adresse : <a href="mailto:<%= emailSupport %>"><%= emailSupport %></a></br>
+              <span style="margin: 0 10px">-</span>Par email &agrave; l&rsquo;adresse : <a href="mailto:<%= emailSupport %>"><%= emailSupport %></a></br>
             </mj-text>
-            <mj-text align="left">
-              L&rsquo;&eacute;quipe Conseiller num&eacute;rique
-            </mj-text>
+            <%- include('../commun/signature.mjml.ejs'); %>
         </mj-column>
       </mj-section>
       <mj-section padding="8px"></mj-section>
