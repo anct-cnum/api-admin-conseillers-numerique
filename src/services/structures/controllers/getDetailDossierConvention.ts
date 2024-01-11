@@ -135,9 +135,13 @@ const getDetailDossierConvention =
         });
         return;
       }
+      const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+        'demarche_simplifiee',
+      );
 
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
+        demarcheSimplifiee,
       );
       if (typeDossierDs === null) {
         res.status(500).json({
@@ -190,10 +194,6 @@ const getDetailDossierConvention =
         structure[0]?.conventionnement?.statut ===
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
       ) {
-        const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
-          'demarche_simplifiee',
-        );
-
         const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
           headers: {
             authorization: `Bearer ${demarcheSimplifiee.token_api}`,

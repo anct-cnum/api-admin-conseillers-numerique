@@ -143,13 +143,42 @@ const queryGetDossierDemarcheSimplifiee = () => gql`
   }
 `;
 
-const getTypeDossierDemarcheSimplifiee = (formJuridique: string) =>
-  categoriesCorrespondances.find((categorieCorrespondance) => {
-    if (categorieCorrespondance.categorie.includes(formJuridique)) {
-      return categorieCorrespondance;
-    }
-    return null;
-  });
+const getTypeDossierDemarcheSimplifiee = (
+  formJuridique: string,
+  demarcheSimplifiee: IConfigurationDemarcheSimplifiee,
+) => {
+  const categorieCorrespondance = categoriesCorrespondances.find((categorie) =>
+    categorie.categorie.includes(formJuridique),
+  );
+  switch (categorieCorrespondance?.type) {
+    case 'association':
+      return {
+        ...categorieCorrespondance,
+        numero_demarche_reconventionnement:
+          demarcheSimplifiee.numero_demarche_association_reconventionnement,
+        numero_demarche_conventionnement:
+          demarcheSimplifiee.numero_demarche_association_conventionnement,
+      };
+    case 'entreprise':
+      return {
+        ...categorieCorrespondance,
+        numero_demarche_reconventionnement:
+          demarcheSimplifiee.numero_demarche_entreprise_reconventionnement,
+        numero_demarche_conventionnement:
+          demarcheSimplifiee.numero_demarche_entreprise_conventionnement,
+      };
+    case 'structure publique':
+      return {
+        ...categorieCorrespondance,
+        numero_demarche_reconventionnement:
+          demarcheSimplifiee.numero_demarche_structure_publique_reconventionnement,
+        numero_demarche_conventionnement:
+          demarcheSimplifiee.numero_demarche_structure_publique_conventionnement,
+      };
+    default:
+      return null;
+  }
+};
 
 const getUrlDossierReconventionnement = (
   idPG: number,
@@ -194,6 +223,7 @@ const getUrlDossierDepotPieceDS = (
   const typeDossierDS: ITypeDossierDS | undefined =
     getTypeDossierDemarcheSimplifiee(
       structure?.insee?.unite_legale?.forme_juridique?.libelle,
+      demarcheSimplifiee,
     );
   if (demandeCoordinateurValider && isRecrutementCoordinateur) {
     return `https://www.demarches-simplifiees.fr/dossiers/${demandeCoordinateurValider?.dossier?.numero}/messagerie`;
