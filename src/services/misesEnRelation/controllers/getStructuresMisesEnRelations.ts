@@ -11,9 +11,9 @@ import {
   filterCCP1,
   filterPix,
   checkAccessReadRequestMisesEnRelation,
-  filterNomConseiller,
   filterStatut,
 } from '../misesEnRelation.repository';
+import { filterNomAndEmailConseiller } from '../../conseillers/repository/conseillers.repository';
 import { validMiseEnRelation } from '../../../schemas/miseEnRelation.schemas';
 import { getCoselec } from '../../../utils';
 
@@ -26,7 +26,7 @@ const countMisesEnRelation =
     diplome: string,
     ccp1: string,
     filter: string,
-    searchByNom: string,
+    search: string,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -34,6 +34,7 @@ const countMisesEnRelation =
           nomPrenomStr: {
             $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
           },
+          email: '$conseillerObj.email',
         },
       },
       {
@@ -41,6 +42,7 @@ const countMisesEnRelation =
           prenomNomStr: {
             $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
           },
+          email: '$conseillerObj.email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
@@ -51,7 +53,7 @@ const countMisesEnRelation =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByNom),
+          ...filterNomAndEmailConseiller(search),
           ...filterStatut(filter),
           $and: [checkAccess],
         },
@@ -83,7 +85,7 @@ const getMisesEnRelation =
     diplome: string,
     ccp1: string,
     filter: string,
-    searchByNom: string,
+    search: string,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -94,6 +96,7 @@ const getMisesEnRelation =
           nomPrenomStr: {
             $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
           },
+          email: '$conseillerObj.email',
         },
       },
       {
@@ -101,6 +104,7 @@ const getMisesEnRelation =
           prenomNomStr: {
             $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
           },
+          email: '$conseillerObj.email',
         },
       },
       { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
@@ -111,7 +115,7 @@ const getMisesEnRelation =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByNom),
+          ...filterNomAndEmailConseiller(search),
           ...filterStatut(filter),
           $and: [checkAccess],
         },
