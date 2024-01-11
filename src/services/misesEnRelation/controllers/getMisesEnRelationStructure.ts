@@ -33,15 +33,20 @@ const getMisesEnRelationStructure =
           {
             $match: {
               $and: [query],
-              statut: {
-                $in: [
-                  'finalisee',
-                  'nouvelle_rupture',
-                  'renouvellement_initiee',
-                  'recrutee',
-                  'finalisee_rupture',
-                ],
-              },
+              $or: [
+                {
+                  statut: {
+                    $in: [
+                      'finalisee',
+                      'nouvelle_rupture',
+                      'renouvellement_initiee',
+                      'recrutee',
+                      'finalisee_rupture',
+                    ],
+                  },
+                },
+                { banniereRefusRecrutement: true },
+              ],
             },
           },
           {
@@ -78,6 +83,7 @@ const getMisesEnRelationStructure =
               banniereValidationRenouvellement: 1,
               createdAt: 1,
               phaseConventionnement: 1,
+              banniereRefusRecrutement: 1,
             },
           },
           {

@@ -7,7 +7,6 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
-import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 import { validUpdateMisesEnRelation } from '../../../schemas/miseEnRelation.schemas';
 
 const updateMiseEnRelation =
@@ -72,63 +71,6 @@ const updateMiseEnRelation =
           dossierIncompletRupture: '',
         };
       }
-      if (
-        req.body.statut === 'interessee' &&
-        miseEnRelationVerif.statut === 'recrutee'
-      ) {
-        if (miseEnRelationVerif?.contratCoordinateur) {
-          const structureUpdated = await app
-            .service(service.structures)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateOne(
-              {
-                _id: structure._id,
-                demandesCoordinateur: {
-                  $elemMatch: {
-                    miseEnRelationId: miseEnRelationVerif._id,
-                  },
-                },
-              },
-              {
-                $unset: {
-                  'demandesCoordinateur.$.miseEnRelationId': '',
-                },
-              },
-            );
-          if (structureUpdated.modifiedCount === 0) {
-            res.status(400).json({
-              message: "la structure n'a pas pu être mise à jour",
-            });
-            return;
-          }
-          await app
-            .service(service.misesEnRelation)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateMany(
-              {
-                'structure.$id': structure._id,
-                'structureObj.demandesCoordinateur': {
-                  $elemMatch: {
-                    miseEnRelationId: miseEnRelationVerif._id,
-                  },
-                },
-              },
-              {
-                $unset: {
-                  'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
-                },
-              },
-            );
-        }
-        remove = {
-          dateDebutDeContrat: '',
-          dateFinDeContrat: '',
-          typeDeContrat: '',
-          salaire: '',
-          emetteurRecrutement: '',
-          contratCoordinateur: '',
-        };
-      }
       if (req.body.statut === 'nouvelle_rupture') {
         if (req.body.dateRupture === null) {
           res.status(400).json({
@@ -178,20 +120,6 @@ const updateMiseEnRelation =
         res.status(404).json({
           message: "Le contrat n'a pas été mis à jour",
         });
-        return;
-      }
-      if (req.body.statut === 'interessee') {
-        const miseEnRelationFormat = miseEnRelation.value.toObject();
-        const { quotaCoordinateurDisponible } =
-          await checkQuotaRecrutementCoordinateur(
-            app,
-            req,
-            structure,
-            miseEnRelationVerif._id,
-          );
-        miseEnRelationFormat.quotaCoordinateur =
-          quotaCoordinateurDisponible > 0;
-        res.status(200).json({ miseEnRelation: miseEnRelationFormat });
         return;
       }
       res.status(200).json({ miseEnRelation: miseEnRelation.value });

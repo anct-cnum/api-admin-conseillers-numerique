@@ -44,11 +44,21 @@ const createContrat =
         return;
       }
       const miseEnRelationObject = miseEnRelation.toObject();
+      // suppression du champ reconventionnement pour le traitement des fins de contrats naturels
+      // sinon ils ne seront pas pris en compte dans le script de fin de contrat pour les phases 2
+      delete miseEnRelationObject.reconventionnement;
       if (typeDeContrat === 'CDI') {
         delete miseEnRelationObject.dateFinDeContrat;
       }
       if (!salaire) {
         delete miseEnRelationObject.salaire;
+      }
+      if (Number(salaire) < Number(app.get('contrat_smic'))) {
+        res.status(400).json({
+          message:
+            'Le salaire doit être égal ou plus élevé que le minimum brut légal',
+        });
+        return;
       }
       const miseEnRelationRenouvellementInitiee = await app
         .service(service.misesEnRelation)
