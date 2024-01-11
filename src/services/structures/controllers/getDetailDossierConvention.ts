@@ -217,7 +217,19 @@ const getDetailDossierConvention =
         structure[0].prefet =
           structure[0]?.prefet?.length > 0 ? structure[0]?.prefet.pop() : {};
         // les champs à ne pas afficher
-        const champsFormulaire = dossier?.dossier?.champs; // à modifier quand le formulaire DS sera publié
+        const champsFormulaire = dossier?.dossier?.champs
+          ?.slice(4)
+          ?.filter(
+            (champ) =>
+              champ.id !== 'Q2hhbXAtMTk5NzEwMg==' &&
+              champ.id !== 'Q2hhbXAtMjg1MTg2Mg==' &&
+              champ.id !== 'Q2hhbXAtMTY4ODg1MQ==' &&
+              champ.id !== 'Q2hhbXAtMTY4ODg1Ng==' &&
+              champ.id !== 'Q2hhbXAtMzQ4NzQxMQ==' &&
+              champ.id !== 'Q2hhbXAtMjk0MDAwNg==' &&
+              champ.id !== 'Q2hhbXAtMTk5NzIwMw==' &&
+              champ.id !== 'Q2hhbXAtMjkzODkzNA==',
+          ); // à modifier quand le formulaire DS sera publié
         structure[0].questionnaire = [];
         champsFormulaire.forEach((champ) => {
           if (champ?.checked === false) {
