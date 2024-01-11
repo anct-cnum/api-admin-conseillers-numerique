@@ -93,6 +93,13 @@ const addRoleCoordinateur =
           { $set: { estCoordinateur: true } },
         );
 
+      if (!conseiller?.passwordCreated) {
+        res.status(409).json({
+          message: 'Le compte du conseiller est inactif',
+        });
+        return;
+      }
+
       if (conseiller.modifiedCount === 0) {
         res
           .status(404)

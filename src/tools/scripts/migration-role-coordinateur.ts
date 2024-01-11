@@ -11,7 +11,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
     const users = await app.service(service.users).Model.find({
       roles: { $in: ['coordinateur_coop'] },
-      passwordCreated: true,
     });
 
     logger.info(`Nombre d'utilisateurs à traiter: ${users?.length}`);
@@ -22,6 +21,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           { _id: user._id },
           {
             $pull: { roles: 'coordinateur_coop' },
+            $push: { roles: 'coordinateur' },
             $set: {
               token: uuidv4(),
               tokenCreatedAt: new Date(),
@@ -30,13 +30,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
             },
           },
         );
-
-        await app
-          .service(service.users)
-          .Model.updateOne(
-            { _id: user._id },
-            { $addToSet: { roles: 'coordinateur' } },
-          );
 
         logger.info(`L'utilisateur ${user._id} a été mis à jour`);
       } catch (error) {
