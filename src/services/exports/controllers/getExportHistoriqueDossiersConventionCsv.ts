@@ -28,7 +28,7 @@ const formatAvenant = (avenant, structure) => {
   const item = { ...avenant };
   item.idPG = structure.idPG;
   item.siret = structure.siret;
-  item.dateSorted = avenant.validateurAvenant?.date;
+  item.dateSorted = avenant.emetteurAvenant?.date;
   item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
   item.nbPostesApresDemande =
     avenant.type === 'ajout'
@@ -125,7 +125,9 @@ const getExportHistoriqueDossiersConventionCsv =
             structureWithAvenant.map(async (structure) => {
               const avenants = structure.demandesCoselec.filter(
                 (demande) =>
-                  demande.type === 'ajout' && demande.statut === 'validee',
+                  (demande.statut === 'validee' ||
+                    demande.statut === 'refusee') &&
+                  demande.type === 'ajout',
               );
               if (avenants.length === 0) {
                 return [];
