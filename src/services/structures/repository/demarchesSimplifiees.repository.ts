@@ -268,72 +268,6 @@ const getUrlDossierDSAdmin = (
   return `https://www.demarches-simplifiees.fr/procedures/${typeDossierDS?.numero_demarche_conventionnement}/dossiers/${structure?.conventionnement?.dossierConventionnement?.numero}/messagerie`;
 };
 
-const titlePartDSPHase2 = (idChamp: string) => {
-  // id correspondant aux titres des différentes partie des formulaires DS
-  const titlePart = [
-    // Formulaire des associations
-    'Q2hhbXAtMTk5Nzk0MA==',
-    'Q2hhbXAtMjg1MTgwMA==',
-    'Q2hhbXAtMTY4OTE2MQ==',
-    'Q2hhbXAtMTY4NTMxNw==',
-    'Q2hhbXAtMjg2MDQwMg==',
-    // Formulaire des entreprises
-    'Q2hhbXAtMTk5OTI3Ng==',
-    'Q2hhbXAtMjg2MDM2Mw==',
-    'Q2hhbXAtMTU5NDQ1NQ==',
-    'Q2hhbXAtMTY4NTMxOQ==',
-    'Q2hhbXAtMTk5OTI3OA==',
-    // Formulaire des structures publiques
-    'Q2hhbXAtMjg1MTg2Mg==',
-    'Q2hhbXAtMTY4ODg1MQ==',
-    'Q2hhbXAtMTk5NzEwMg==',
-    'Q2hhbXAtMTY4ODg1Ng==',
-    'Q2hhbXAtMTk5NzIwMw==',
-  ];
-  return titlePart.includes(idChamp);
-};
-
-const filtreChampsInutilesDSPhase2Recrutement = (
-  typeStructure: string,
-  champs: any[],
-) => {
-  switch (typeStructure) {
-    case 'association':
-      return champs
-        ?.slice(3)
-        ?.filter(
-          (champ) =>
-            champ.id !== 'Q2hhbXAtMzQ4Nzk5Mw==' &&
-            champ.id !== 'Q2hhbXAtMjk0MDAwNA==' &&
-            champ.id !== 'Q2hhbXAtMTk5Nzk0MQ==' &&
-            champ.id !== 'Q2hhbXAtMzQ4NzQxMQ==' &&
-            champ.id !== 'Q2hhbXAtMjk0MDAwNg==' &&
-            champ.id !== 'Q2hhbXAtMjkzODkzNA==',
-        );
-    case 'entreprise':
-      return champs
-        ?.slice(3)
-        ?.filter(
-          (champ) =>
-            champ.id !== 'Q2hhbXAtMzQ4Nzk5MA==' &&
-            champ.id !== 'Q2hhbXAtMjkzOTk4OA==' &&
-            champ.id !== 'Q2hhbXAtMjkzODkzMQ==' &&
-            champ.id !== 'Q2hhbXAtMTY4NTMxOQ==',
-        );
-    case 'structure_publique':
-      return champs
-        ?.slice(3)
-        ?.filter(
-          (champ) =>
-            champ.id !== 'Q2hhbXAtMzQ4NzQxMQ==' &&
-            champ.id !== 'Q2hhbXAtMjk0MDAwNg==' &&
-            champ.id !== 'Q2hhbXAtMjkzODkzNA==',
-        );
-    default:
-      return [];
-  }
-};
-
 export {
   queryGetDemarcheDemarcheSimplifiee,
   queryGetDossierDemarcheSimplifiee,
@@ -342,6 +276,4 @@ export {
   getUrlDossierDSAdmin,
   getUrlDossierConventionnement,
   getUrlDossierReconventionnement,
-  filtreChampsInutilesDSPhase2Recrutement,
-  titlePartDSPHase2,
 };

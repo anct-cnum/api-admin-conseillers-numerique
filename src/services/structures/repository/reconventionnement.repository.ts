@@ -18,7 +18,8 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
     return {
       statut: 'CREEE',
       coordinateurCandidature: false,
-      'conventionnement.dossierReconventionnement': { $exists: true },
+      createdAt: { $gte: new Date('2023-01-01') },
+      'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
       ...filterAvisPrefet(avisPrefet),
     };
   }
@@ -170,16 +171,33 @@ const filterDateDemandeAndStatutHistorique = (
 };
 
 const totalParConvention = async (app: Application, req: IRequest) => {
+  const checkAccess = await checkAccessReadRequestStructures(app, req);
   const conventionnement = await app
     .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      statut: 'CREEE',
-      coordinateurCandidature: false,
-      'conventionnement.dossierReconventionnement': { $exists: true },
-    });
-  const checkAccess = await checkAccessReadRequestStructures(app, req);
-
+    .Model.aggregate([
+      {
+        $addFields: {
+          lastPrefet: {
+            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
+          },
+        },
+      },
+      {
+        $match: {
+          $and: [checkAccess],
+          statut: 'CREEE',
+          coordinateurCandidature: false,
+          'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
+          createdAt: { $gte: new Date('2023-01-01') },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          count: { $sum: 1 },
+        },
+      },
+    ]);
   const countAvenant = await app.service(service.structures).Model.aggregate([
     {
       $match: {
@@ -199,15 +217,16 @@ const totalParConvention = async (app: Application, req: IRequest) => {
       },
     },
   ]);
+  const countConventionnement = conventionnement[0]?.count ?? 0;
   const totalAvenantAjoutPoste =
     countAvenant.find((element) => element._id === 'ajout')?.count ?? 0;
   const totalAvenantRenduPoste =
     countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
-    conventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
+    countConventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
 
   return {
-    conventionnement,
+    conventionnement: countConventionnement,
     avenantAjoutPoste: totalAvenantAjoutPoste,
     avenantRenduPoste: totalAvenantRenduPoste,
     total,
@@ -380,32 +399,31 @@ const formatReconventionnementForDossierConventionnement = (
 
 const formatConventionnementForDossierConventionnement = (structures) =>
   structures
-    .filter((structure) => structure?.statut === 'CREEE')
+    .filter(
+      (structure) =>
+        structure?.statut === 'CREEE' ||
+        structure?.conventionnement?.statut ===
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+    )
     .map((structure) => {
-      const item = structure.conventionnement.dossierReconventionnement;
-      item.dateSorted = item?.dateDeCreation;
-      item.idPG = structure.idPG;
-      item.nom = structure.nom;
-      item._id = structure._id;
-      item.nom = structure.nom;
-      item.typeConvention = 'conventionnement';
-      item.prefet = structure?.prefet?.length > 0 ? structure.prefet.pop() : {};
-      item.statutConventionnement = structure.conventionnement.statut;
-      item.nombreConseillersCoselec =
-        getCoselec(structure)?.nombreConseillersCoselec ?? 0;
-      item.nbPostesAvantDemande = 0;
-      item.variation =
-        item.nombreConseillersCoselec - item.nbPostesAvantDemande;
-      item.codeDepartement = structure.codeDepartement;
-      item.departement = findDepartementNameByNumDepartement(
-        structure.codeDepartement,
-        structure.codeCom,
-      );
-      item.region = findRegionNameByNumDepartement(
-        structure.codeDepartement,
-        structure.codeCom,
-      );
-      return item;
+      return {
+        ...structure,
+        dateSorted: structure.createdAt,
+        typeConvention: 'conventionnement',
+        prefet: structure?.prefet?.length > 0 ? structure.prefet.pop() : {},
+        nombreConseillersCoselec:
+          getCoselec(structure)?.nombreConseillersCoselec ?? 0,
+        nbPostesAvantDemande: 0,
+        variation: 0,
+        departement: findDepartementNameByNumDepartement(
+          structure.codeDepartement,
+          structure.codeCom,
+        ),
+        region: findRegionNameByNumDepartement(
+          structure.codeDepartement,
+          structure.codeCom,
+        ),
+      };
     });
 
 const sortDossierConventionnement = (

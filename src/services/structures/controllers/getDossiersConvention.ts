@@ -54,6 +54,7 @@ const getStructures =
           conventionnement: 1,
           demandesCoselec: 1,
           prefet: 1,
+          createdAt: 1,
         },
       },
     ]);

@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { GraphQLClient } from 'graphql-request';
 import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
@@ -10,12 +9,7 @@ import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
-import {
-  filtreChampsInutilesDSPhase2Recrutement,
-  getTypeDossierDemarcheSimplifiee,
-  queryGetDossierDemarcheSimplifiee,
-  titlePartDSPHase2,
-} from '../repository/demarchesSimplifiees.repository';
+import { getTypeDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 import { StatutConventionnement } from '../../../ts/enum';
 import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
@@ -83,6 +77,7 @@ const getDetailStructureWithConseillers =
           insee: 1,
           conseillers: '$conseillers',
           prefet: 1,
+          createdAt: 1,
         },
       },
     ]);
@@ -145,7 +140,10 @@ const getDetailDossierConvention =
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
         demarcheSimplifiee,
       );
-      if (typeDossierDs === null) {
+      if (
+        typeDossierDs === null &&
+        structure[0].statut === 'VALIDATION_COSELEC'
+      ) {
         res.status(500).json({
           message: 'Erreur lors de la récupération du type de la structure',
         });
@@ -196,63 +194,8 @@ const getDetailDossierConvention =
         structure[0]?.conventionnement?.statut ===
           StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
       ) {
-        const graphQLClient = new GraphQLClient(demarcheSimplifiee.endpoint, {
-          headers: {
-            authorization: `Bearer ${demarcheSimplifiee.token_api}`,
-            'content-type': 'application/json',
-          },
-        });
-        const dossier: any | Error = await graphQLClient
-          .request(queryGetDossierDemarcheSimplifiee(), {
-            dossierNumber:
-              structure[0].conventionnement.dossierReconventionnement.numero,
-          })
-          .catch(() => {
-            return new Error("Le dossier n'existe pas");
-          });
-        if (dossier instanceof Error) {
-          res.status(404).json({
-            message: dossier.message,
-          });
-          return;
-        }
         structure[0].prefet =
           structure[0]?.prefet?.length > 0 ? structure[0]?.prefet.pop() : {};
-        // les champs à ne pas afficher
-        const champsFormulaire = filtreChampsInutilesDSPhase2Recrutement(
-          typeDossierDs.type,
-          dossier?.dossier?.champs,
-        );
-        structure[0].questionnaire = [];
-        let numeroPartie = 1;
-        champsFormulaire.forEach((champ) => {
-          if (champ?.checked === false) {
-            Object.assign(champ, { stringValue: 'Non' });
-          }
-          if (champ?.checked === true) {
-            Object.assign(champ, { stringValue: 'Oui' });
-          }
-          if (champ?.stringValue === '') {
-            Object.assign(champ, { stringValue: 'Sans réponse' });
-          }
-          if (champ?.files?.length > 0) {
-            structure[0].questionnaire.push({
-              enoncer: champ.label,
-              files: champ?.files,
-            });
-          } else if (titlePartDSPHase2(champ.id)) {
-            structure[0].questionnaire.push({
-              titre: `${numeroPartie}. ${champ.label}`,
-              reponse: '',
-            });
-            numeroPartie += 1;
-          } else {
-            structure[0].questionnaire.push({
-              enoncer: champ.label,
-              reponse: champ.stringValue,
-            });
-          }
-        });
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
       }
