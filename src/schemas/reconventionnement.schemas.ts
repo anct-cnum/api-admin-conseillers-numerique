@@ -17,7 +17,7 @@ const validReconventionnement = Joi.object({
   ),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
   avisPrefet: Joi.string().error(
-    new Error('Le filtre avis du préfet est invalide'),
+    new Error('Le filtre avis préfet est invalide'),
   ),
 });
 
