@@ -10,7 +10,6 @@ import { checkAccessReadRequestStructures } from '../repository/structures.repos
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { getTypeDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
-import { StatutConventionnement } from '../../../ts/enum';
 import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
 
 const getDetailStructureWithConseillers =
@@ -76,7 +75,7 @@ const getDetailStructureWithConseillers =
           nombreConseillersSouhaites: 1,
           insee: 1,
           conseillers: '$conseillers',
-          prefet: 1,
+          prefet: { $arrayElemAt: ['$prefet', -1] },
           createdAt: 1,
         },
       },
@@ -189,13 +188,6 @@ const getDetailDossierConvention =
             conseiller.statutMiseEnrelation !== 'terminee' &&
             conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
         );
-      } else if (
-        structure[0].statut === 'CREEE' ||
-        structure[0]?.conventionnement?.statut ===
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
-      ) {
-        structure[0].prefet =
-          structure[0]?.prefet?.length > 0 ? structure[0]?.prefet.pop() : {};
       } else {
         structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
       }

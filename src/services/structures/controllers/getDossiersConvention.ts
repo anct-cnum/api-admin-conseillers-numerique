@@ -53,7 +53,7 @@ const getStructures =
           statut: 1,
           conventionnement: 1,
           demandesCoselec: 1,
-          prefet: 1,
+          prefet: '$lastPrefet',
           createdAt: 1,
         },
       },

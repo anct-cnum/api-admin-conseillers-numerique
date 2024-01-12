@@ -411,7 +411,6 @@ const formatConventionnementForDossierConventionnement = (structures) =>
         ...structure,
         dateSorted: structure.createdAt,
         typeConvention: 'conventionnement',
-        prefet: structure?.prefet?.length > 0 ? structure.prefet.pop() : {},
         nombreConseillersCoselec:
           getCoselec(structure)?.nombreConseillersCoselec ?? 0,
         nbPostesAvantDemande: 0,
