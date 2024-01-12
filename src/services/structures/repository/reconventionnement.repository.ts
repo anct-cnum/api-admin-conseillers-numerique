@@ -49,7 +49,8 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
       {
         statut: 'CREEE',
         coordinateurCandidature: false,
-        'conventionnement.dossierReconventionnement': { $exists: true },
+        createdAt: { $gte: new Date('2023-01-01') },
+        'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
       },
       {
         demandesCoselec: {
