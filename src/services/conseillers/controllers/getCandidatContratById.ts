@@ -1,7 +1,10 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
@@ -53,9 +56,13 @@ const getCandidatContratById =
         .findOne({
           _id: conseillerFormat.miseEnRelation?.structureObj?._id,
         });
+      const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+        'demarche_simplifiee',
+      );
       const typeDossierDS: ITypeDossierDS | undefined =
         getTypeDossierDemarcheSimplifiee(
           structure?.insee?.unite_legale?.forme_juridique?.libelle,
+          demarcheSimplifiee,
         );
       if (typeDossierDS === null) {
         res.status(500).json({
