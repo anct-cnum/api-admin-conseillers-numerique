@@ -1,7 +1,10 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
@@ -126,9 +129,13 @@ const getDetailDossierConvention =
         });
         return;
       }
+      const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+        'demarche_simplifiee',
+      );
 
       const typeDossierDs = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
+        demarcheSimplifiee,
       );
       if (typeDossierDs === null) {
         res.status(500).json({
