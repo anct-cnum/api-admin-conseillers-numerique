@@ -54,7 +54,7 @@ const totalParStatutDemandesConseiller = async (
   app: Application,
   checkAccess,
 ) => {
-  const countDemandesCoordinateur = await app
+  const countDemandesConseiller = await app
     .service(service.structures)
     .Model.aggregate([
       {
@@ -80,25 +80,25 @@ const totalParStatutDemandesConseiller = async (
         },
       },
     ]);
-  const totalDemandesCoordinateurEnCours =
-    countDemandesCoordinateur.find((element) => element._id === 'CREEE')
-      ?.count ?? 0;
-  const totalDemandesCoordinateurValider =
-    countDemandesCoordinateur.find(
+  const totalDemandesConseillerEnCours =
+    countDemandesConseiller.find((element) => element._id === 'CREEE')?.count ??
+    0;
+  const totalDemandesConseillerValider =
+    countDemandesConseiller.find(
       (element) => element._id === 'VALIDATION_COSELEC',
     )?.count ?? 0;
-  const totalDemandesCoordinateurRefuser =
-    countDemandesCoordinateur.find((element) => element._id === 'REFUS_COSELEC')
+  const totalDemandesConseillerRefuser =
+    countDemandesConseiller.find((element) => element._id === 'REFUS_COSELEC')
       ?.count ?? 0;
   const total =
-    totalDemandesCoordinateurEnCours +
-    totalDemandesCoordinateurValider +
-    totalDemandesCoordinateurRefuser;
+    totalDemandesConseillerEnCours +
+    totalDemandesConseillerValider +
+    totalDemandesConseillerRefuser;
 
   return {
-    nouvelleCandidature: totalDemandesCoordinateurEnCours,
-    candidatureValider: totalDemandesCoordinateurValider,
-    candidatureNonRetenus: totalDemandesCoordinateurRefuser,
+    nouvelleCandidature: totalDemandesConseillerEnCours,
+    candidatureValider: totalDemandesConseillerValider,
+    candidatureNonRetenus: totalDemandesConseillerRefuser,
     total,
   };
 };
