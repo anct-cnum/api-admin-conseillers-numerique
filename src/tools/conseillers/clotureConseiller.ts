@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/conseillers/clotureConseiller.ts -f -db
+// Lancement de ce script : ts-node src/tools/conseillers/clotureConseiller.ts -f -fdb
 
 import { program } from 'commander';
 import dayjs from 'dayjs';
@@ -15,12 +15,9 @@ import {
 import {
   getMisesEnRelationsFinaliseesNaturelles,
   getConseiller,
-  deleteConseillerInCoordinateurs,
-  deleteCoordinateurInConseillers,
+  nettoyageCoordinateur,
   updateCacheObj,
-  deletePermanences,
-  updatePermanences,
-  deletePermanencesInCras,
+  nettoyagePermanence,
   deleteMattermostAccount,
   deleteMailbox,
 } from '../../utils/functionsDeleteRoleConseiller';
@@ -168,99 +165,112 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     logger.info(
       `Il y a ${termineesNaturelles.length} conseillers comportant le statut terminee_naturelle.`,
     );
+
     for (const termineeNaturelle of termineesNaturelles) {
       const conseiller = await getConseiller(app)(
         termineeNaturelle.conseillerId,
       );
       const user = await getUser(app)(termineeNaturelle.conseillerId);
+      if (fix && conseiller && user) {
+        const structuresIdsAutre = termineeNaturelle.structuresIdsAutre.filter(
+          (structureId) => {
+            return structureId !== null;
+          },
+        );
+        const structureIdTerminee =
+          termineeNaturelle.structuresIdsTerminee.filter((terminee) => {
+            return terminee !== null;
+          })[0];
 
-      if (fix) {
-        // suppression du conseiller dans les permanences
-        await deletePermanences(app)(conseiller._id)
-          .then(async () => {
-            await updatePermanences(app)(conseiller._id);
-          })
-          .then(async () => {
-            await deletePermanencesInCras(app)(conseiller._id, updatedAt);
-          })
-          .then(async () => {
+        if (
+          !structuresIdsAutre.includes(structureIdTerminee) &&
+          structureIdTerminee !== null
+        ) {
+          // suppression du conseiller dans les permanences / des permanences dans les cras
+          await nettoyagePermanence(app)(
+            structureIdTerminee,
+            conseiller._id,
+            updatedAt,
+          ).then(async () => {
             logger.info(
               `Les permanences du conseiller (id: ${conseiller._id}) ont été supprimées et retirées des cras`,
             );
           });
-        // suppression du conseiller dans les listes de coordinateur
-        if (conseiller?.coordinateurs) {
-          await deleteConseillerInCoordinateurs(app)(conseiller).then(
-            async () => {
-              logger.info(
-                `Le conseiller (id: ${conseiller._id}) a été retiré des listes de coordinations`,
-              );
-            },
-          );
-        }
-        // suppression du coordinateur dans les structures et les conseillers
-        if (conseiller.estCoordinateur) {
-          await deleteCoordinateurInConseillers(app)(conseiller).then(
-            async () => {
+
+          // suppression du conseiller dans les listes de coordinateur / du coordinateur dans les structures et les conseillers
+          await nettoyageCoordinateur(app)(structureIdTerminee, conseiller)
+            .then(async () => {
               await updateStructure(app)(
                 termineeNaturelle.structureId,
                 termineeNaturelle._id,
               );
-            },
-          );
-        }
-        // mise aux normes du conseiller et de l'utilisateur
-        await updateConseiller(app)(conseiller, updatedAt)
-          .then(async () => {
-            await createConseillersTermines(app)(conseiller, termineeNaturelle);
-          })
-          .then(async () => {
-            await updateUser(app)(user._id, conseiller.email);
-          })
-          .then(async () => {
-            logger.info(
-              `Le conseiller (id: ${conseiller._id}) a été remis à zéro et le user (id: ${user._id}) a été passé en candidat avec son adresse email d'origine`,
-            );
-          });
-        // suppression des outils (Mattermost, Gandi)
-        await deleteMattermostAccount(app)(conseiller)
-          .then(async () => {
-            await deleteMailbox(app)(conseiller._id, user.name);
-          })
-          .then(async () => {
-            logger.info(
-              `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
-            );
-          });
+            })
+            .then(async () => {
+              logger.info(
+                `Le conseiller (id: ${conseiller._id}) a été retiré des listes de coordinations`,
+              );
+            });
 
-        // Mise à jour du cache Obj
-        await updateCacheObj(app)(conseiller);
+          if (structuresIdsAutre.length === 0) {
+            // mise aux normes du conseiller et de l'utilisateur
+            await updateConseiller(app)(conseiller, updatedAt)
+              .then(async () => {
+                await createConseillersTermines(app)(
+                  conseiller,
+                  termineeNaturelle,
+                );
+              })
+              .then(async () => {
+                await updateUser(app)(user._id, conseiller.email);
+              })
+              .then(async () => {
+                logger.info(
+                  `Le conseiller (id: ${conseiller._id}) a été remis à zéro et le user (id: ${user._id}) a été passé en candidat avec son adresse email d'origine`,
+                );
+              });
+            // suppression des outils (Mattermost, Gandi)
+            await deleteMattermostAccount(app)(conseiller)
+              .then(async () => {
+                await deleteMailbox(app)(conseiller._id, user.name);
+              })
+              .then(async () => {
+                logger.info(
+                  `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
+                );
+              });
+          }
 
-        // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
-        const mailerInstance = mailer(app);
-        const messageFinContratPix = conseillerRupturePix(mailerInstance);
-        const errorSmtpMailFinContratPix = await messageFinContratPix
-          .send(conseiller)
-          .catch((errSmtp: Error) => {
-            logger.error(errSmtp);
-            Sentry.captureException(errSmtp);
-          });
-        if (errorSmtpMailFinContratPix instanceof Error) {
-          logger.error(errorSmtpMailFinContratPix.message);
-          Sentry.captureException(errorSmtpMailFinContratPix.message);
-        }
+          // Mise à jour du cache Obj
+          await updateCacheObj(app)(conseiller._id);
 
-        const messageFinContratConseiller =
-          suppressionCompteConseiller(mailerInstance);
-        const errorSmtpMailFinContrat = await messageFinContratConseiller
-          .send(conseiller)
-          .catch((errSmtp: Error) => {
-            logger.error(errSmtp);
-            Sentry.captureException(errSmtp);
-          });
-        if (errorSmtpMailFinContrat instanceof Error) {
-          logger.error(errorSmtpMailFinContrat.message);
-          Sentry.captureException(errorSmtpMailFinContrat.message);
+          if (structuresIdsAutre.length === 0) {
+            // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
+            const mailerInstance = mailer(app);
+            const messageFinContratPix = conseillerRupturePix(mailerInstance);
+            const errorSmtpMailFinContratPix = await messageFinContratPix
+              .send(conseiller)
+              .catch((errSmtp: Error) => {
+                logger.error(errSmtp);
+                Sentry.captureException(errSmtp);
+              });
+            if (errorSmtpMailFinContratPix instanceof Error) {
+              logger.error(errorSmtpMailFinContratPix.message);
+              Sentry.captureException(errorSmtpMailFinContratPix.message);
+            }
+
+            const messageFinContratConseiller =
+              suppressionCompteConseiller(mailerInstance);
+            const errorSmtpMailFinContrat = await messageFinContratConseiller
+              .send(conseiller)
+              .catch((errSmtp: Error) => {
+                logger.error(errSmtp);
+                Sentry.captureException(errSmtp);
+              });
+            if (errorSmtpMailFinContrat instanceof Error) {
+              logger.error(errorSmtpMailFinContrat.message);
+              Sentry.captureException(errorSmtpMailFinContrat.message);
+            }
+          }
         }
       }
       await delay(2000);

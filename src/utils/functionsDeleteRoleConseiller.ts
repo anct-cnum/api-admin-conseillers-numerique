@@ -9,34 +9,11 @@ const getMisesEnRelationsFinaliseesNaturelles =
           statut: {
             $in: ['finalisee', 'recrutee', 'terminee_naturelle'],
           },
-          dateFinDeContrat: { $gte: dateDebut, $lte: dateFin },
         },
       },
       {
         $group: {
           _id: '$conseiller.$id',
-          finalisee: {
-            $sum: {
-              $cond: [
-                {
-                  $eq: ['$statut', 'finalisee'],
-                },
-                1,
-                0,
-              ],
-            },
-          },
-          recrutee: {
-            $sum: {
-              $cond: [
-                {
-                  $eq: ['$statut', 'recrutee'],
-                },
-                1,
-                0,
-              ],
-            },
-          },
           terminee_naturelle: {
             $sum: {
               $cond: [
@@ -59,7 +36,7 @@ const getMisesEnRelationsFinaliseesNaturelles =
               ],
             },
           },
-          structureId: {
+          structuresIdsTerminee: {
             $push: {
               $cond: [
                 {
@@ -70,12 +47,46 @@ const getMisesEnRelationsFinaliseesNaturelles =
               ],
             },
           },
+          structuresIdsAutre: {
+            $push: {
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ['$statut', 'recrutee'] },
+                    { $eq: ['$statut', 'finalisee'] },
+                  ],
+                },
+                '$structure.$id',
+                null,
+              ],
+            },
+          },
+          datesFinDeContrat: {
+            $push: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ['$statut', 'terminee_naturelle'] },
+                    {
+                      $gte: ['$dateFinDeContrat', dateDebut],
+                    },
+                    {
+                      $lte: ['$dateFinDeContrat', dateFin],
+                    },
+                  ],
+                },
+                '$dateFinDeContrat',
+                null,
+              ],
+            },
+          },
         },
       },
       {
         $match: {
-          finalisee: 0,
-          recrutee: 0,
+          datesFinDeContrat: {
+            $elemMatch: { $gte: dateDebut, $lte: dateFin },
+          },
           terminee_naturelle: {
             $gte: 1,
           },
@@ -83,9 +94,11 @@ const getMisesEnRelationsFinaliseesNaturelles =
       },
       {
         $project: {
-          _id: { $arrayElemAt: ['$idMiseEnRelation', 0] },
+          _id: '$idMiseEnRelation',
           conseillerId: '$_id',
-          structureId: { $arrayElemAt: ['$structureId', 0] },
+          structuresIdsTerminee: 1,
+          structuresIdsAutre: 1,
+          datesFinDeContrat: 1,
         },
       },
     ]);
@@ -114,78 +127,96 @@ const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
   }
 };
 
-const deleteConseillerInCoordinateurs = (app) => async (conseiller) =>
-  app.service(service.conseillers).Model.updateMany(
-    {
-      estCoordinateur: true,
-      'listeSubordonnes.type': 'conseillers',
-      'listeSubordonnes.liste': {
-        $elemMatch: { $eq: conseiller._id },
+const deleteConseillerInCoordinateurs =
+  (app) => async (conseillerId, structureId) =>
+    app.service(service.conseillers).Model.updateMany(
+      {
+        estCoordinateur: true,
+        structureId,
+        'listeSubordonnes.type': 'conseillers',
+        'listeSubordonnes.liste': {
+          $elemMatch: { $eq: conseillerId },
+        },
       },
-    },
-    {
-      $pull: {
-        'listeSubordonnes.liste': conseiller._id,
+      {
+        $pull: {
+          'listeSubordonnes.liste': conseillerId,
+        },
       },
-    },
-  );
+    );
 
-const deleteCoordinateurInConseillers = (app) => async (coordinateur) => {
-  const conseillers = await app.service(service.conseillers).Model.find({
-    coordinateurs: {
-      $elemMatch: {
-        id: coordinateur._id,
+const deleteCoordinateurInConseillers =
+  (app) => async (coordinateurId, structureId) => {
+    const conseillers = await app.service(service.conseillers).Model.find({
+      structureId,
+      coordinateurs: {
+        $elemMatch: {
+          id: coordinateurId,
+        },
       },
-    },
-  });
-  if (conseillers.length > 0) {
-    for (const conseiller of conseillers) {
-      if (conseiller.coordinateurs.length === 1) {
-        app.service(service.conseillers).Model.updateMany(
-          { _id: conseiller._id },
-          {
-            $unset: {
-              coordinateurs: '',
-            },
-          },
-        );
-        app.service(service.misesEnRelation).Model.updateMany(
-          { 'conseiller.$id': conseiller._id },
-          {
-            $unset: {
-              'conseillerObj.coordinateurs': '',
-            },
-          },
-        );
-      } else {
-        app.service(service.conseillers).Model.updateOne(
-          { _id: conseiller._id },
-          {
-            $pull: {
-              coordinateurs: {
-                id: coordinateur._id,
+    });
+    if (conseillers.length > 0) {
+      for (const conseiller of conseillers) {
+        if (conseiller.coordinateurs.length === 1) {
+          app.service(service.conseillers).Model.updateMany(
+            { _id: conseiller._id },
+            {
+              $unset: {
+                coordinateurs: '',
               },
             },
-          },
-        );
-        app.service(service.misesEnRelation).Model.updateMany(
-          { 'conseiller.$id': conseiller._id },
-          {
-            $pull: {
-              'conseillerObj.coordinateurs': {
-                id: coordinateur._id,
+          );
+          app.service(service.misesEnRelation).Model.updateMany(
+            { 'conseiller.$id': conseiller._id, 'structure.$id': structureId },
+            {
+              $unset: {
+                'conseillerObj.coordinateurs': '',
               },
             },
-          },
-        );
+          );
+        } else {
+          app.service(service.conseillers).Model.updateOne(
+            { _id: conseiller._id },
+            {
+              $pull: {
+                coordinateurs: {
+                  id: coordinateurId,
+                },
+              },
+            },
+          );
+          app.service(service.misesEnRelation).Model.updateMany(
+            { 'conseiller.$id': conseiller._id, 'structure.$id': structureId },
+            {
+              $pull: {
+                'conseillerObj.coordinateurs': {
+                  id: coordinateurId,
+                },
+              },
+            },
+          );
+        }
       }
     }
-  }
-};
+  };
+
+const nettoyageCoordinateur =
+  (app) => async (structureIdterminee, conseiller) => {
+    await deleteConseillerInCoordinateurs(app)(
+      conseiller._id,
+      structureIdterminee,
+    );
+    if (conseiller.estCoordinateur) {
+      await deleteCoordinateurInConseillers(app)(
+        conseiller._id,
+        structureIdterminee,
+      );
+    }
+  };
 
 const updateCacheObj = (app) => async (idConseiller) => {
   const conseiller = await app
-    .service(service.misesEnRelation)
+    .service(service.conseillers)
     .Model.findOne({ _id: idConseiller });
   app.service(service.misesEnRelation).Model.updateMany(
     { 'conseiller.$id': conseiller._id },
@@ -197,16 +228,20 @@ const updateCacheObj = (app) => async (idConseiller) => {
   );
 };
 
-const deletePermanences = (app) => async (idConseiller) =>
+const deletePermanences = (app) => async (idConseiller, idStructure) =>
   app.service(service.permanences).Model.deleteMany({
     conseillers: {
       $eq: [idConseiller],
     },
+    'structure.$id': idStructure,
   });
 
-const updatePermanences = (app) => async (idConseiller) =>
-  app.service(service.users).Model.updateMany(
-    { conseillers: { $elemMatch: { $eq: idConseiller } } },
+const updatePermanences = (app) => async (idConseiller, idStructure) =>
+  app.service(service.permanences).Model.updateMany(
+    {
+      conseillers: { $elemMatch: { $eq: idConseiller } },
+      'structure.$id': idStructure,
+    },
     {
       $pull: {
         conseillers: idConseiller,
@@ -216,14 +251,15 @@ const updatePermanences = (app) => async (idConseiller) =>
     },
   );
 
-const deletePermanencesInCras = (app) => async (idConseiller, updatedAt) =>
-  app.service(service.cras).Model.updateMany(
-    {
-      'conseiller.$id': idConseiller._id,
-    },
-    { $set: { updatedAt } },
-    { $unset: { permanence: '' } },
-  );
+const deletePermanencesInCras =
+  (app) => async (idConseiller, structureId, updatedAt) =>
+    app.service(service.cras).Model.updateMany(
+      {
+        'conseiller.$id': idConseiller,
+        'structure.$id': structureId,
+      },
+      { $set: { updatedAt }, $unset: { permanence: '' } },
+    );
 
 const loginApi = async ({ mattermost }) => {
   const resultLogin = await axios({
@@ -237,6 +273,21 @@ const loginApi = async ({ mattermost }) => {
 
   return resultLogin.request.res.headers.token;
 };
+
+const nettoyagePermanence =
+  (app) => async (structureIdterminee, conseillerId, updatedAt) => {
+    await deletePermanences(app)(conseillerId, structureIdterminee)
+      .then(async () => {
+        await updatePermanences(app)(conseillerId, structureIdterminee);
+      })
+      .then(async () => {
+        await deletePermanencesInCras(app)(
+          conseillerId,
+          structureIdterminee,
+          updatedAt,
+        );
+      });
+  };
 
 const deleteMattermostAccount = (app) => async (conseiller) => {
   const mattermost = app.get('mattermost');
@@ -314,10 +365,12 @@ export {
   updateConseillersPG,
   deleteConseillerInCoordinateurs,
   deleteCoordinateurInConseillers,
+  nettoyageCoordinateur,
   updateCacheObj,
   deletePermanences,
   updatePermanences,
   deletePermanencesInCras,
+  nettoyagePermanence,
   deleteMattermostAccount,
   deleteMailbox,
 };

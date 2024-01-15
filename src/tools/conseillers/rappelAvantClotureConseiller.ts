@@ -37,28 +37,33 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     }
 
     for (const termineeNaturelle of termineesNaturelles) {
-      const conseiller = await getConseiller(app)(
-        termineeNaturelle.conseillerId,
-      );
-      // Envoi des emails de rappel de cloture de compte
-      const mailerInstance = mailer(app);
-      const messageRappelSuppressionConseiller =
-        rappelSuppressionCompteConseiller(mailerInstance);
-      const errorSmtpMailRappelSuppressionConseiller =
-        await messageRappelSuppressionConseiller
-          .send(conseiller)
-          .catch((errSmtp: Error) => {
-            logger.error(errSmtp);
-            Sentry.captureException(errSmtp);
-          });
-      if (errorSmtpMailRappelSuppressionConseiller instanceof Error) {
-        logger.error(errorSmtpMailRappelSuppressionConseiller.message);
-        Sentry.captureException(
-          errorSmtpMailRappelSuppressionConseiller.message,
+      if (
+        termineeNaturelle.finalisee === 0 &&
+        termineeNaturelle.recrutee === 0
+      ) {
+        const conseiller = await getConseiller(app)(
+          termineeNaturelle.conseillerId,
         );
-      }
+        // Envoi des emails de rappel de cloture de compte
+        const mailerInstance = mailer(app);
+        const messageRappelSuppressionConseiller =
+          rappelSuppressionCompteConseiller(mailerInstance);
+        const errorSmtpMailRappelSuppressionConseiller =
+          await messageRappelSuppressionConseiller
+            .send(conseiller)
+            .catch((errSmtp: Error) => {
+              logger.error(errSmtp);
+              Sentry.captureException(errSmtp);
+            });
+        if (errorSmtpMailRappelSuppressionConseiller instanceof Error) {
+          logger.error(errorSmtpMailRappelSuppressionConseiller.message);
+          Sentry.captureException(
+            errorSmtpMailRappelSuppressionConseiller.message,
+          );
+        }
 
-      await delay(1000);
+        await delay(1000);
+      }
     }
   } catch (error) {
     logger.error(error);

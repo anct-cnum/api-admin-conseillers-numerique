@@ -19,13 +19,15 @@ import {
 
 const { Pool } = require('pg');
 
-const getMisesEnRelationsFinContrat = (app) => async (dateDuJour) =>
-  app.service(service.misesEnRelation).Model.find({
-    dateFinDeContrat: { $lt: dateDuJour },
-    statut: 'finalisee',
-    typeDeContrat: { $ne: 'CDI' },
-    reconventionnement: { $ne: true },
-  });
+const getMisesEnRelationsFinContrat =
+  (app) => async (dateDuJourDebut, dateDuJourFin) =>
+    app.service(service.misesEnRelation).Model.find({
+      dateFinDeContrat: { $gte: dateDuJourDebut, $lte: dateDuJourFin },
+      statut: 'finalisee',
+      typeDeContrat: { $ne: 'CDI' },
+      reconventionnement: { $ne: true },
+    });
+
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
 // avant de les passer en terminer à M+2 de la fin de contrat
@@ -65,16 +67,23 @@ program
     '-ee, --envoiEmail',
     'envoiEmail: Envoyer les emails de prévention de suppression',
   )
+  .option(
+    '-fdb, --flagDateDebut',
+    'flagDateDebut: prendre la date du début du dispositif',
+  )
   .parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit, Sentry }) => {
   try {
     const options = program.opts();
     const dateDuJour = new Date();
-    const { fix, envoiEmail } = options;
+    const { fix, envoiEmail, flagDateDebut } = options;
 
     const misesEnRelationsFinContrat = await getMisesEnRelationsFinContrat(app)(
-      dateDuJour,
+      dayjs(flagDateDebut ? new Date('2020/11/01') : dateDuJour)
+        .startOf('date')
+        .toDate(),
+      dayjs(dateDuJour).endOf('date').toDate(),
     );
 
     if (misesEnRelationsFinContrat.length === 0) {
