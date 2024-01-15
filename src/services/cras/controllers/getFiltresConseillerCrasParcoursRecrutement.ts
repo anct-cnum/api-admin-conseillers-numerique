@@ -17,11 +17,11 @@ import {
 const getFiltresConseillerCrasParcoursRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idConseiller = req.query?.id;
-      if (!ObjectId.isValid(idConseiller)) {
+      if (!ObjectId.isValid(req.query?.id)) {
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
+      const idConseiller = new ObjectId(req.query.id);
       const conseiller: IConseillers = await app
         .service(service.conseillers)
         .Model.findOne({
@@ -49,26 +49,39 @@ const getFiltresConseillerCrasParcoursRecrutement =
         app,
         checkAccess,
       )([conseiller._id]);
-      const miseEnRelations: IMisesEnRelation[] = await app
+      const listeStructures: IMisesEnRelation[] = await app
         .service(service.misesEnRelation)
-        .Model.find({
-          'conseiller.$id': idConseiller,
-          statut: {
-            $in: [
-              'finalisee',
-              'finalisee_rupture',
-              'terminee_naturelle',
-              'nouvelle_rupture',
-            ],
+        .Model.aggregate([
+          {
+            $match: {
+              'conseiller.$id': idConseiller,
+              statut: {
+                $in: [
+                  'finalisee',
+                  'finalisee_rupture',
+                  'terminee_naturelle',
+                  'nouvelle_rupture',
+                ],
+              },
+            },
           },
-        });
-      const listeStructures = miseEnRelations.map((miseEnRelation) => {
-        return {
-          structureId: miseEnRelation.structure.oid,
-          nom: miseEnRelation.structureObj.nom,
-          codePostal: miseEnRelation.structureObj.codePostal,
-        };
-      });
+          {
+            $group: {
+              _id: '$structureObj.nom',
+              structureId: { $addToSet: '$structureObj._id' },
+              nom: { $first: '$structureObj.nom' },
+              codePostal: { $first: '$structureObj.codePostal' },
+            },
+          },
+          {
+            $unwind: '$structureId',
+          },
+          {
+            $project: {
+              _id: 0,
+            },
+          },
+        ]);
       const listeCodesPostaux =
         createArrayForFiltreCodePostaux(listCodePostaux);
 

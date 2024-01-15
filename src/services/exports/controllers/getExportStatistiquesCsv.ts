@@ -13,7 +13,7 @@ import { formatDateGMT } from '../../../utils';
 
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    let { idType, nom, structureIds } = req.query;
+    let { idType, nom, idStructure, idConseiller } = req.query;
     const {
       codePostal,
       ville,
@@ -21,13 +21,10 @@ const getExportStatistiquesCsv =
       codeRegion,
       prenom,
       numeroDepartement,
-      conseillerIds,
     } = req.query;
     const { type } = req.query;
     const dateDebut = new Date(req.query.dateDebut);
     const dateFin = new Date(req.query.dateFin);
-    let idStructure: ObjectId;
-    let idConseiller: ObjectId;
     let query: Object;
     let statistiques = {};
     const statsValidation = validStatCsv.validate({
@@ -46,6 +43,14 @@ const getExportStatistiquesCsv =
 
     if (statsValidation.error) {
       res.status(400).json({ message: statsValidation.error.message });
+      return;
+    }
+    if (idConseiller && !ObjectId.isValid(idConseiller)) {
+      res.status(400).json({ message: 'Id conseiller incorrect' });
+      return;
+    }
+    if (idStructure && !ObjectId.isValid(idStructure)) {
+      res.status(400).json({ message: 'Id structure incorrect' });
       return;
     }
     const dateDebutFormat = formatDateGMT(dateDebut);
@@ -98,7 +103,6 @@ const getExportStatistiquesCsv =
           break;
         case 'conseiller':
           idConseiller = new ObjectId(String(idType));
-          structureIds = structureIds ? JSON.parse(structureIds) : [];
           query = {
             'cra.dateAccompagnement': {
               $gte: dateDebutFormat,
@@ -109,8 +113,8 @@ const getExportStatistiquesCsv =
           if (codePostal) {
             query['cra.codePostal'] = codePostal;
           }
-          if (structureIds.length > 0) {
-            query['structure.$id'] = { $eq: new ObjectId(structureIds[0]) };
+          if (idStructure) {
+            query['structure.$id'] = { $eq: new ObjectId(idStructure) };
           }
           if (codeCommune !== 'null' && codeCommune !== '') {
             query['cra.codeCommune'] = codeCommune;
@@ -125,7 +129,12 @@ const getExportStatistiquesCsv =
           break;
         case 'codeDepartement':
         case 'codeRegion':
-          structureIds = await getStructuresIdsByTerritoire(type, idType, app);
+          // eslint-disable-next-line no-case-declarations
+          const structureIds = await getStructuresIdsByTerritoire(
+            type,
+            idType,
+            app,
+          );
           query = {
             'cra.dateAccompagnement': {
               $gte: dateDebutFormat,
@@ -144,8 +153,8 @@ const getExportStatistiquesCsv =
           req.query = {
             dateDebut: dateDebutFormat,
             dateFin: dateFinFormat,
-            structureIds,
-            conseillerIds,
+            idStructure,
+            idConseiller,
             codeRegion,
             numeroDepartement,
             codeCommune,
