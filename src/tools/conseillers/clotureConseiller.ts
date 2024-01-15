@@ -116,16 +116,21 @@ const updateStructure = (app) => async (structureId, miseEnRelationId) => {
   );
 };
 
-const createConseillersTermines = (app) => async (conseiller, miseEnRelation) =>
-  app.service(service.conseillersTermines).Model.create({
-    conseillerId: conseiller._id,
-    structureId: conseiller.structureId,
-    typeContrat: miseEnRelation.typeDeContrat,
-    dateDebutContrat: miseEnRelation.dateDebutDeContrat,
-    dateFinContrat: miseEnRelation.dateFinDeContrat,
-    phaseConventionnement: miseEnRelation?.phaseConventionnement ?? null,
-    reconventionnement: miseEnRelation?.reconventionnement ?? false,
-  });
+const createConseillersTermines =
+  (app) => async (conseiller, miseEnRelationIdTerminee) => {
+    const miseEnRelation = await app.service(service.misesEnRelation).findOne({
+      _id: miseEnRelationIdTerminee._id,
+    });
+    await app.service(service.conseillersTermines).Model.create({
+      conseillerId: conseiller._id,
+      structureId: conseiller.structureId,
+      typeContrat: miseEnRelation.typeDeContrat,
+      dateDebutContrat: miseEnRelation.dateDebutDeContrat,
+      dateFinContrat: miseEnRelation.dateFinDeContrat,
+      phaseConventionnement: miseEnRelation?.phaseConventionnement ?? null,
+      reconventionnement: miseEnRelation?.reconventionnement ?? false,
+    });
+  };
 
 program
   .option(
@@ -181,6 +186,9 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
           termineeNaturelle.structuresIdsTerminee.filter((terminee) => {
             return terminee !== null;
           })[0];
+        const miseEnRelationIdTerminee = termineeNaturelle._id.filter((id) => {
+          return id !== null;
+        })[0];
 
         if (
           !structuresIdsAutre.includes(structureIdTerminee) &&
@@ -201,8 +209,8 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
           await nettoyageCoordinateur(app)(structureIdTerminee, conseiller)
             .then(async () => {
               await updateStructure(app)(
-                termineeNaturelle.structureId,
-                termineeNaturelle._id,
+                structureIdTerminee,
+                miseEnRelationIdTerminee,
               );
             })
             .then(async () => {
@@ -217,7 +225,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               .then(async () => {
                 await createConseillersTermines(app)(
                   conseiller,
-                  termineeNaturelle,
+                  miseEnRelationIdTerminee,
                 );
               })
               .then(async () => {
