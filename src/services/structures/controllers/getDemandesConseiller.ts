@@ -7,7 +7,6 @@ import {
   filterSearchBar,
   filterRegion,
   filterDepartement,
-  filterStatut,
   filterAvisPrefet,
   filterStatutDemandeConseiller,
 } from '../repository/structures.repository';
@@ -41,7 +40,7 @@ const getTotalStructures =
             checkAccess,
             filterSearchBar(search),
             filterAvisPrefet(avisPrefet),
-            filterStatut(statut),
+            filterStatutDemandeConseiller(statut),
           ],
           ...filterRegion(region),
           ...filterDepartement(departement),
@@ -220,6 +219,10 @@ const getDemandesConseiller =
         page,
         options.paginate.default,
       );
+      items.totalParDemandesConseiller = await totalParStatutDemandesConseiller(
+        app,
+        checkAccess,
+      );
       if (structures.length > 0) {
         const totalStructures = await getTotalStructures(app, checkAccess)(
           statut,
@@ -230,8 +233,6 @@ const getDemandesConseiller =
         );
         items.data = structures;
         items.total = totalStructures[0]?.count_structures;
-        items.totalParDemandesConseiller =
-          await totalParStatutDemandesConseiller(app, checkAccess);
         items.limit = options.paginate.default;
         items.skip = Number(page);
       }
