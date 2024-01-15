@@ -47,26 +47,26 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       .filter((prefet) => prefet.departement === structure.codeDepartement)
       .map((prefet) => ({ ...prefet._doc, structure })),
   );
-  const messageAvisCandidaturePosteStructure =
+  const messageAvisCandidaturePosteConseiller =
     informationNouvelleCandidatureConseiller(app, mailer);
   let count = 0;
   for (const prefetWithStructure of prefetsWithStructure) {
-    const errorSmtpMailCandidaturePosteStructure =
-      await messageAvisCandidaturePosteStructure
+    const errorSmtpMailCandidaturePosteConseiller =
+      await messageAvisCandidaturePosteConseiller
         .send(prefetWithStructure)
         .catch((errSmtp: Error) => {
           return errSmtp;
         });
-    if (errorSmtpMailCandidaturePosteStructure instanceof Error) {
+    if (errorSmtpMailCandidaturePosteConseiller instanceof Error) {
       logger.error(
-        `Erreur lors de l'envoi du mail de notification de candidature structure : ${errorSmtpMailCandidaturePosteStructure}`,
+        `Erreur lors de l'envoi du mail de notification de candidature conseiller : ${errorSmtpMailCandidaturePosteConseiller}`,
       );
     } else {
       count += 1;
     }
   }
   logger.info(
-    `Nombre de mails envoyés pour les notifications de candidature structure : ${count}`,
+    `Nombre de mails envoyés pour les notifications de candidature conseiller : ${count}`,
   );
   exit();
 });
