@@ -130,6 +130,23 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
   );
 };
 
+const filterAvisPrefet = (avisPrefet: string | undefined) => {
+  if (avisPrefet === undefined) {
+    return {};
+  }
+  if (avisPrefet === 'sans-avis') {
+    return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
+  }
+  return { 'lastPrefet.avisPrefet': { $eq: avisPrefet } };
+};
+
+const filterStatutDemandeConseiller = (statut: string) => {
+  if (statut !== 'toutes') {
+    return { statut: { $eq: statut } };
+  }
+  return { statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] } };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -147,4 +164,6 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  filterAvisPrefet,
+  filterStatutDemandeConseiller,
 };
