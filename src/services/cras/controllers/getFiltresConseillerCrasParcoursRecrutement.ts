@@ -54,7 +54,12 @@ const getFiltresConseillerCrasParcoursRecrutement =
         .Model.find({
           'conseiller.$id': idConseiller,
           statut: {
-            $in: ['finalisee', 'finalisee_rupture', 'terminee_naturelle', 'nouvelle_rupture'],
+            $in: [
+              'finalisee',
+              'finalisee_rupture',
+              'terminee_naturelle',
+              'nouvelle_rupture',
+            ],
           },
         });
       const listeStructures = miseEnRelations.map((miseEnRelation) => {
