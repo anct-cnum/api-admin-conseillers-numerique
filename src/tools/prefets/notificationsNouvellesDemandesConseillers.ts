@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/prefets/notificationsNouvellesDemandesStructures.ts
+// Lancement de ce script : ts-node src/tools/prefets/notificationsNouvellesDemandesConseillers.ts
 
 import execute from '../utils';
 import service from '../../helpers/services';
-import { informationNouvelleCandidatureStructure } from '../../emails';
+import { informationNouvelleCandidatureConseiller } from '../../emails';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 
 execute(__filename, async ({ app, mailer, logger, exit }) => {
@@ -17,7 +17,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       {
         statut: 'CREEE',
         coordinateurCandidature: false,
-        createdAt: { $gte: dateMoins1Jours, $lte: new Date() },
+        createdAt: { $gte: dateMoins1Jours },
         codeDepartement: { $ne: '00' },
       },
       {
@@ -48,28 +48,23 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       .map((prefet) => ({ ...prefet._doc, structure })),
   );
   const messageAvisCandidaturePosteStructure =
-    informationNouvelleCandidatureStructure(app, mailer);
-  const promises: Promise<void>[] = [];
+    informationNouvelleCandidatureConseiller(app, mailer);
   let count = 0;
-  prefetsWithStructure.forEach(async (prefetWithStructure) => {
-    // eslint-disable-next-line no-async-promise-executor
-    const p = new Promise<void>(async (resolve, reject) => {
-      const errorSmtpMailCandidaturePosteStructure =
-        await messageAvisCandidaturePosteStructure
-          .send(prefetWithStructure)
-          .catch((errSmtp: Error) => {
-            return errSmtp;
-          });
-      if (errorSmtpMailCandidaturePosteStructure instanceof Error) {
-        reject();
-        return;
-      }
+  for (const prefetWithStructure of prefetsWithStructure) {
+    const errorSmtpMailCandidaturePosteStructure =
+      await messageAvisCandidaturePosteStructure
+        .send(prefetWithStructure)
+        .catch((errSmtp: Error) => {
+          return errSmtp;
+        });
+    if (errorSmtpMailCandidaturePosteStructure instanceof Error) {
+      logger.error(
+        `Erreur lors de l'envoi du mail de notification de candidature structure : ${errorSmtpMailCandidaturePosteStructure}`,
+      );
+    } else {
       count += 1;
-      resolve(p);
-    });
-    promises.push(p);
-  });
-  await Promise.allSettled(promises);
+    }
+  }
   logger.info(
     `Nombre de mails envoyés pour les notifications de candidature structure : ${count}`,
   );

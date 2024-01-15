@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import logger from '../../logger';
 
 export default function (app: Application, mailer) {
-  const templateName = 'informationNouvelleCandidatureStructure';
+  const templateName = 'informationNouvelleCandidatureConseiller';
 
   const render = async (nomStructure: string) => {
     return mailer.render(__dirname, templateName, {
@@ -16,7 +16,7 @@ export default function (app: Application, mailer) {
     send: async (prefetWithStructure) => {
       const onSuccess = async () => {
         logger.info(
-          `Email envoyé avec succès pour l'information d'une nouvelle candidature structure au préfet ${prefetWithStructure.name}`,
+          `Email envoyé avec succès pour l'information d'une nouvelle candidature conseiller au préfet ${prefetWithStructure.name}`,
         );
       };
       const onError = async (err: Error) => {
