@@ -8,7 +8,7 @@ import service from '../../helpers/services';
 import { informationNouvelleCandidatureConseiller } from '../../emails';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 
-execute(__filename, async ({ app, mailer, logger, exit }) => {
+execute(__filename, async ({ app, mailer, logger, exit, delay }) => {
   const dateMoins1Jours = new Date();
   dateMoins1Jours.setDate(dateMoins1Jours.getDate() - 1);
   const structures: IStructures[] = await app
@@ -64,6 +64,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     } else {
       count += 1;
     }
+    await delay(2000);
   }
   logger.info(
     `Nombre de mails envoyés pour les notifications de candidature conseiller : ${count}`,
