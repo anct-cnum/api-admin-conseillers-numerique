@@ -67,7 +67,7 @@ const getFiltresConseillerCrasParcoursRecrutement =
           },
           {
             $group: {
-              _id: '$structureObj.nom',
+              _id: '$structureObj.codePostal',
               structureId: { $addToSet: '$structureObj._id' },
               nom: { $first: '$structureObj.nom' },
               codePostal: { $first: '$structureObj.codePostal' },
