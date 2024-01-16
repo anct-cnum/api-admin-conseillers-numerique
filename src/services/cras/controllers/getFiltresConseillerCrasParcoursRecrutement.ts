@@ -68,7 +68,6 @@ const getFiltresConseillerCrasParcoursRecrutement =
           {
             $group: {
               _id: '$structureObj._id',
-              structureId: { $addToSet: '$structureObj._id' },
               nom: { $first: '$structureObj.nom' },
               codePostal: { $first: '$structureObj.codePostal' },
             },
@@ -76,6 +75,9 @@ const getFiltresConseillerCrasParcoursRecrutement =
           {
             $project: {
               _id: 0,
+              structureId: '$_id',
+              nom: '$nom',
+              codePostal: '$codePostal',
             },
           },
         ]);
