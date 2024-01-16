@@ -137,6 +137,12 @@ const filterAvisPrefet = (avisPrefet: string | undefined) => {
   if (avisPrefet === 'sans-avis') {
     return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
   }
+  if (avisPrefet === 'favorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'POSITIF' } };
+  }
+  if (avisPrefet === 'defavorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'NÉGATIF' } };
+  }
   return { 'lastPrefet.avisPrefet': { $eq: avisPrefet } };
 };
 
