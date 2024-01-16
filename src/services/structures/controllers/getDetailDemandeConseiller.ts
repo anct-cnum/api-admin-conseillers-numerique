@@ -16,22 +16,14 @@ const getDetailDemandeConseiller =
       const checkAccess = checkAccessReadRequestStructures(app, req);
       const structure = await app.service(service.structures).Model.aggregate([
         {
-          $addFields: {
-            lastPrefet: {
-              $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-            },
-          },
-        },
-        {
           $match: {
             $and: [checkAccess],
             _id: new ObjectId(idStructure),
-            'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
           },
         },
         {
           $project: {
-            prefet: '$lastPrefet',
+            prefet: { $arrayElemAt: ['$prefet', -1] },
             nombreConseillersSouhaites: 1,
             createdAt: 1,
             statut: 1,
