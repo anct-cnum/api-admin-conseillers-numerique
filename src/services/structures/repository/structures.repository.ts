@@ -131,13 +131,16 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
 };
 
 const filterAvisPrefet = (avisPrefet: string | undefined) => {
-  if (avisPrefet === undefined) {
-    return {};
-  }
   if (avisPrefet === 'sans-avis') {
     return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
   }
-  return { 'lastPrefet.avisPrefet': { $eq: avisPrefet } };
+  if (avisPrefet === 'favorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'POSITIF' } };
+  }
+  if (avisPrefet === 'défavorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'NÉGATIF' } };
+  }
+  return {};
 };
 
 export {
