@@ -74,9 +74,6 @@ const getFiltresConseillerCrasParcoursRecrutement =
             },
           },
           {
-            $unwind: '$structureId',
-          },
-          {
             $project: {
               _id: 0,
             },

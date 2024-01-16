@@ -54,9 +54,6 @@ const getFiltresConseillerCras =
             },
           },
           {
-            $unwind: '$structureId',
-          },
-          {
             $project: {
               _id: 0,
             },
