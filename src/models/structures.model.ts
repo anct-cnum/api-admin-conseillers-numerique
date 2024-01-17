@@ -44,6 +44,7 @@ export default function (app: Application): Model<any> {
       type: String,
       observationsReferent: String,
       prioritaireCoselec: String,
+      banniereValidationAvisAdmin: Boolean,
     },
     { _id: false, strict: false },
   );

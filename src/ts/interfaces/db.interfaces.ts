@@ -417,6 +417,7 @@ interface ICoselec {
   type?: string;
   observationsReferent?: string;
   prioritaireCoselec?: string;
+  banniereValidationAvisAdmin?: boolean;
 }
 
 export interface IDemandesCoordinateur {

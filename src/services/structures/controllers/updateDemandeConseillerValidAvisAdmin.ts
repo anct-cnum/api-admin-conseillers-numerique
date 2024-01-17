@@ -32,7 +32,7 @@ const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
   }
 };
 
-const updateDemandeCoordinateurValidAvisAdmin =
+const updateDemandeConseillerValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { nombreConseillersCoselec } = req.body;
@@ -79,7 +79,6 @@ const updateDemandeCoordinateurValidAvisAdmin =
               statut: 'VALIDATION_COSELEC',
               coselecAt: updatedAt,
               updatedAt,
-              banniereValidationAvisAdmin: true,
             },
             $push: {
               coselec: {
@@ -87,6 +86,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
                 avisCoselec: 'POSITIF',
                 insertedAt: new Date(),
                 phaseConventionnement: PhaseConventionnement.PHASE_2,
+                banniereValidationAvisAdmin: true,
               },
             },
           },
@@ -160,4 +160,4 @@ const updateDemandeCoordinateurValidAvisAdmin =
     }
   };
 
-export default updateDemandeCoordinateurValidAvisAdmin;
+export default updateDemandeConseillerValidAvisAdmin;
