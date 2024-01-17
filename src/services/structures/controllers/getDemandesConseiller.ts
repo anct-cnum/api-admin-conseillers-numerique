@@ -24,18 +24,12 @@ const getTotalStructures =
   ) =>
     app.service(service.structures).Model.aggregate([
       {
-        $addFields: {
-          idPGStr: { $toString: '$idPG' },
-          lastPrefet: {
-            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-          },
-        },
+        $addFields: { idPGStr: { $toString: '$idPG' } },
       },
       {
         $match: {
           coordinateurCandidature: false,
           createdAt: { $gte: new Date('2023-01-01') },
-          'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
           $and: [
             checkAccess,
             filterSearchBar(search),
@@ -58,19 +52,11 @@ const totalParStatutDemandesConseiller = async (
     .service(service.structures)
     .Model.aggregate([
       {
-        $addFields: {
-          lastPrefet: {
-            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-          },
-        },
-      },
-      {
         $match: {
           $and: [checkAccess],
           statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] },
           coordinateurCandidature: false,
           createdAt: { $gte: new Date('2023-01-01') },
-          'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
         },
       },
       {
@@ -117,18 +103,12 @@ const getStructures =
   ) =>
     app.service(service.structures).Model.aggregate([
       {
-        $addFields: {
-          idPGStr: { $toString: '$idPG' },
-          lastPrefet: {
-            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-          },
-        },
+        $addFields: { idPGStr: { $toString: '$idPG' } },
       },
       {
         $match: {
           coordinateurCandidature: false,
           createdAt: { $gte: new Date('2023-01-01') },
-          'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
           $and: [
             checkAccess,
             filterSearchBar(search),
@@ -145,7 +125,7 @@ const getStructures =
           codePostal: 1,
           idPG: 1,
           createdAt: 1,
-          prefet: '$lastPrefet',
+          prefet: { $arrayElemAt: ['$prefet', -1] },
         },
       },
       { $sort: sortColonne },
