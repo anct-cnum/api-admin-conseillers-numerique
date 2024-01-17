@@ -214,78 +214,88 @@ const validationRecrutementContrat =
         false,
         datePG,
       );
-      const userAccount = await app
+      // vérification si le conseiller possède encore son adresse mail conseiller numérique
+      const userEstEncoreConseillerNumerique = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({
-          name: miseEnRelationVerif.conseillerObj.email,
-          roles: { $in: ['candidat'] },
+        .countDocuments({
+          name: conseillerVerif?.emailCN?.address,
+          roles: { $in: ['conseiller'] },
         });
-      const passwordHash = bcrypt.hashSync(uuidv4(), 10);
-      if (userAccount === null) {
-        const canCreate = req.ability.can(action.create, ressource.users);
-        if (!canCreate) {
-          res.status(403).json({
-            message: `Accès refusé, vous n'êtes pas autorisé à créer un utilisateur`,
-          });
-          return;
-        }
-        user = await app.service(service.users).create({
-          name: miseEnRelationVerif.conseillerObj.email,
-          prenom: miseEnRelationVerif.conseillerObj.prenom,
-          nom: miseEnRelationVerif.conseillerObj.nom,
-          password: passwordHash, // random password (required to create user)
-          roles: Array('conseiller'),
-          entity: new DBRef(
-            'conseillers',
-            miseEnRelationVerif.conseillerObj._id,
-            database,
-          ),
-          token: uuidv4(),
-          mailSentDate: null,
-          passwordCreated: false,
-          createdAt: new Date(),
-        });
-        if (!user) {
-          res.status(400).json({
-            message: "L'utilisateur n'a pas été créé",
-          });
-          return;
-        }
-      } else {
-        const userUpdated = await app
+      if (userEstEncoreConseillerNumerique === 0) {
+        const userAccount = await app
           .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            { name: miseEnRelationVerif.conseillerObj?.email },
-            {
-              $set: {
-                prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
-                nom: miseEnRelationVerif.conseillerObj?.nom,
-                password: passwordHash,
-                roles: Array('conseiller'),
-                token: uuidv4(),
-                mailSentDate: null,
-                passwordCreated: false,
-                entity: new DBRef(
-                  'conseillers',
-                  miseEnRelationVerif.conseillerObj._id,
-                  database,
-                ),
-              },
-              $unset: {
-                resetPasswordCnil: '',
-              },
-            },
-            { returnOriginal: false, rawResult: true },
-          );
-        if (userUpdated.lastErrorObject.n === 0) {
-          res.status(400).json({
-            message: "L'utilisateur n'a pas été mise à jour",
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({
+            name: miseEnRelationVerif.conseillerObj.email,
+            roles: { $in: ['candidat'] },
           });
-          return;
+        const passwordHash = bcrypt.hashSync(uuidv4(), 10);
+        if (userAccount === null) {
+          const canCreate = req.ability.can(action.create, ressource.users);
+          if (!canCreate) {
+            res.status(403).json({
+              message: `Accès refusé, vous n'êtes pas autorisé à créer un utilisateur`,
+            });
+            return;
+          }
+          user = await app.service(service.users).create({
+            name: miseEnRelationVerif.conseillerObj.email,
+            prenom: miseEnRelationVerif.conseillerObj.prenom,
+            nom: miseEnRelationVerif.conseillerObj.nom,
+            password: passwordHash, // random password (required to create user)
+            roles: Array('conseiller'),
+            entity: new DBRef(
+              'conseillers',
+              miseEnRelationVerif.conseillerObj._id,
+              database,
+            ),
+            token: uuidv4(),
+            mailSentDate: null,
+            passwordCreated: false,
+            createdAt: new Date(),
+          });
+          if (!user) {
+            res.status(400).json({
+              message: "L'utilisateur n'a pas été créé",
+            });
+            return;
+          }
+        } else {
+          const userUpdated = await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .findOneAndUpdate(
+              { name: miseEnRelationVerif.conseillerObj?.email },
+              {
+                $set: {
+                  prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
+                  nom: miseEnRelationVerif.conseillerObj?.nom,
+                  password: passwordHash,
+                  roles: Array('conseiller'),
+                  token: uuidv4(),
+                  mailSentDate: null,
+                  passwordCreated: false,
+                  entity: new DBRef(
+                    'conseillers',
+                    miseEnRelationVerif.conseillerObj._id,
+                    database,
+                  ),
+                },
+                $unset: {
+                  resetPasswordCnil: '',
+                },
+              },
+              { returnOriginal: false, rawResult: true },
+            );
+          if (userUpdated.lastErrorObject.n === 0) {
+            res.status(400).json({
+              message: "L'utilisateur n'a pas été mise à jour",
+            });
+            return;
+          }
+          user = userUpdated.value;
         }
-        user = userUpdated.value;
       }
       const conseillerUpdated = await app
         .service(service.conseillers)
