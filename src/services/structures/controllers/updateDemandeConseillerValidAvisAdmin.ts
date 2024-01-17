@@ -86,7 +86,6 @@ const updateDemandeConseillerValidAvisAdmin =
                 avisCoselec: 'POSITIF',
                 insertedAt: new Date(),
                 phaseConventionnement: PhaseConventionnement.PHASE_2,
-                banniereValidationAvisAdmin: true,
               },
             },
           },
@@ -149,7 +148,7 @@ const updateDemandeConseillerValidAvisAdmin =
           return;
         }
       }
-      res.status(200).json({ success: true });
+      res.status(200).json(structureUpdated?.statut);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

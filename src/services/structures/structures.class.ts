@@ -25,6 +25,7 @@ import {
   updateDemandeCoordinateurRefusAvisAdmin,
   updateDemandeCoordinateurValidAvisAdmin,
   addRoleCoordinateur,
+  updateDemandeConseillerValidAvisAdmin,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -92,6 +93,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getStructuresMisesEnRelationsStats(app),
+    );
+    app.patch(
+      '/avis/admin/valid/conseiller/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateDemandeConseillerValidAvisAdmin(app),
     );
     app.get(
       '/demandes/coordinateurs',
