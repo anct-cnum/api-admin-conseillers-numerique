@@ -219,7 +219,7 @@ const validationRecrutementContrat =
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
-          name: conseillerVerif?.emailCN?.address,
+          name: miseEnRelationVerif.conseillerObj?.emailCN?.address,
           roles: { $in: ['conseiller'] },
         });
       if (userEstEncoreConseillerNumerique === 0) {
