@@ -366,6 +366,7 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  coselec: ICoselec[];
   conventionnement: {
     statut: string;
     motif: string;
@@ -405,6 +406,17 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+}
+
+interface ICoselec {
+  nombreConseillersCoselec: number;
+  avisCoselec: string;
+  insertedAt: Date;
+  numero?: string;
+  phaseConventionnement?: string;
+  type?: string;
+  observationsReferent?: string;
+  prioritaireCoselec?: string;
 }
 
 export interface IDemandesCoordinateur {
