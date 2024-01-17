@@ -15,6 +15,7 @@ import conseillerRelanceInvitation from './controllers/conseillerRelanceInvitati
 import getCandidatsStructure from './controllers/getCandidatsStructure';
 import getConseillerContratById from './controllers/getConseillerContratById';
 import getCandidatContratById from './controllers/getCandidatContratById';
+import getConseillersCoordonnes from './controllers/getConseillersCoordonnes';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -24,6 +25,12 @@ export default class Conseillers extends Service {
       authenticateMode(app),
       createAbilities(app),
       getConseillersStatutRecrute(app, options),
+    );
+    app.get(
+      '/conseillers-coordonnes',
+      authenticateMode(app),
+      createAbilities(app),
+      getConseillersCoordonnes(app, options),
     );
     app.get(
       '/candidats',

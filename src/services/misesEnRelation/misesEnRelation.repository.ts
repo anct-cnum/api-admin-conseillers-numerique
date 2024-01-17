@@ -37,6 +37,34 @@ const filterNomConseiller = (nom: string) => {
   return {};
 };
 
+const filterNomConseillerObj = (nom: string) => {
+  const inputSearchBar = nom?.trim();
+  if (inputSearchBar) {
+    return {
+      $or: [
+        { 'conseillerObj.nom': { $regex: inputSearchBar, $options: 'i' } },
+        {
+          'conseillerObj.prenom': { $regex: inputSearchBar, $options: 'i' },
+        },
+        { 'conseillerObj.idPG': { $regex: inputSearchBar, $options: 'i' } },
+      ],
+    };
+  }
+  return {};
+};
+
+const filterRegionConseillerObj = (region: string) => {
+  return region
+    ? { $expr: { $eq: ['$conseillerObj.codeRegion', region] } }
+    : {};
+};
+
+const filterDepartementConseillerObj = (departement: string) => {
+  return departement
+    ? { $expr: { $eq: ['$conseillerObj.codeDepartement', departement] } }
+    : {};
+};
+
 const filterNomConseillerOrStructure = (nom: string) => {
   const inputSearchBar = nom?.trim();
   if (inputSearchBar) {
@@ -314,6 +342,9 @@ const countCoordinateurRecrutees = async (
 export {
   checkAccessReadRequestMisesEnRelation,
   filterNomConseiller,
+  filterNomConseillerObj,
+  filterRegionConseillerObj,
+  filterDepartementConseillerObj,
   filterNomConseillerOrStructure,
   filterDepartement,
   filterRegion,
