@@ -14,15 +14,21 @@ const getStatsConseiller =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const { codePostal, codeCommune } = req.query;
+      const { codePostal, codeCommune, idStructure } = req.query;
       const statsValidation = validStatConseiller.validate({
         dateDebut,
         dateFin,
-        idConseiller,
         codePostal,
         codeCommune,
       });
-
+      if (!ObjectId.isValid(idConseiller)) {
+        res.status(400).json({ message: "l'id du conseiller est invalide" });
+        return;
+      }
+      if (idStructure && !ObjectId.isValid(idStructure)) {
+        res.status(400).json({ message: "l'id de la structure est invalide" });
+        return;
+      }
       if (statsValidation.error) {
         res.status(400).json({ message: statsValidation.error.message });
         return;
@@ -44,6 +50,9 @@ const getStatsConseiller =
         req.query?.codeCommune !== undefined
       ) {
         query['cra.codeCommune'] = req.query?.codeCommune;
+      }
+      if (idStructure) {
+        query['structure.$id'] = new ObjectId(idStructure);
       }
       const donneesStats = await getStatsGlobales(
         query,
