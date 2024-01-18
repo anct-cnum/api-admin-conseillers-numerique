@@ -305,12 +305,7 @@ const validationRecrutementContrat =
         .updateMany(
           {
             statut: {
-              $in: [
-                'finalisee_rupture',
-                'terminee',
-                'terminee_naturelle',
-                'nouvelle_rupture',
-              ],
+              $in: ['finalisee_rupture', 'terminee', 'nouvelle_rupture'],
             },
             'conseiller.$id': conseillerUpdated.value?._id,
           },
