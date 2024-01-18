@@ -31,8 +31,8 @@ const formatStatutMisesEnRelation = (
   }
 };
 
-const filterNomConseiller = (nom: string) => {
-  const inputSearchBar = nom?.trim();
+const filterNomAndEmailConseiller = (search: string) => {
+  const inputSearchBar = search?.trim();
   if (inputSearchBar) {
     return {
       $or: [
@@ -44,6 +44,12 @@ const filterNomConseiller = (nom: string) => {
         },
         {
           prenomNomStr: {
+            $regex: `(?'name'${inputSearchBar}.*$)`,
+            $options: 'i',
+          },
+        },
+        {
+          email: {
             $regex: `(?'name'${inputSearchBar}.*$)`,
             $options: 'i',
           },
@@ -231,7 +237,7 @@ export {
   checkAccessReadRequestConseillers,
   formatStatutMisesEnRelation,
   filterIsCoordinateur,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterNomStructure,
   filterIsRuptureMisesEnRelation,
   filterIsRuptureConseiller,

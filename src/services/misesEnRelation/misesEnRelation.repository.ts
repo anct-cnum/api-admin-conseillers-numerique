@@ -13,30 +13,6 @@ const checkAccessReadRequestMisesEnRelation = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const filterNomConseiller = (nom: string) => {
-  const inputSearchBar = nom?.trim();
-  if (inputSearchBar) {
-    return {
-      $or: [
-        {
-          nomPrenomStr: {
-            $regex: `(?'name'${inputSearchBar}.*$)`,
-            $options: 'i',
-          },
-        },
-        {
-          prenomNomStr: {
-            $regex: `(?'name'${inputSearchBar}.*$)`,
-            $options: 'i',
-          },
-        },
-        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
-      ],
-    };
-  }
-  return {};
-};
-
 const filterNomConseillerOrStructure = (nom: string) => {
   const inputSearchBar = nom?.trim();
   if (inputSearchBar) {
@@ -323,7 +299,6 @@ const countCoordinateurRecrutees = async (
 
 export {
   checkAccessReadRequestMisesEnRelation,
-  filterNomConseiller,
   filterNomConseillerOrStructure,
   filterDepartement,
   filterRegion,

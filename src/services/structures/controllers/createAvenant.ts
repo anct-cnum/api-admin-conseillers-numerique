@@ -8,6 +8,7 @@ import { validCreationAvenant } from '../../../schemas/structures.schemas';
 import getDetailStructureById from './getDetailStructureById';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
+import { getCoselec } from '../../../utils';
 
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -58,6 +59,16 @@ const createAvenant =
       return;
     }
 
+    if (getStructure.demandesCoselec?.length > 0) {
+      const demandeCoselec = getStructure.demandesCoselec.pop();
+      if (demandeCoselec?.statut === 'en_cours') {
+        res.status(409).json({
+          message: `Une demande est en cours d'instruction. Vous ne pouvez faire aucune action pendant cette période.`,
+        });
+        return;
+      }
+    }
+
     const demandeCoselec = {
       id: new ObjectId(),
       ...(type === 'retrait'
@@ -69,6 +80,8 @@ const createAvenant =
       statut: 'en_cours',
       banniereValidationAvenant: false,
       phaseConventionnement,
+      nbPostesAvantDemande:
+        getCoselec(getStructure).nombreConseillersCoselec ?? 0,
     };
 
     try {

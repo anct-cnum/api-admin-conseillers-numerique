@@ -59,6 +59,7 @@ const getMiseEnRelation =
               salaire: 1,
               typeDeContrat: 1,
               contratCoordinateur: 1,
+              disponible: '$conseiller.disponible',
               estDiplomeMedNum: '$conseiller.estDiplomeMedNum',
               prenom: '$conseiller.prenom',
               nom: '$conseiller.nom',

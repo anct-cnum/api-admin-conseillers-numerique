@@ -117,6 +117,8 @@ export interface IMisesEnRelation {
   banniereAjoutRoleCoordinateur: boolean | undefined;
 
   contratCoordinateur: boolean | undefined;
+
+  banniereRefusRecrutement: boolean | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -398,6 +400,11 @@ interface IDemandesCoselec {
     email: string;
   };
   banniereValidationAvenant: boolean;
+  nbPostesAvantDemande: number;
+  validateurAvenant?: {
+    date: Date;
+    email: string;
+  };
 }
 
 export interface IDemandesCoordinateur {

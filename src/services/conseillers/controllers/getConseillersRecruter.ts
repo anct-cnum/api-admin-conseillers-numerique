@@ -9,7 +9,7 @@ import {
   filterIsCoordinateur,
   filterIsRuptureMisesEnRelation,
   filterIsRuptureConseiller,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterNomStructure,
   filterRegion,
   formatStatutMisesEnRelation,
@@ -75,7 +75,7 @@ const getConseillersRecruter =
         $match: {
           ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
-          ...filterNomConseiller(searchByConseiller),
+          ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],
