@@ -222,7 +222,7 @@ const filterIsRuptureConseiller = (
       return {
         $or: [
           { statut: { $eq: 'RUPTURE' } },
-          { statut: { $eq: 'TERMINE' } },
+          { statut: { $in: ['RUPTURE', 'TERMINE'] } },
           {
             statut: { $eq: 'RECRUTE' },
             datePrisePoste: { $gte: dateDebut, $lte: dateFin },
