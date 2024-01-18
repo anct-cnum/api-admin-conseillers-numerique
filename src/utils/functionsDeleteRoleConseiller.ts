@@ -167,7 +167,7 @@ const deleteCoordinateurInConseillers =
             },
           );
           app.service(service.misesEnRelation).Model.updateMany(
-            { 'conseiller.$id': conseiller._id, 'structure.$id': structureId },
+            { 'conseiller.$id': conseiller._id },
             {
               $unset: {
                 'conseillerObj.coordinateurs': '',
@@ -215,11 +215,9 @@ const nettoyageCoordinateur =
   };
 
 const updateCacheObj = (app) => async (idConseiller) => {
-  const conseiller = await app
-    .service(service.conseillers)
-    .Model.findOne({ _id: idConseiller });
+  const conseiller = await getConseiller(idConseiller);
   app.service(service.misesEnRelation).Model.updateMany(
-    { 'conseiller.$id': conseiller._id },
+    { 'conseiller.$id': idConseiller },
     {
       $set: {
         conseillerObj: conseiller,

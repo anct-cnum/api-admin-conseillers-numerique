@@ -16,6 +16,7 @@ import {
   getMisesEnRelationsFinaliseesNaturelles,
   getConseiller,
   nettoyageCoordinateur,
+  updateConseillersPG,
   updateCacheObj,
   nettoyagePermanence,
   deleteMattermostAccount,
@@ -23,6 +24,7 @@ import {
 } from '../../utils/functionsDeleteRoleConseiller';
 
 const { v4: uuidv4 } = require('uuid');
+const { Pool } = require('pg');
 
 const getUser = (app) => async (idConseiller) =>
   app.service(service.users).Model.findOne({
@@ -53,6 +55,18 @@ const updateConseiller = (app) => async (conseiller, updatedAt) =>
         listeSubordonnes: '',
         estCoordinateur: '',
       },
+      $set: {
+        disponible: true,
+        dateDisponibilite: updatedAt,
+        updatedAt,
+      },
+    },
+  );
+
+const updateConseillers = (app) => async (email, updatedAt) =>
+  app.service(service.conseillers).Model.updateMany(
+    { email },
+    {
       $set: {
         disponible: true,
         dateDisponibilite: updatedAt,
@@ -219,16 +233,20 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               );
             });
 
+          // Historisation du conseiller terminé
+          await createConseillersTermines(app)(
+            conseiller,
+            miseEnRelationIdTerminee,
+          );
+
           if (structuresIdsAutre.length === 0) {
             // mise aux normes du conseiller et de l'utilisateur
-            await updateConseiller(app)(conseiller, updatedAt)
+            const pool = new Pool();
+            const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
+            await updateConseillersPG(pool)(conseiller.email, true, datePG)
               .then(async () => {
-                await createConseillersTermines(app)(
-                  conseiller,
-                  miseEnRelationIdTerminee,
-                );
-              })
-              .then(async () => {
+                await updateConseillers(app)(conseiller.email, updatedAt);
+                await updateConseiller(app)(conseiller, updatedAt);
                 await updateUser(app)(user._id, conseiller.email);
               })
               .then(async () => {
@@ -236,6 +254,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
                   `Le conseiller (id: ${conseiller._id}) a été remis à zéro et le user (id: ${user._id}) a été passé en candidat avec son adresse email d'origine`,
                 );
               });
+
             // suppression des outils (Mattermost, Gandi)
             await deleteMattermostAccount(app)(conseiller)
               .then(async () => {
@@ -246,12 +265,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
                   `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
                 );
               });
-          }
 
-          // Mise à jour du cache Obj
-          await updateCacheObj(app)(conseiller._id);
-
-          if (structuresIdsAutre.length === 0) {
             // Envoi des emails de cloture de compte pour PIX / le conseiller / la structure
             const mailerInstance = mailer(app);
             const messageFinContratPix = conseillerRupturePix(mailerInstance);
@@ -279,6 +293,8 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               Sentry.captureException(errorSmtpMailFinContrat.message);
             }
           }
+          // Mise à jour du cache Obj
+          await updateCacheObj(app)(conseiller._id);
         }
       }
       await delay(2000);

@@ -10,14 +10,12 @@ import mailer from '../../mailer';
 import service from '../../helpers/services';
 import {
   getConseiller,
-  updateConseillersPG,
+  updateCacheObj,
 } from '../../utils/functionsDeleteRoleConseiller';
 import {
   preventionSuppressionConseiller,
   prenventionSuppressionConseillerStructure,
 } from '../../emails';
-
-const { Pool } = require('pg');
 
 const getMisesEnRelationsFinContrat =
   (app) => async (dateDuJourDebut, dateDuJourFin) =>
@@ -31,7 +29,7 @@ const getMisesEnRelationsFinContrat =
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
 // avant de les passer en terminer à M+2 de la fin de contrat
-const updateMiseEnRelation = (app) => async (id, updatedAt) =>
+const updateMiseEnRelation = (app) => async (id) =>
   app.service(service.misesEnRelation).Model.updateOne(
     {
       _id: id,
@@ -39,8 +37,6 @@ const updateMiseEnRelation = (app) => async (id, updatedAt) =>
     {
       $set: {
         statut: 'terminee_naturelle',
-        'conseillerObj.statut': 'TERMINE',
-        'conseillerObj.updatedAt': updatedAt,
       },
     },
   );
@@ -73,7 +69,7 @@ program
   )
   .parse(process.argv);
 
-execute(__filename, async ({ app, logger, exit, Sentry }) => {
+execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
   try {
     const options = program.opts();
     const dateDuJour = new Date();
@@ -104,29 +100,24 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       );
 
       if (fix) {
-        const pool = new Pool();
-        const datePG = dayjs(dateDuJour).format('YYYY-MM-DD');
-        await updateConseillersPG(pool)(conseiller.email, true, datePG).then(
+        await updateConseiller(app)(conseiller._id, dateDuJour);
+        logger.info(
+          `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
+        );
+        await updateMiseEnRelation(app)(miseEnRelationFinContrat._id).then(
           async () => {
-            await updateConseiller(app)(conseiller._id, dateDuJour);
             logger.info(
-              `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
+              `Le conseiller (idPG: ${
+                conseiller.idPG
+              }) passe en fin de contrat naturelle - date de fin de contrat est au ${dayjs(
+                miseEnRelationFinContrat.dateFinDeContrat,
+              ).format('DD-MM-YYYY')}`,
             );
           },
         );
 
-        await updateMiseEnRelation(app)(
-          miseEnRelationFinContrat._id,
-          dateDuJour,
-        ).then(async () => {
-          logger.info(
-            `Le conseiller (idPG: ${
-              conseiller.idPG
-            }) passe en fin de contrat naturelle - date de fin de contrat est au ${dayjs(
-              miseEnRelationFinContrat.dateFinDeContrat,
-            ).format('DD-MM-YYYY')}`,
-          );
-        });
+        await updateCacheObj(app)(conseiller._id);
+
         // Envoie de mail conseiller et structure
         if (envoiEmail) {
           const mailerInstance = mailer(app);
@@ -167,6 +158,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           }
         }
       }
+      await delay(2000);
     }
   } catch (error) {
     logger.error(error);

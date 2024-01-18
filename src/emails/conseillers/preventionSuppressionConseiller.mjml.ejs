@@ -31,13 +31,17 @@
               et de vous inscrire &agrave; <a href='<%= link %>' target="blank" rel="noopener noreferrer"
               >la newsletter</a> destin&eacute;e au conseiller num&eacute;rique en fin de mission.
             </mj-text>
-            <%- include('../commun/signature.mjml.ejs'); %>
           </mj-column>
-          <mj-section padding="8px"></mj-section>
-          <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
-            <mj-image align="left" padding-left="10px" width="256px" alt="Pied de page Conseiller numérique"
-            src="<%= utils.getPublicUrl('/assets/img/email/footer-cloture-prev-conum.png') %>" />
-          </mj-section>
+      </mj-wrapper>
+      <mj-wrapper css-class="wrapper">
+        <mj-section>
+          <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+        </mj-section>
+        <mj-section padding="8px"></mj-section>
+        <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
+          <mj-image align="left" padding-left="10px" width="256px" alt="Pied de page Conseiller numrique"
+          src="<%= utils.getPublicUrl('/assets/img/email/footer-cloture-prev-conum.png') %>" />
+        </mj-section>
       </mj-wrapper>
   </mj-body>
 </mjml>
