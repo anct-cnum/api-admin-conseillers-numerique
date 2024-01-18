@@ -7,11 +7,8 @@ import {
   checkAccessReadRequestStructures,
   filterAvisPrefet,
 } from './structures.repository';
-import { getCoselec, getTimestampByDate } from '../../../utils';
-import {
-  findDepartementNameByNumDepartement,
-  findRegionNameByNumDepartement,
-} from '../../../helpers/commonQueriesFunctions';
+import { getTimestampByDate } from '../../../utils';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 const filterStatut = (typeConvention: string, avisPrefet: string) => {
   if (typeConvention === 'conventionnement') {
@@ -388,31 +385,16 @@ const formatReconventionnementForDossierConventionnement = (
       return item;
     });
 
-const formatConventionnementForDossierConventionnement = (structures) =>
+const formatConventionnementForDossierConventionnement = (
+  structures: IStructures[],
+) =>
   structures
-    .filter(
-      (structure) =>
-        structure?.statut === 'CREEE' ||
-        structure?.conventionnement?.statut ===
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-    )
-    .map((structure) => {
+    .filter((structure: IStructures) => structure?.statut === 'CREEE')
+    .map((structure: IStructures) => {
       return {
         ...structure,
         dateSorted: structure.createdAt,
         typeConvention: 'conventionnement',
-        nombreConseillersCoselec:
-          getCoselec(structure)?.nombreConseillersCoselec ?? 0,
-        nbPostesAvantDemande: 0,
-        variation: 0,
-        departement: findDepartementNameByNumDepartement(
-          structure.codeDepartement,
-          structure.codeCom,
-        ),
-        region: findRegionNameByNumDepartement(
-          structure.codeDepartement,
-          structure.codeCom,
-        ),
       };
     });
 
