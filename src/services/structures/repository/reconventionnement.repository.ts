@@ -78,8 +78,10 @@ const filterDateDemandeAndStatutHistorique = (
   }
   if (typeConvention === 'conventionnement') {
     return {
-      'conventionnement.statut': StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-      'conventionnement.dossierConventionnement.dateDeCreation': {
+      coordinateurCandidature: false,
+      'conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      createdAt: {
         $gte: dateDebut,
         $lte: dateFin,
       },
@@ -125,9 +127,10 @@ const filterDateDemandeAndStatutHistorique = (
         },
       },
       {
+        coordinateurCandidature: false,
         'conventionnement.statut':
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-        'conventionnement.dossierConventionnement.dateDeCreation': {
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+        createdAt: {
           $gte: dateDebut,
           $lte: dateFin,
         },
@@ -207,8 +210,6 @@ const totalParConvention = async (app: Application, req: IRequest) => {
 const totalParHistoriqueConvention = async (
   app: Application,
   req: IRequest,
-  dateDebut: Date,
-  dateFin: Date,
 ) => {
   const reconventionnement = await app
     .service(service.structures)
@@ -216,20 +217,14 @@ const totalParHistoriqueConvention = async (
     .countDocuments({
       'conventionnement.statut':
         StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-      'conventionnement.dossierReconventionnement.dateDeCreation': {
-        $gte: dateDebut,
-        $lte: dateFin,
-      },
     });
   const conventionnement = await app
     .service(service.structures)
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
-      'conventionnement.statut': StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-      'conventionnement.dossierConventionnement.dateDeCreation': {
-        $gte: dateDebut,
-        $lte: dateFin,
-      },
+      coordinateurCandidature: false,
+      'conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
     });
   const checkAccess = await checkAccessReadRequestStructures(app, req);
   const countAvenant = await app.service(service.structures).Model.aggregate([
@@ -242,10 +237,6 @@ const totalParHistoriqueConvention = async (
     {
       $match: {
         'demandesCoselec.statut': { $ne: 'en_cours' },
-        'demandesCoselec.emetteurAvenant.date': {
-          $gte: dateDebut,
-          $lte: dateFin,
-        },
       },
     },
     {
@@ -390,6 +381,26 @@ const formatConventionnementForDossierConventionnement = (
       return item;
     });
 
+const formatConventionnementForHistoriqueDossierConventionnement = (
+  structures,
+) =>
+  structures
+    .filter(
+      (structure) =>
+        structure?.statut === 'VALIDATION_COSELEC' ||
+        structure?.statut === 'REFUS_COSELEC',
+    )
+    .map((structure) => {
+      return {
+        ...structure,
+        dateSorted: structure.createdAt,
+        typeConvention: 'conventionnement',
+        statutConventionnement: structure.conventionnement.statut,
+        nombreConseillersCoselec:
+          structure.coselec[0]?.nombreConseillersCoselec ?? 0,
+      };
+    });
+
 const sortDossierConventionnement = (
   type: string,
   ordre: number,
@@ -432,10 +443,8 @@ const sortHistoriqueDossierConventionnement = (
     );
   }
   if (type === 'conventionnement' || type === 'toutes') {
-    conventionnement = formatConventionnementForDossierConventionnement(
-      structures,
-      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-    );
+    conventionnement =
+      formatConventionnementForHistoriqueDossierConventionnement(structures);
   }
   const structureFormat = avenantSort.concat(
     reconventionnement,

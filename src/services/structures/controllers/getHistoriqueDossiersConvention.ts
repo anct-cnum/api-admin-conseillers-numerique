@@ -52,6 +52,8 @@ const getStructures =
           demandesCoselec: 1,
           coselec: 1,
           statut: 1,
+          createdAt: 1,
+          prefet: 1,
           conventionnement: 1,
         },
       },
@@ -129,12 +131,7 @@ const getHistoriqueDossiersConvention =
         structures,
       );
       items.total = structuresFormat.length;
-      const totalConvention = await totalParHistoriqueConvention(
-        app,
-        req,
-        dateDebut,
-        dateFin,
-      );
+      const totalConvention = await totalParHistoriqueConvention(app, req);
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,
