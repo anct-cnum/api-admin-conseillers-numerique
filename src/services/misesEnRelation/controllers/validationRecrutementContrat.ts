@@ -7,7 +7,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
-import { IUser } from '../../../ts/interfaces/db.interfaces';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 import {
   checkAccessReadRequestMisesEnRelation,
   countConseillersRecrutees,
@@ -15,6 +15,7 @@ import {
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
+import { transfertChannelDepartementConseiller } from '../../../utils/mattermost';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -139,6 +140,7 @@ const validationRecrutementContrat =
           },
           {
             $project: {
+              structureObj: 1,
               dateToMigrateCRA: {
                 $max: [
                   {
@@ -296,6 +298,19 @@ const validationRecrutementContrat =
           }
           user = userUpdated.value;
         }
+      } else if (
+        miseEnRelationSansMission[0].structureObj.codeDepartement !==
+        miseEnRelationVerif.structureObj.codeDepartement
+      ) {
+        const ancienneStructure: IStructures =
+          miseEnRelationSansMission[0].structureObj;
+        const structureDestination: IStructures =
+          miseEnRelationVerif.structureObj;
+        await transfertChannelDepartementConseiller(app)(
+          structureDestination,
+          ancienneStructure,
+          miseEnRelationVerif.conseillerObj,
+        );
       }
       const conseillerUpdated = await app
         .service(service.conseillers)
