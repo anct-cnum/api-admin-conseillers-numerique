@@ -23,6 +23,7 @@ const updateDemandeConseillerAvisPrefet =
       avisPrefet: avisPrefet === 'favorable' ? 'POSITIF' : 'NÉGATIF',
       banniereValidationAvisPrefet: true,
       commentairePrefet: commentaire,
+      insertedAt: new Date(),
     };
     try {
       if (!ObjectId.isValid(idStructure)) {

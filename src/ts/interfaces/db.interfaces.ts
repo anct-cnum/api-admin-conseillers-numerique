@@ -363,6 +363,7 @@ export interface IStructures {
   };
   insee: Iinsee;
   estZRR: boolean;
+  prefet: IPrefet[];
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
@@ -405,6 +406,12 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+}
+
+interface IPrefet {
+  avisPrefet: string;
+  commentairePrefet: string;
+  insertedAt: Date;
 }
 
 export interface IDemandesCoordinateur {
