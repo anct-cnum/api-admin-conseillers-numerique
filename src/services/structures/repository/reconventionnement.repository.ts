@@ -19,7 +19,6 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
       statut: 'CREEE',
       coordinateurCandidature: false,
       createdAt: { $gte: new Date('2023-01-01') },
-      'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
       ...filterAvisPrefet(avisPrefet),
     };
   }
@@ -50,7 +49,6 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
         statut: 'CREEE',
         coordinateurCandidature: false,
         createdAt: { $gte: new Date('2023-01-01') },
-        'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
       },
       {
         demandesCoselec: {
@@ -177,18 +175,10 @@ const totalParConvention = async (app: Application, req: IRequest) => {
     .service(service.structures)
     .Model.aggregate([
       {
-        $addFields: {
-          lastPrefet: {
-            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-          },
-        },
-      },
-      {
         $match: {
           $and: [checkAccess],
           statut: 'CREEE',
           coordinateurCandidature: false,
-          'lastPrefet.avisPrefet': { $ne: 'DOUBLON' },
           createdAt: { $gte: new Date('2023-01-01') },
         },
       },
