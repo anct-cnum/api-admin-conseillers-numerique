@@ -79,8 +79,16 @@ const filterDateDemandeAndStatutHistorique = (
   if (typeConvention === 'conventionnement') {
     return {
       coordinateurCandidature: false,
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      $or: [
+        {
+          'conventionnement.statut':
+            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+          statut: 'VALIDATION_COSELEC',
+        },
+        {
+          statut: 'REFUS_COSELEC',
+        },
+      ],
       createdAt: {
         $gte: dateDebut,
         $lte: dateFin,
@@ -128,8 +136,16 @@ const filterDateDemandeAndStatutHistorique = (
       },
       {
         coordinateurCandidature: false,
-        'conventionnement.statut':
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+        $or: [
+          {
+            'conventionnement.statut':
+              StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+            statut: 'VALIDATION_COSELEC',
+          },
+          {
+            statut: 'REFUS_COSELEC',
+          },
+        ],
         createdAt: {
           $gte: dateDebut,
           $lte: dateFin,
@@ -223,8 +239,16 @@ const totalParHistoriqueConvention = async (
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
       coordinateurCandidature: false,
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      $or: [
+        {
+          'conventionnement.statut':
+            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+          statut: 'VALIDATION_COSELEC',
+        },
+        {
+          statut: 'REFUS_COSELEC',
+        },
+      ],
     });
   const checkAccess = await checkAccessReadRequestStructures(app, req);
   const countAvenant = await app.service(service.structures).Model.aggregate([
@@ -395,9 +419,8 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
         ...structure,
         dateSorted: structure.createdAt,
         typeConvention: 'conventionnement',
-        statutConventionnement: structure.conventionnement.statut,
         nombreConseillersCoselec:
-          structure.coselec[0]?.nombreConseillersCoselec ?? 0,
+          structure?.coselec[0]?.nombreConseillersCoselec ?? 0,
       };
     });
 

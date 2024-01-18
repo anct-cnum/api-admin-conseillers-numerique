@@ -53,7 +53,7 @@ const getStructures =
           coselec: 1,
           statut: 1,
           createdAt: 1,
-          prefet: 1,
+          prefet: { $arrayElemAt: ['$prefet', -1] },
           conventionnement: 1,
         },
       },
