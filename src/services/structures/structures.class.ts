@@ -12,6 +12,7 @@ import {
   verifySiretStructure,
   getDossiersConvention,
   getDetailDossierConvention,
+  updateRefusConventionnement,
   getHistoriqueDossiersConvention,
   updateDossierReconventionnement,
   createAvenant,
@@ -146,6 +147,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       getDetailDossierConvention(app),
+    );
+    app.patch(
+      '/conventions/admin/refus/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateRefusConventionnement(app),
     );
     app.patch(
       '/reconventionnement',

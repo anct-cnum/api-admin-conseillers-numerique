@@ -9,6 +9,7 @@ import preSelectionnerCandidat from './preSelectionnerCandidat';
 import updateDossierReconventionnement from './updateDossierReconventionnement';
 import getDossiersConvention from './getDossiersConvention';
 import getDetailDossierConvention from './getDetailDossierConvention';
+import updateRefusConventionnement from './updateRefusConventionnement';
 import getHistoriqueDossiersConvention from './getHistoriqueDossiersConvention';
 import closeBanner from './closeBanner';
 import createAvenant from './createAvenant';
@@ -34,6 +35,7 @@ export {
   updateDossierReconventionnement,
   getDossiersConvention,
   getDetailDossierConvention,
+  updateRefusConventionnement,
   getHistoriqueDossiersConvention,
   closeBanner,
   createAvenant,

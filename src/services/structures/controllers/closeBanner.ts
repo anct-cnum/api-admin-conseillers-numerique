@@ -20,6 +20,7 @@ const closeBanner =
       'renouvellement',
       'avenant',
       'ajoutRoleCoordinateur',
+      'primoEntrant',
     ];
     if (!typeValidation.includes(type)) {
       res.status(400).json({ message: 'Type incorrect' });
@@ -149,7 +150,20 @@ const closeBanner =
             { $set: { banniereAjoutRoleCoordinateur: false } },
           );
       }
-
+      if (type === 'primoEntrant') {
+        await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              'structure.$id': new ObjectId(req.params.id),
+              statut: {
+                $in: ['VALIDE_COSELEC', 'REFUS_COSELEC'],
+              },
+            },
+            { $set: { banniereValidationCoselec: false } },
+          );
+      }
       await getDetailStructureById(app)(req, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
