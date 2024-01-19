@@ -19,9 +19,9 @@ import {
   updateConseillersPG,
   updateCacheObj,
   nettoyagePermanence,
-  deleteMattermostAccount,
-  deleteMailbox,
 } from '../../utils/functionsDeleteRoleConseiller';
+import { deleteMattermostAccount } from '../../utils/mattermost';
+import { deleteMailboxCloture } from '../../utils/gandi';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -258,7 +258,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
             // suppression des outils (Mattermost, Gandi)
             await deleteMattermostAccount(app)(conseiller)
               .then(async () => {
-                await deleteMailbox(app)(conseiller._id, user.name);
+                await deleteMailboxCloture(app)(conseiller._id, user.name);
               })
               .then(async () => {
                 logger.info(

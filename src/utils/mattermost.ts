@@ -52,4 +52,35 @@ const deleteAccount = (app, req) => async (conseiller) => {
   }
 };
 
-export default deleteAccount;
+const deleteMattermostAccount = (app) => async (conseiller) => {
+  const mattermost = app.get('mattermost');
+  try {
+    const token = await loginApi({ mattermost });
+
+    // Query parameter permanent pour la suppression définitive (il faut que le paramètre ServiceSettings.EnableAPIUserDeletion soit configuré à true)
+    await axios({
+      method: 'delete',
+      url: `${mattermost.endPoint}/api/v4/users/${conseiller.mattermost?.id}?permanent=true`,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    await app.service(service.conseillers).Model.updateOne(
+      { _id: conseiller._id },
+      {
+        $set: { 'mattermost.errorDeleteAccount': false },
+      },
+    );
+  } catch (error) {
+    await app.service(service.conseillers).Model.updateOne(
+      { _id: conseiller._id },
+      {
+        $set: { 'mattermost.errorDeleteAccount': true },
+      },
+    );
+    throw new Error(error);
+  }
+};
+
+export { deleteAccount, deleteMattermostAccount };
