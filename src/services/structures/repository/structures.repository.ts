@@ -130,6 +130,29 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
   );
 };
 
+const filterAvisANCT = (avisANCT: string | undefined) => {
+  if (avisANCT === 'VALIDATION_COSELEC') {
+    return {
+      statut: avisANCT,
+      'conventionnement.statut':
+        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+    };
+  }
+  if (avisANCT === 'REFUS_COSELEC') {
+    return { statut: avisANCT };
+  }
+  return {
+    $or: [
+      {
+        statut: 'VALIDATION_COSELEC',
+        'conventionnement.statut':
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
+      },
+      { statut: 'REFUS_COSELEC' },
+    ],
+  };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -147,4 +170,5 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  filterAvisANCT,
 };

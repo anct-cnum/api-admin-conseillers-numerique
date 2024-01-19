@@ -58,8 +58,15 @@ const formatAvenant = (avenant, structure) => {
 
 const getExportHistoriqueDossiersConventionCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type, nomOrdre, ordre, searchByNomStructure, region, departement } =
-      req.query;
+    const {
+      type,
+      nomOrdre,
+      ordre,
+      searchByNomStructure,
+      region,
+      departement,
+      avisANCT,
+    } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
     dateDebut.setUTCHours(0, 0, 0, 0);
@@ -75,6 +82,7 @@ const getExportHistoriqueDossiersConventionCsv =
       searchByNomStructure,
       region,
       departement,
+      avisANCT,
     });
     if (pageValidation.error) {
       res.status(400).json({ message: pageValidation.error.message });
@@ -93,7 +101,12 @@ const getExportHistoriqueDossiersConventionCsv =
             $match: {
               $and: [
                 checkAccessStructure,
-                filterDateDemandeAndStatutHistorique(type, dateDebut, dateFin),
+                filterDateDemandeAndStatutHistorique(
+                  type,
+                  dateDebut,
+                  dateFin,
+                  avisANCT,
+                ),
                 filterSearchBar(searchByNomStructure),
               ],
               ...filterRegion(region),

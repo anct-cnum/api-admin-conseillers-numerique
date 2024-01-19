@@ -3,7 +3,10 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { checkAccessReadRequestStructures } from './structures.repository';
+import {
+  checkAccessReadRequestStructures,
+  filterAvisANCT,
+} from './structures.repository';
 import { getCoselecConventionnement, getTimestampByDate } from '../../../utils';
 
 const filterStatut = (typeConvention: string) => {
@@ -65,6 +68,7 @@ const filterDateDemandeAndStatutHistorique = (
   typeConvention: string,
   dateDebut: Date,
   dateFin: Date,
+  avisANCT: string,
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
@@ -79,16 +83,7 @@ const filterDateDemandeAndStatutHistorique = (
   if (typeConvention === 'conventionnement') {
     return {
       coordinateurCandidature: false,
-      $or: [
-        {
-          'conventionnement.statut':
-            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-          statut: 'VALIDATION_COSELEC',
-        },
-        {
-          statut: 'REFUS_COSELEC',
-        },
-      ],
+      ...filterAvisANCT(avisANCT),
       createdAt: {
         $gte: dateDebut,
         $lte: dateFin,

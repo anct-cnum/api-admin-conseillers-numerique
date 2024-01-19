@@ -25,6 +25,7 @@ const getStructures =
     searchByNomStructure: string,
     region: string,
     departement: string,
+    avisANCT: string,
   ) =>
     app.service(service.structures).Model.aggregate([
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -36,6 +37,7 @@ const getStructures =
               typeConvention,
               dateDebut,
               dateFin,
+              avisANCT,
             ),
             filterSearchBar(searchByNomStructure),
           ],
@@ -69,6 +71,7 @@ const getHistoriqueDossiersConvention =
       searchByNomStructure,
       region,
       departement,
+      avisANCT,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
@@ -85,6 +88,7 @@ const getHistoriqueDossiersConvention =
         searchByNomStructure,
         region,
         departement,
+        avisANCT,
       });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
@@ -124,6 +128,7 @@ const getHistoriqueDossiersConvention =
         searchByNomStructure,
         region,
         departement,
+        avisANCT,
       );
       const structuresFormat = sortHistoriqueDossierConventionnement(
         type,
