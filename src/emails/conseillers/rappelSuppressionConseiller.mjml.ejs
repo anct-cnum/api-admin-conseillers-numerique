@@ -1,10 +1,7 @@
 <mjml>
   <%- include('../commun/head.mjml.ejs'); %>
   <mj-body>
-    <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
-      <mj-image align="left" padding-left="10px" width="256px" alt="En-tête Conseiller numérique"
-      src="<%= utils.getPublicUrl('/assets/img/email/header-cloture-conum.png') %>" />
-    </mj-section>
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
     <mj-section padding="8px"></mj-section>
     <mj-wrapper css-class="wrapper">
       <mj-section>
@@ -35,9 +32,8 @@
         <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
       </mj-section>
       <mj-section padding="8px"></mj-section>
-      <mj-section padding-top="0" padding-left="0" padding-bottom="0" border-radius="5px" background-color="#fff">
-        <mj-image align="left" padding-left="10px" width="256px" alt="Pied de page Conseiller numrique"
-        src="<%= utils.getPublicUrl('/assets/img/email/footer-cloture-prev-conum.png') %>" />
+      <mj-section>
+        <mj-column> <%- include('../commun/footer.mjml.ejs'); %></mj-column>
       </mj-section>
     </mj-wrapper>
   </mj-body>
