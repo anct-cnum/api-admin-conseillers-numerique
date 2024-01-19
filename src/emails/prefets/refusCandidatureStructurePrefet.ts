@@ -26,7 +26,7 @@ export default function (mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Appel à candidature Conseiller numérique - décision défavorable',
+            'Candidature au poste de conseiller numérique - décision défavorable',
           body: await render(structure.nom),
         })
         .then(onSuccess)

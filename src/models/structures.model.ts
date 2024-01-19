@@ -62,7 +62,6 @@ export default function (app: Application): Model<any> {
       banniereInformationAvisStructure: Boolean,
       banniereValidationAvisPrefet: Boolean,
       banniereValidationAvisAdmin: Boolean,
-      banniereValidationCoselec: Boolean,
       miseEnRelationId: { type: 'ObjectId' },
     },
     { _id: false, strict: false },

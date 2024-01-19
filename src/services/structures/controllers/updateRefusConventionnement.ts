@@ -53,7 +53,6 @@ const updateRefusConventionnement =
           {
             $set: {
               statut: 'REFUS_COSELEC',
-              banniereValidationCoselec: true,
               coselec,
               coselecAt: new Date(),
             },
