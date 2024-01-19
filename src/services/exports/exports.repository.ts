@@ -830,6 +830,47 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
     throw new Error(error);
   }
 };
+const generateCsvConseillersCoordonnes = async (conseillers, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id',
+      'Nom',
+      'Prénom',
+      'Structure',
+      'CD',
+      'Début de contrat',
+      'Fin de contrat',
+      'Activé',
+      'CRA saisis',
+      'Groupe CRA',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...conseillers.map((conseiller) =>
+          [
+            conseiller.idPG,
+            conseiller.nom,
+            conseiller.prenom,
+            conseiller.nomStructure,
+            conseiller.codeDepartement,
+            formatDate(conseiller.dateDebutDeContrat),
+            formatDate(conseiller.dateFinDeContrat),
+            conseiller.compteCoopActif ? 'Oui' : 'Non',
+            conseiller.craCount,
+            conseiller.groupeCRA,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
 
 const generateCsvListeStructures = async (structures, res: Response) => {
   try {
@@ -1042,6 +1083,7 @@ export {
   generateCsvStatistiques,
   generateCsvTerritoires,
   generateCsvConseillers,
+  generateCsvConseillersCoordonnes,
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,

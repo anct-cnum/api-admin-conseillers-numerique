@@ -2,21 +2,22 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { filterNomStructure } from '../repository/conseillers.repository';
-import { getNombreCras } from '../../cras/cras.repository';
-import { action } from '../../../helpers/accessControl/accessList';
 import {
-  filterNomConseillerObj,
   filterRegionConseillerObj,
   filterDepartementConseillerObj,
+  filterNomConseillerObj,
 } from '../../misesEnRelation/misesEnRelation.repository';
-import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
-import { validConseillersCoordonnes } from '../../../schemas/conseillers.schemas';
+import { filterNomStructure } from '../../conseillers/repository/conseillers.repository';
 
-const getConseillersCoordonnes =
-  (app: Application, options) => async (req: IRequest, res: Response) => {
+import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
+
+import { generateCsvConseillersCoordonnes } from '../exports.repository';
+import { getNombreCras } from '../../cras/cras.repository';
+import { action } from '../../../helpers/accessControl/accessList';
+
+const getExportConseillersCoordonnesCsv =
+  (app: Application) => async (req: IRequest, res: Response) => {
     const {
-      skip,
       ordre,
       nomOrdre,
       searchByConseiller,
@@ -27,31 +28,11 @@ const getConseillersCoordonnes =
 
     const dateDebut: Date = new Date(req.query.dateDebut as string);
     const dateFin: Date = new Date(req.query.dateFin as string);
-    const limit = options.paginate.default;
-    const validate = validConseillersCoordonnes.validate({
-      dateDebut,
-      dateFin,
-      skip,
-      ordre,
-      nomOrdre,
-      searchByConseiller,
-      searchByStructure,
-      region,
-      departement,
-    });
 
-    if (validate.error) {
-      res.statusMessage = validate.error.message;
-      return res.status(400).end();
-    }
-
-    const items: { total: number; data: object; limit: number; skip: number } =
-      {
-        total: 0,
-        data: [],
-        limit: 0,
-        skip: 0,
-      };
+    const items: { total: number; data: object } = {
+      total: 0,
+      data: [],
+    };
     const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
 
     try {
@@ -91,10 +72,6 @@ const getConseillersCoordonnes =
           {
             $sort: sortColonne,
           },
-          {
-            $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
-          },
-          { $limit: Number(limit) },
         ]);
 
       const promises = misesEnRelation.map(
@@ -128,17 +105,17 @@ const getConseillersCoordonnes =
       if (misesEnRelation.length > 0) {
         items.data = conseillersCoordonnes;
         items.total = conseillersCoordonnes.length;
-        items.limit = limit;
-        items.skip = Number(skip);
       }
-      return res.status(200).json(items);
+
+      generateCsvConseillersCoordonnes(conseillersCoordonnes, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
-        return res.status(403).json({ message: 'Accès refusé' });
+        res.status(403).json({ message: 'Accès refusé' });
+        return;
       }
       res.status(500).json({ message: error.message });
       throw new Error(error);
     }
   };
 
-export default getConseillersCoordonnes;
+export default getExportConseillersCoordonnesCsv;
