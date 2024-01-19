@@ -3,5 +3,8 @@
   "*/15 * * * * $ROOT/src/tools/jobs/onboardingConseiller.sh",
   "0 2 * * * $ROOT/src/tools/jobs/deleteMiseEnRelation.sh",
   "0 * * * * $ROOT/src/tools/jobs/onboardingStructure.sh",
-  "0 9 * * * $ROOT/src/tools/jobs/notifications.sh"
+  "0 9 * * * $ROOT/src/tools/jobs/notifications.sh",
+  "0 5 * * * $ROOT/src/tools/jobs/finDeContratNaturellePrevention.sh",
+  "0 6 * * * $ROOT/src/tools/jobs/finDeContratNaturelleRappel.sh",
+  "0 7 * * * $ROOT/src/tools/jobs/finDeContratNaturelleCloture.sh"
 ]
