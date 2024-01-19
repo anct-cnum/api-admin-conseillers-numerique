@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
+import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { filterNomStructure } from '../repository/conseillers.repository';
@@ -10,8 +11,22 @@ import {
   filterRegionConseillerObj,
   filterDepartementConseillerObj,
 } from '../../misesEnRelation/misesEnRelation.repository';
-import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { validConseillersCoordonnes } from '../../../schemas/conseillers.schemas';
+
+interface IConseillerCoordonne {
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
+  nomStructure: string;
+  idPG: number;
+  _id: ObjectId;
+  nom: string;
+  prenom: string;
+  groupeCRA: string;
+  codeDepartement: string;
+  codeRegion: string;
+  emailCN?: string;
+  mattermostId?: string;
+}
 
 const getConseillersCoordonnes =
   (app: Application, options) => async (req: IRequest, res: Response) => {
@@ -85,6 +100,8 @@ const getConseillersCoordonnes =
               groupeCRA: '$conseillerObj.groupeCRA',
               codeDepartement: '$conseillerObj.codeDepartement',
               codeRegion: '$conseillerObj.codeRegion',
+              emailCN: '$conseillerObj.emailCN.address',
+              mattermostId: '$conseillerObj.mattermost.id',
               craCount: 1,
             },
           },
@@ -98,8 +115,10 @@ const getConseillersCoordonnes =
         ]);
 
       const promises = misesEnRelation.map(
-        async (miseEnRelation: IMisesEnRelation) => {
+        async (miseEnRelation: IConseillerCoordonne) => {
           const craCount = await getNombreCras(app, req)(miseEnRelation._id);
+          const compteCoopActif =
+            miseEnRelation.emailCN && miseEnRelation.mattermostId;
           const dernierCRA = await app
             .service(service.cras)
             .Model.findOne({
@@ -116,6 +135,7 @@ const getConseillersCoordonnes =
           }
           return {
             ...miseEnRelation,
+            compteCoopActif,
             craCount,
           };
         },
