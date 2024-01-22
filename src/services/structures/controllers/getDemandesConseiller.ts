@@ -24,7 +24,14 @@ const getTotalStructures =
   ) =>
     app.service(service.structures).Model.aggregate([
       {
-        $addFields: { idPGStr: { $toString: '$idPG' } },
+        $addFields: {
+          idPGStr: {
+            $toString: '$idPG',
+            lastPrefet: {
+              $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
+            },
+          },
+        },
       },
       {
         $match: {
