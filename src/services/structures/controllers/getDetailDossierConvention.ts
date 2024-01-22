@@ -189,7 +189,7 @@ const getDetailDossierConvention =
           structure[0].conseillersRecruterConventionnement =
             structure[0]?.conseillers?.filter(
               (conseiller) =>
-                conseiller?.phaseConventionnement === undefined &&
+                !conseiller?.phaseConventionnement &&
                 (conseiller.statut === 'finalisee' ||
                   conseiller.statut === 'nouvelle_rupture' ||
                   conseiller.statut === 'terminee'),
