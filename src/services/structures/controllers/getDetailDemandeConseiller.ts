@@ -42,7 +42,7 @@ const getDetailDemandeConseiller =
       }
       if (
         !['POSITIF', 'NÉGATIF'].includes(structure[0]?.prefet?.avisPrefet) &&
-        structure?.statut === 'CREEE'
+        structure[0]?.statut === 'CREEE'
       ) {
         const listeStructure = await app
           .service(service.structures)
