@@ -20,7 +20,6 @@ const closeBanner =
       'renouvellement',
       'avenant',
       'ajoutRoleCoordinateur',
-      'primoEntrant',
     ];
     if (!typeValidation.includes(type)) {
       res.status(400).json({ message: 'Type incorrect' });
