@@ -103,7 +103,12 @@ const getStructures =
   ) =>
     app.service(service.structures).Model.aggregate([
       {
-        $addFields: { idPGStr: { $toString: '$idPG' } },
+        $addFields: {
+          idPGStr: { $toString: '$idPG' },
+          lastPrefet: {
+            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
+          },
+        },
       },
       {
         $match: {
@@ -125,7 +130,7 @@ const getStructures =
           codePostal: 1,
           idPG: 1,
           createdAt: 1,
-          prefet: { $arrayElemAt: ['$prefet', -1] },
+          prefet: '$lastPrefet',
         },
       },
       { $sort: sortColonne },
