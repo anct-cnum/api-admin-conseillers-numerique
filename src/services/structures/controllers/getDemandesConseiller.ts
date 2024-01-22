@@ -25,12 +25,8 @@ const getTotalStructures =
     app.service(service.structures).Model.aggregate([
       {
         $addFields: {
-          idPGStr: {
-            $toString: '$idPG',
-            lastPrefet: {
-              $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-            },
-          },
+          idPGStr: { $toString: '$idPG' },
+          lastPrefet: { $arrayElemAt: ['$prefet', -1] },
         },
       },
       {
@@ -112,9 +108,7 @@ const getStructures =
       {
         $addFields: {
           idPGStr: { $toString: '$idPG' },
-          lastPrefet: {
-            $ifNull: [{ $arrayElemAt: ['$prefet', -1] }, null],
-          },
+          lastPrefet: { $arrayElemAt: ['$prefet', -1] },
         },
       },
       {
