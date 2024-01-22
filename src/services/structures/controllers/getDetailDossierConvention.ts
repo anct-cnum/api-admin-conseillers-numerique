@@ -141,10 +141,9 @@ const getDetailDossierConvention =
             _id: structure[0]?.prefet?.idStructureTransfert,
           });
         if (!structureTransfert) {
-          res.status(404).json({
-            message: "La structure n'existe pas",
-          });
-          return;
+          throw new Error(
+            `La structure ${structure[0]?.prefet?.idStructureTransfert} n'existe pas lié à la structure ${idStructure}`,
+          );
         }
         structure[0].prefet.structureTransfert = structureTransfert;
       }
