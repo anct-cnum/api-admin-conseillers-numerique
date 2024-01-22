@@ -153,6 +153,26 @@ const filterAvisANCT = (avisANCT: string | undefined) => {
   };
 };
 
+const filterAvisPrefet = (avisPrefet: string | undefined) => {
+  if (avisPrefet === 'sans-avis') {
+    return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
+  }
+  if (avisPrefet === 'favorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'POSITIF' } };
+  }
+  if (avisPrefet === 'défavorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'NÉGATIF' } };
+  }
+  return {};
+};
+
+const filterStatutDemandeConseiller = (statut: string) => {
+  if (statut !== 'toutes') {
+    return { statut: { $eq: statut } };
+  }
+  return { statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] } };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -171,4 +191,6 @@ export {
   getConseillersByStatus,
   checkStructurePhase2,
   filterAvisANCT,
+  filterAvisPrefet,
+  filterStatutDemandeConseiller,
 };
