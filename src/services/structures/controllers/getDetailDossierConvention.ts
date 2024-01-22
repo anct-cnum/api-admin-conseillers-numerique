@@ -11,6 +11,7 @@ import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/mis
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { getTypeDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -131,6 +132,21 @@ const getDetailDossierConvention =
           message: "La structure n'existe pas",
         });
         return;
+      }
+      if (structure[0]?.prefet?.idStructureTransfert) {
+        const structureTransfert = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({
+            _id: structure[0]?.prefet?.idStructureTransfert,
+          });
+        if (!structureTransfert) {
+          res.status(404).json({
+            message: "La structure n'existe pas",
+          });
+          return;
+        }
+        structure[0].prefet.structureTransfert = structureTransfert;
       }
       if (structure[0]?.insee?.unite_legale?.forme_juridique?.libelle) {
         const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
