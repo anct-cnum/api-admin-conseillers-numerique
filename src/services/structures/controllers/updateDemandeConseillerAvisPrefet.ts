@@ -9,7 +9,11 @@ import { demandeConseillerAvisPrefet } from '../../../schemas/structures.schemas
 const updateDemandeConseillerAvisPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { avisPrefet, commentaire } = req.body;
+    const { avisPrefet, commentaire, idStructureTransfert } = req.body;
+    if (idStructureTransfert && !ObjectId.isValid(idStructureTransfert)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
     const avisPrefetValidation = demandeConseillerAvisPrefet.validate({
       avisPrefet,
       commentaire,
@@ -24,6 +28,9 @@ const updateDemandeConseillerAvisPrefet =
       banniereValidationAvisPrefet: true,
       commentairePrefet: commentaire,
       insertedAt: new Date(),
+      ...(idStructureTransfert && {
+        idStructureTransfert,
+      }),
     };
     try {
       if (!ObjectId.isValid(idStructure)) {

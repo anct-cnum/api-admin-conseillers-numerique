@@ -412,6 +412,8 @@ interface IPrefet {
   avisPrefet: string;
   commentairePrefet: string;
   insertedAt: Date;
+  idStructureTransfert?: ObjectId;
+  banniereValidationAvisPrefet?: boolean;
 }
 
 export interface IDemandesCoordinateur {

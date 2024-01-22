@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getDetailDemandeConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -39,7 +40,18 @@ const getDetailDemandeConseiller =
         });
         return;
       }
-      res.status(200).json(structure[0]);
+      if (!['POSITIF', 'NÉGATIF'].includes(structure[0]?.prefet?.avisPrefet)) {
+        const listeStructure = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .find({
+            statut: 'VALIDATION_COSELEC',
+          })
+          .select({ nom: 1 });
+        res.status(200).json({ structure: structure[0], listeStructure });
+        return;
+      }
+      res.status(200).json({ structure: structure[0] });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

@@ -57,6 +57,8 @@ export default function (app: Application): Model<any> {
       avisPrefet: String,
       commentairePrefet: String,
       insertedAt: Date,
+      idStructureTransfert: { type: 'ObjectId' },
+      banniereValidationAvisPrefet: Boolean,
     },
     { _id: false, strict: false },
   );
