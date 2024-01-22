@@ -136,7 +136,9 @@ const updateRefusConventionnement =
           return;
         }
       }
-      res.status(200).json({ success: true });
+      res
+        .status(200)
+        .json({ success: true, structure: structureUpdated.value });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
