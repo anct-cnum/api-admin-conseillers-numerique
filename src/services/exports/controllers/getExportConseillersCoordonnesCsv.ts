@@ -56,17 +56,25 @@ const getExportConseillersCoordonnesCsv =
           },
           {
             $project: {
-              nomStructure: '$structureObj.nom',
-              dateDebutDeContrat: 1,
-              dateFinDeContrat: 1,
               idPG: '$conseillerObj.idPG',
-              _id: '$conseillerObj._id',
               nom: '$conseillerObj.nom',
               prenom: '$conseillerObj.prenom',
-              groupeCRA: '$conseillerObj.groupeCRA',
-              codeDepartement: '$conseillerObj.codeDepartement',
-              codeRegion: '$conseillerObj.codeRegion',
-              craCount: 1,
+              emailPerso: '$conseillerObj.email',
+              emailCN: '$conseillerObj.emailCN.address',
+              nomStructure: '$structureObj.nom',
+              codePostal: '$conseillerObj.codePostal',
+              dateDeRecrutement: '$conseillerObj.datePrisePoste',
+              dateFinFormation: '$conseillerObj.dateFinFormation',
+              certification: '$conseillerObj.certificationPixFormation',
+              nomSuperieurHierarchique: '$conseillerObj.supHierarchique.nom',
+              prenomSuperieurHierarchique:
+                '$conseillerObj.supHierarchique.prenom',
+              fonctionSuperieurHierarchique:
+                '$conseillerObj.supHierarchique.fonction',
+              emailSuperieurHierarchique:
+                '$conseillerObj.supHierarchique.email',
+              telephoneSuperieurHierarchique:
+                '$conseillerObj.supHierarchique.numeroTelephone',
             },
           },
           {
