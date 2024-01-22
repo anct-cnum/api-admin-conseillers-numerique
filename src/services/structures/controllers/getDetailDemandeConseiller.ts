@@ -40,7 +40,10 @@ const getDetailDemandeConseiller =
         });
         return;
       }
-      if (!['POSITIF', 'NÉGATIF'].includes(structure[0]?.prefet?.avisPrefet)) {
+      if (
+        !['POSITIF', 'NÉGATIF'].includes(structure[0]?.prefet?.avisPrefet) &&
+        structure?.statut === 'CREEE'
+      ) {
         const listeStructure = await app
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
