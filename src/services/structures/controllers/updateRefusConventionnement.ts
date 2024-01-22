@@ -69,23 +69,6 @@ const updateRefusConventionnement =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'structure.$id': new ObjectId(idStructure),
-            'structureObj.coordinateurCandidature': false,
-            'structureObj.statut': 'CREEE',
-          },
-          {
-            $set: {
-              'structureObj.statut': 'REFUS_COSELEC',
-              'structure.coselec': coselec,
-              'structureObj.coselecAt': new Date(),
-            },
-          },
-        );
 
       const prefets: IUser[] = await app
         .service(service.users)
