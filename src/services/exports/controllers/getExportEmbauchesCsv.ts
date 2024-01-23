@@ -86,7 +86,7 @@ const getExportEmbauchesCsv =
                 'structure.siret': 1,
                 'structure.nom': 1,
                 'structure.contact': 1,
-                'structure.nomCommune': 1,
+                'structure.insee': 1,
                 'structure.codePostal': 1,
                 'structure.codeCommune': 1,
                 'structure.codeRegion': 1,
