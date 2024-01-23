@@ -14,6 +14,8 @@ import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 const updateRefusConventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
+    const createdAt = new Date(req.params.date);
+    console.log(createdAt);
     if (!ObjectId.isValid(idStructure)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
@@ -25,22 +27,13 @@ const updateRefusConventionnement =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           _id: new ObjectId(idStructure),
-          coordinateurCandidature: false,
           statut: 'CREEE',
+          createdAt,
         });
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-
-      const coselec = [
-        {
-          nombreConseillersCoselec: 0,
-          avisCoselec: 'NÉGATIF',
-          insertedAt: new Date(),
-        },
-      ];
-
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
@@ -53,8 +46,14 @@ const updateRefusConventionnement =
           {
             $set: {
               statut: 'REFUS_COSELEC',
-              coselec,
               coselecAt: new Date(),
+            },
+            $push: {
+              coselec: {
+                nombreConseillersCoselec: 0,
+                avisCoselec: 'NÉGATIF',
+                insertedAt: new Date(),
+              },
             },
           },
           {

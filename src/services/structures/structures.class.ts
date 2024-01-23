@@ -149,7 +149,7 @@ export default class Structures extends Service {
       getDetailDossierConvention(app),
     );
     app.patch(
-      '/conventions/admin/refus/:id',
+      '/conventions/admin/refus/:id/:date',
       authenticateMode(app),
       createAbilities(app),
       updateRefusConventionnement(app),
