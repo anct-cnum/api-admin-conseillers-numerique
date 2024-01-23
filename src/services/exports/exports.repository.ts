@@ -58,7 +58,7 @@ const checkIfCcp1 = (statut) =>
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;Dénomination;Type;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller,ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
   );
   try {
     await Promise.all(
@@ -83,16 +83,17 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
               : ''
           };${checkIfCcp1(miseEnrelation.conseiller?.statut)};${miseEnrelation
             .structure?.siret};${miseEnrelation.structure
-            ?.idPG};${miseEnrelation.structure?.nom};${miseEnrelation.structure
-            ?.type};${miseEnrelation.structure?.codePostal};${miseEnrelation
-            .structure?.codeCommune};${miseEnrelation.structure
+            ?.idPG};${miseEnrelation.structure?._id};${miseEnrelation.structure
+            ?.nom};${miseEnrelation.structure?.type};${formatAdresseStructure(
+            miseEnrelation.structure.insee,
+          )};${miseEnrelation.structure?.codePostal};${miseEnrelation.structure
+            ?.codeCommune};${miseEnrelation.structure
             ?.codeDepartement};${miseEnrelation.structure
             ?.codeRegion};${miseEnrelation.structure?.contact
             ?.prenom};${miseEnrelation.structure?.contact?.nom};${miseEnrelation
             .structure?.contact?.telephone};${miseEnrelation.structure?.contact
-            ?.email};${miseEnrelation.conseiller?.idPG};${
-            coselec !== null ? coselec?.numero : ''
-          };${
+            ?.email};${miseEnrelation.conseiller?.idPG};${miseEnrelation
+            .conseiller?._id};${coselec !== null ? coselec?.numero : ''};${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
           };${formatDate(
             miseEnrelation.conseiller?.datePrisePoste,
