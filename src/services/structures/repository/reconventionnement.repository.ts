@@ -1,15 +1,22 @@
 import { Application } from '@feathersjs/express';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
-import { StatutConventionnement } from '../../../ts/enum';
+import {
+  PhaseConventionnement,
+  StatutConventionnement,
+} from '../../../ts/enum';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   checkAccessReadRequestStructures,
   filterAvisANCT,
-  filterAvisPrefet
+  filterAvisPrefet,
 } from './structures.repository';
-import { getTimestampByDate } from '../../../utils';
+import { getCoselec, getTimestampByDate } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import {
+  findDepartementNameByNumDepartement,
+  findRegionNameByNumDepartement,
+} from '../../../helpers/commonQueriesFunctions';
 
 const filterStatut = (typeConvention: string, avisPrefet: string) => {
   if (typeConvention === 'conventionnement') {
@@ -333,7 +340,11 @@ const formatAvenantForDossierConventionnement = (structures) =>
       return avenantEnCours;
     });
 
-const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
+const formatAvenantForHistoriqueDossierConventionnement = (
+  structures,
+  type: string,
+  isExport: boolean = false,
+) =>
   structures
     .filter((structure) => structure?.demandesCoselec?.length > 0)
     .flatMap((structure) => {
@@ -360,27 +371,54 @@ const formatAvenantForHistoriqueDossierConventionnement = (structures, type) =>
       if (!avenants) {
         return [];
       }
-      return avenants.map((avenant) => ({
-        ...avenant,
-        dateSorted: avenant.emetteurAvenant.date,
-        typeConvention:
+      return avenants.map((avenant) => {
+        const item = avenant;
+        item.dateSorted = avenant.emetteurAvenant.date;
+        item.typeConvention =
           avenant.type === 'retrait'
             ? 'avenantRenduPoste'
-            : 'avenantAjoutPoste',
-        idPG: structure.idPG,
-        nom: structure.nom,
-        idStructure: structure._id,
-      }));
+            : 'avenantAjoutPoste';
+        item.idPG = structure.idPG;
+        item.nom = structure.nom;
+        item.idStructure = structure._id;
+        if (isExport) {
+          item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
+          item.nbPostesApresDemande =
+            avenant.type === 'ajout'
+              ? (avenant.nbPostesAvantDemande || 0) +
+                (avenant.nombreDePostesAccordes || 0)
+              : (avenant.nbPostesAvantDemande || 0) -
+                (avenant.nombreDePostesRendus || 0);
+          item.variation =
+            item.nbPostesApresDemande - item.nbPostesAvantDemande;
+          item.numeroDossierDS =
+            structure.conventionnement?.statut ===
+            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ
+              ? structure.conventionnement?.dossierConventionnement?.numero
+              : structure.conventionnement?.dossierReconventionnement?.numero;
+          item.codeDepartement = structure.codeDepartement;
+          item.departement = findDepartementNameByNumDepartement(
+            structure.codeDepartement,
+            structure.codeCom,
+          );
+          item.region = findRegionNameByNumDepartement(
+            structure.codeDepartement,
+            structure.codeCom,
+          );
+        }
+        return item;
+      });
     });
 
 const formatReconventionnementForDossierConventionnement = (
   structures,
-  statutConventionnement,
+  isExport: boolean = false,
 ) =>
   structures
     .filter(
       (structure) =>
-        structure?.conventionnement?.statut === statutConventionnement,
+        structure?.conventionnement?.statut ===
+        StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
     )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
@@ -390,6 +428,25 @@ const formatReconventionnementForDossierConventionnement = (
       item._id = structure._id;
       item.typeConvention = 'reconventionnement';
       item.statutConventionnement = structure.conventionnement.statut;
+      if (isExport) {
+        const valideCoselec =
+          getCoselec(structure)?.nombreConseillersCoselec ?? 0;
+        item.phaseConventionnement = PhaseConventionnement.PHASE_2;
+        item.nbPostesAvantDemande = valideCoselec;
+        item.nbPostesApresDemande = valideCoselec;
+        item.type = 'Reconventionnement';
+        item.numeroDossierDS = item.numero;
+        item.variation = 0;
+        item.codeDepartement = structure.codeDepartement;
+        item.departement = findDepartementNameByNumDepartement(
+          structure.codeDepartement,
+          structure.codeCom,
+        );
+        item.region = findRegionNameByNumDepartement(
+          structure.codeDepartement,
+          structure.codeCom,
+        );
+      }
       return item;
     });
 
@@ -408,21 +465,36 @@ const formatConventionnementForDossierConventionnement = (
 
 const formatConventionnementForHistoriqueDossierConventionnement = (
   structures,
+  isExport: boolean = false,
 ) =>
   structures
     .filter(
-      (structure) =>
+      (structure: IStructures) =>
         structure?.statut === 'VALIDATION_COSELEC' ||
         structure?.statut === 'REFUS_COSELEC',
     )
     .map((structure) => {
-      return {
-        ...structure,
-        dateSorted: structure.createdAt,
-        typeConvention: 'conventionnement',
-        nombreConseillersCoselec:
-          structure?.coselec[0]?.nombreConseillersCoselec ?? 0,
-      };
+      const item = structure;
+      item.dateSorted = item.createdAt;
+      item.typeConvention = 'conventionnement';
+      item.nombreConseillersCoselec =
+        structure?.coselec[0]?.nombreConseillersCoselec ?? 0;
+      if (isExport) {
+        item.phaseConventionnement = PhaseConventionnement.PHASE_2;
+        item.nbPostesAvantDemande = 0;
+        item.type = 'Conventionnement initial';
+        item.nbPostesApresDemande = item.nombreConseillersCoselec;
+        item.variation = 0;
+        item.departement = findDepartementNameByNumDepartement(
+          structure.codeDepartement,
+          structure.codeCom,
+        );
+        item.region = findRegionNameByNumDepartement(
+          structure.codeDepartement,
+          structure.codeCom,
+        );
+      }
+      return item;
     });
 
 const sortDossierConventionnement = (
@@ -448,6 +520,7 @@ const sortHistoriqueDossierConventionnement = (
   type: string,
   ordre: number,
   structures: any,
+  isExport = false,
 ) => {
   let avenantSort: any = [];
   let conventionnement: any = [];
@@ -456,17 +529,21 @@ const sortHistoriqueDossierConventionnement = (
     avenantSort = formatAvenantForHistoriqueDossierConventionnement(
       structures,
       type,
+      isExport,
     );
   }
   if (type === 'reconventionnement' || type === 'toutes') {
     reconventionnement = formatReconventionnementForDossierConventionnement(
       structures,
-      StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
+      isExport,
     );
   }
   if (type === 'conventionnement' || type === 'toutes') {
     conventionnement =
-      formatConventionnementForHistoriqueDossierConventionnement(structures);
+      formatConventionnementForHistoriqueDossierConventionnement(
+        structures,
+        isExport,
+      );
   }
   const structureFormat = avenantSort.concat(
     reconventionnement,
