@@ -11,10 +11,7 @@ import {
   StatutConventionnement,
 } from '../../../ts/enum';
 import mailer from '../../../mailer';
-import {
-  validationCandidaturePosteConseiller,
-  validationCandidaturePosteConseillerPrefet,
-} from '../../../emails';
+import { validationCandidaturePosteConseillerPrefet } from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -132,22 +129,7 @@ const updateDemandeConseillerValidAvisAdmin =
         });
         await Promise.allSettled(promises);
       }
-      if (structure?.contact?.email) {
-        const messageAvisCandidaturePosteConseiller =
-          validationCandidaturePosteConseiller(mailerInstance);
-        const errorSmtpMailCandidaturePosteConseiller =
-          await messageAvisCandidaturePosteConseiller
-            .send(structureUpdated)
-            .catch((errSmtp: Error) => {
-              return errSmtp;
-            });
-        if (errorSmtpMailCandidaturePosteConseiller instanceof Error) {
-          res.status(503).json({
-            message: errorSmtpMailCandidaturePosteConseiller.message,
-          });
-          return;
-        }
-      }
+
       res.status(200).json(structureUpdated?.statut);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

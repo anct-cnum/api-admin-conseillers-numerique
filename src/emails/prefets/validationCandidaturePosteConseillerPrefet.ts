@@ -5,11 +5,11 @@ export default function (mailer) {
   const templateName = 'validationCandidaturePosteConseillerPrefet';
 
   const render = async (
-    nombreCoordinateursCoselec: number,
+    nombreConseillersCoselec: number,
     nomStructure: string,
   ) => {
     return mailer.render(__dirname, templateName, {
-      nombreCoordinateursCoselec,
+      nombreConseillersCoselec,
       nomStructure,
     });
   };
