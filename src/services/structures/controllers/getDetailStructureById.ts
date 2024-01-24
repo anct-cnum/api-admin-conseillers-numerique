@@ -1,7 +1,10 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import {
   checkAccessReadRequestStructures,
@@ -30,7 +33,9 @@ import {
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const demarcheSimplifiee = app.get('demarche_simplifiee');
+    const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+      'demarche_simplifiee',
+    );
     try {
       if (!ObjectId.isValid(idStructure)) {
         return res.status(400).json({ message: 'Id incorrect' });
@@ -142,6 +147,7 @@ const getDetailStructureById =
       });
       const typeStructure = getTypeDossierDemarcheSimplifiee(
         structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
+        demarcheSimplifiee,
       );
       const coselec = getCoselec(structure[0]);
       const coselecConventionnement = getCoselecConventionnement(structure[0]);

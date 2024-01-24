@@ -28,7 +28,10 @@ const demandeCoordinateurAvisPrefet = Joi.object({
     .required()
     .error(new Error('L avis est invalide')),
   commentaire: Joi.string()
+    .trim()
+    .min(10)
     .max(1000)
+    .required()
     .error(new Error('Le commentaire est invalide')),
 });
 

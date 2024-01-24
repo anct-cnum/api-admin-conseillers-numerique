@@ -16,9 +16,6 @@ const validStatConseiller = Joi.object({
   dateFin: Joi.date()
     .required()
     .error(new Error('La date de fin est invalide')),
-  idConseiller: Joi.string()
-    .regex(/^[0-9a-fA-F]{24}$/)
-    .error(new Error("L'id du conseiller est invalide")),
   codePostal: Joi.string()
     .allow('', null)
     .error(new Error('Le filtre code postal est invalide')),
