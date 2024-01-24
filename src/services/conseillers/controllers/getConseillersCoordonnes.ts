@@ -75,7 +75,7 @@ const getConseillersCoordonnes =
         .Model.accessibleBy(req.ability, action.read)
         .getQuery();
 
-      const misesEnRelation = await app
+      const coordonnes = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
           {
@@ -102,7 +102,6 @@ const getConseillersCoordonnes =
               codeRegion: '$conseillerObj.codeRegion',
               emailCN: '$conseillerObj.emailCN.address',
               mattermostId: '$conseillerObj.mattermost.id',
-              craCount: 1,
             },
           },
           {
@@ -114,15 +113,14 @@ const getConseillersCoordonnes =
           { $limit: Number(limit) },
         ]);
 
-      const promises = misesEnRelation.map(
-        async (miseEnRelation: IConseillerCoordonne) => {
-          const craCount = await getNombreCras(app, req)(miseEnRelation._id);
-          const compteCoopActif =
-            miseEnRelation.emailCN && miseEnRelation.mattermostId;
+      const promises = coordonnes.map(
+        async (coordonne: IConseillerCoordonne) => {
+          const craCount = await getNombreCras(app, req)(coordonne._id);
+          const compteCoopActif = coordonne.emailCN && coordonne.mattermostId;
           const dernierCRA = await app
             .service(service.cras)
             .Model.findOne({
-              'conseiller.$id': miseEnRelation._id,
+              'conseiller.$id': coordonne._id,
             })
             .sort({ createdAt: -1 })
             .limit(1);
@@ -134,7 +132,7 @@ const getConseillersCoordonnes =
             return null;
           }
           return {
-            ...miseEnRelation,
+            ...coordonne,
             compteCoopActif,
             craCount,
           };
@@ -145,7 +143,7 @@ const getConseillersCoordonnes =
         await Promise.all(promises)
       ).filter((item) => item !== null);
 
-      if (misesEnRelation.length > 0) {
+      if (coordonnes.length > 0) {
         items.data = conseillersCoordonnes;
         items.total = conseillersCoordonnes.length;
         items.limit = limit;

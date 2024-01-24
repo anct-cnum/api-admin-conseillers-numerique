@@ -44,6 +44,9 @@ const getConseillers = async (
       conseillers = await app
         .service(service.conseillers)
         .Model.find(query, { _id: 1, structureId: 1 });
+      conseillers = conseillers.filter(
+        (coordinateur) => !coordinateur._id.equals(userId),
+      );
     } catch (error) {
       throw new Error(error);
     }

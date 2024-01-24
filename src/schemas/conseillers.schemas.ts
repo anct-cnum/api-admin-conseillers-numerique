@@ -48,7 +48,7 @@ const validConseillersCoordonnes = Joi.object({
   searchByStructure: Joi.string().error(
     new Error('La recherche par structure est invalide'),
   ),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
   departement: Joi.string().error(
     new Error('Le filtre département est invalide'),
   ),
