@@ -81,7 +81,7 @@ const verificationCandidaturesRecrutee =
   };
 
 const archiverLaSuppression =
-  (app) => async (tableauCandidat, user, role, motif) => {
+  (app) => async (tableauCandidat, user, role, motif, misesEnRelations) => {
     try {
       await Promise.all(
         tableauCandidat.map(async (profil) => {
@@ -102,6 +102,7 @@ const archiverLaSuppression =
               deletedAt: new Date(),
               motif,
               conseiller,
+              historiqueContrat: misesEnRelations,
               actionUser: {
                 role,
                 userId: user._id,
@@ -221,7 +222,17 @@ const deleteCandidatById =
         motif === 'doublon'
           ? { _id: new ObjectId(idConseiller), email }
           : { email };
-
+      const instructionSuppressionMER =
+        motif === 'doublon'
+          ? {
+              'conseiller.$id': new ObjectId(idConseiller),
+              'conseillerObj.email': email,
+              statut: {},
+            }
+          : { 'conseillerObj.email': email, statut: {} };
+      instructionSuppressionMER.statut = {
+        $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
+      };
       const nbDoublonsReel = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -236,6 +247,24 @@ const deleteCandidatById =
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .find(instructionSuppression);
+
+      const misesEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .find(instructionSuppressionMER, {
+          statut: 1,
+          'conseiller.$id': 1,
+          'structure.$id': 1,
+          dateRecrutement: 1,
+          dateDebutDeContrat: 1,
+          dateFinDeContrat: 1,
+          typeDeContrat: 1,
+          reconventionnement: 1,
+          conventionnement: 1,
+          phaseConventionnement: 1,
+          dateRupture: 1,
+          motifRupture: 1,
+        });
 
       if (estDoublon && tableauCandidat[0]?.ruptures?.length > 0) {
         res.status(409).json({
@@ -270,6 +299,7 @@ const deleteCandidatById =
         req.user,
         req.query.role,
         motif,
+        misesEnRelation,
       );
       await suppressionTotalCandidat(app, req, pool)(tableauCandidat);
       if (estDoublon && aDoublonRecrute === 0) {
