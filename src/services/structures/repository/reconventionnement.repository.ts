@@ -3,14 +3,20 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-import { checkAccessReadRequestStructures } from './structures.repository';
-import { getCoselecConventionnement, getTimestampByDate } from '../../../utils';
+import {
+  checkAccessReadRequestStructures,
+  filterAvisPrefet,
+} from './structures.repository';
+import { getTimestampByDate } from '../../../utils';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
-const filterStatut = (typeConvention: string) => {
+const filterStatut = (typeConvention: string, avisPrefet: string) => {
   if (typeConvention === 'conventionnement') {
     return {
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
+      statut: 'CREEE',
+      coordinateurCandidature: false,
+      createdAt: { $gte: new Date('2023-01-01') },
+      ...filterAvisPrefet(avisPrefet),
     };
   }
   if (typeConvention === 'avenantAjoutPoste') {
@@ -37,9 +43,9 @@ const filterStatut = (typeConvention: string) => {
   return {
     $or: [
       {
-        'conventionnement.statut': {
-          $eq: StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-        },
+        statut: 'CREEE',
+        coordinateurCandidature: false,
+        createdAt: { $gte: new Date('2023-01-01') },
       },
       {
         demandesCoselec: {
@@ -161,15 +167,25 @@ const filterDateDemandeAndStatutHistorique = (
 };
 
 const totalParConvention = async (app: Application, req: IRequest) => {
+  const checkAccess = await checkAccessReadRequestStructures(app, req);
   const conventionnement = await app
     .service(service.structures)
-    .Model.accessibleBy(req.ability, action.read)
-    .countDocuments({
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-    });
-  const checkAccess = await checkAccessReadRequestStructures(app, req);
-
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
+          statut: 'CREEE',
+          coordinateurCandidature: false,
+          createdAt: { $gte: new Date('2023-01-01') },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          count: { $sum: 1 },
+        },
+      },
+    ]);
   const countAvenant = await app.service(service.structures).Model.aggregate([
     {
       $match: {
@@ -189,15 +205,16 @@ const totalParConvention = async (app: Application, req: IRequest) => {
       },
     },
   ]);
+  const countConventionnement = conventionnement[0]?.count ?? 0;
   const totalAvenantAjoutPoste =
     countAvenant.find((element) => element._id === 'ajout')?.count ?? 0;
   const totalAvenantRenduPoste =
     countAvenant.find((element) => element._id === 'retrait')?.count ?? 0;
   const total =
-    conventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
+    countConventionnement + totalAvenantAjoutPoste + totalAvenantRenduPoste;
 
   return {
-    conventionnement,
+    conventionnement: countConventionnement,
     avenantAjoutPoste: totalAvenantAjoutPoste,
     avenantRenduPoste: totalAvenantRenduPoste,
     total,
@@ -369,25 +386,16 @@ const formatReconventionnementForDossierConventionnement = (
     });
 
 const formatConventionnementForDossierConventionnement = (
-  structures,
-  statutConventionnement,
+  structures: IStructures[],
 ) =>
   structures
-    .filter(
-      (structure) =>
-        structure?.conventionnement?.statut === statutConventionnement,
-    )
-    .map((structure) => {
-      const item = structure.conventionnement.dossierConventionnement;
-      item.dateSorted = item?.dateDeCreation;
-      item.idPG = structure.idPG;
-      item.nom = structure.nom;
-      item._id = structure._id;
-      item.typeConvention = 'conventionnement';
-      item.statutConventionnement = structure.conventionnement.statut;
-      item.nombreConseillersCoselec =
-        getCoselecConventionnement(structure)?.nombreConseillersCoselec ?? 0;
-      return item;
+    .filter((structure: IStructures) => structure?.statut === 'CREEE')
+    .map((structure: IStructures) => {
+      return {
+        ...structure,
+        dateSorted: structure.createdAt,
+        typeConvention: 'conventionnement',
+      };
     });
 
 const sortDossierConventionnement = (
@@ -401,10 +409,8 @@ const sortDossierConventionnement = (
     avenantSort = formatAvenantForDossierConventionnement(structures);
   }
   if (type === 'conventionnement' || type === 'toutes') {
-    conventionnement = formatConventionnementForDossierConventionnement(
-      structures,
-      StatutConventionnement.CONVENTIONNEMENT_EN_COURS,
-    );
+    conventionnement =
+      formatConventionnementForDossierConventionnement(structures);
   }
   const structureFormat = avenantSort.concat(conventionnement);
 
@@ -432,10 +438,8 @@ const sortHistoriqueDossierConventionnement = (
     );
   }
   if (type === 'conventionnement' || type === 'toutes') {
-    conventionnement = formatConventionnementForDossierConventionnement(
-      structures,
-      StatutConventionnement.CONVENTIONNEMENT_VALIDÉ,
-    );
+    conventionnement =
+      formatConventionnementForDossierConventionnement(structures);
   }
   const structureFormat = avenantSort.concat(
     reconventionnement,
