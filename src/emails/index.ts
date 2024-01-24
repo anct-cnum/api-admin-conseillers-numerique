@@ -15,6 +15,8 @@ import validationCandidaturePosteCoordinateurPrefet from './prefets/validationCa
 import refusCandidaturePosteCoordinateurPrefet from './prefets/refusCandidaturePosteCoordinateurPrefet';
 import validationCandidaturePosteConseillerPrefet from './prefets/validationCandidaturePosteConseillerPrefet';
 import informationNouvelleCandidatureConseiller from './prefets/informationNouvelleCandidatureConseiller';
+import refusCandidaturePosteConseiller from './structures/refusCandidaturePosteConseiller';
+import refusCandidaturePosteConseillerPrefet from './prefets/refusCandidaturePosteConseillerPrefet';
 
 export {
   creationCompteCandidat,
@@ -34,4 +36,6 @@ export {
   refusCandidaturePosteCoordinateurPrefet,
   validationCandidaturePosteConseillerPrefet,
   informationNouvelleCandidatureConseiller,
+  refusCandidaturePosteConseiller,
+  refusCandidaturePosteConseillerPrefet,
 };

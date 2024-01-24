@@ -1,0 +1,30 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Nous avons le regret de vous informer que votre demande de poste de <strong>Conseiller
+              num&eacute;rique, n&rsquo;a pas &eacute;t&eacute; retenue</strong> par l&rsquo;ANCT.
+          </mj-text>
+          <mj-text align="left">
+            Votre Pr&eacute;fecture de d&eacute;partement se tient &agrave; votre disposition pour
+            r&eacute;pondre &agrave; l&rsquo;ensemble de vos questions.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

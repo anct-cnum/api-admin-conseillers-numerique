@@ -22,6 +22,7 @@ import updateDemandeCoordinateurRefusAvisAdmin from './updateDemandeCoordinateur
 import updateDemandeCoordinateurValidAvisAdmin from './updateDemandeCoordinateurValidAvisAdmin';
 import addRoleCoordinateur from './addRoleCoordinateur';
 import updateDemandeConseillerValidAvisAdmin from './updateDemandeConseillerValidAvisAdmin';
+import updateDemandeConseillerRefusAvisAdmin from './updateDemandeConseillerRefusAvisAdmin';
 import getDemandesConseiller from './getDemandesConseiller';
 import getDetailDemandeConseiller from './getDetailDemandeConseiller';
 
@@ -50,6 +51,7 @@ export {
   updateDemandeCoordinateurValidAvisAdmin,
   addRoleCoordinateur,
   updateDemandeConseillerValidAvisAdmin,
+  updateDemandeConseillerRefusAvisAdmin,
   getDemandesConseiller,
   getDetailDemandeConseiller,
 };
