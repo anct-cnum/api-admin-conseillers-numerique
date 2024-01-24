@@ -130,7 +130,7 @@ const updateDemandeConseillerValidAvisAdmin =
         await Promise.allSettled(promises);
       }
 
-      res.status(200).json(structureUpdated?.statut);
+      res.status(200).json(structureUpdated);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
