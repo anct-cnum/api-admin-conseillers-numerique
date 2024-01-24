@@ -23,6 +23,8 @@ import updateDemandeCoordinateurValidAvisAdmin from './updateDemandeCoordinateur
 import addRoleCoordinateur from './addRoleCoordinateur';
 import getDemandesConseiller from './getDemandesConseiller';
 import getDetailDemandeConseiller from './getDetailDemandeConseiller';
+import updateDemandeConseillerAvisPrefet from './updateDemandeConseillerAvisPrefet';
+import closeBannerDemandeConseillerAvisPrefet from './closeBannerDemandeConseillerAvisPrefet';
 
 export {
   getStructures,
@@ -50,4 +52,6 @@ export {
   addRoleCoordinateur,
   getDemandesConseiller,
   getDetailDemandeConseiller,
+  updateDemandeConseillerAvisPrefet,
+  closeBannerDemandeConseillerAvisPrefet,
 };
