@@ -14,7 +14,6 @@ import informationNouvelleCandidatureCoordinateur from './prefets/informationNou
 import validationCandidaturePosteCoordinateurPrefet from './prefets/validationCandidaturePosteCoordinateurPrefet';
 import refusCandidaturePosteCoordinateurPrefet from './prefets/refusCandidaturePosteCoordinateurPrefet';
 import validationCandidaturePosteConseillerPrefet from './prefets/validationCandidaturePosteConseillerPrefet';
-import validationCandidaturePosteConseiller from './structures/validationCandidaturePosteConseiller';
 import informationNouvelleCandidatureConseiller from './prefets/informationNouvelleCandidatureConseiller';
 
 export {
@@ -34,6 +33,5 @@ export {
   validationCandidaturePosteCoordinateurPrefet,
   refusCandidaturePosteCoordinateurPrefet,
   validationCandidaturePosteConseillerPrefet,
-  validationCandidaturePosteConseiller,
   informationNouvelleCandidatureConseiller,
 };
