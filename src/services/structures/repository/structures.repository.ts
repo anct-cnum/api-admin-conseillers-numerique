@@ -143,6 +143,13 @@ const filterAvisPrefet = (avisPrefet: string | undefined) => {
   return {};
 };
 
+const filterStatutDemandeConseiller = (statut: string) => {
+  if (statut !== 'toutes') {
+    return { statut: { $eq: statut } };
+  }
+  return { statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] } };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -161,4 +168,5 @@ export {
   getConseillersByStatus,
   checkStructurePhase2,
   filterAvisPrefet,
+  filterStatutDemandeConseiller,
 };
