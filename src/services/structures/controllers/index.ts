@@ -25,6 +25,8 @@ import updateDemandeConseillerValidAvisAdmin from './updateDemandeConseillerVali
 import updateDemandeConseillerRefusAvisAdmin from './updateDemandeConseillerRefusAvisAdmin';
 import getDemandesConseiller from './getDemandesConseiller';
 import getDetailDemandeConseiller from './getDetailDemandeConseiller';
+import updateDemandeConseillerAvisPrefet from './updateDemandeConseillerAvisPrefet';
+import closeBannerDemandeConseillerAvisPrefet from './closeBannerDemandeConseillerAvisPrefet';
 
 export {
   getStructures,
@@ -54,4 +56,6 @@ export {
   updateDemandeConseillerRefusAvisAdmin,
   getDemandesConseiller,
   getDetailDemandeConseiller,
+  updateDemandeConseillerAvisPrefet,
+  closeBannerDemandeConseillerAvisPrefet,
 };
