@@ -1,4 +1,9 @@
 import getCodePostauxStructureCras from './getCodePostauxStructureCras';
-import getCodePostauxConseillerCras from './getCodePostauxConseillerCras';
+import getFiltresConseillerCras from './getFiltresConseillerCras';
+import getFiltresConseillerCrasParcoursRecrutement from './getFiltresConseillerCrasParcoursRecrutement';
 
-export { getCodePostauxStructureCras, getCodePostauxConseillerCras };
+export {
+  getCodePostauxStructureCras,
+  getFiltresConseillerCras,
+  getFiltresConseillerCrasParcoursRecrutement,
+};

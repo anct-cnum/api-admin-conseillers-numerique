@@ -22,14 +22,15 @@ const getStatsNationalesGrandReseau =
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query.dateFin);
       dateFin.setUTCHours(23, 59, 59, 59);
-      const { codePostal, codeCommune, codeRegion, numeroDepartement } =
-        req.query;
-      const structureIds = req.query.structureIds
-        ? JSON.parse(req.query.structureIds)
-        : [];
-      const conseillerIds = req.query.conseillerIds
-        ? JSON.parse(req.query.conseillerIds)
-        : [];
+      const {
+        codePostal,
+        codeCommune,
+        codeRegion,
+        numeroDepartement,
+        idConseiller,
+        idStructure,
+      } = req.query;
+
       if (!exportStats) {
         const statsValidation = validStatGrandReseau.validate({
           dateDebut,
@@ -42,6 +43,14 @@ const getStatsNationalesGrandReseau =
 
         if (statsValidation.error) {
           res.status(400).json({ message: statsValidation.error.message });
+          return;
+        }
+        if (idConseiller && !ObjectId.isValid(idConseiller)) {
+          res.status(400).json({ message: 'Id conseiller incorrect' });
+          return;
+        }
+        if (idStructure && !ObjectId.isValid(idStructure)) {
+          res.status(400).json({ message: 'Id structure incorrect' });
           return;
         }
       }
@@ -112,16 +121,12 @@ const getStatsNationalesGrandReseau =
         query['cra.codeCommune'] = codeCommune;
       }
       // Si la requête contient une structure, on l'ajoute à la requête
-      if (structureIds.length > 0) {
-        query['structure.$id'] = {
-          $in: structureIds.map((id: string) => new ObjectId(id)),
-        };
+      if (idStructure) {
+        query['structure.$id'] = new ObjectId(idStructure);
       }
       // Si la requête contient un conseiller, on l'ajoute à la requête
-      if (conseillerIds.length > 0) {
-        query['conseiller.$id'] = {
-          $in: conseillerIds.map((id: string) => new ObjectId(id)),
-        };
+      if (idConseiller) {
+        query['conseiller.$id'] = new ObjectId(idConseiller);
       }
       // Récupération des données
       const donneesStats = await getStatsGlobales(

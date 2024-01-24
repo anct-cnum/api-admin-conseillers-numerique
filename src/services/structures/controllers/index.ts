@@ -22,6 +22,8 @@ import closeBannerParcoursCoordinateur from './closeBannerParcoursCoordinateur';
 import updateDemandeCoordinateurRefusAvisAdmin from './updateDemandeCoordinateurRefusAvisAdmin';
 import updateDemandeCoordinateurValidAvisAdmin from './updateDemandeCoordinateurValidAvisAdmin';
 import addRoleCoordinateur from './addRoleCoordinateur';
+import getDemandesConseiller from './getDemandesConseiller';
+import getDetailDemandeConseiller from './getDetailDemandeConseiller';
 
 export {
   getStructures,
@@ -48,4 +50,6 @@ export {
   updateDemandeCoordinateurRefusAvisAdmin,
   updateDemandeCoordinateurValidAvisAdmin,
   addRoleCoordinateur,
+  getDemandesConseiller,
+  getDetailDemandeConseiller,
 };
