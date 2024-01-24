@@ -52,6 +52,17 @@ export default function (app: Application): Model<any> {
     { _id: false, strict: false },
   );
 
+  const prefetSchema = new Schema(
+    {
+      avisPrefet: String,
+      commentairePrefet: String,
+      insertedAt: Date,
+      idStructureTransfert: { type: 'ObjectId' },
+      banniereValidationAvisPrefet: Boolean,
+    },
+    { _id: false, strict: false },
+  );
+
   const demandeCoordinateurSchema = new Schema(
     {
       id: { type: 'ObjectId' },
@@ -143,6 +154,8 @@ export default function (app: Application): Model<any> {
       coordonneesInsee: { type: Object },
 
       adresseInsee2Ban: { type: Object },
+
+      prefet: { type: [prefetSchema], default: undefined },
 
       conventionnement: { type: conventionnementSchema },
 
