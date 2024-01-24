@@ -15,7 +15,6 @@ const updateRefusConventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const createdAt = new Date(req.params.date);
-    console.log(createdAt);
     if (!ObjectId.isValid(idStructure)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
