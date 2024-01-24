@@ -49,6 +49,7 @@ const getDetailDemandeConseiller =
           .Model.accessibleBy(req.ability, action.read)
           .find({
             statut: 'VALIDATION_COSELEC',
+            _id: { $ne: structure[0]._id },
           })
           .select({ nom: 1 });
         res.status(200).json({ structure: structure[0], listeStructure });
