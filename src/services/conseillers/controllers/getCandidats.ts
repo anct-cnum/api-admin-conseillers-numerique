@@ -7,13 +7,13 @@ import { validCandidats } from '../../../schemas/conseillers.schemas';
 import {
   filterDepartement,
   filterRegion,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   checkAccessReadRequestConseillers,
 } from '../repository/conseillers.repository';
 
 const getTotalCandidats =
   (app: Application, checkAccess) =>
-  async (region: string, departement: string, searchByName: string) =>
+  async (region: string, departement: string, search: string) =>
     app.service(service.conseillers).Model.aggregate([
       {
         $addFields: {
@@ -32,7 +32,7 @@ const getTotalCandidats =
           $and: [checkAccess],
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
@@ -44,7 +44,7 @@ const getCandidatsAvecFiltre =
   async (
     region: string,
     departement: string,
-    searchByName: string,
+    search: string,
     skip: string,
     limit: number,
   ) =>
@@ -66,7 +66,7 @@ const getCandidatsAvecFiltre =
           $and: [checkAccess],
           ...filterRegion(region),
           ...filterDepartement(departement),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       {
@@ -90,10 +90,10 @@ const getCandidatsAvecFiltre =
 
 const getCandidats =
   (app: Application, options) => async (req: IRequest, res: Response) => {
-    const { skip, searchByNomCandidat, departement, region } = req.query;
+    const { skip, search, departement, region } = req.query;
     const candidatValidation = validCandidats.validate({
       skip,
-      searchByNomCandidat,
+      search,
       departement,
       region,
     });
@@ -117,7 +117,7 @@ const getCandidats =
       )(
         region as string,
         departement as string,
-        searchByNomCandidat as string,
+        search as string,
         skip as string,
         options.paginate.default,
       );
@@ -125,7 +125,7 @@ const getCandidats =
         const totalCandidats = await getTotalCandidats(app, checkAccess)(
           region as string,
           departement as string,
-          searchByNomCandidat as string,
+          search as string,
         );
         items.data = candidats;
         items.total = totalCandidats[0]?.count_candidats;

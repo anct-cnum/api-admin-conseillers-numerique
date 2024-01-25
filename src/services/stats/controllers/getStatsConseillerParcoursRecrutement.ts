@@ -11,7 +11,7 @@ import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 const getStatsConseillerParcoursRecrutement =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
-      const idConseiller = String(req.query?.idConseiller);
+      const idConseiller = req.query?.idConseiller;
       const dateDebut = new Date(req.query?.dateDebut);
       dateDebut.setUTCHours(0, 0, 0, 0);
       const dateFin = new Date(req.query?.dateFin);
@@ -20,7 +20,6 @@ const getStatsConseillerParcoursRecrutement =
       const statsValidation = validStatConseiller.validate({
         dateDebut,
         dateFin,
-        idConseiller,
         codePostal,
         codeCommune,
       });
