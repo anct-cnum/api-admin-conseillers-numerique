@@ -49,8 +49,9 @@ const updateDemandeConseillerRefusAvisAdmin =
               coselec: {
                 nombreConseillersCoselec: 0,
                 avisCoselec: 'NÉGATIF',
-                insertedAt: new Date(),
                 phaseConventionnement: PhaseConventionnement.PHASE_2,
+                validateur: req.user?.name,
+                insertedAt: new Date(),
               },
             },
           },
@@ -60,9 +61,10 @@ const updateDemandeConseillerRefusAvisAdmin =
         );
 
       if (!structureUpdated) {
-        res
-          .status(404)
-          .json({ message: "La structure n'a pas été mise à jour" });
+        res.status(404).json({
+          message:
+            "La structure n'existe pas ou n'a pas postulé pour recruter un conseiller",
+        });
         return;
       }
 

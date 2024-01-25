@@ -44,7 +44,7 @@ const updateDemandeConseillerValidAvisAdmin =
     ) {
       res
         .status(400)
-        .json({ message: 'Nombre de conseillers COSELEC incorrect' });
+        .json({ message: 'Nombre de conseillers saisi incorrect' });
       return;
     }
     try {
@@ -56,7 +56,10 @@ const updateDemandeConseillerValidAvisAdmin =
           statut: 'CREEE',
         });
       if (!structure) {
-        res.status(404).json({ message: "La structure n'existe pas" });
+        res.status(404).json({
+          message:
+            "La structure n'existe pas ou n'a pas postulé pour recruter un conseiller",
+        });
         return;
       }
       const updatedAt = new Date();
@@ -81,8 +84,9 @@ const updateDemandeConseillerValidAvisAdmin =
               coselec: {
                 nombreConseillersCoselec,
                 avisCoselec: 'POSITIF',
-                insertedAt: new Date(),
                 phaseConventionnement: PhaseConventionnement.PHASE_2,
+                validateur: req.user?.name,
+                insertedAt: new Date(),
               },
             },
           },

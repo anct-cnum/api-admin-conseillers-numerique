@@ -38,12 +38,13 @@ export default function (app: Application): Model<any> {
     {
       nombreConseillersCoselec: Number,
       avisCoselec: String,
-      insertedAt: Date,
       numero: String,
       phaseConventionnement: String,
       type: String,
       observationsReferent: String,
       prioritaireCoselec: String,
+      validateur: String,
+      insertedAt: Date,
     },
     { _id: false, strict: false },
   );

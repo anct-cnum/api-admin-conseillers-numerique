@@ -412,12 +412,13 @@ interface IDemandesCoselec {
 interface ICoselec {
   nombreConseillersCoselec: number;
   avisCoselec: string;
-  insertedAt: Date;
   numero?: string;
   phaseConventionnement?: string;
   type?: string;
   observationsReferent?: string;
   prioritaireCoselec?: string;
+  validateur?: string;
+  insertedAt: Date;
 }
 
 interface IPrefet {
