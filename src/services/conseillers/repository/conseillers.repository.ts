@@ -153,7 +153,7 @@ const filtrePiecesManquantes = (piecesManquantes: boolean) => {
   return {};
 };
 
-const filterIsRuptureMisesEnRelation = (
+const filterByStatutContratMisesEnRelation = (
   statutContrat: string,
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
@@ -209,12 +209,12 @@ const filterIsRuptureMisesEnRelation = (
   }
 };
 
-const filterIsRuptureConseiller = (
-  rupture: string,
+const filterByStatutConseiller = (
+  statut: string,
   dateDebut: Date,
   dateFin: Date,
 ) => {
-  switch (rupture) {
+  switch (statut) {
     case 'finalisee_rupture':
     case 'terminee_naturelle':
       return { statut: { $in: ['RUPTURE', 'TERMINE'] } };
@@ -239,8 +239,8 @@ export {
   filterIsCoordinateur,
   filterNomAndEmailConseiller,
   filterNomStructure,
-  filterIsRuptureMisesEnRelation,
-  filterIsRuptureConseiller,
+  filterByStatutContratMisesEnRelation,
+  filterByStatutConseiller,
   filterRegion,
   filterDepartement,
   filterCv,

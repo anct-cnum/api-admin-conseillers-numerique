@@ -7,8 +7,8 @@ import { validConseillers } from '../../../schemas/conseillers.schemas';
 import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
-  filterIsRuptureMisesEnRelation,
-  filterIsRuptureConseiller,
+  filterByStatutContratMisesEnRelation,
+  filterByStatutConseiller,
   filterNomAndEmailConseiller,
   filterNomStructure,
   filterRegion,
@@ -32,7 +32,7 @@ const getTotalConseillersRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,
@@ -73,7 +73,7 @@ const getConseillersRecruter =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
+          ...filterByStatutConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
@@ -106,7 +106,7 @@ const getMisesEnRelationRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,

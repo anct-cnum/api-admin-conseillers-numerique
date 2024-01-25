@@ -596,8 +596,8 @@ export interface ConseillersSupprimes {
 
 export interface ConseillersRuptures {
   _id: ObjectId;
-  conseillerId: Types.ObjectId;
-  structureId: Types.ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
   dateRupture: Date;
   motifRupture: string;
 }

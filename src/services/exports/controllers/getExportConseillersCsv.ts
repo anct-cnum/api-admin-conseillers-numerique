@@ -9,8 +9,8 @@ import {
   filterNomAndEmailConseiller,
   filterRegion,
   filterNomStructure,
-  filterIsRuptureConseiller,
-  filterIsRuptureMisesEnRelation,
+  filterByStatutConseiller,
+  filterByStatutContratMisesEnRelation,
   checkAccessReadRequestConseillers,
   filterDepartement,
 } from '../../conseillers/repository/conseillers.repository';
@@ -43,7 +43,7 @@ const getConseillersRecruter =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
+          ...filterByStatutConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
@@ -74,7 +74,7 @@ const getMisesEnRelationRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,

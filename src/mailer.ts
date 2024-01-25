@@ -52,6 +52,10 @@ export default function (app: Application) {
 
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
 
+  const getQuestionFinContratUrl = () => `${app.get('url_question_contrat')}`;
+
+  const getSupportMail = () => configuration.replyTo;
+
   const initSentry = () => {
     if (config().sentry.enabled === 'true') {
       Sentry.init({
@@ -79,6 +83,8 @@ export default function (app: Application) {
     getPixSupportMail,
     getEspaceCandidatUrl,
     getEspaceCoopUrl,
+    getQuestionFinContratUrl,
+    getSupportMail,
   };
   return {
     utils,
