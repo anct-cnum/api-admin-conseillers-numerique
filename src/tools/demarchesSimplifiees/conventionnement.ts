@@ -4,29 +4,50 @@
 // Lancement de ce script : ts-node src/tools/demarchesSimplifiees/conventionnement.ts
 
 import { GraphQLClient } from 'graphql-request';
+import { Application } from '@feathersjs/express';
 import execute from '../utils';
 import service from '../../helpers/services';
 import {
   TypeDossierReconventionnement,
   StatutConventionnement,
 } from '../../ts/enum';
-import { IDossierDS } from '../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IDossierDS,
+} from '../../ts/interfaces/global.interfaces';
 import { queryGetDemarcheDemarcheSimplifiee } from '../../services/structures/repository/demarchesSimplifiees.repository';
 
-const categoriesCorrespondances = require('../../../datas/categorieFormCorrespondances.json');
-
-const getDemarcheNumber = (type: string) =>
-  categoriesCorrespondances.find((categorie) => categorie.type === type)
-    .numero_demarche_conventionnement;
+const getDemarcheNumber = (type: string, app: Application) => {
+  const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+    'demarche_simplifiee',
+  );
+  switch (type) {
+    case 'association':
+      return Number(
+        demarcheSimplifiee.numero_demarche_association_conventionnement,
+      );
+    case 'entreprise':
+      return Number(
+        demarcheSimplifiee.numero_demarche_entreprise_conventionnement,
+      );
+    case 'structure_publique':
+      return Number(
+        demarcheSimplifiee.numero_demarche_structure_publique_conventionnement,
+      );
+    default:
+      return null;
+  }
+};
 
 const requestGraphQLForGetDemarcheDS = (
+  app: Application,
   graphQLClient: GraphQLClient,
   type: string,
   cursor: string,
 ): Promise<any> =>
   graphQLClient
     .request(queryGetDemarcheDemarcheSimplifiee(), {
-      demarcheNumber: getDemarcheNumber(type),
+      demarcheNumber: getDemarcheNumber(type, app),
       after: cursor,
     })
     .catch(() => {
@@ -43,6 +64,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
   do {
     if (arrayHasNextPage[0] === true) {
       const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
+        app,
         graphQLClient,
         TypeDossierReconventionnement.StructurePublique,
         arrayCursor[0],
@@ -58,6 +80,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
     }
     if (arrayHasNextPage[1] === true) {
       const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
+        app,
         graphQLClient,
         TypeDossierReconventionnement.Association,
         arrayCursor[1],
@@ -72,6 +95,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
     }
     if (arrayHasNextPage[2] === true) {
       const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
+        app,
         graphQLClient,
         TypeDossierReconventionnement.Entreprise,
         arrayCursor[2],
