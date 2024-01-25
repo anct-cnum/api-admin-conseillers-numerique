@@ -22,15 +22,21 @@ const getStructures =
     searchByNomStructure: string,
     region: string,
     departement: string,
+    avisPrefet: string,
   ) =>
     app.service(service.structures).Model.aggregate([
-      { $addFields: { idPGStr: { $toString: '$idPG' } } },
+      {
+        $addFields: {
+          idPGStr: { $toString: '$idPG' },
+          lastPrefet: { $arrayElemAt: ['$prefet', -1] },
+        },
+      },
       {
         $match: {
           $and: [
             checkAccess,
             filterSearchBar(searchByNomStructure),
-            filterStatut(typeConvention),
+            filterStatut(typeConvention, avisPrefet),
           ],
           ...filterRegion(region),
           ...filterDepartement(departement),
@@ -45,6 +51,8 @@ const getStructures =
           statut: 1,
           conventionnement: 1,
           demandesCoselec: 1,
+          prefet: '$lastPrefet',
+          createdAt: 1,
         },
       },
     ]);
@@ -59,6 +67,7 @@ const getDossiersConvention =
       searchByNomStructure,
       region,
       departement,
+      avisPrefet,
     } = req.query;
     try {
       const pageValidation = validReconventionnement.validate({
@@ -69,6 +78,7 @@ const getDossiersConvention =
         searchByNomStructure,
         region,
         departement,
+        avisPrefet,
       });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
@@ -104,6 +114,7 @@ const getDossiersConvention =
         searchByNomStructure,
         region,
         departement,
+        avisPrefet,
       );
       const structuresFormat = sortDossierConventionnement(
         type,
