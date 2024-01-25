@@ -40,12 +40,8 @@ const getConseillersCoordonnes =
       departement,
     } = req.query;
 
-    const dateDebut: Date = new Date(req.query.dateDebut as string);
-    const dateFin: Date = new Date(req.query.dateFin as string);
     const limit = options.paginate.default;
     const validate = validConseillersCoordonnes.validate({
-      dateDebut,
-      dateFin,
       skip,
       ordre,
       nomOrdre,
@@ -117,20 +113,6 @@ const getConseillersCoordonnes =
         async (coordonne: IConseillerCoordonne) => {
           const craCount = await getNombreCras(app, req)(coordonne._id);
           const compteCoopActif = coordonne.emailCN && coordonne.mattermostId;
-          const dernierCRA = await app
-            .service(service.cras)
-            .Model.findOne({
-              'conseiller.$id': coordonne._id,
-            })
-            .sort({ createdAt: -1 })
-            .limit(1);
-
-          if (
-            dernierCRA &&
-            (dernierCRA.createdAt < dateDebut || dernierCRA.createdAt > dateFin)
-          ) {
-            return null;
-          }
           return {
             ...coordonne,
             compteCoopActif,

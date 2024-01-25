@@ -22,7 +22,7 @@ const validConseillers = Joi.object({
     new Error('Le filtre coordinateur est invalide'),
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
   departement: Joi.string().error(
     new Error('Le filtre département est invalide'),
   ),
@@ -32,12 +32,6 @@ const validConseillers = Joi.object({
 });
 const validConseillersCoordonnes = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
-  dateDebut: Joi.date()
-    .required()
-    .error(new Error('La date de début est invalide')),
-  dateFin: Joi.date()
-    .required()
-    .error(new Error('La date de fin est invalide')),
   ordre: Joi.number().required().error(new Error('Le tri est invalide')),
   nomOrdre: Joi.string()
     .required()

@@ -41,12 +41,20 @@ const getConseillers = async (
       default:
     }
     try {
-      conseillers = await app
-        .service(service.conseillers)
-        .Model.find(query, { _id: 1, structureId: 1 });
-      conseillers = conseillers.filter(
-        (coordinateur) => !coordinateur._id.equals(userId),
-      );
+      conseillers = await app.service(service.conseillers).Model.aggregate([
+        {
+          $match: {
+            ...query,
+            _id: { $ne: userId },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            structureId: 1,
+          },
+        },
+      ]);
     } catch (error) {
       throw new Error(error);
     }

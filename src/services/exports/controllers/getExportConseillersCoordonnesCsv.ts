@@ -42,9 +42,6 @@ const getExportConseillersCoordonnesCsv =
       departement,
     } = req.query;
 
-    const dateDebut: Date = new Date(req.query.dateDebut as string);
-    const dateFin: Date = new Date(req.query.dateFin as string);
-
     const items: { total: number; data: object } = {
       total: 0,
       data: [],
@@ -100,20 +97,6 @@ const getExportConseillersCoordonnesCsv =
       const promises = coordonnes.map(
         async (coordonne: IConseillerCoordonne) => {
           const craCount = await getNombreCras(app, req)(coordonne._id);
-          const dernierCRA = await app
-            .service(service.cras)
-            .Model.findOne({
-              'conseiller.$id': coordonne._id,
-            })
-            .sort({ createdAt: -1 })
-            .limit(1);
-
-          if (
-            dernierCRA &&
-            (dernierCRA.createdAt < dateDebut || dernierCRA.createdAt > dateFin)
-          ) {
-            return null;
-          }
           return {
             ...coordonne,
             craCount,
