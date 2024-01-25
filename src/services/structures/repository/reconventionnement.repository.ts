@@ -382,6 +382,7 @@ const formatAvenantForHistoriqueDossierConventionnement = (
         item.nom = structure.nom;
         item.idStructure = structure._id;
         if (isExport) {
+          item.siret = structure.siret;
           item.nbPostesAvantDemande = avenant.nbPostesAvantDemande ?? 0;
           item.nbPostesApresDemande =
             avenant.type === 'ajout'
@@ -434,6 +435,7 @@ const formatReconventionnementForDossierConventionnement = (
         item.phaseConventionnement = PhaseConventionnement.PHASE_2;
         item.nbPostesAvantDemande = valideCoselec;
         item.nbPostesApresDemande = valideCoselec;
+        item.siret = structure.siret;
         item.type = 'Reconventionnement';
         item.numeroDossierDS = item.numero;
         item.variation = 0;
@@ -475,16 +477,19 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure;
-      item.dateSorted = item.createdAt;
+      item.dateSorted = structure.createdAt;
       item.typeConvention = 'conventionnement';
       item.nombreConseillersCoselec =
         structure?.coselec[0]?.nombreConseillersCoselec ?? 0;
       if (isExport) {
-        item.phaseConventionnement = PhaseConventionnement.PHASE_2;
+        item.phaseConventionnement = structure?.coselec[0]
+          ?.phaseConventionnement
+          ? PhaseConventionnement.PHASE_2
+          : PhaseConventionnement.PHASE_1;
         item.nbPostesAvantDemande = 0;
         item.type = 'Conventionnement initial';
         item.nbPostesApresDemande = item.nombreConseillersCoselec;
-        item.variation = 0;
+        item.variation = item.nombreConseillersCoselec;
         item.departement = findDepartementNameByNumDepartement(
           structure.codeDepartement,
           structure.codeCom,

@@ -77,6 +77,7 @@ const getExportHistoriqueDossiersConventionCsv =
               siret: 1,
               idPG: 1,
               type: 1,
+              createdAt: 1,
               codeRegion: 1,
               codeDepartement: 1,
               statut: 1,
