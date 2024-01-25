@@ -17,20 +17,19 @@ import {
   prenventionSuppressionConseillerStructure,
 } from '../../emails';
 
-const getMisesEnRelationsFinContrat =
-  (app) => async (dateDuJourDebut, dateDuJourFin) =>
-    app.service(service.misesEnRelation).Model.find({
-      dateFinDeContrat: { $gte: dateDuJourDebut, $lte: dateDuJourFin },
-      statut: 'finalisee',
-      typeDeContrat: { $ne: 'CDI' },
-      reconventionnement: { $ne: true },
-    });
+const getMisesEnRelationsFinContrat = (app) => async (dateDuJourFin) =>
+  app.service(service.misesEnRelation).Model.find({
+    dateFinDeContrat: { $lte: dateDuJourFin },
+    statut: 'finalisee',
+    typeDeContrat: { $ne: 'CDI' },
+    reconventionnement: { $ne: true },
+  });
 
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
 // avant de les passer en terminer à M+2 de la fin de contrat
 const updateMiseEnRelation = (app) => async (id) =>
-  app.service(service.misesEnRelation).Model.updateOne(
+  app.service(service.misesEnRelation).Model.findOneAndUpdate(
     {
       _id: id,
     },
@@ -39,9 +38,12 @@ const updateMiseEnRelation = (app) => async (id) =>
         statut: 'terminee_naturelle',
       },
     },
+    {
+      new: true,
+    },
   );
 
-const updateConseiller = (app) => async (idConseiller, updatedAt) =>
+const updateConseiller = (app) => async (idConseiller) =>
   app.service(service.conseillers).Model.updateOne(
     {
       id: idConseiller,
@@ -49,7 +51,6 @@ const updateConseiller = (app) => async (idConseiller, updatedAt) =>
     {
       $set: {
         statut: 'TERMINE',
-        updatedAt,
       },
     },
   );
@@ -63,10 +64,6 @@ program
     '-ee, --envoiEmail',
     'envoiEmail: Envoyer les emails de prévention de suppression',
   )
-  .option(
-    '-fdb, --flagDateDebut',
-    'flagDateDebut: prendre la date du début du dispositif',
-  )
   .parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
@@ -79,7 +76,6 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
       dayjs(flagDateDebut ? new Date('2020/11/01') : dateDuJour)
         .startOf('date')
         .toDate(),
-      dayjs(dateDuJour).endOf('date').toDate(),
     );
 
     if (misesEnRelationsFinContrat.length === 0) {
@@ -100,7 +96,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
       );
 
       if (fix) {
-        await updateConseiller(app)(conseiller._id, dateDuJour);
+        const conseillerUpdated = await updateConseiller(app)(conseiller._id);
         logger.info(
           `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
         );
@@ -116,7 +112,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
           },
         );
 
-        await updateCacheObj(app)(conseiller._id);
+        await updateCacheObj(app)(conseillerUpdated);
 
         // Envoie de mail conseiller et structure
         if (envoiEmail) {
@@ -144,7 +140,8 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               .send(
                 conseiller.idPG,
                 miseEnRelationFinContrat.structureObj.idPG,
-                miseEnRelationFinContrat.structureObj.email,
+                conseiller?.supHierarchique?.email ??
+                  miseEnRelationFinContrat.structureObj?.contact?.email,
               )
               .catch((errSmtp: Error) => {
                 logger.error(errSmtp);

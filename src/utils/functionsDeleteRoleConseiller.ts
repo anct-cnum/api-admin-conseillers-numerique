@@ -213,10 +213,9 @@ const nettoyageCoordinateur =
     }
   };
 
-const updateCacheObj = (app) => async (idConseiller) => {
-  const conseiller = await getConseiller(idConseiller);
+const updateCacheObj = (app) => async (conseiller) => {
   app.service(service.misesEnRelation).Model.updateMany(
-    { 'conseiller.$id': idConseiller },
+    { 'conseiller.$id': conseiller._id },
     {
       $set: {
         conseillerObj: conseiller,
