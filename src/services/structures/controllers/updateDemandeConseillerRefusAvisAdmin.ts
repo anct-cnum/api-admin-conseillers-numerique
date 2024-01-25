@@ -38,9 +38,7 @@ const updateDemandeConseillerRefusAvisAdmin =
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           {
-            _id: new ObjectId(idStructure),
-            coordinateurCandidature: false,
-            statut: 'CREEE',
+            _id: structure._id,
           },
           {
             $set: {
