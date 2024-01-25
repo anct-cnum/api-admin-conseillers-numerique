@@ -6,7 +6,7 @@ import service from '../../../helpers/services';
 import { validExportConseillers } from '../../../schemas/conseillers.schemas';
 import {
   filterIsCoordinateur,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterRegion,
   filterNomStructure,
   filterIsRuptureConseiller,
@@ -45,7 +45,7 @@ const getConseillersRecruter =
         $match: {
           ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
-          ...filterNomConseiller(searchByConseiller),
+          ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],

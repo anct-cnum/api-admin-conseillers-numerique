@@ -1,12 +1,17 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
 import { getTypeDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
+import { ITypeDossierDS } from '../../../ts/interfaces/json.interface';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getDetailStructureWithConseillers =
   (app: Application, checkAccessStructure) => async (idStructure: string) =>
@@ -71,6 +76,8 @@ const getDetailStructureWithConseillers =
           nombreConseillersSouhaites: 1,
           insee: 1,
           conseillers: '$conseillers',
+          prefet: { $arrayElemAt: ['$prefet', -1] },
+          createdAt: 1,
         },
       },
     ]);
@@ -126,58 +133,78 @@ const getDetailDossierConvention =
         });
         return;
       }
-
-      const typeDossierDs = getTypeDossierDemarcheSimplifiee(
-        structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
-      );
-      if (typeDossierDs === null) {
-        res.status(500).json({
-          message: 'Erreur lors de la récupération du type de la structure',
-        });
-        return;
-      }
-
-      if (
-        structure[0]?.conventionnement?.statut?.match(/\bRECONVENTIONNEMENT\B/)
-      ) {
-        const checkAccessMiseEnRelation =
-          await checkAccessReadRequestMisesEnRelation(app, req);
-        structure[0].conseillers = await miseEnRelationConseillerStructure(
-          app,
-          checkAccessMiseEnRelation,
-        )(
-          idStructure,
-          structure[0]?.conseillers?.map((conseiller) => conseiller._id),
-        );
-        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}`;
-        structure[0].conseillers = await Promise.all(
-          structure[0].conseillers?.map(async (conseiller) => {
-            const item = conseiller;
-            item.idPG = item.conseillerObj?.idPG;
-            item.nom = item.conseillerObj?.nom;
-            item.prenom = item.conseillerObj?.prenom;
-            item._id = item.conseillerObj?._id;
-            item.statutMiseEnrelation = item.statut;
-
-            return item;
-          }),
-        );
-        structure[0].conseillersRecruterConventionnement =
-          structure[0]?.conseillers?.filter(
-            (conseiller) =>
-              conseiller?.phaseConventionnement === undefined &&
-              (conseiller.statut === 'finalisee' ||
-                conseiller.statut === 'nouvelle_rupture' ||
-                conseiller.statut === 'terminee'),
+      if (structure[0]?.prefet?.idStructureTransfert) {
+        const structureTransfert = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({
+            _id: structure[0]?.prefet?.idStructureTransfert,
+          });
+        if (!structureTransfert) {
+          throw new Error(
+            `La structure ${structure[0]?.prefet?.idStructureTransfert} n'existe pas lié à la structure ${idStructure}`,
           );
-        structure[0].conseillersRenouveller = structure[0]?.conseillers?.filter(
-          (conseiller) =>
-            conseiller.reconventionnement === true &&
-            conseiller.statutMiseEnrelation !== 'terminee' &&
-            conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
+        }
+        structure[0].prefet.structureTransfert = structureTransfert;
+      }
+      if (structure[0]?.insee?.unite_legale?.forme_juridique?.libelle) {
+        const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+          'demarche_simplifiee',
         );
-      } else {
-        structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
+        const typeDossierDs: ITypeDossierDS = getTypeDossierDemarcheSimplifiee(
+          structure[0]?.insee?.unite_legale?.forme_juridique?.libelle,
+          demarcheSimplifiee,
+        );
+        if (typeDossierDs === null) {
+          res.status(500).json({
+            message: 'Erreur lors de la récupération du type de la structure',
+          });
+          return;
+        }
+
+        if (structure[0]?.conventionnement?.dossierReconventionnement?.numero) {
+          const checkAccessMiseEnRelation =
+            await checkAccessReadRequestMisesEnRelation(app, req);
+          structure[0].conseillers = await miseEnRelationConseillerStructure(
+            app,
+            checkAccessMiseEnRelation,
+          )(
+            idStructure,
+            structure[0]?.conseillers?.map((conseiller) => conseiller._id),
+          );
+          structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_reconventionnement}/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}`;
+          structure[0].conseillers = await Promise.all(
+            structure[0].conseillers?.map(async (conseiller) => {
+              const item = conseiller;
+              item.idPG = item.conseillerObj?.idPG;
+              item.nom = item.conseillerObj?.nom;
+              item.prenom = item.conseillerObj?.prenom;
+              item._id = item.conseillerObj?._id;
+              item.statutMiseEnrelation = item.statut;
+
+              return item;
+            }),
+          );
+          structure[0].conseillersRecruterConventionnement =
+            structure[0]?.conseillers?.filter(
+              (conseiller) =>
+                !conseiller?.phaseConventionnement &&
+                (conseiller.statut === 'finalisee' ||
+                  conseiller.statut === 'nouvelle_rupture' ||
+                  conseiller.statut === 'terminee'),
+            );
+          structure[0].conseillersRenouveller =
+            structure[0]?.conseillers?.filter(
+              (conseiller) =>
+                conseiller.reconventionnement === true &&
+                conseiller.statutMiseEnrelation !== 'terminee' &&
+                conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
+            );
+        } else if (
+          structure[0]?.conventionnement?.dossierConventionnement?.numero
+        ) {
+          structure[0].url = `https://www.demarches-simplifiees.fr/procedures/${typeDossierDs?.numero_demarche_conventionnement}/dossiers/${structure[0]?.conventionnement?.dossierConventionnement?.numero}`;
+        }
       }
       structure[0].nombreConseillersCoselec =
         getCoselec(structure[0])?.nombreConseillersCoselec ?? 0;
