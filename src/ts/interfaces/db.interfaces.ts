@@ -367,6 +367,7 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  coselec: ICoselec[];
   conventionnement: {
     statut: string;
     motif: string;
@@ -406,6 +407,18 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+}
+
+interface ICoselec {
+  nombreConseillersCoselec: number;
+  avisCoselec: string;
+  numero?: string;
+  phaseConventionnement?: string;
+  type?: string;
+  observationsReferent?: string;
+  prioritaireCoselec?: string;
+  validateur?: string;
+  insertedAt: Date;
 }
 
 interface IPrefet {
