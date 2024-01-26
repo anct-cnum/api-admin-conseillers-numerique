@@ -11,7 +11,11 @@ import {
   filterAvisANCT,
   filterAvisPrefet,
 } from './structures.repository';
-import { getCoselec, getTimestampByDate } from '../../../utils';
+import {
+  getCoselec,
+  getCoselecConventionnementInitial,
+  getTimestampByDate,
+} from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import {
   findDepartementNameByNumDepartement,
@@ -468,16 +472,26 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure;
+      const coselecInitial = getCoselecConventionnementInitial(structure);
       item.dateSorted = structure.createdAt;
       item.typeConvention = 'conventionnement';
       item.nombreConseillersCoselec =
-        structure?.coselec[0]?.nombreConseillersCoselec ?? 0;
+        coselecInitial?.nombreConseillersCoselec ?? 0;
       if (isExport) {
-        item.phaseConventionnement = structure?.coselec[0]
-          ?.phaseConventionnement
+        item.phaseConventionnement = coselecInitial?.phaseConventionnement
           ? PhaseConventionnement.PHASE_2
           : PhaseConventionnement.PHASE_1;
         item.nbPostesAvantDemande = 0;
+        if (
+          structure?.conventionnement?.statut ===
+          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2
+        ) {
+          item.numeroDossierDS =
+            structure.conventionnement?.dossierReconventionnement?.numero;
+        } else {
+          item.numeroDossierDS =
+            structure.conventionnement?.dossierConventionnement?.numero;
+        }
         item.type = 'Conventionnement initial';
         item.nbPostesApresDemande = item.nombreConseillersCoselec;
         item.variation = item.nombreConseillersCoselec;

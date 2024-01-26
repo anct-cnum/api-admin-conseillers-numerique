@@ -4,6 +4,7 @@ import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 import { IRequest } from '../ts/interfaces/global.interfaces';
 import { PhaseConventionnement } from '../ts/enum';
+import { IStructures } from '../ts/interfaces/db.interfaces';
 
 /**
  * On cherche le bon coselec avec avis POSITIF :
@@ -48,6 +49,19 @@ const getCoselecPositifConventionnement = (structure) => {
     : null;
 };
 
+const getCoselecPositifConventionnementInitial = (structure: IStructures) => {
+  // récupérer le premier coselec positif de la structure (conventionnement initial)
+  const coselecs = structure.coselec
+    .filter(
+      (coselec) =>
+        coselec.nombreConseillersCoselec > 0 &&
+        coselec.avisCoselec === 'POSITIF',
+    )
+    .sort((a, b) => a.insertedAt.getTime() - b.insertedAt.getTime());
+
+  return coselecs.length > 0 ? coselecs[0] : null;
+};
+
 /**
  * On cherche le dernier Coselec en fonction du numéro.
  * Le numéro est de la forme "COSELEC 2"
@@ -83,6 +97,14 @@ const getCoselecConventionnement = (structure) => {
     return getCoselecPositifConventionnement(structure);
   }
   return getLastCoselec(structure);
+};
+
+// récupère le premier coselec positif de la structure (conventionnement initial)
+const getCoselecConventionnementInitial = (structure) => {
+  if (structure.statut === 'VALIDATION_COSELEC') {
+    return getCoselecPositifConventionnementInitial(structure);
+  }
+  return null;
 };
 
 const getTimestampByDate = (date?: Date) =>
@@ -123,6 +145,7 @@ const formatDateGMT = (date: Date) => {
 export {
   getCoselecPositif,
   getCoselecConventionnement,
+  getCoselecConventionnementInitial,
   getLastCoselec,
   getCoselec,
   deleteUser,
