@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/conseillers/preventionFinDeContratNaturelle.ts
+// Lancement de ce script : ts-node src/tools/conseillers/preventionFinDeContratNaturelle.ts -f
 
 import { program } from 'commander';
 import dayjs from 'dayjs';
@@ -23,7 +23,7 @@ const getMisesEnRelationsFinContrat = (app) => async (dateDuJourFin) =>
     statut: 'finalisee',
     typeDeContrat: { $ne: 'CDI' },
     reconventionnement: { $ne: true },
-  });
+  }).limit(50);
 
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
@@ -44,7 +44,7 @@ const updateMiseEnRelation = (app) => async (id) =>
   );
 
 const updateConseiller = (app) => async (idConseiller) =>
-  app.service(service.conseillers).Model.updateOne(
+  app.service(service.conseillers).Model.findOneAndUpdate(
     {
       _id: idConseiller,
     },
@@ -52,6 +52,9 @@ const updateConseiller = (app) => async (idConseiller) =>
       $set: {
         statut: 'TERMINE',
       },
+    },
+    {
+      new: true,
     },
   );
 
@@ -75,9 +78,11 @@ const getEmailsStructure = (app) => async (conseiller) => {
 
 const createConseillersTermines =
   (app) => async (conseiller, miseEnRelationIdTerminee) => {
-    const miseEnRelation = await app.service(service.misesEnRelation).findOne({
-      _id: miseEnRelationIdTerminee._id,
-    });
+    const miseEnRelation = await app
+      .service(service.misesEnRelation)
+      .Model.findOne({
+        _id: miseEnRelationIdTerminee._id,
+      });
     await app.service(service.conseillersTermines).Model.create({
       conseillerId: conseiller._id,
       structureId: conseiller.structureId,

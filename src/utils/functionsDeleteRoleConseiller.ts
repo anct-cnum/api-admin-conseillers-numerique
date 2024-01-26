@@ -212,7 +212,7 @@ const nettoyageCoordinateur =
     }
   };
 
-const updateCacheObj = (app) => async (conseiller) => {
+const updateCacheObj = (app) => async (conseiller) =>
   app.service(service.misesEnRelation).Model.updateMany(
     { 'conseiller.$id': conseiller._id },
     {
@@ -221,7 +221,6 @@ const updateCacheObj = (app) => async (conseiller) => {
       },
     },
   );
-};
 
 const deletePermanences = (app) => async (idConseiller, idStructure) =>
   app.service(service.permanences).Model.deleteMany({
