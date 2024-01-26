@@ -12,6 +12,7 @@ import {
 } from '../repository/structures.repository';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { validDemandesConseiller } from '../../../schemas/structures.schemas';
+import { action } from '../../../helpers/accessControl/accessList';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -32,7 +33,6 @@ const getTotalStructures =
       {
         $match: {
           coordinateurCandidature: false,
-          createdAt: { $gte: new Date('2023-01-01') },
           $and: [
             checkAccess,
             filterSearchBar(search),
@@ -59,7 +59,6 @@ const totalParStatutDemandesConseiller = async (
           $and: [checkAccess],
           statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] },
           coordinateurCandidature: false,
-          createdAt: { $gte: new Date('2023-01-01') },
         },
       },
       {
@@ -114,7 +113,6 @@ const getStructures =
       {
         $match: {
           coordinateurCandidature: false,
-          createdAt: { $gte: new Date('2023-01-01') },
           $and: [
             checkAccess,
             filterSearchBar(search),
@@ -173,6 +171,7 @@ const getDemandesConseiller =
       const items: {
         total: number;
         data: object;
+        structureBannerAvisPrefetOpen: object;
         totalParDemandesConseiller: {
           nouvelleCandidature: number;
           candidatureValider: number;
@@ -184,6 +183,7 @@ const getDemandesConseiller =
       } = {
         total: 0,
         data: [],
+        structureBannerAvisPrefetOpen: [],
         totalParDemandesConseiller: {
           nouvelleCandidature: 0,
           candidatureValider: 0,
@@ -209,6 +209,17 @@ const getDemandesConseiller =
         app,
         checkAccess,
       );
+      items.structureBannerAvisPrefetOpen = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          prefet: {
+            $elemMatch: {
+              banniereValidationAvisPrefet: true,
+            },
+          },
+        })
+        .select({ nom: 1, 'prefet.$': 1 });
       if (structures.length > 0) {
         const totalStructures = await getTotalStructures(app, checkAccess)(
           statut,
