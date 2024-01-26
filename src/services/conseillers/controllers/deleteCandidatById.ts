@@ -102,7 +102,7 @@ const archiverLaSuppression =
               deletedAt: new Date(),
               motif,
               conseiller,
-              historiqueContrat: misesEnRelations,
+              historiqueContrats: misesEnRelations,
               actionUser: {
                 role,
                 userId: user._id,
