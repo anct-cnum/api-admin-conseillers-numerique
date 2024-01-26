@@ -23,7 +23,7 @@ const getMisesEnRelationsFinContrat = (app) => async (dateDuJourFin) =>
     statut: 'finalisee',
     typeDeContrat: { $ne: 'CDI' },
     reconventionnement: { $ne: true },
-  }).limit(50);
+  });
 
 // insertion du nouveau flag dans le statut afin de gérer les cas de fin de contrat naturelle
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
