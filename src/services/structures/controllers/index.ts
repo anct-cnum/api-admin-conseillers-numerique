@@ -21,6 +21,8 @@ import closeBannerParcoursCoordinateur from './closeBannerParcoursCoordinateur';
 import updateDemandeCoordinateurRefusAvisAdmin from './updateDemandeCoordinateurRefusAvisAdmin';
 import updateDemandeCoordinateurValidAvisAdmin from './updateDemandeCoordinateurValidAvisAdmin';
 import addRoleCoordinateur from './addRoleCoordinateur';
+import updateDemandeConseillerValidAvisAdmin from './updateDemandeConseillerValidAvisAdmin';
+import updateDemandeConseillerRefusAvisAdmin from './updateDemandeConseillerRefusAvisAdmin';
 import getDemandesConseiller from './getDemandesConseiller';
 import getDetailDemandeConseiller from './getDetailDemandeConseiller';
 import updateDemandeConseillerAvisPrefet from './updateDemandeConseillerAvisPrefet';
@@ -50,6 +52,8 @@ export {
   updateDemandeCoordinateurRefusAvisAdmin,
   updateDemandeCoordinateurValidAvisAdmin,
   addRoleCoordinateur,
+  updateDemandeConseillerValidAvisAdmin,
+  updateDemandeConseillerRefusAvisAdmin,
   getDemandesConseiller,
   getDetailDemandeConseiller,
   updateDemandeConseillerAvisPrefet,
