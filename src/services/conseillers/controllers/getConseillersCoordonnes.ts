@@ -3,13 +3,15 @@ import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
-import { filterNomStructure } from '../repository/conseillers.repository';
-import { getNombreCras } from '../../cras/cras.repository';
-import { action } from '../../../helpers/accessControl/accessList';
 import {
-  filterNomConseillerObj,
+  filterNomStructure,
+  filterNomAndEmailConseiller,
+} from '../repository/conseillers.repository';
+import { getNombreCras } from '../../cras/cras.repository';
+import {
   filterRegionConseillerObj,
   filterDepartementConseillerObj,
+  checkAccessReadRequestMisesEnRelation,
 } from '../../misesEnRelation/misesEnRelation.repository';
 import { validConseillersCoordonnes } from '../../../schemas/conseillers.schemas';
 
@@ -51,6 +53,9 @@ const getConseillersCoordonnes =
       departement,
     });
 
+    const checkAccessMiseEnRelation =
+      await checkAccessReadRequestMisesEnRelation(app, req);
+
     if (validate.error) {
       res.statusMessage = validate.error.message;
       return res.status(400).end();
@@ -66,22 +71,32 @@ const getConseillersCoordonnes =
     const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
 
     try {
-      const query = await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.read)
-        .getQuery();
-
       const coordonnes = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
+          {
+            $addFields: {
+              nomPrenomStr: {
+                $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+              },
+            },
+          },
+          {
+            $addFields: {
+              prenomNomStr: {
+                $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+              },
+            },
+          },
+          { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
           {
             $match: {
               statut: 'finalisee',
               ...filterNomStructure(searchByStructure),
               ...filterRegionConseillerObj(region),
               ...filterDepartementConseillerObj(departement),
-              ...filterNomConseillerObj(searchByConseiller),
-              $and: [query],
+              ...filterNomAndEmailConseiller(searchByConseiller),
+              $and: [checkAccessMiseEnRelation],
             },
           },
           {

@@ -6,12 +6,14 @@ import service from '../../../helpers/services';
 import {
   filterRegionConseillerObj,
   filterDepartementConseillerObj,
-  filterNomConseillerObj,
+  checkAccessReadRequestMisesEnRelation,
 } from '../../misesEnRelation/misesEnRelation.repository';
-import { filterNomStructure } from '../../conseillers/repository/conseillers.repository';
+import {
+  filterNomAndEmailConseiller,
+  filterNomStructure,
+} from '../../conseillers/repository/conseillers.repository';
 import { generateCsvConseillersCoordonnes } from '../exports.repository';
 import { getNombreCras } from '../../cras/cras.repository';
-import { action } from '../../../helpers/accessControl/accessList';
 
 interface IConseillerCoordonne {
   _id: ObjectId;
@@ -42,29 +44,38 @@ const getExportConseillersCoordonnesCsv =
       departement,
     } = req.query;
 
-    const items: { total: number; data: object } = {
-      total: 0,
-      data: [],
-    };
     const sortColonne = JSON.parse(`{"conseillerObj.${nomOrdre}":${ordre}}`);
 
-    try {
-      const query = await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.read)
-        .getQuery();
+    const checkAccessMiseEnRelation =
+      await checkAccessReadRequestMisesEnRelation(app, req);
 
+    try {
       const coordonnes = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
+          {
+            $addFields: {
+              nomPrenomStr: {
+                $concat: ['$conseillerObj.nom', ' ', '$conseillerObj.prenom'],
+              },
+            },
+          },
+          {
+            $addFields: {
+              prenomNomStr: {
+                $concat: ['$conseillerObj.prenom', ' ', '$conseillerObj.nom'],
+              },
+            },
+          },
+          { $addFields: { idPGStr: { $toString: '$conseillerObj.idPG' } } },
           {
             $match: {
               statut: 'finalisee',
               ...filterNomStructure(searchByStructure),
               ...filterRegionConseillerObj(region),
               ...filterDepartementConseillerObj(departement),
-              ...filterNomConseillerObj(searchByConseiller),
-              $and: [query],
+              ...filterNomAndEmailConseiller(searchByConseiller),
+              $and: [checkAccessMiseEnRelation],
             },
           },
           {
@@ -97,8 +108,10 @@ const getExportConseillersCoordonnesCsv =
       const promises = coordonnes.map(
         async (coordonne: IConseillerCoordonne) => {
           const craCount = await getNombreCras(app, req)(coordonne._id);
+          const compteCoopActif = coordonne.emailCN && coordonne.mattermostId;
           return {
             ...coordonne,
+            compteCoopActif,
             craCount,
           };
         },
@@ -107,11 +120,6 @@ const getExportConseillersCoordonnesCsv =
       const conseillersCoordonnes = await (
         await Promise.all(promises)
       ).filter((item) => item !== null);
-
-      if (coordonnes.length > 0) {
-        items.data = conseillersCoordonnes;
-        items.total = conseillersCoordonnes.length;
-      }
 
       generateCsvConseillersCoordonnes(conseillersCoordonnes, res);
     } catch (error) {

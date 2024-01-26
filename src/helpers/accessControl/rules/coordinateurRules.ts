@@ -50,7 +50,6 @@ const getConseillers = async (
         },
         {
           $project: {
-            _id: 1,
             structureId: 1,
           },
         },
