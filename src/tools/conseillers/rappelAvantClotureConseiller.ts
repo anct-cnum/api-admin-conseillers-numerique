@@ -37,10 +37,17 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     }
 
     for (const termineeNaturelle of termineesNaturelles) {
-      if (
-        termineeNaturelle.finalisee === 0 &&
-        termineeNaturelle.recrutee === 0
-      ) {
+      const structuresIdsRecruteeEtFinalisee =
+        termineeNaturelle.structuresIdsAutre.filter(
+          (structureId) => structureId !== null,
+        );
+      const structureIdTerminee =
+        termineeNaturelle.structuresIdsTerminee.filter(
+          (terminee) => terminee !== null,
+        )[0];
+
+      // Contrôler si la structure qui est en fin de contrat n'a pas réembauché (recrutee, finalisee) le conseiller
+      if (!structuresIdsRecruteeEtFinalisee.includes(structureIdTerminee)) {
         const conseiller = await getConseiller(app)(
           termineeNaturelle.conseillerId,
         );
