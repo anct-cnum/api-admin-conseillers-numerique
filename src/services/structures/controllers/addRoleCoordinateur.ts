@@ -6,14 +6,12 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
-import { envoiEmailInvit } from '../../../utils/email';
-import mailer from '../../../mailer';
 import { deleteRoleUser } from '../../../utils';
 
 const addRoleCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { conseillerId } = req.body;
-    let errorSmtpMail: Error | null = null;
+    const errorSmtpMail: Error | null = null;
 
     if (!ObjectId.isValid(conseillerId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -88,6 +86,19 @@ const addRoleCoordinateur =
 
       const conseiller = await app
         .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: new ObjectId(conseillerId),
+        });
+
+      if (!conseiller?.passwordCreated) {
+        res.status(409).json({
+          message: 'Le compte du conseiller est inactif',
+        });
+        return;
+      }
+      const updatedConseiller = await app
+        .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
@@ -98,14 +109,7 @@ const addRoleCoordinateur =
           { $set: { estCoordinateur: true } },
         );
 
-      if (!conseiller?.passwordCreated) {
-        res.status(409).json({
-          message: 'Le compte du conseiller est inactif',
-        });
-        return;
-      }
-
-      if (conseiller.modifiedCount === 0) {
+      if (updatedConseiller.modifiedCount === 0) {
         res
           .status(404)
           .json({ message: "Le conseiller n'a pas été mise à jour" });
@@ -149,9 +153,6 @@ const addRoleCoordinateur =
         res
           .status(404)
           .json({ message: "L'utilisateur n'a pas été mis à jour" });
-      }
-      if (!user.sub) {
-        errorSmtpMail = await envoiEmailInvit(app, req, mailer, user);
       }
       if (errorSmtpMail instanceof Error) {
         await deleteRoleUser(app, req, user.name, {
