@@ -28,8 +28,17 @@ const getMisesEnRelationsFinaliseesNaturelles =
             $push: {
               $cond: [
                 {
-                  $eq: ['$statut', 'terminee_naturelle'],
+                  $and: [
+                    { $eq: ['$statut', 'terminee_naturelle'] },
+                    {
+                      $gte: ['$dateFinDeContrat', dateDebut],
+                    },
+                    {
+                      $lte: ['$dateFinDeContrat', dateFin],
+                    },
+                  ],
                 },
+
                 '$_id',
                 null,
               ],

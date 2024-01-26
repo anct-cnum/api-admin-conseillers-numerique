@@ -145,6 +145,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     const dateMoins2MoisFin = dayjs(dateMoins2Mois).endOf('date').toDate();
     let countSucess = 0;
     let countError = 0;
+    let countInexistant = 0;
 
     logger.info('Cloture des contrats passer en statut terminee_naturelle');
     const termineesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
@@ -162,6 +163,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
         termineeNaturelle.conseillerId,
       );
       const user = await getUser(app)(termineeNaturelle.conseillerId);
+
       if (fix && conseiller && user) {
         const structuresIdsRecruteeEtFinalisee =
           termineeNaturelle.structuresIdsAutre.filter(
@@ -174,7 +176,6 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
         const miseEnRelationIdTerminee = termineeNaturelle._id.filter(
           (id) => id !== null,
         )[0];
-
         // Contrôler si la structure qui est en fin de contrat n'a pas réembauché (recrutee, finalisee) le conseiller
         if (!structuresIdsRecruteeEtFinalisee.includes(structureIdTerminee)) {
           // suppression du conseiller dans les permanences / des permanences dans les cras
@@ -264,11 +265,13 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
         } else {
           countError += 1;
         }
+      } else {
+        countInexistant += 1;
       }
       await delay(2000);
     }
     logger.info(
-      `Nous avons traité ${termineesNaturelles.length} conseillers comportant le statut terminee_naturelle. (En erreur: ${countError} / En succès: ${countSucess})`,
+      `Nous avons traité ${termineesNaturelles.length} conseillers comportant le statut terminee_naturelle. (En erreur: ${countError} / En succès: ${countSucess} / user ou conseiller inexistant: ${countInexistant})`,
     );
   } catch (error) {
     logger.error(error);
