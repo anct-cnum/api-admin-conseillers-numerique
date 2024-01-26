@@ -256,16 +256,7 @@ const totalParHistoriqueConvention = async (
     .Model.accessibleBy(req.ability, action.read)
     .countDocuments({
       coordinateurCandidature: false,
-      $or: [
-        {
-          'conventionnement.statut':
-            StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-          statut: 'VALIDATION_COSELEC',
-        },
-        {
-          statut: 'REFUS_COSELEC',
-        },
-      ],
+      statut: { $in: ['VALIDATION_COSELEC', 'REFUS_COSELEC'] },
     });
   const checkAccess = await checkAccessReadRequestStructures(app, req);
   const countAvenant = await app.service(service.structures).Model.aggregate([

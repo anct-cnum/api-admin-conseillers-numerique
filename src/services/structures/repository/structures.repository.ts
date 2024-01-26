@@ -131,25 +131,11 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
 };
 
 const filterAvisANCT = (avisANCT: string | undefined) => {
-  if (avisANCT === 'VALIDATION_COSELEC') {
-    return {
-      statut: avisANCT,
-      'conventionnement.statut':
-        StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-    };
-  }
-  if (avisANCT === 'REFUS_COSELEC') {
+  if (avisANCT) {
     return { statut: avisANCT };
   }
   return {
-    $or: [
-      {
-        statut: 'VALIDATION_COSELEC',
-        'conventionnement.statut':
-          StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-      },
-      { statut: 'REFUS_COSELEC' },
-    ],
+    statut: { $in: ['VALIDATION_COSELEC', 'REFUS_COSELEC'] },
   };
 };
 
