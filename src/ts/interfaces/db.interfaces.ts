@@ -601,6 +601,7 @@ export interface ConseillersSupprimes {
   motif: string;
   conseiller: object;
   actionUser: object;
+  historiqueContrats: [Object];
 }
 
 export interface ConseillersRuptures {
