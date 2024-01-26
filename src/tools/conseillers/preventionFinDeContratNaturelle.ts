@@ -46,7 +46,7 @@ const updateMiseEnRelation = (app) => async (id) =>
 const updateConseiller = (app) => async (idConseiller) =>
   app.service(service.conseillers).Model.updateOne(
     {
-      id: idConseiller,
+      _id: idConseiller,
     },
     {
       $set: {
@@ -54,6 +54,40 @@ const updateConseiller = (app) => async (idConseiller) =>
       },
     },
   );
+
+const getEmailsStructure = (app) => async (conseiller) => {
+  const emailsStructure = [];
+  const userStructure = await app.service(service.users).Model.findOne({
+    'entity.$id': conseiller.structureId,
+    roles: { $in: ['structure'] },
+  });
+  if (userStructure?.name) {
+    emailsStructure.push(userStructure.name);
+  }
+  if (
+    userStructure?.name !== conseiller?.supHierarchique?.email &&
+    conseiller?.supHierarchique?.email
+  ) {
+    emailsStructure.push(conseiller.supHierarchique.email);
+  }
+  return emailsStructure;
+};
+
+const createConseillersTermines =
+  (app) => async (conseiller, miseEnRelationIdTerminee) => {
+    const miseEnRelation = await app.service(service.misesEnRelation).findOne({
+      _id: miseEnRelationIdTerminee._id,
+    });
+    await app.service(service.conseillersTermines).Model.create({
+      conseillerId: conseiller._id,
+      structureId: conseiller.structureId,
+      typeDeContrat: miseEnRelation.typeDeContrat,
+      dateDebutDeContrat: miseEnRelation.dateDebutDeContrat,
+      dateFinDeContrat: miseEnRelation.dateFinDeContrat,
+      phaseConventionnement: miseEnRelation?.phaseConventionnement ?? null,
+      reconventionnement: miseEnRelation?.reconventionnement ?? false,
+    });
+  };
 
 program
   .option(
@@ -70,12 +104,10 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
   try {
     const options = program.opts();
     const dateDuJour = new Date();
-    const { fix, envoiEmail, flagDateDebut } = options;
+    const { fix, envoiEmail } = options;
 
     const misesEnRelationsFinContrat = await getMisesEnRelationsFinContrat(app)(
-      dayjs(flagDateDebut ? new Date('2020/11/01') : dateDuJour)
-        .startOf('date')
-        .toDate(),
+      dayjs(dateDuJour).startOf('date').toDate(),
     );
 
     if (misesEnRelationsFinContrat.length === 0) {
@@ -114,6 +146,12 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
 
         await updateCacheObj(app)(conseillerUpdated);
 
+        // Historisation du conseiller terminé
+        await createConseillersTermines(app)(
+          conseillerUpdated,
+          miseEnRelationFinContrat,
+        );
+
         // Envoie de mail conseiller et structure
         if (envoiEmail) {
           const mailerInstance = mailer(app);
@@ -135,23 +173,25 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
 
           const messagePreventionFinContratStructure =
             prenventionSuppressionConseillerStructure(mailerInstance);
-          const errorSmtpMailPreventionFinContratStructure =
-            await messagePreventionFinContratStructure
-              .send(
-                conseiller.idPG,
-                miseEnRelationFinContrat.structureObj.idPG,
-                conseiller?.supHierarchique?.email ??
-                  miseEnRelationFinContrat.structureObj?.contact?.email,
-              )
-              .catch((errSmtp: Error) => {
-                logger.error(errSmtp);
-                Sentry.captureException(errSmtp);
-              });
-          if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
-            logger.error(errorSmtpMailPreventionFinContratStructure.message);
-            Sentry.captureException(
-              errorSmtpMailPreventionFinContratStructure.message,
-            );
+          const emailsStructure = await getEmailsStructure(app)(conseiller);
+          for (const emailStructure of emailsStructure) {
+            const errorSmtpMailPreventionFinContratStructure =
+              await messagePreventionFinContratStructure
+                .send(
+                  conseiller.idPG,
+                  miseEnRelationFinContrat.structureObj.idPG,
+                  emailStructure,
+                )
+                .catch((errSmtp: Error) => {
+                  logger.error(errSmtp);
+                  Sentry.captureException(errSmtp);
+                });
+            if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
+              logger.error(errorSmtpMailPreventionFinContratStructure.message);
+              Sentry.captureException(
+                errorSmtpMailPreventionFinContratStructure.message,
+              );
+            }
           }
         }
       }

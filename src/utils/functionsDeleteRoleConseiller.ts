@@ -147,7 +147,6 @@ const deleteConseillerInCoordinateurs =
 const deleteCoordinateurInConseillers =
   (app) => async (coordinateurId, structureId) => {
     const conseillers = await app.service(service.conseillers).Model.find({
-      structureId,
       coordinateurs: {
         $elemMatch: {
           id: coordinateurId,
@@ -253,6 +252,9 @@ const deletePermanencesInCras =
       {
         'conseiller.$id': idConseiller,
         'structure.$id': structureId,
+        permanence: {
+          $exists: true,
+        },
       },
       { $set: { updatedAt }, $unset: { permanence: '' } },
     );

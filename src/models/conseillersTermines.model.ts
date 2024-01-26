@@ -9,9 +9,9 @@ export default function (app: Application): Model<any> {
     {
       conseillerId: { type: 'ObjectId' },
       structureId: { type: 'ObjectId' },
-      typeContrat: { type: String },
-      dateDebutContrat: { type: Date },
-      dateFinContrat: { type: Date },
+      typeDeContrat: { type: String },
+      dateDebutDeContrat: { type: Date },
+      dateFinDeContrat: { type: Date },
       phaseConventionnement: { type: String },
       reconventionnement: { type: Boolean },
     },

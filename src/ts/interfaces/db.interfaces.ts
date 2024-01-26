@@ -615,9 +615,9 @@ export interface IConseillersTermines {
   _id: ObjectId;
   conseillerId: Types.ObjectId;
   structureId: Types.ObjectId;
-  typeContrat: String;
-  dateDebutContrat: Date;
-  dateFinContrat: Date;
+  typeDeContrat: String;
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
   phaseConventionnement: String;
   reconventionnement: Boolean;
 }
