@@ -24,7 +24,7 @@ const getExportHistoriqueDossiersConventionCsv =
       searchByNomStructure,
       region,
       departement,
-      avisANCT,
+      avisAdmin,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
@@ -40,7 +40,7 @@ const getExportHistoriqueDossiersConventionCsv =
       searchByNomStructure,
       region,
       departement,
-      avisANCT,
+      avisAdmin,
     });
     if (pageValidation.error) {
       res.status(400).json({ message: pageValidation.error.message });
@@ -63,7 +63,7 @@ const getExportHistoriqueDossiersConventionCsv =
                   type,
                   dateDebut,
                   dateFin,
-                  avisANCT,
+                  avisAdmin,
                 ),
                 filterSearchBar(searchByNomStructure),
               ],

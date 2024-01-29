@@ -8,7 +8,7 @@ import {
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   checkAccessReadRequestStructures,
-  filterAvisANCT,
+  filterAvisAdmin,
   filterAvisPrefet,
 } from './structures.repository';
 import {
@@ -83,7 +83,7 @@ const filterDateDemandeAndStatutHistorique = (
   typeConvention: string,
   dateDebut: Date,
   dateFin: Date,
-  avisANCT: string,
+  avisAdmin: string,
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
@@ -98,7 +98,7 @@ const filterDateDemandeAndStatutHistorique = (
   if (typeConvention === 'conventionnement') {
     return {
       coordinateurCandidature: false,
-      ...filterAvisANCT(avisANCT),
+      ...filterAvisAdmin(avisAdmin),
       createdAt: {
         $gte: dateDebut,
         $lte: dateFin,

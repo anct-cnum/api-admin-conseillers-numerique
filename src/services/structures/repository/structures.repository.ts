@@ -130,9 +130,9 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
   );
 };
 
-const filterAvisANCT = (avisANCT: string | undefined) => {
-  if (avisANCT) {
-    return { statut: avisANCT };
+const filterAvisAdmin = (avisAdmin: string | undefined) => {
+  if (avisAdmin) {
+    return { statut: avisAdmin };
   }
   return {
     statut: { $in: ['VALIDATION_COSELEC', 'REFUS_COSELEC'] },
@@ -176,7 +176,7 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
-  filterAvisANCT,
+  filterAvisAdmin,
   filterAvisPrefet,
   filterStatutDemandeConseiller,
 };
