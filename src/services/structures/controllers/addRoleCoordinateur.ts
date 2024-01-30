@@ -99,7 +99,7 @@ const addRoleCoordinateur =
 
       if (!conseillerUser?.passwordCreated) {
         res.status(409).json({
-          message: 'Le compte du conseiller est inactif',
+          message: "Le conseiller n'a pas encore activé son compte",
         });
         return;
       }
