@@ -31,7 +31,7 @@ interface IConseillerCoordonne {
 }
 
 const getTotalConseillersCoordonness =
-  (app: Application, checkAcces) =>
+  (app: Application, checkAccess) =>
   async (searchByStructure: string, region: string, departement: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
@@ -40,7 +40,7 @@ const getTotalConseillersCoordonness =
           ...filterNomStructure(searchByStructure),
           ...filterRegionConseillerObj(region),
           ...filterDepartementConseillerObj(departement),
-          $and: [checkAcces],
+          $and: [checkAccess],
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
