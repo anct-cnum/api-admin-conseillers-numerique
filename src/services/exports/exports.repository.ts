@@ -849,6 +849,8 @@ const generateCsvListeStructures = async (structures, res: Response) => {
       'Type',
       'Zone rurale',
       'Nombre de CRA total cumulés',
+      'Personnes accompagnées',
+      "Nombre d'accompagnement",
       'Candidats recrutés',
       'Conventionnement phase 2',
     ];
@@ -871,6 +873,8 @@ const generateCsvListeStructures = async (structures, res: Response) => {
             structure.type,
             formatQpv(structure?.qpvStatut),
             structure.craCount,
+            structure.personnesAccompagnees,
+            structure.personnesAccompagnees + structure.personnesRecurrentes,
             `${structure.conseillersRecruter}/${structure.posteValiderCoselec}`,
             checkStructurePhase2(structure?.conventionnement?.statut)
               ? 'Oui'
