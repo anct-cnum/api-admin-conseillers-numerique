@@ -15,7 +15,6 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
     return {
       statut: 'CREEE',
       coordinateurCandidature: false,
-      createdAt: { $gte: new Date('2023-01-01') },
       ...filterAvisPrefet(avisPrefet),
     };
   }
@@ -45,7 +44,6 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
       {
         statut: 'CREEE',
         coordinateurCandidature: false,
-        createdAt: { $gte: new Date('2023-01-01') },
       },
       {
         demandesCoselec: {
@@ -176,7 +174,6 @@ const totalParConvention = async (app: Application, req: IRequest) => {
           $and: [checkAccess],
           statut: 'CREEE',
           coordinateurCandidature: false,
-          createdAt: { $gte: new Date('2023-01-01') },
         },
       },
       {
