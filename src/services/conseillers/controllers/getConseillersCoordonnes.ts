@@ -30,6 +30,23 @@ interface IConseillerCoordonne {
   mattermostId?: string;
 }
 
+const getTotalConseillersCoordonness =
+  (app: Application, checkAcces) =>
+  async (searchByStructure: string, region: string, departement: string) =>
+    app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $match: {
+          statut: 'finalisee',
+          ...filterNomStructure(searchByStructure),
+          ...filterRegionConseillerObj(region),
+          ...filterDepartementConseillerObj(departement),
+          $and: [checkAcces],
+        },
+      },
+      { $group: { _id: null, count: { $sum: 1 } } },
+      { $project: { _id: 0, count_conseillers: '$count' } },
+    ]);
+
 const getConseillersCoordonnes =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const {
@@ -141,8 +158,12 @@ const getConseillersCoordonnes =
       ).filter((item) => item !== null);
 
       if (coordonnes.length > 0) {
+        const totalConseillersCoordonnes = await getTotalConseillersCoordonness(
+          app,
+          checkAccessMiseEnRelation,
+        )(searchByStructure as string, region as string, departement as string);
         items.data = conseillersCoordonnes;
-        items.total = conseillersCoordonnes.length;
+        items.total = totalConseillersCoordonnes[0]?.count_conseillers;
         items.limit = limit;
         items.skip = Number(skip);
       }

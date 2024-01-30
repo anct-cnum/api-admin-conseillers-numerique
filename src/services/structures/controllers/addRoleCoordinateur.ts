@@ -107,7 +107,6 @@ const addRoleCoordinateur =
       const user = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)
-
         .updateOne(
           {
             'entity.$id': new ObjectId(conseillerId),
