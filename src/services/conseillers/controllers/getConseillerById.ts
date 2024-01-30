@@ -38,7 +38,7 @@ const getConseillerById =
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.read)
           .countDocuments({
-            statut: { $in: ['recrutee', 'interessee'] },
+            statut: { $in: ['recrutee', 'interessee', 'nouvelle'] },
             'conseiller.$id': new ObjectId(idConseiller),
           });
         enCoursDeReRecrutement = countEnCoursDeReRecrutement !== 0;
