@@ -12,12 +12,7 @@ import {
   filterStatut,
   filterType,
 } from '../../structures/repository/structures.repository';
-import {
-  getNombreCrasByStructureId,
-  getNombreAccompagnementsByStructureId,
-  getPersonnesRecurrentesByStructureId,
-  checkAccessRequestCras,
-} from '../../cras/cras.repository';
+import { getNombreCrasByStructureId } from '../../cras/cras.repository';
 import { getCoselec } from '../../../utils';
 import { action } from '../../../helpers/accessControl/accessList';
 
@@ -53,11 +48,6 @@ const getExportListeStructuresCsv =
       );
       structures = await app.service(service.structures).Model.aggregate([
         {
-          $addFields: {
-            idPGStr: { $toString: '$idPG' },
-          },
-        },
-        {
           $match: {
             createdAt: { $gt: dateDebut, $lt: dateFin },
             $and: [checkAccessStructures],
@@ -91,23 +81,11 @@ const getExportListeStructuresCsv =
         },
         { $sort: sortColonne },
       ]);
-      const checkAccessCras = await checkAccessRequestCras(app, req);
+
       structures = await Promise.all(
         structures.map(async (ligneStats) => {
           const item = { ...ligneStats };
-          const personnesRecurrentes =
-            await getPersonnesRecurrentesByStructureId(
-              app,
-              checkAccessCras,
-            )(item._id);
-          const personnesAccompagnees =
-            await getNombreAccompagnementsByStructureId(
-              app,
-              checkAccessCras,
-            )(item._id);
           item.craCount = await getNombreCrasByStructureId(app, req)(item._id);
-          item.personnesAccompagnees = personnesAccompagnees[0]?.total ?? 0;
-          item.personnesRecurrentes = personnesRecurrentes[0]?.total ?? 0;
           item.conseillersRecruter = await app
             .service(service.misesEnRelation)
             .Model.accessibleBy(req.ability, action.read)
