@@ -7,11 +7,12 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { deleteRoleUser } from '../../../utils';
+import { envoiEmailInvit } from '../../../utils/email';
+import mailer from '../../../mailer';
 
 const addRoleCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { conseillerId } = req.body;
-    const errorSmtpMail: Error | null = null;
 
     if (!ObjectId.isValid(conseillerId)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -84,14 +85,19 @@ const addRoleCoordinateur =
         return;
       }
 
-      const conseiller = await app
-        .service(service.conseillers)
+      const conseillerUser = await app
+        .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({
-          _id: new ObjectId(conseillerId),
+        .findOne({ 'entity.$id': new ObjectId(conseillerId) });
+      if (!conseillerUser) {
+        res.status(404).json({
+          message:
+            'Le candidat ne possède pas de compte (doublon ou inactivité)',
         });
+        return;
+      }
 
-      if (!conseiller?.passwordCreated) {
+      if (!conseillerUser?.passwordCreated) {
         res.status(409).json({
           message: 'Le compte du conseiller est inactif',
         });
@@ -154,6 +160,14 @@ const addRoleCoordinateur =
           .status(404)
           .json({ message: "L'utilisateur n'a pas été mis à jour" });
       }
+
+      const errorSmtpMail: Error | null = await envoiEmailInvit(
+        app,
+        req,
+        mailer,
+        user,
+      );
+
       if (errorSmtpMail instanceof Error) {
         await deleteRoleUser(app, req, user.name, {
           $pull: {
