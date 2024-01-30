@@ -44,6 +44,26 @@ const getNombreAccompagnementsByStructureId =
       },
     ]);
 
+const getPersonnesRecurrentesByStructureId =
+  (app: Application, checkAccess) => async (structureId: ObjectId) =>
+    app.service(service.cras).Model.aggregate([
+      {
+        $match: {
+          'structure.$id': { $eq: structureId },
+          $and: [checkAccess],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          nbParticipantsRecurrents: { $sum: '$cra.nbParticipantsRecurrents' },
+        },
+      },
+      {
+        $project: { total: '$nbParticipantsRecurrents' },
+      },
+    ]);
+
 const getNombreCrasByStructureId =
   (app: Application, req: IRequest) => async (structureId: ObjectId) =>
     app
@@ -170,5 +190,6 @@ export {
   getNombreCras,
   getNombreCrasByStructureId,
   getNombreAccompagnementsByStructureId,
+  getPersonnesRecurrentesByStructureId,
   createArrayForFiltreCodePostaux,
 };
