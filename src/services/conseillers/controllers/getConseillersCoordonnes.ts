@@ -30,7 +30,7 @@ interface IConseillerCoordonne {
   mattermostId?: string;
 }
 
-const getTotalConseillersCoordonness =
+const getTotalConseillersCoordonnes =
   (app: Application, checkAccess) =>
   async (searchByStructure: string, region: string, departement: string) =>
     app.service(service.misesEnRelation).Model.aggregate([
@@ -158,7 +158,7 @@ const getConseillersCoordonnes =
       ).filter((item) => item !== null);
 
       if (coordonnes.length > 0) {
-        const totalConseillersCoordonnes = await getTotalConseillersCoordonness(
+        const totalConseillersCoordonnes = await getTotalConseillersCoordonnes(
           app,
           checkAccessMiseEnRelation,
         )(searchByStructure as string, region as string, departement as string);
