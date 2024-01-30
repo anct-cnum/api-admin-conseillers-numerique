@@ -92,7 +92,7 @@ const addRoleCoordinateur =
       if (!conseillerUser) {
         res.status(404).json({
           message:
-            'Le candidat ne possède pas de compte (doublon ou inactivité)',
+            'Le conseiller ne possède pas de compte (doublon ou inactivité)',
         });
         return;
       }
@@ -103,42 +103,11 @@ const addRoleCoordinateur =
         });
         return;
       }
-      const updatedConseiller = await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          {
-            _id: new ObjectId(conseillerId),
-            statut: 'RECRUTE',
-            structureId: new ObjectId(structure._id),
-          },
-          { $set: { estCoordinateur: true } },
-        );
-
-      if (updatedConseiller.modifiedCount === 0) {
-        res
-          .status(404)
-          .json({ message: "Le conseiller n'a pas été mise à jour" });
-      }
-
-      const miseEnRelationUpdated = await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'conseiller.$id': new ObjectId(conseillerId),
-          },
-          { $set: { 'conseillerObj.estCoordinateur': true } },
-        );
-      if (miseEnRelationUpdated.modifiedCount === 0) {
-        res.status(404).json({
-          message: "Les mises en relation n'ont pas été mises à jour",
-        });
-      }
 
       const user = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)
+
         .updateOne(
           {
             'entity.$id': new ObjectId(conseillerId),
@@ -180,6 +149,40 @@ const addRoleCoordinateur =
         });
         return;
       }
+
+      const updatedConseiller = await app
+        .service(service.conseillers)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: new ObjectId(conseillerId),
+            statut: 'RECRUTE',
+            structureId: new ObjectId(structure._id),
+          },
+          { $set: { estCoordinateur: true } },
+        );
+
+      if (updatedConseiller.modifiedCount === 0) {
+        res
+          .status(404)
+          .json({ message: "Le conseiller n'a pas été mise à jour" });
+      }
+
+      const miseEnRelationUpdated = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'conseiller.$id': new ObjectId(conseillerId),
+          },
+          { $set: { 'conseillerObj.estCoordinateur': true } },
+        );
+      if (miseEnRelationUpdated.modifiedCount === 0) {
+        res.status(404).json({
+          message: "Les mises en relation n'ont pas été mises à jour",
+        });
+      }
+
       if (
         demandesCoordinateurValider.some(
           (demande) => !demande?.miseEnRelationId,
