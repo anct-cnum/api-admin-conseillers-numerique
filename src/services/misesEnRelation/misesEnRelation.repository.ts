@@ -13,6 +13,18 @@ const checkAccessReadRequestMisesEnRelation = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
+const filterRegionConseillerObj = (region: string) => {
+  return region
+    ? { $expr: { $eq: ['$conseillerObj.codeRegion', region] } }
+    : {};
+};
+
+const filterDepartementConseillerObj = (departement: string) => {
+  return departement
+    ? { $expr: { $eq: ['$conseillerObj.codeDepartement', departement] } }
+    : {};
+};
+
 const filterNomConseillerOrStructure = (nom: string) => {
   const inputSearchBar = nom?.trim();
   if (inputSearchBar) {
@@ -289,6 +301,8 @@ const countCoordinateurRecrutees = async (
 
 export {
   checkAccessReadRequestMisesEnRelation,
+  filterRegionConseillerObj,
+  filterDepartementConseillerObj,
   filterNomConseillerOrStructure,
   filterDepartement,
   filterRegion,
