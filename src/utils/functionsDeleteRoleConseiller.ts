@@ -38,7 +38,6 @@ const getMisesEnRelationsFinaliseesNaturelles =
                     },
                   ],
                 },
-
                 '$_id',
                 null,
               ],

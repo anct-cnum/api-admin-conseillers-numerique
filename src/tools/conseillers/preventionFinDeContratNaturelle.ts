@@ -60,17 +60,16 @@ const updateConseiller = (app) => async (idConseiller) =>
 
 const getEmailsStructure = (app) => async (conseiller) => {
   const emailsStructure = [];
-  const userStructure = await app.service(service.users).Model.findOne({
+  const usersStructure = await app.service(service.users).Model.find({
     'entity.$id': conseiller.structureId,
     roles: { $in: ['structure'] },
   });
-  if (userStructure?.name) {
-    emailsStructure.push(userStructure.name);
+  for (const userStructure of usersStructure) {
+    if (!emailsStructure.includes(userStructure?.name)) {
+      emailsStructure.push(userStructure.name);
+    }
   }
-  if (
-    userStructure?.name !== conseiller?.supHierarchique?.email &&
-    conseiller?.supHierarchique?.email
-  ) {
+  if (!emailsStructure.includes(conseiller?.supHierarchique?.email)) {
     emailsStructure.push(conseiller.supHierarchique.email);
   }
   return emailsStructure;
