@@ -50,12 +50,12 @@ const createAvenant =
       : PhaseConventionnement.PHASE_1;
 
     if (
-      type === 'retrait' &&
+      type === 'ajout' &&
       phaseConventionnement === PhaseConventionnement.PHASE_1
     ) {
       res
         .status(400)
-        .json({ message: 'Impossible de retirer des postes en phase 1' });
+        .json({ message: `Impossible d'ajouter des postes en phase 1` });
       return;
     }
 
