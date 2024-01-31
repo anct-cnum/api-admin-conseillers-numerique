@@ -362,6 +362,7 @@ export interface IStructures {
     inactivite: boolean;
   };
   insee: Iinsee;
+  codeCom: string | null;
   estZRR: boolean;
   qpvStatut: string;
   qpvListe: Array<object>;
@@ -387,6 +388,13 @@ export interface IStructures {
   };
   demandesCoselec: IDemandesCoselec[];
   demandesCoordinateur: IDemandesCoordinateur[];
+}
+
+export interface IHubs {
+  _id: ObjectId;
+  name: string;
+  region_names: string[];
+  channelId: string;
 }
 
 interface IDemandesCoselec {
@@ -601,6 +609,7 @@ export interface ConseillersRuptures {
   dateRupture: Date;
   motifRupture: string;
 }
+
 export interface AccessLogs {
   createdAt: Date;
   name: string;

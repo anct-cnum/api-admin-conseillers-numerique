@@ -27,6 +27,7 @@ const ressource: Ressource = {
   conseillersRuptures: 'conseillersRuptures',
   qpv: 'qpv',
   communes: 'communes',
+  hubs: 'hubs',
 };
 
 const functionnality: Functionnality = {

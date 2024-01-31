@@ -83,7 +83,8 @@
     "endPoint": "MATTERMOST_ENDPOINT",
     "login": "MATTERMOST_LOGIN",
     "password": "MATTERMOST_PASSWORD",
-    "teamId": "MATTERMOST_TEAM_ID"
+    "teamId": "MATTERMOST_TEAM_ID",
+    "hubTeamId": "MATTERMOST_HUB_TEAM_ID"
   },
   "gandi": {
     "token": "GANDI_TOKEN",

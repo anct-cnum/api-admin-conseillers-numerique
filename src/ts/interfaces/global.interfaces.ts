@@ -37,6 +37,7 @@ export interface Ressource {
   conseillersRuptures: string;
   qpv: string;
   communes: string;
+  hubs: string;
 }
 
 export interface IStructuresConseillers {
@@ -85,4 +86,12 @@ export interface IConfigurationDemarcheSimplifiee {
   url_entreprise_conventionnement: string;
   url_structure_publique_conventionnement: string;
   numero_demarche_recrutement_coordinateur: string;
+}
+
+export interface IMattermost {
+  endPoint: string;
+  login: string;
+  password: string;
+  teamId: string;
+  hubTeamId: string;
 }

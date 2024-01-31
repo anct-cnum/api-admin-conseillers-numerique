@@ -3,7 +3,10 @@ import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IMattermost,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
@@ -15,7 +18,10 @@ import {
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
-import { transfertChannelDepartementConseiller } from '../../../utils/mattermost';
+import {
+  transfertChannelDepartementConseiller,
+  transfertChannelHubConseiller,
+} from '../../../utils/mattermost';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -300,13 +306,20 @@ const validationRecrutementContrat =
         }
       } else if (
         miseEnRelationSansMission[0].structureObj.codeDepartement !==
-        miseEnRelationVerif.structureObj.codeDepartement
+          miseEnRelationVerif.structureObj.codeDepartement &&
+        miseEnRelationVerif.conseillerObj?.mattermost?.id
       ) {
         const ancienneStructure: IStructures =
           miseEnRelationSansMission[0].structureObj;
         const structureDestination: IStructures =
           miseEnRelationVerif.structureObj;
-        await transfertChannelDepartementConseiller(app)(
+        const mattermost: IMattermost = app.get('mattermost');
+        await transfertChannelDepartementConseiller(app, mattermost)(
+          structureDestination,
+          ancienneStructure,
+          miseEnRelationVerif.conseillerObj,
+        );
+        await transfertChannelHubConseiller(app, req, mattermost)(
           structureDestination,
           ancienneStructure,
           miseEnRelationVerif.conseillerObj,
