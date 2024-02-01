@@ -143,6 +143,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     const dateMoins2Mois = dayjs(updatedAt).subtract(2, 'month');
     const dateMoins2MoisDebut = dayjs(dateMoins2Mois).startOf('date').toDate();
     const dateMoins2MoisFin = dayjs(dateMoins2Mois).endOf('date').toDate();
+
     let countSucess = 0;
     let countError = 0;
     let countInexistant = 0;

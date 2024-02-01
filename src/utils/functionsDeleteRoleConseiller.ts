@@ -162,47 +162,48 @@ const deleteCoordinateurInConseillers =
       },
     });
     if (conseillers.length > 0) {
-      for (const conseiller of conseillers) {
-        if (conseiller.coordinateurs.length === 1) {
-          app.service(service.conseillers).Model.updateMany(
-            { _id: conseiller._id },
-            {
-              $unset: {
-                coordinateurs: '',
-              },
+      await app.service(service.conseillers).Model.updateOne(
+        { _id: { $in: conseillers } },
+        {
+          $pull: {
+            coordinateurs: {
+              id: coordinateurId,
             },
-          );
-          app.service(service.misesEnRelation).Model.updateMany(
-            { 'conseiller.$id': conseiller._id },
-            {
-              $unset: {
-                'conseillerObj.coordinateurs': '',
-              },
+          },
+        },
+      );
+      await app.service(service.conseillers).Model.updateOne(
+        { _id: { $in: conseillers }, coordinateurs: { $size: 0 } },
+        {
+          $unset: {
+            coordinateurs: '',
+          },
+        },
+      );
+      await app.service(service.misesEnRelation).Model.updateMany(
+        {
+          'conseiller.$id': { $in: conseillers },
+          'structure.$id': structureId,
+        },
+        {
+          $pull: {
+            'conseillerObj.coordinateurs': {
+              id: coordinateurId,
             },
-          );
-        } else {
-          app.service(service.conseillers).Model.updateOne(
-            { _id: conseiller._id },
-            {
-              $pull: {
-                coordinateurs: {
-                  id: coordinateurId,
-                },
-              },
-            },
-          );
-          app.service(service.misesEnRelation).Model.updateMany(
-            { 'conseiller.$id': conseiller._id, 'structure.$id': structureId },
-            {
-              $pull: {
-                'conseillerObj.coordinateurs': {
-                  id: coordinateurId,
-                },
-              },
-            },
-          );
-        }
-      }
+          },
+        },
+      );
+      await app.service(service.misesEnRelation).Model.updateMany(
+        {
+          'conseiller.$id': { $in: conseillers },
+          'conseillerObj.coordinateurs': { $size: 0 },
+        },
+        {
+          $unset: {
+            'conseillerObj.coordinateurs': '',
+          },
+        },
+      );
     }
   };
 
@@ -222,7 +223,7 @@ const nettoyageCoordinateur =
 
 const updateCacheObj = (app) => async (conseiller) =>
   app.service(service.misesEnRelation).Model.updateMany(
-    { 'conseiller.$id': conseiller._id },
+    { 'conseillerObj.email': conseiller.email },
     {
       $set: {
         conseillerObj: conseiller,
