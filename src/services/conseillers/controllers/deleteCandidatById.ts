@@ -102,7 +102,9 @@ const archiverLaSuppression =
               deletedAt: new Date(),
               motif,
               conseiller,
-              historiqueContrats: misesEnRelations,
+              historiqueContrats: misesEnRelations.filter(
+                (mer) => mer.id !== conseiller._id,
+              ),
               actionUser: {
                 role,
                 userId: user._id,
@@ -260,8 +262,9 @@ const deleteCandidatById =
           dateFinDeContrat: 1,
           typeDeContrat: 1,
           reconventionnement: 1,
-          conventionnement: 1,
           phaseConventionnement: 1,
+          miseEnRelationReconventionnement: 1,
+          miseEnRelationConventionnement: 1,
           dateRupture: 1,
           motifRupture: 1,
         });
