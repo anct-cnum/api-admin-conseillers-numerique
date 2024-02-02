@@ -13,6 +13,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 const getConseillerById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
+    let enCoursDeReRecrutement = false;
     try {
       if (!ObjectId.isValid(idConseiller)) {
         res.status(400).json({ message: 'Id incorrect' });
@@ -33,6 +34,14 @@ const getConseillerById =
           res.status(404).json({ message: "La structure n'existe pas" });
           return;
         }
+        const countEnCoursDeReRecrutement = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.read)
+          .countDocuments({
+            statut: { $in: ['recrutee', 'interessee', 'nouvelle'] },
+            'conseiller.$id': new ObjectId(idConseiller),
+          });
+        enCoursDeReRecrutement = countEnCoursDeReRecrutement !== 0;
       } else {
         const checkAccessConseillers = await checkAccessReadRequestConseillers(
           app,
@@ -155,7 +164,9 @@ const getConseillerById =
         res.status(404).json({ message: 'Conseiller non trouvé' });
         return;
       }
-      res.status(200).json(conseiller[0]);
+      res
+        .status(200)
+        .json({ conseiller: conseiller[0], enCoursDeReRecrutement });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
