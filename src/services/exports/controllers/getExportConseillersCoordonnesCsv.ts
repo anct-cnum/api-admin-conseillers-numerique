@@ -80,6 +80,7 @@ const getExportConseillersCoordonnesCsv =
           },
           {
             $project: {
+              _id: '$conseillerObj._id',
               idPG: '$conseillerObj.idPG',
               nom: '$conseillerObj.nom',
               prenom: '$conseillerObj.prenom',
@@ -88,6 +89,8 @@ const getExportConseillersCoordonnesCsv =
               mattermostId: '$conseillerObj.mattermost.id',
               nomStructure: '$structureObj.nom',
               codePostal: '$conseillerObj.codePostal',
+              dateDebutDeContrat: 1,
+              dateFinDeFormation: '$conseillerObj.dateFinDeFormation',
               certificationPix: '$conseillerObj.certificationPixFormation',
               nomSuperieurHierarchique: '$conseillerObj.supHierarchique.nom',
               prenomSuperieurHierarchique:
