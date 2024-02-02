@@ -2,7 +2,7 @@
   <%- include('../commun/head.mjml.ejs'); %>
 
   <mj-body background-color="#f0f0f0">
-    <%- include('../commun/header.mjml.ejs', { utils }); %>
+    <%- include('../commun/header-structure.mjml.ejs', { utils }); %>
 
     <mj-wrapper css-class="wrapper">
       <mj-section>
@@ -13,7 +13,7 @@
           <mj-text>
             Après délibération du Comité national de sélection, et sur le fondement de l'avis formulé par votre
             préfecture de département, nous vous informons que votre structure est éligible à l'accueil
-            de <%= nombreConseillersCoselec %> Conseiller(s) numérique(s) France Services.
+            de <%= nombreConseillersCoselec %> Conseiller(s) numérique(s).
           </mj-text>
           <mj-text font-weight="bold" font-size="20px">
             Comment procéder au recrutement ?
@@ -21,7 +21,7 @@
           <mj-text>
             Vous devez accéder à votre tableau de pilotage pour gérer vos recrutements.
             Vous recevrez un email “Bienvenue sur votre nouveau tableau de pilotage conseiller
-            numérique France service” pour vous expliquer comment créer votre compte.
+            numérique” pour vous expliquer comment créer votre compte.
           </mj-text>
           <mj-text>
             Une fois l’étape de création de compte faite, vous pouvez désormais procéder au recrutement
@@ -30,12 +30,12 @@
           <mj-text>C’est très simple, on vous explique tout <a href="https://aide.conseiller-numerique.gouv.fr/fr/article/comment-recruter-un-conseiller-numerique-sur-le-tableau-de-pilotage-9fszjs/" target="_blank" style="color: #0063CB;">ici</a></mj-text>
           <mj-text>
             Nous comptons sur votre mobilisation pour recruter le ou les conseiller(s)
-            numérique(s) France Services dans les meilleurs délais.
+            numérique(s) dans les meilleurs délais.
           </mj-text>
           <mj-text>
             En tout état de cause, si le recrutement devait intervenir dans un délai supérieur à trois mois,
             la validation de votre structure pourrait être réévaluée pour privilégier les recrutements
-            les plus rapides dans le cadre du dispositif Conseiller numérique France Services.
+            les plus rapides dans le cadre du dispositif Conseiller numérique.
           </mj-text>
         </mj-column>
       </mj-section>
@@ -55,6 +55,7 @@
       <mj-section>
         <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
       </mj-section>
+      <%- include('../commun/footer.mjml.ejs'); %>
     </mj-wrapper>
   </mj-body>
 </mjml>

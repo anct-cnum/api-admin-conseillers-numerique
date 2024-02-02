@@ -129,6 +129,7 @@ const getStructures =
           codePostal: 1,
           idPG: 1,
           createdAt: 1,
+          nombreConseillersSouhaites: 1,
           prefet: '$lastPrefet',
         },
       },
