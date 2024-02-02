@@ -44,9 +44,12 @@ const updateDemandeConseillerAvisPrefet =
           {
             _id: new ObjectId(idStructure),
             coordinateurCandidature: false,
-            statut: 'CREEE',
+            statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
           },
           {
+            $set: {
+              statut: 'CREEE',
+            },
             $push: {
               prefet: updatedPrefet,
             },
