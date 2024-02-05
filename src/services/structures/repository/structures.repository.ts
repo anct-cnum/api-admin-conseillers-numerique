@@ -147,7 +147,7 @@ const filterStatutDemandeConseiller = (statut: string) => {
   if (statut === 'NOUVELLE') {
     return { statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] } };
   }
-  if (statut !== 'toutes' && statut !== 'CREEE') {
+  if (statut !== 'toutes' && statut !== 'NOUVELLE') {
     return { statut: { $eq: statut } };
   }
   return {
