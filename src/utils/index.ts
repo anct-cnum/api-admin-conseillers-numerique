@@ -4,6 +4,7 @@ import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 import { IRequest } from '../ts/interfaces/global.interfaces';
 import { PhaseConventionnement } from '../ts/enum';
+import { IStructures } from '../ts/interfaces/db.interfaces';
 
 /**
  * On cherche le bon coselec avec avis POSITIF :
@@ -46,6 +47,22 @@ const getCoselecPositifConventionnement = (structure) => {
   return coselecsPositifs !== null && coselecsPositifs.length > 0
     ? coselecsPositifs.slice(-1).pop()
     : null;
+};
+
+const getCoselecPositifConventionnementInitial = (structure: IStructures) => {
+  if (structure.statut === 'VALIDATION_COSELEC') {
+    // récupérer le premier coselec positif de la structure (conventionnement initial)
+    const coselecs = structure.coselec
+      .filter(
+        (coselec) =>
+          coselec.nombreConseillersCoselec > 0 &&
+          coselec.avisCoselec === 'POSITIF',
+      )
+      .sort((a, b) => a.insertedAt.getTime() - b.insertedAt.getTime());
+
+    return coselecs.length > 0 ? coselecs[0] : null;
+  }
+  return null;
 };
 
 /**
@@ -125,6 +142,7 @@ export {
   getCoselecConventionnement,
   getLastCoselec,
   getCoselec,
+  getCoselecPositifConventionnementInitial,
   deleteUser,
   deleteRoleUser,
   formatDateGMT,

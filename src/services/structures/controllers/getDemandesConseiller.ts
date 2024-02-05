@@ -13,6 +13,7 @@ import {
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { validDemandesConseiller } from '../../../schemas/structures.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
+import { getCoselecPositifConventionnementInitial } from '../../../utils';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -141,6 +142,7 @@ const getStructures =
           codePostal: 1,
           idPG: 1,
           createdAt: 1,
+          coselec: 1,
           nombreConseillersSouhaites: 1,
           prefet: '$lastPrefet',
         },
@@ -241,7 +243,12 @@ const getDemandesConseiller =
           departement,
           avisPrefet,
         );
-        items.data = structures;
+        items.data = structures.map((structure) => ({
+          ...structure,
+          nombreConseillersCoselec:
+            getCoselecPositifConventionnementInitial(structure)
+              ?.nombreConseillersCoselec ?? 0,
+        }));
         items.total = totalStructures[0]?.count_structures;
         items.limit = options.paginate.default;
         items.skip = Number(page);
