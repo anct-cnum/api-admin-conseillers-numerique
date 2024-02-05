@@ -103,7 +103,7 @@ const archiverLaSuppression =
               motif,
               conseiller,
               historiqueContrats: misesEnRelations.filter(
-                (mer) => String(mer.conseiller.oid) === String(conseiller._id),
+                (mer) => String(mer.conseiller.$id) === String(conseiller._id),
               ),
               actionUser: {
                 role,
@@ -253,7 +253,9 @@ const deleteCandidatById =
       const misesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
-        .find(instructionSuppressionMER, {
+        .find(instructionSuppressionMER)
+        .select({
+          _id: 1,
           statut: 1,
           'conseiller.$id': 1,
           'structure.$id': 1,
