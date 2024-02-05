@@ -146,16 +146,7 @@ const filterDateDemandeAndStatutHistorique = (
       },
       {
         coordinateurCandidature: false,
-        $or: [
-          {
-            'conventionnement.statut':
-              StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2,
-            statut: 'VALIDATION_COSELEC',
-          },
-          {
-            statut: 'REFUS_COSELEC',
-          },
-        ],
+        statut: { $in: ['VALIDATION_COSELEC', 'ABANDON'] },
         createdAt: {
           $gte: dateDebut,
           $lte: dateFin,
@@ -465,10 +456,10 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
   isExport: boolean = false,
 ) =>
   structures
-    .filter(
-      (structure: IStructures) =>
-        structure?.statut === 'VALIDATION_COSELEC' ||
-        structure?.statut === 'REFUS_COSELEC',
+    .filter((structure: IStructures) =>
+      ['VALIDATION_COSELEC', 'ABANDON', 'REFUS_COSELEC'].includes(
+        structure?.statut,
+      ),
     )
     .map((structure) => {
       const item = structure;
