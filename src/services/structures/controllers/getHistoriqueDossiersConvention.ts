@@ -38,6 +38,7 @@ const getStructures =
               dateDebut,
               dateFin,
               avisAdmin,
+              ['VALIDATION_COSELEC', 'REFUS_COSELEC'],
             ),
             filterSearchBar(searchByNomStructure),
           ],

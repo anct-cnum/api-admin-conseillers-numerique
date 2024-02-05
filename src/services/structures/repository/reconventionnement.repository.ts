@@ -84,6 +84,7 @@ const filterDateDemandeAndStatutHistorique = (
   dateDebut: Date,
   dateFin: Date,
   avisAdmin: string,
+  statutStructureStatutHistoriqueToutes: string[],
 ) => {
   if (typeConvention === 'reconventionnement') {
     return {
@@ -146,7 +147,7 @@ const filterDateDemandeAndStatutHistorique = (
       },
       {
         coordinateurCandidature: false,
-        statut: { $in: ['VALIDATION_COSELEC', 'ABANDON'] },
+        statut: { $in: statutStructureStatutHistoriqueToutes },
         createdAt: {
           $gte: dateDebut,
           $lte: dateFin,

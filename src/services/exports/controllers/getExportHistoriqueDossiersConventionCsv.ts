@@ -64,6 +64,7 @@ const getExportHistoriqueDossiersConventionCsv =
                   dateDebut,
                   dateFin,
                   avisAdmin,
+                  ['VALIDATION_COSELEC', 'ABANDON'],
                 ),
                 filterSearchBar(searchByNomStructure),
               ],
