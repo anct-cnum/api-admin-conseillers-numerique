@@ -47,9 +47,6 @@ const updateDemandeConseillerAvisPrefet =
             statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
           },
           {
-            $set: {
-              statut: 'CREEE',
-            },
             $push: {
               prefet: updatedPrefet,
             },
