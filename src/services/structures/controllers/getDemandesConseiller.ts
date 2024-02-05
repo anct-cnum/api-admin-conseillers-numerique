@@ -143,6 +143,7 @@ const getStructures =
           idPG: 1,
           createdAt: 1,
           coselec: 1,
+          statut: 1,
           nombreConseillersSouhaites: 1,
           prefet: '$lastPrefet',
         },
