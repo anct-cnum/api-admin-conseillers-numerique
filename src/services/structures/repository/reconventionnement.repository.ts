@@ -13,7 +13,7 @@ import { IStructures } from '../../../ts/interfaces/db.interfaces';
 const filterStatut = (typeConvention: string, avisPrefet: string) => {
   if (typeConvention === 'conventionnement') {
     return {
-      statut: 'CREEE',
+      statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
       coordinateurCandidature: false,
       ...filterAvisPrefet(avisPrefet),
     };
@@ -42,7 +42,7 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
   return {
     $or: [
       {
-        statut: 'CREEE',
+        statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
         coordinateurCandidature: false,
       },
       {
@@ -172,7 +172,7 @@ const totalParConvention = async (app: Application, req: IRequest) => {
       {
         $match: {
           $and: [checkAccess],
-          statut: 'CREEE',
+          statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
           coordinateurCandidature: false,
         },
       },
@@ -386,7 +386,11 @@ const formatConventionnementForDossierConventionnement = (
   structures: IStructures[],
 ) =>
   structures
-    .filter((structure: IStructures) => structure?.statut === 'CREEE')
+    .filter(
+      (structure: IStructures) =>
+        structure?.statut === 'CREEE' ||
+        structure?.statut === 'EXAMEN_COMPLEMENTAIRE_COSELEC',
+    )
     .map((structure: IStructures) => {
       return {
         ...structure,

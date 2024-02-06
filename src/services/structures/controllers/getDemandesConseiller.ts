@@ -13,6 +13,7 @@ import {
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { validDemandesConseiller } from '../../../schemas/structures.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
+import { getCoselecPositifConventionnementInitial } from '../../../utils';
 
 const getTotalStructures =
   (app: Application, checkAccess) =>
@@ -57,7 +58,14 @@ const totalParStatutDemandesConseiller = async (
       {
         $match: {
           $and: [checkAccess],
-          statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] },
+          statut: {
+            $in: [
+              'CREEE',
+              'VALIDATION_COSELEC',
+              'REFUS_COSELEC',
+              'EXAMEN_COMPLEMENTAIRE_COSELEC',
+            ],
+          },
           coordinateurCandidature: false,
         },
       },
@@ -68,16 +76,21 @@ const totalParStatutDemandesConseiller = async (
         },
       },
     ]);
-  const totalDemandesConseillerEnCours =
-    countDemandesConseiller.find((element) => element._id === 'CREEE')?.count ??
-    0;
+  const totalDemandesConseillerEnCours = countDemandesConseiller
+    .filter(
+      (demandeConseiller) =>
+        demandeConseiller._id === 'CREEE' ||
+        demandeConseiller._id === 'EXAMEN_COMPLEMENTAIRE_COSELEC',
+    )
+    .reduce((acc, demandeConseiller) => acc + demandeConseiller.count, 0);
   const totalDemandesConseillerValider =
     countDemandesConseiller.find(
-      (element) => element._id === 'VALIDATION_COSELEC',
+      (demandeConseiller) => demandeConseiller._id === 'VALIDATION_COSELEC',
     )?.count ?? 0;
   const totalDemandesConseillerRefuser =
-    countDemandesConseiller.find((element) => element._id === 'REFUS_COSELEC')
-      ?.count ?? 0;
+    countDemandesConseiller.find(
+      (demandeConseiller) => demandeConseiller._id === 'REFUS_COSELEC',
+    )?.count ?? 0;
   const total =
     totalDemandesConseillerEnCours +
     totalDemandesConseillerValider +
@@ -129,6 +142,9 @@ const getStructures =
           codePostal: 1,
           idPG: 1,
           createdAt: 1,
+          coselec: 1,
+          statut: 1,
+          nombreConseillersSouhaites: 1,
           prefet: '$lastPrefet',
         },
       },
@@ -228,7 +244,12 @@ const getDemandesConseiller =
           departement,
           avisPrefet,
         );
-        items.data = structures;
+        items.data = structures.map((structure) => ({
+          ...structure,
+          nombreConseillersCoselec:
+            getCoselecPositifConventionnementInitial(structure)
+              ?.nombreConseillersCoselec ?? 0,
+        }));
         items.total = totalStructures[0]?.count_structures;
         items.limit = options.paginate.default;
         items.skip = Number(page);
