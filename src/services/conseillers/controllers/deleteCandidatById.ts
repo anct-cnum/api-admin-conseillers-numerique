@@ -103,7 +103,7 @@ const archiverLaSuppression =
               motif,
               conseiller,
               historiqueContrats: misesEnRelations.filter(
-                (mer) => String(mer.conseiller.$id) === String(conseiller._id),
+                (misesEnRelation) => String(misesEnRelation.conseiller.$id) === String(conseiller._id),
               ),
               actionUser: {
                 role,
