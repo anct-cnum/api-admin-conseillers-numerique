@@ -103,7 +103,9 @@ const archiverLaSuppression =
               motif,
               conseiller,
               historiqueContrats: misesEnRelations.filter(
-                (misesEnRelation) => String(misesEnRelation.conseiller.$id) === String(conseiller._id),
+                (misesEnRelation) =>
+                  String(misesEnRelation.conseillerId) ===
+                  String(conseiller._id),
               ),
               actionUser: {
                 role,
@@ -252,24 +254,28 @@ const deleteCandidatById =
 
       const misesEnRelation = await app
         .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.read)
-        .find(instructionSuppressionMER)
-        .select({
-          _id: 1,
-          statut: 1,
-          'conseiller.$id': 1,
-          'structure.$id': 1,
-          dateRecrutement: 1,
-          dateDebutDeContrat: 1,
-          dateFinDeContrat: 1,
-          typeDeContrat: 1,
-          reconventionnement: 1,
-          phaseConventionnement: 1,
-          miseEnRelationReconventionnement: 1,
-          miseEnRelationConventionnement: 1,
-          dateRupture: 1,
-          motifRupture: 1,
-        });
+        .Model.aggregate([
+          {
+            $match: instructionSuppressionMER,
+          },
+          {
+            $project: {
+              statut: 1,
+              conseillerId: '$conseiller.$id',
+              structureId: '$structure.$id',
+              dateRecrutement: 1,
+              dateDebutDeContrat: 1,
+              dateFinDeContrat: 1,
+              typeDeContrat: 1,
+              reconventionnement: 1,
+              phaseConventionnement: 1,
+              miseEnRelationReconventionnement: 1,
+              miseEnRelationConventionnement: 1,
+              dateRupture: 1,
+              motifRupture: 1,
+            },
+          },
+        ]);
 
       if (estDoublon && tableauCandidat[0]?.ruptures?.length > 0) {
         res.status(409).json({

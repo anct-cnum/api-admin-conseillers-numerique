@@ -595,16 +595,31 @@ export interface ICras {
   createdAt: Date;
 }
 
-export interface ConseillersSupprimes {
+export interface IConseillersSupprimes {
   _id: ObjectId;
   deletedAt: Date;
   motif: string;
   conseiller: object;
   actionUser: object;
-  historiqueContrats: [Object];
+  historiqueContrats: IHistoriqueContrats[];
 }
 
-export interface ConseillersRuptures {
+interface IHistoriqueContrats {
+  conseillerId: Types.ObjectId;
+  structureId: Types.ObjectId;
+  dateRecrutement: Date;
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
+  typeDeContrat: String;
+  reconventionnement: Boolean;
+  phaseConventionnement: String;
+  miseEnRelationReconventionnement: Types.ObjectId;
+  miseEnRelationConventionnement: Types.ObjectId;
+  dateRupture: Date;
+  motifRupture: String;
+}
+
+export interface IConseillersRuptures {
   _id: ObjectId;
   conseillerId: Types.ObjectId;
   structureId: Types.ObjectId;
