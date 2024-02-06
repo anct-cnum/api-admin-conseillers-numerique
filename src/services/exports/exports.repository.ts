@@ -74,10 +74,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
             ?.email};${
-            miseEnrelation.conseiller?.estCoordinateur &&
-            miseEnrelation.conseiller?.listeSubordonnes?.length > 0
-              ? 'oui'
-              : 'non'
+            miseEnrelation.conseiller?.estCoordinateur ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.codePostal};${miseEnrelation.conseiller
             ?.nomCommune};${miseEnrelation.conseiller?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
