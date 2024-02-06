@@ -18,7 +18,7 @@ const allowedRoles = [
   'prefet',
   'hub_coop',
   'grandReseau',
-  'coordinateur_coop',
+  'coordinateur',
 ];
 
 const axios = require('axios');

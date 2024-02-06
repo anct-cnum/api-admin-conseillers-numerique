@@ -25,9 +25,8 @@ import {
 const filterStatut = (typeConvention: string, avisPrefet: string) => {
   if (typeConvention === 'conventionnement') {
     return {
-      statut: 'CREEE',
+      statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
       coordinateurCandidature: false,
-      createdAt: { $gte: new Date('2023-01-01') },
       ...filterAvisPrefet(avisPrefet),
     };
   }
@@ -55,9 +54,8 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
   return {
     $or: [
       {
-        statut: 'CREEE',
+        statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
         coordinateurCandidature: false,
-        createdAt: { $gte: new Date('2023-01-01') },
       },
       {
         demandesCoselec: {
@@ -189,9 +187,8 @@ const totalParConvention = async (app: Application, req: IRequest) => {
       {
         $match: {
           $and: [checkAccess],
-          statut: 'CREEE',
+          statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
           coordinateurCandidature: false,
-          createdAt: { $gte: new Date('2023-01-01') },
         },
       },
       {
@@ -443,7 +440,11 @@ const formatConventionnementForDossierConventionnement = (
   structures: IStructures[],
 ) =>
   structures
-    .filter((structure: IStructures) => structure?.statut === 'CREEE')
+    .filter(
+      (structure: IStructures) =>
+        structure?.statut === 'CREEE' ||
+        structure?.statut === 'EXAMEN_COMPLEMENTAIRE_COSELEC',
+    )
     .map((structure: IStructures) => {
       return {
         ...structure,

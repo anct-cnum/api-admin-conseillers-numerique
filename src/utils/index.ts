@@ -50,16 +50,19 @@ const getCoselecPositifConventionnement = (structure) => {
 };
 
 const getCoselecPositifConventionnementInitial = (structure: IStructures) => {
-  // récupérer le premier coselec positif de la structure (conventionnement initial)
-  const coselecs = structure.coselec
-    .filter(
-      (coselec) =>
-        coselec.nombreConseillersCoselec > 0 &&
-        coselec.avisCoselec === 'POSITIF',
-    )
-    .sort((a, b) => a.insertedAt.getTime() - b.insertedAt.getTime());
+  if (structure.statut === 'VALIDATION_COSELEC') {
+    // récupérer le premier coselec positif de la structure (conventionnement initial)
+    const coselecs = structure.coselec
+      .filter(
+        (coselec) =>
+          coselec.nombreConseillersCoselec > 0 &&
+          coselec.avisCoselec === 'POSITIF',
+      )
+      .sort((a, b) => a.insertedAt.getTime() - b.insertedAt.getTime());
 
-  return coselecs.length > 0 ? coselecs[0] : null;
+    return coselecs.length > 0 ? coselecs[0] : null;
+  }
+  return null;
 };
 
 /**
@@ -97,14 +100,6 @@ const getCoselecConventionnement = (structure) => {
     return getCoselecPositifConventionnement(structure);
   }
   return getLastCoselec(structure);
-};
-
-// récupère le premier coselec positif de la structure (conventionnement initial)
-const getCoselecConventionnementInitial = (structure) => {
-  if (structure.statut === 'VALIDATION_COSELEC') {
-    return getCoselecPositifConventionnementInitial(structure);
-  }
-  return null;
 };
 
 const getTimestampByDate = (date?: Date) =>
@@ -145,9 +140,9 @@ const formatDateGMT = (date: Date) => {
 export {
   getCoselecPositif,
   getCoselecConventionnement,
-  getCoselecConventionnementInitial,
   getLastCoselec,
   getCoselec,
+  getCoselecPositifConventionnementInitial,
   deleteUser,
   deleteRoleUser,
   formatDateGMT,

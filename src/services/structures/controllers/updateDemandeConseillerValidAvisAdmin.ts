@@ -53,7 +53,7 @@ const updateDemandeConseillerValidAvisAdmin =
         .Model.findOne({
           _id: new ObjectId(idStructure),
           coordinateurCandidature: false,
-          statut: 'CREEE',
+          statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
         });
       if (!structure) {
         res.status(404).json({

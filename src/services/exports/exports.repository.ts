@@ -831,6 +831,61 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
     throw new Error(error);
   }
 };
+const generateCsvConseillersCoordonnes = async (conseillers, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id',
+      'Nom',
+      'Prénom',
+      'Mail personnel',
+      'Mail conseiller numérique',
+      'Structure',
+      'Code postal',
+      'Date de début de contrat',
+      'Date de fin de formation',
+      'Certification',
+      'Activé',
+      'CRA saisi',
+      'Nom supérieur',
+      'Prénom supérieur',
+      'Fonction supérieur',
+      'Mail supérieur',
+      'Téléphone supérieur',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...conseillers.map((conseiller) =>
+          [
+            conseiller.idPG,
+            conseiller.nom,
+            conseiller.prenom,
+            conseiller.emailPerso,
+            conseiller.emailCN,
+            conseiller.nomStructure,
+            conseiller.codePostal,
+            formatDate(conseiller.dateDebutDeContrat),
+            formatDate(conseiller.dateFinDeFormation),
+            conseiller.certificationPix ? 'Oui' : 'Non',
+            conseiller.compteCoopActif ? 'Oui' : 'Non',
+            conseiller.craCount,
+            conseiller.nomSuperieurHierarchique,
+            conseiller.prenomSuperieurHierarchique,
+            conseiller.fonctionSuperieurHierarchique,
+            conseiller.emailSuperieurHierarchique,
+            conseiller.telephoneSuperieurHierarchique,
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
 
 const generateCsvListeStructures = async (structures, res: Response) => {
   try {
@@ -1043,6 +1098,7 @@ export {
   generateCsvStatistiques,
   generateCsvTerritoires,
   generateCsvConseillers,
+  generateCsvConseillersCoordonnes,
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,

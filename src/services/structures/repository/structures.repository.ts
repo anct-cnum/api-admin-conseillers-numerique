@@ -153,10 +153,22 @@ const filterAvisPrefet = (avisPrefet: string | undefined) => {
 };
 
 const filterStatutDemandeConseiller = (statut: string) => {
-  if (statut !== 'toutes') {
+  if (statut === 'NOUVELLE') {
+    return { statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] } };
+  }
+  if (statut !== 'toutes' && statut !== 'NOUVELLE') {
     return { statut: { $eq: statut } };
   }
-  return { statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] } };
+  return {
+    statut: {
+      $in: [
+        'CREEE',
+        'EXAMEN_COMPLEMENTAIRE_COSELEC',
+        'VALIDATION_COSELEC',
+        'REFUS_COSELEC',
+      ],
+    },
+  };
 };
 
 export {
