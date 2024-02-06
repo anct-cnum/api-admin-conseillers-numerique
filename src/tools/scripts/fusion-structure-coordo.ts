@@ -142,7 +142,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     );
     await userUpdatedStructureDoublon(app)(structureDoublon);
-    await miseEnRelationMajCache(app)(structureAConserver); // A check delta de 1
+    await miseEnRelationMajCache(app)(structureAConserver);
     await miseEnRelationMajCache(app)(structureDoublonSuiteFusion);
     logger.info(
       `Structure ${options.structureActif} passe de ${
