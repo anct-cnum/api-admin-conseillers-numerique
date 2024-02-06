@@ -13,7 +13,7 @@ import {
 } from './structures.repository';
 import {
   getCoselec,
-  getCoselecConventionnementInitial,
+  getCoselecPositifConventionnementInitial,
   getTimestampByDate,
 } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
@@ -465,7 +465,8 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure;
-      const coselecInitial = getCoselecConventionnementInitial(structure);
+      const coselecInitial =
+        getCoselecPositifConventionnementInitial(structure);
       item.dateSorted = structure.createdAt;
       item.typeConvention = 'conventionnement';
       item.nombreConseillersCoselec =
