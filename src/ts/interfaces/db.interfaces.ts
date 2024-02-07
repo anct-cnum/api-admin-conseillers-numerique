@@ -367,7 +367,7 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
-  codeCom: string | undefined;
+  codeCom: string | null;
   coselec: ICoselec[];
   conventionnement: {
     statut: string;
