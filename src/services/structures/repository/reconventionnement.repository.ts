@@ -395,7 +395,7 @@ const formatAvenantForHistoriqueDossierConventionnement = (
       });
     });
 
-const formatReconventionnementForDossierConventionnement = (
+const formatReconventionnementForHistoriqueDossierConventionnement = (
   structures,
   isExport: boolean = false,
 ) =>
@@ -537,10 +537,11 @@ const sortHistoriqueDossierConventionnement = (
     );
   }
   if (type === 'reconventionnement' || type === 'toutes') {
-    reconventionnement = formatReconventionnementForDossierConventionnement(
-      structures,
-      isExport,
-    );
+    reconventionnement =
+      formatReconventionnementForHistoriqueDossierConventionnement(
+        structures,
+        isExport,
+      );
   }
   if (type === 'conventionnement' || type === 'toutes') {
     conventionnement =
