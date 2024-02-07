@@ -12,7 +12,7 @@ import {
 } from '../../structures/repository/structures.repository';
 import {
   filterDateDemandeAndStatutHistorique,
-  sortHistoriqueDossierConventionnement,
+  sortExportHistoriqueDossierConventionnement,
 } from '../../structures/repository/reconventionnement.repository';
 
 const getExportHistoriqueDossiersConventionCsv =
@@ -89,11 +89,10 @@ const getExportHistoriqueDossiersConventionCsv =
             },
           },
         ]);
-      const structuresFormat = sortHistoriqueDossierConventionnement(
+      const structuresFormat = sortExportHistoriqueDossierConventionnement(
         type,
         ordre,
         structures,
-        true,
       );
       generateCsvHistoriqueDossiersConvention(structuresFormat, res);
     } catch (error) {
