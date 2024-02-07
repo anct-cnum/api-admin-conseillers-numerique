@@ -65,6 +65,22 @@ const getCoselecPositifConventionnementInitial = (structure: IStructures) => {
   return null;
 };
 
+const getCoselecPositifAbandon = (structure: IStructures) => {
+  // récupérer le dernier coselec positif de la structure avant l'abandon
+  if (structure?.coselec?.length > 0) {
+    const coselecs = structure.coselec
+      .filter(
+        (coselec) =>
+          coselec.nombreConseillersCoselec > 0 &&
+          coselec.avisCoselec === 'POSITIF',
+      )
+      .sort((a, b) => b.insertedAt.getTime() - a.insertedAt.getTime());
+
+    return coselecs.length > 0 ? coselecs[0] : null;
+  }
+  return null;
+};
+
 /**
  * On cherche le dernier Coselec en fonction du numéro.
  * Le numéro est de la forme "COSELEC 2"
@@ -143,6 +159,7 @@ export {
   getLastCoselec,
   getCoselec,
   getCoselecPositifConventionnementInitial,
+  getCoselecPositifAbandon,
   deleteUser,
   deleteRoleUser,
   formatDateGMT,
