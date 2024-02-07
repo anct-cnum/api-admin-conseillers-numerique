@@ -130,6 +130,15 @@ const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
   );
 };
 
+const filterAvisAdmin = (avisAdmin: string | undefined) => {
+  if (avisAdmin) {
+    return { statut: avisAdmin };
+  }
+  return {
+    statut: { $in: ['VALIDATION_COSELEC', 'REFUS_COSELEC'] },
+  };
+};
+
 const filterAvisPrefet = (avisPrefet: string | undefined) => {
   if (avisPrefet === 'sans-avis') {
     return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
@@ -179,6 +188,7 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  filterAvisAdmin,
   filterAvisPrefet,
   filterStatutDemandeConseiller,
 };
