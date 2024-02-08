@@ -304,7 +304,8 @@ const validationRecrutementContrat =
           }
           user = userUpdated.value;
         }
-      } else if (
+      }
+      if (
         miseEnRelationSansMission[0].structureObj.codeDepartement !==
           miseEnRelationVerif.structureObj.codeDepartement &&
         miseEnRelationVerif.conseillerObj?.mattermost?.id

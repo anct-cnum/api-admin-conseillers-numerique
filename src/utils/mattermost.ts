@@ -281,7 +281,7 @@ const transfertChannelHubConseiller =
           },
         );
       await app
-        .service(service.conseillers)
+        .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           { 'conseiller.$id': conseiller._id },
