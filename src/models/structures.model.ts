@@ -170,7 +170,7 @@ export default function (app: Application): Model<any> {
 
       adresseInsee2Ban: { type: Object },
 
-      coselec: { type: [coselecSchema], default: undefined },
+      coselec: { type: [coselecSchema] },
 
       prefet: { type: [prefetSchema], default: undefined },
 
