@@ -6,6 +6,8 @@ import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { validUpdateMisesEnRelation } from '../../../schemas/miseEnRelation.schemas';
+import { getCoselec } from '../../../utils';
+import { countConseillersRecrutees } from '../misesEnRelation.repository';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -38,6 +40,25 @@ const updateMiseEnRelation =
         return;
       }
       if (req.body.statut === 'finalisee') {
+        const dernierCoselec = getCoselec(structure);
+        if (dernierCoselec !== null) {
+          // Nombre de candidats déjà recrutés pour cette structure
+          const misesEnRelationRecrutees = await countConseillersRecrutees(
+            app,
+            req,
+            miseEnRelationVerif.structure.oid,
+          );
+          if (
+            misesEnRelationRecrutees.length >
+            dernierCoselec.nombreConseillersCoselec
+          ) {
+            res.status(400).json({
+              message:
+                'Action non autorisée : quota atteint de conseillers validés par rapport au nombre de postes attribués',
+            });
+            return;
+          }
+        }
         remove = {
           emetteurRupture: '',
           dateRupture: '',
