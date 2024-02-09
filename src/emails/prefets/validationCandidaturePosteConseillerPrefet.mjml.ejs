@@ -21,6 +21,15 @@
               En savoir plus sur ces étapes
             </a>
           </mj-text>
+          <mj-text align="left">
+            Elle doit désormais transmettre aux équipes en charge de l’instruction, via la plateforme
+            Démarches-Simplifiées et dans les meilleurs délais, les pièces suivantes :
+            <% if(typeStructure == 'PRIVATE') { %>
+              <%- include('../commun/piece-justificatif-structure-private.mjml.ejs'); %>
+            <% } else{ %>
+              <%- include('../commun/piece-justificatif-structure-public.mjml.ejs'); %>
+           <% } %>
+          </mj-text>
         </mj-column>
       </mj-section>
     </mj-wrapper>

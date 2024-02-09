@@ -7,10 +7,12 @@ export default function (mailer) {
   const render = async (
     nombreConseillersCoselec: number,
     nomStructure: string,
+    typeStructure: string,
   ) => {
     return mailer.render(__dirname, templateName, {
       nombreConseillersCoselec,
       nomStructure,
+      typeStructure,
     });
   };
 
@@ -34,6 +36,7 @@ export default function (mailer) {
           body: await render(
             structure.coselec[0].nombreConseillersCoselec,
             structure.nom,
+            structure.type,
           ),
         })
         .then(onSuccess)
