@@ -30,7 +30,7 @@ export default function (mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Appel à candidature Conseiller numérique - attribution de poste',
+            'Candidature au poste de conseiller numérique - attribution de poste',
           body: await render(
             structure.coselec[0].nombreConseillersCoselec,
             structure.nom,

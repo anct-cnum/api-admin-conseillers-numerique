@@ -26,7 +26,7 @@ export default function (app: Application, mailer) {
       return mailer
         .createMailer()
         .sendEmail(prefetWithStructure.name, {
-          subject: 'Nouvelle candidature Conseiller numérique',
+          subject: 'Nouvelle candidature au poste de conseiller numérique',
           body: await render(prefetWithStructure.structure.nom),
         })
         .then(onSuccess)
