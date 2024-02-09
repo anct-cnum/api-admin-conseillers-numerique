@@ -393,7 +393,8 @@ export interface IStructures {
 export interface IHubs {
   _id: ObjectId;
   name: string;
-  region_names: string[];
+  region_names?: string[];
+  departement_names?: string[];
   channelId: string;
 }
 

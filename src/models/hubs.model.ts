@@ -15,6 +15,7 @@ export default function (app: Application): Model<any> {
     {
       name: { type: String },
       region_names: { type: [String] },
+      departements: { type: [String] },
       channelId: { type: String },
     },
     { strict: false, collection: 'hubs', versionKey: false },
