@@ -119,9 +119,7 @@ const getCoselecConventionnement = (structure) => {
 };
 
 const getTimestampByDate = (date?: Date) =>
-  typeof date === 'object' && date !== null && 'getTime' in date
-    ? new Date(date).getTime()
-    : 0;
+  date instanceof Date ? date.getTime() : 0;
 
 const deleteUser = async (app: Application, req: IRequest, email: string) => {
   await app
