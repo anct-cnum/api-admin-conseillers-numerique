@@ -394,7 +394,7 @@ export interface IHubs {
   _id: ObjectId;
   name: string;
   region_names?: string[];
-  departement_names?: string[];
+  departements?: string[];
   channelId: string;
 }
 
