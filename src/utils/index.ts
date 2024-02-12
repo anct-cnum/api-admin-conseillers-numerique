@@ -65,7 +65,7 @@ const getCoselecPositifConventionnementInitial = (structure: IStructures) => {
   return null;
 };
 
-const getCoselecPositifAbandon = (structure: IStructures) => {
+const getCoselecPositifAvantAbandon = (structure: IStructures) => {
   // récupérer le dernier coselec positif de la structure avant l'abandon
   if (structure?.coselec?.length > 0) {
     const coselecs = structure.coselec
@@ -159,7 +159,7 @@ export {
   getLastCoselec,
   getCoselec,
   getCoselecPositifConventionnementInitial,
-  getCoselecPositifAbandon,
+  getCoselecPositifAvantAbandon,
   deleteUser,
   deleteRoleUser,
   formatDateGMT,
