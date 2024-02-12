@@ -2,7 +2,7 @@
   <%- include('../commun/head.mjml.ejs'); %>
 
   <mj-body background-color="#f0f0f0">
-    <%- include('../commun/header.mjml.ejs', { utils }); %>
+    <%- include('../commun/header-structure.mjml.ejs', { utils }); %>
 
     <mj-wrapper css-class="wrapper">
       <mj-section>
@@ -25,6 +25,7 @@
       <mj-section>
         <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
       </mj-section>
+      <%- include('../commun/footer.mjml.ejs'); %>
     </mj-wrapper>
   </mj-body>
 </mjml>
