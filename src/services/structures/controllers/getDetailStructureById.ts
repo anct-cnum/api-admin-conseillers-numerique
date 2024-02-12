@@ -21,7 +21,10 @@ import {
   getNombreCrasByStructureId,
 } from '../../cras/cras.repository';
 import { getCoselec, getCoselecConventionnement } from '../../../utils';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import {
+  IMisesEnRelation,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import { PhaseConventionnement } from '../../../ts/enum';
 import {
@@ -29,6 +32,17 @@ import {
   getUrlDossierConventionnement,
   getUrlDossierReconventionnement,
 } from '../repository/demarchesSimplifiees.repository';
+
+type IConseiller = {
+  idPG: number;
+  nom: string;
+  prenom: string;
+  _id: string;
+  statut: string;
+  phaseConventionnement: string;
+  reconventionnement: boolean;
+  typeDeContrat: string;
+};
 
 const getDetailStructureById =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -186,16 +200,20 @@ const getDetailStructureById =
       if (checkStructurePhase2(structure[0]?.conventionnement?.statut)) {
         structure[0].urlDossierReconventionnementMessagerie = `https://www.demarches-simplifiees.fr/dossiers/${structure[0]?.conventionnement?.dossierReconventionnement?.numero}/messagerie`;
       }
-      structure[0].conseillers = structure[0].conseillers?.map((conseiller) => {
-        return {
-          idPG: conseiller?.conseillerObj?.idPG,
-          nom: conseiller?.conseillerObj?.nom,
-          prenom: conseiller?.conseillerObj?.prenom,
-          _id: conseiller?.conseillerObj?._id,
-          statut: conseiller?.statut,
-          phaseConventionnement: conseiller?.phaseConventionnement,
-        };
-      });
+      structure[0].conseillers = structure[0].conseillers?.map(
+        (conseiller: IMisesEnRelation) => {
+          return {
+            idPG: conseiller?.conseillerObj?.idPG,
+            nom: conseiller?.conseillerObj?.nom,
+            prenom: conseiller?.conseillerObj?.prenom,
+            _id: conseiller?.conseillerObj?._id,
+            statut: conseiller?.statut,
+            phaseConventionnement: conseiller?.phaseConventionnement,
+            reconventionnement: conseiller?.reconventionnement,
+            typeDeContrat: conseiller?.typeDeContrat,
+          };
+        },
+      );
 
       const conseillersValiderConventionnement = getConseillersByStatus(
         structure[0].conseillers,
@@ -233,11 +251,23 @@ const getDetailStructureById =
         ['finalisee', 'terminee'],
       );
 
-      const conseillersRecruterReconventionnement = getConseillersByStatus(
+      const getConseillersRecruterReconventionnement = getConseillersByStatus(
         structure[0].conseillers,
         ['finalisee'],
         PhaseConventionnement.PHASE_2,
       );
+      const getConseillersReconventionnementCDI =
+        structure[0].conseillers.filter(
+          (conseiller: IConseiller) =>
+            conseiller.typeDeContrat === 'CDI' &&
+            conseiller.reconventionnement &&
+            conseiller.statut === 'finalisee',
+        );
+
+      const conseillersRecruterReconventionnement = [
+        ...getConseillersReconventionnementCDI,
+        ...getConseillersRecruterReconventionnement,
+      ];
 
       Object.assign(structure[0], {
         conseillersValiderConventionnement,
