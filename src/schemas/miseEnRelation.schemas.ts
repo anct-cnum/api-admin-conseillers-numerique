@@ -29,7 +29,7 @@ const validMiseEnRelation = Joi.object({
 
 const validUpdateMisesEnRelation = Joi.object({
   statut: Joi.string()
-    .valid('nonInteressee', 'nouvelle', 'interessee', 'nouvelle_rupture')
+    .valid('nonInteressee', 'nouvelle', 'finalisee', 'nouvelle_rupture')
     .required()
     .error(new Error('Le statut est invalide')),
   motifRupture: Joi.string()
