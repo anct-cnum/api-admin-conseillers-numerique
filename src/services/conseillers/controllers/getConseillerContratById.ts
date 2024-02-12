@@ -44,6 +44,7 @@ const getConseillerContratById =
                   'nouvelle_rupture',
                   'finalisee',
                   'finalisee_rupture',
+                  'renouvellement_initiee',
                 ],
               },
               as: 'misesEnRelation',
@@ -155,6 +156,13 @@ const getConseillerContratById =
         res.status(404).json({ message: 'Mise en relation non trouvée' });
         return;
       }
+      conseiller[0].renouvellementEnCours =
+        !!conseiller[0].misesEnRelation.find(
+          (miseEnRelation) =>
+            String(miseEnRelation.structureObj._id) ===
+              String(conseiller[0].structureId) &&
+            miseEnRelation.statut === 'renouvellement_initiee',
+        );
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
