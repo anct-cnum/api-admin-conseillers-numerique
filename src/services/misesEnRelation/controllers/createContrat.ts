@@ -52,16 +52,12 @@ const createContrat =
       }
       if (!salaire) {
         delete miseEnRelationObject.salaire;
-      }
-
-      if (salaire) {
-        if (Number(salaire) < Number(app.get('contrat_smic'))) {
-          res.status(400).json({
-            message:
-              'Le salaire doit être égal ou plus élevé que le minimum brut légal',
-          });
-          return;
-        }
+      } else if (Number(salaire) < Number(app.get('contrat_smic'))) {
+        res.status(400).json({
+          message:
+            'Le salaire doit être égal ou plus élevé que le minimum brut légal',
+        });
+        return;
       }
       const miseEnRelationRenouvellementInitiee = await app
         .service(service.misesEnRelation)
