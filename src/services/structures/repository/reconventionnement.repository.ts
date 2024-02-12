@@ -14,7 +14,7 @@ import {
 } from './structures.repository';
 import {
   getCoselec,
-  getCoselecPositifAbandon,
+  getCoselecPositifAvantAbandon,
   getCoselecPositifConventionnementInitial,
   getTimestampByDate,
 } from '../../../utils';
@@ -535,7 +535,7 @@ const formatAbandonForExportHistoriqueDossierConventionnement = (structures) =>
     .filter((structure: IStructures) => structure?.statut === 'ABANDON')
     .map((structure) => {
       const item = structure;
-      const coselecInitial = getCoselecPositifAbandon(structure);
+      const coselecInitial = getCoselecPositifAvantAbandon(structure);
       item.dateSorted = structure.createdAt;
       item.phaseConventionnement = coselecInitial?.phaseConventionnement
         ? PhaseConventionnement.PHASE_2
