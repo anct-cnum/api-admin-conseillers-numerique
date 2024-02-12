@@ -23,7 +23,8 @@ export default function (mailer) {
       return mailer
         .createMailer()
         .sendEmail(structure.contact.email, {
-          subject: 'Conseiller numérique - votre candidature a été examinée',
+          subject:
+            'Candidature au poste de conseiller numérique - votre candidature a été examinée',
           body: await render(),
         })
         .then(onSuccess)
