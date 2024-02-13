@@ -129,7 +129,7 @@ const checkAndUpdatePermanence =
   (app) => async (structuresIdsRecruteeEtFinalisee, conseillerId) => {
     const countPermanence = await app
       .service(service.permanences)
-      .countDocuments({
+      .Model.countDocuments({
         conseillers: { $in: [conseillerId] },
         'structure.$id': { $in: structuresIdsRecruteeEtFinalisee },
       });
