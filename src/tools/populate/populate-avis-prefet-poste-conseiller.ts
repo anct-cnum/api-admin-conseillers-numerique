@@ -30,7 +30,14 @@ execute(__filename, async ({ app, logger, exit }) => {
         .service(service.structures)
         .Model.findOne({
           idPG: parseInt(structure.ID, 10),
-          statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+          statut: {
+            $in: [
+              'VALIDATION_COSELEC',
+              'CREEE',
+              'EXAMEN_COMPLEMENTAIRE_COSELEC',
+            ],
+          },
+          'prefet.avisPrefet': { $nin: ['POSITIF', 'NÉGATIF'] },
         });
 
       if (match === null) {
