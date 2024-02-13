@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable prettier/prettier */
 
-// Lancement de ce script : ts-node src/tools/populate/populate-avis-prefet.ts -c <file>
+// Lancement de ce script : ts-node src/tools/populate/populate-avis-prefet-poste-conseiller.ts -c <file>
 
 import CSVToJSON from 'csvtojson';
 import { program } from 'commander';
@@ -34,17 +34,31 @@ execute(__filename, async ({ app, logger, exit }) => {
         });
 
       if (match === null) {
-        logger.warn(`Structure ${structure.ID} inexistante`);
+        logger.warn(
+          `Structure ${structure.ID} inexistante ou en statut non autorisée`,
+        );
+        reject();
+        return;
+      }
+      if (structure.AVIS_PREFET !== 'Oui' && structure.AVIS_PREFET !== 'Non') {
+        logger.warn(`Avis préfet non valide pour la structure ${structure.ID}`);
+        reject();
+        return;
+      }
+      if (structure.COMMENTAIRE.trim().length < 5) {
+        logger.warn(
+          `Commentaire préfet non valide pour la structure ${structure.ID}`,
+        );
         reject();
         return;
       }
       const prefet = {
         avisPrefet: structure.AVIS_PREFET === 'Oui' ? 'POSITIF' : 'NÉGATIF',
-        commentaire: structure.COMMENTAIRE,
+        commentaire: structure.COMMENTAIRE.trim(),
         insertedAt: new Date(),
         banniereValidationAvisPrefet: false,
       };
-      if (structure?.ID_TRANSFERT) {
+      if (structure.ID_TRANSFERT) {
         const structureTransfert: IStructures = await app
           .service(service.structures)
           .Model.findOne({ idPG: parseInt(structure.ID_TRANSFERT, 10) });
@@ -75,9 +89,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           },
         },
       );
-      logger.info(
-        `Un avis préfet a été donné à la structure ${match.idPG}`,
-      );
+      logger.info(`Un avis préfet a été donné à la structure ${match.idPG}`);
       resolve(p);
     });
     promises.push(p);
