@@ -3,6 +3,7 @@
 // ts-node src/tools/scripts/fusion-structure-coordo.ts --structureActif XidPGX --structureDoublon XidPGX
 
 import { program } from 'commander';
+import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { getCoselec } from '../../utils';
@@ -105,6 +106,9 @@ execute(__filename, async ({ app, logger, exit }) => {
     const structureAConserver = await findOneAndUpdateStructure(app)(
       structureActif._id,
       {
+        $set: {
+          updatedAt: dayjs(structureDoublon.updatedAt).format('YYYY-MM-DD'),
+        },
         $push: {
           ...(coselecCoordo && {
             coselec: {
@@ -130,7 +134,11 @@ execute(__filename, async ({ app, logger, exit }) => {
     const structureDoublonSuiteFusion = await findOneAndUpdateStructure(app)(
       structureDoublon._id,
       {
-        $set: { statut: 'ABANDON', userCreated: false },
+        $set: {
+          statut: 'ABANDON',
+          userCreated: false,
+          updatedAt: dayjs(new Date()).format('YYYY-MM-DD'),
+        },
         $push: {
           coselec: {
             nombreConseillersCoselec: 0,
