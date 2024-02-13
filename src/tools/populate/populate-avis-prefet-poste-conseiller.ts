@@ -35,7 +35,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
       if (match === null) {
         logger.warn(
-          `Structure ${structure.ID} inexistante ou en statut non autorisée`,
+          `Structure ${structure.ID} inexistante ou en statut non autorisé`,
         );
         reject();
         return;
