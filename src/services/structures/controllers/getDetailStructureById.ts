@@ -259,9 +259,9 @@ const getDetailStructureById =
       );
       const getConseillersReconventionnementCDI = conseillers.filter(
         (conseiller: IConseiller) =>
-          conseiller.typeDeContrat === 'CDI' &&
-          conseiller.reconventionnement &&
-          conseiller.statut === 'finalisee',
+          conseiller?.typeDeContrat === 'CDI' &&
+          conseiller?.reconventionnement &&
+          conseiller?.statut === 'finalisee',
       );
 
       const conseillersRecruterReconventionnement = [
