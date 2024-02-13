@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Lancement de ce script : ts-node src/tools/scripts/rattrapage-dossier-ds-reconventionnement.ts
+// Lancement de ce script : ts-node src/tools/scripts/rattrapage-dossier-ds-reconventionnement.ts -id <idPG> -n <numero>
 
 import { program } from 'commander';
 import execute from '../utils';
