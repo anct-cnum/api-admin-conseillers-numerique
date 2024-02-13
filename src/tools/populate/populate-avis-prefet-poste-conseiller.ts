@@ -61,7 +61,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       if (structure.ID_TRANSFERT) {
         const structureTransfert: IStructures = await app
           .service(service.structures)
-          .Model.findOne({ idPG: parseInt(structure.ID_TRANSFERT, 10) });
+          .Model.findOne({
+            idPG: parseInt(structure.ID_TRANSFERT, 10),
+            statut: 'VALIDATION_COSELEC',
+          });
         if (!structureTransfert) {
           logger.warn(
             `Structure ${structure.ID_TRANSFERT} inexistante pour le transfert`,
