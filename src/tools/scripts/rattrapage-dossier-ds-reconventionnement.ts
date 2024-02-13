@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Lancement de ce script : ts-node src/tools/scripts/fix-dossier-ds-reconventionnement.ts
+// Lancement de ce script : ts-node src/tools/scripts/rattrapage-dossier-ds-reconventionnement.ts
 
 import { program } from 'commander';
 import execute from '../utils';
@@ -144,7 +144,7 @@ execute(
             `La structure ${structure.idPG} n'a pas de type de dossier DS correspondant`,
           );
           exit();
-          break;
+          return;
       }
       const structureUpdated = await app
         .service(service.structures)
