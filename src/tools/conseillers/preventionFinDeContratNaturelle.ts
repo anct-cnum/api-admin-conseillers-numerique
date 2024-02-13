@@ -8,10 +8,7 @@ import dayjs from 'dayjs';
 import execute from '../utils';
 import mailer from '../../mailer';
 import service from '../../helpers/services';
-import {
-  getConseiller,
-  updateCacheObj,
-} from '../../utils/functionsDeleteRoleConseiller';
+import { getConseiller } from '../../utils/functionsDeleteRoleConseiller';
 import {
   preventionSuppressionConseiller,
   prenventionSuppressionConseillerStructure,
@@ -29,7 +26,7 @@ const getMisesEnRelationsFinContrat = (app) => async (dateDuJourFin) =>
 // statut créer pour identifer les contrats terminés mais qui ont toujours accès aux outils Conum
 // avant de les passer en terminer à M+2 de la fin de contrat
 const updateMiseEnRelation = (app) => async (id) =>
-  app.service(service.misesEnRelation).Model.findOneAndUpdate(
+  app.service(service.misesEnRelation).Model.updateOne(
     {
       _id: id,
     },
@@ -37,9 +34,6 @@ const updateMiseEnRelation = (app) => async (id) =>
       $set: {
         statut: 'terminee_naturelle',
       },
-    },
-    {
-      new: true,
     },
   );
 
@@ -69,7 +63,10 @@ const getEmailsStructure = (app) => async (conseiller) => {
       emailsStructure.push(userStructure.name);
     }
   }
-  if (!emailsStructure.includes(conseiller?.supHierarchique?.email)) {
+  if (
+    conseiller?.supHierarchique ??
+    !emailsStructure.includes(conseiller?.supHierarchique?.email)
+  ) {
     emailsStructure.push(conseiller.supHierarchique.email);
   }
   return emailsStructure;
@@ -77,21 +74,27 @@ const getEmailsStructure = (app) => async (conseiller) => {
 
 const createConseillersTermines =
   (app) => async (conseiller, miseEnRelationIdTerminee) => {
-    const miseEnRelation = await app
-      .service(service.misesEnRelation)
-      .Model.findOne({
-        _id: miseEnRelationIdTerminee._id,
-      });
     await app.service(service.conseillersTermines).Model.create({
       conseillerId: conseiller._id,
       structureId: conseiller.structureId,
-      typeDeContrat: miseEnRelation.typeDeContrat,
-      dateDebutDeContrat: miseEnRelation.dateDebutDeContrat,
-      dateFinDeContrat: miseEnRelation.dateFinDeContrat,
-      phaseConventionnement: miseEnRelation?.phaseConventionnement ?? null,
-      reconventionnement: miseEnRelation?.reconventionnement ?? false,
+      typeDeContrat: miseEnRelationIdTerminee.typeDeContrat,
+      dateDebutDeContrat: miseEnRelationIdTerminee.dateDebutDeContrat,
+      dateFinDeContrat: miseEnRelationIdTerminee.dateFinDeContrat,
+      phaseConventionnement:
+        miseEnRelationIdTerminee?.phaseConventionnement ?? null,
+      reconventionnement: miseEnRelationIdTerminee?.reconventionnement ?? false,
     });
   };
+
+const updateCacheObj = (app) => async (conseiller) =>
+  app.service(service.misesEnRelation).Model.updateMany(
+    { 'conseiller.$id': conseiller._id },
+    {
+      $set: {
+        conseillerObj: conseiller,
+      },
+    },
+  );
 
 program
   .option(

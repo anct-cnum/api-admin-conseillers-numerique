@@ -51,9 +51,6 @@ const updateConseiller = (app) => async (conseiller) =>
         codeRegionStructure: '',
         codeDepartementStructure: '',
         hasPermanence: '',
-        coordinateurs: '',
-        listeSubordonnes: '',
-        estCoordinateur: '',
       },
     },
     {
@@ -127,6 +124,39 @@ const updateStructure = (app) => async (structureId, miseEnRelationId) => {
     },
   );
 };
+
+const checkAndUpdatePermanence =
+  (app) => async (structuresIdsRecruteeEtFinalisee, conseillerId) => {
+    const countPermanence = await app
+      .service(service.permanences)
+      .countDocuments({
+        conseillers: { $in: [conseillerId] },
+        'structure.$id': { $in: structuresIdsRecruteeEtFinalisee },
+      });
+
+    if (countPermanence === 0) {
+      await app.service(service.conseillers).updateOne(
+        {
+          _id: conseillerId,
+        },
+        {
+          $unset: {
+            hasPermanence: '',
+          },
+        },
+      );
+      await app.service(service.misesEnRelation).updateOne(
+        {
+          'conseiller.$id': conseillerId,
+        },
+        {
+          $unset: {
+            'conseillerObj.hasPermanence': '',
+          },
+        },
+      );
+    }
+  };
 
 program
   .option(
@@ -204,7 +234,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               );
             });
 
-          // Contrôler s'il n'y aucune autre mise en relation (recrutee, finalisee) que celle de la structure en fin de contrat
+          // Contrôler s'il n'y a aucune autre mise en relation (recrutee, finalisee) que celle de la structure en fin de contrat
           if (structuresIdsRecruteeEtFinalisee.length === 0) {
             // mise aux normes du conseiller et de l'utilisateur
             const pool = new Pool();
@@ -229,11 +259,14 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
                   );
                 });
 
+              // Mise à jour du cache Obj
+              await updateCacheObj(app)(conseillerUpdated);
+
               // Envoi des emails de cloture de compte pour PIX / le conseiller
               const mailerInstance = mailer(app);
               const messageFinContratPix = conseillerRupturePix(mailerInstance);
               const errorSmtpMailFinContratPix = await messageFinContratPix
-                .send(conseillerUpdated)
+                .send(conseiller)
                 .catch((errSmtp: Error) => {
                   logger.error(errSmtp);
                   Sentry.captureException(errSmtp);
@@ -255,12 +288,16 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
                 logger.error(errorSmtpMailFinContrat.message);
                 Sentry.captureException(errorSmtpMailFinContrat.message);
               }
-              // Mise à jour du cache Obj
-              await updateCacheObj(app)(conseillerUpdated);
             } catch (error) {
               logger.error(error);
               Sentry.captureException(error);
             }
+          } else {
+            // S'il y a au moins une mise en relation (recrutee, finalisee) on vérifie si le conseiller peut conserver le flag hasPermanence
+            await checkAndUpdatePermanence(app)(
+              structuresIdsRecruteeEtFinalisee,
+              conseiller._id,
+            );
           }
           countSucess += 1;
         } else {

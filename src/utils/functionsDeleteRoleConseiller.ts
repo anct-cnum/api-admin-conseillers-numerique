@@ -134,102 +134,152 @@ const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
   }
 };
 
-const deleteConseillerInCoordinateurs =
-  (app) => async (conseillerId, structureId) =>
-    app.service(service.conseillers).Model.updateMany(
+const deleteConseillerInCoordinateurs = (app) => async (conseillerId) => {
+  await app.service(service.conseillers).Model.updateMany(
+    {
+      estCoordinateur: true,
+      'listeSubordonnes.type': 'conseillers',
+      'listeSubordonnes.liste': {
+        $elemMatch: { $eq: conseillerId },
+      },
+    },
+    {
+      $pull: {
+        'listeSubordonnes.liste': conseillerId,
+      },
+    },
+  );
+  await app.service(service.misesEnRelation).Model.updateMany(
+    {
+      'conseillerObj.estCoordinateur': true,
+      'conseillerObj.listeSubordonnes.type': 'conseillers',
+      'conseillerObj.listeSubordonnes.liste': {
+        $elemMatch: { $eq: conseillerId },
+      },
+    },
+    {
+      $pull: {
+        'conseillerObj.listeSubordonnes.liste': conseillerId,
+      },
+    },
+  );
+  await app.service(service.conseillers).Model.updateOne(
+    { _id: conseillerId },
+    {
+      $unset: {
+        coordinateurs: '',
+      },
+    },
+  );
+  await app.service(service.misesEnRelation).Model.updateMany(
+    { 'conseiler.$id': conseillerId },
+    {
+      $unset: {
+        'conseillerObj.coordinateurs': '',
+      },
+    },
+  );
+};
+
+const deleteCoordinateurInConseillers = (app) => async (coordinateurId) => {
+  const conseillers = await app.service(service.conseillers).Model.find({
+    coordinateurs: {
+      $elemMatch: {
+        id: coordinateurId,
+      },
+    },
+  });
+  if (conseillers.length > 0) {
+    await app.service(service.conseillers).Model.updateOne(
+      { _id: { $in: conseillers } },
       {
-        estCoordinateur: true,
-        structureId,
-        'listeSubordonnes.type': 'conseillers',
-        'listeSubordonnes.liste': {
-          $elemMatch: { $eq: conseillerId },
+        $pull: {
+          coordinateurs: {
+            id: coordinateurId,
+          },
         },
+      },
+    );
+    await app.service(service.conseillers).Model.updateOne(
+      { _id: { $in: conseillers }, coordinateurs: { $size: 0 } },
+      {
+        $unset: {
+          coordinateurs: '',
+        },
+      },
+    );
+    await app.service(service.misesEnRelation).Model.updateMany(
+      {
+        'conseiller.$id': { $in: conseillers },
       },
       {
         $pull: {
-          'listeSubordonnes.liste': conseillerId,
+          'conseillerObj.coordinateurs': {
+            id: coordinateurId,
+          },
         },
       },
     );
-
-const deleteCoordinateurInConseillers =
-  (app) => async (coordinateurId, structureId) => {
-    const conseillers = await app.service(service.conseillers).Model.find({
-      coordinateurs: {
-        $elemMatch: {
-          id: coordinateurId,
+    await app.service(service.misesEnRelation).Model.updateMany(
+      {
+        'conseiller.$id': { $in: conseillers },
+        'conseillerObj.coordinateurs': { $size: 0 },
+      },
+      {
+        $unset: {
+          'conseillerObj.coordinateurs': '',
         },
       },
-    });
-    if (conseillers.length > 0) {
-      await app.service(service.conseillers).Model.updateOne(
-        { _id: { $in: conseillers } },
-        {
-          $pull: {
-            coordinateurs: {
-              id: coordinateurId,
-            },
-          },
-        },
-      );
-      await app.service(service.conseillers).Model.updateOne(
-        { _id: { $in: conseillers }, coordinateurs: { $size: 0 } },
-        {
-          $unset: {
-            coordinateurs: '',
-          },
-        },
-      );
-      await app.service(service.misesEnRelation).Model.updateMany(
-        {
-          'conseiller.$id': { $in: conseillers },
-          'structure.$id': structureId,
-        },
-        {
-          $pull: {
-            'conseillerObj.coordinateurs': {
-              id: coordinateurId,
-            },
-          },
-        },
-      );
-      await app.service(service.misesEnRelation).Model.updateMany(
-        {
-          'conseiller.$id': { $in: conseillers },
-          'conseillerObj.coordinateurs': { $size: 0 },
-        },
-        {
-          $unset: {
-            'conseillerObj.coordinateurs': '',
-          },
-        },
-      );
-    }
-  };
+    );
+  }
+  await app.service(service.conseillers).Model.updateOne(
+    { _id: coordinateurId },
+    {
+      $unset: {
+        listeSubordonnes: '',
+        estCoordinateur: '',
+      },
+    },
+  );
+  await app.service(service.misesEnRelation).Model.updateMany(
+    { 'conseiler.$id': coordinateurId },
+    {
+      $unset: {
+        'conseillerObj.listeSubordonnes': '',
+        'conseillerObj.estCoordinateur': '',
+      },
+    },
+  );
+};
 
 const nettoyageCoordinateur =
   (app) => async (structureIdterminee, conseiller) => {
-    await deleteConseillerInCoordinateurs(app)(
-      conseiller._id,
-      structureIdterminee,
-    );
+    await deleteConseillerInCoordinateurs(app)(conseiller._id);
     if (conseiller.estCoordinateur) {
-      await deleteCoordinateurInConseillers(app)(
-        conseiller._id,
-        structureIdterminee,
-      );
+      await deleteCoordinateurInConseillers(app)(conseiller._id);
     }
   };
 
-const updateCacheObj = (app) => async (conseiller) =>
-  app.service(service.misesEnRelation).Model.updateMany(
-    { 'conseillerObj.email': conseiller.email },
+const updateCacheObj = (app) => async (conseiller) => {
+  await app.service(service.misesEnRelation).Model.updateMany(
+    { 'conseiller.$id': conseiller._id },
     {
       $set: {
         conseillerObj: conseiller,
       },
     },
   );
+  await app.service(service.misesEnRelation).Model.updateMany(
+    { 'conseillerObj.email': conseiller.email },
+    {
+      $set: {
+        'conseillerObj.disponible': true,
+        'conseillerObj.dateDisponibilite': conseiller.dateDisponibilite,
+        'conseillerObj.updatedAt': conseiller.updatedAt,
+      },
+    },
+  );
+};
 
 const deletePermanences = (app) => async (idConseiller, idStructure) =>
   app.service(service.permanences).Model.deleteMany({

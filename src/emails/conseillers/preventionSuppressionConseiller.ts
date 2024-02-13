@@ -8,6 +8,7 @@ export default function (mailer) {
     return mailer.render(__dirname, templateName, {
       conseiller,
       link: utils.getQuestionFinContratUrl(),
+      espaceCandidat: utils.getEspaceCandidatUrl(),
       emailSupport: utils.getSupportMail(),
     });
   };
