@@ -10,6 +10,8 @@ import { getCoselec } from '../../utils';
 import { PhaseConventionnement } from '../../ts/enum';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
 
+const { Pool } = require('pg');
+
 program.option(
   '-sa, --structureActif <structureActif>',
   "idPG de la structure qu'on conserve",
@@ -39,6 +41,14 @@ const findOneAndUpdateStructure = (app) => (structureId, query) =>
       { ...query },
       { returnOriginal: false },
     );
+const updateStructurePG = (pool) => async (idPG, datePG) =>
+  pool.query(
+    `
+          UPDATE djapp_hostorganization
+          SET updated = $2
+          WHERE id = $1`,
+    [idPG, datePG],
+  );
 
 const miseEnRelationMajCache = (app) => (structureObj: any) =>
   app
@@ -67,6 +77,8 @@ const userUpdatedStructureDoublon = (app) => async (structureDoublon) => {
 execute(__filename, async ({ app, logger, exit }) => {
   try {
     const options = program.opts();
+    const pool = new Pool();
+
     if (
       Number.isNaN(Number(options.structureActif)) ||
       Number.isNaN(Number(options.structureDoublon))
@@ -103,6 +115,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
       return;
     }
+    await updateStructurePG(pool)(
+      structureActif.idPG,
+      dayjs(structureDoublon.updatedAt).format('YYYY-MM-DD'),
+    );
     const structureAConserver = await findOneAndUpdateStructure(app)(
       structureActif._id,
       {
@@ -130,6 +146,10 @@ execute(__filename, async ({ app, logger, exit }) => {
           },
         },
       },
+    );
+    await updateStructurePG(pool)(
+      structureDoublon.idPG,
+      dayjs(new Date()).format('YYYY-MM-DD'),
     );
     const structureDoublonSuiteFusion = await findOneAndUpdateStructure(app)(
       structureDoublon._id,
