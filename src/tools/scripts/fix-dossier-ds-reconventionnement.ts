@@ -50,6 +50,7 @@ execute(
         .service(service.structures)
         .Model.findOne({
           idPG: options.idPG,
+          statut: 'VALIDATION_COSELEC',
         });
       if (!structure) {
         logger.error(`La structure ${options.idPG} n'existe pas`);
@@ -139,6 +140,10 @@ execute(
           }
           break;
         default:
+          logger.error(
+            `La structure ${structure.idPG} n'a pas de type de dossier DS correspondant`,
+          );
+          exit();
           break;
       }
       const structureUpdated = await app
