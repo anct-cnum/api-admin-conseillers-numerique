@@ -291,6 +291,7 @@ const getDetailStructureById =
       )(structure[0]._id);
       structure[0].craCount = craCount;
       structure[0].accompagnementCount = accompagnementsCount[0]?.total;
+      delete structure[0].misesEnRelations;
 
       if (structure.length === 0) {
         return res.status(404).json({ message: 'Structure non trouvée' });
