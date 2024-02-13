@@ -123,7 +123,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       structureActif._id,
       {
         $set: {
-          updatedAt: dayjs(structureDoublon.updatedAt).format('YYYY-MM-DD'),
+          updatedAt: structureDoublon.updatedAt,
         },
         $push: {
           ...(coselecCoordo && {
@@ -147,9 +147,10 @@ execute(__filename, async ({ app, logger, exit }) => {
         },
       },
     );
+    const today = new Date();
     await updateStructurePG(pool)(
       structureDoublon.idPG,
-      dayjs(new Date()).format('YYYY-MM-DD'),
+      dayjs(today).format('YYYY-MM-DD'),
     );
     const structureDoublonSuiteFusion = await findOneAndUpdateStructure(app)(
       structureDoublon._id,
@@ -157,13 +158,13 @@ execute(__filename, async ({ app, logger, exit }) => {
         $set: {
           statut: 'ABANDON',
           userCreated: false,
-          updatedAt: dayjs(new Date()).format('YYYY-MM-DD'),
+          updatedAt: today,
         },
         $push: {
           coselec: {
             nombreConseillersCoselec: 0,
             avisCoselec: 'POSITIF',
-            insertedAt: new Date(),
+            insertedAt: today,
           },
         },
         $unset: { demandesCoordinateur: '' },
