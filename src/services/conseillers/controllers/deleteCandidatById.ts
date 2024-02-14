@@ -104,8 +104,8 @@ const archiverLaSuppression =
               motif,
               conseiller,
               historiqueContrats: misesEnRelations.filter(
-                (misesEnRelation) =>
-                  String(misesEnRelation.conseillerId) ===
+                (miseEnRelation) =>
+                  String(miseEnRelation.conseillerId) ===
                   String(conseiller._id),
               ),
               actionUser: {
@@ -262,9 +262,11 @@ const deleteCandidatById =
         .service(service.misesEnRelation)
         .Model.aggregate([
           {
-            $match: instructionSuppressionMER,
+            $match: {
+              ...instructionSuppressionMER,
+              $and: [checkAccessMiseEnRelation],
+            },
           },
-          { $match: checkAccessMiseEnRelation },
           {
             $project: {
               statut: 1,
