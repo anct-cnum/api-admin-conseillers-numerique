@@ -48,6 +48,11 @@ const getExportListeStructuresCsv =
       );
       structures = await app.service(service.structures).Model.aggregate([
         {
+          $addFields: {
+            idPGStr: { $toString: '$idPG' },
+          },
+        },
+        {
           $match: {
             createdAt: { $gt: dateDebut, $lt: dateFin },
             $and: [checkAccessStructures],
