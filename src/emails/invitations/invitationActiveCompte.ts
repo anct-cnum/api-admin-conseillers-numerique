@@ -6,9 +6,11 @@ import { IRequest } from '../../ts/interfaces/global.interfaces';
 
 export default function (app: Application, mailer, req: IRequest = null) {
   const { utils } = mailer;
-  const templateName = 'invitationActiveCompte';
 
   const render = async (user: IUser) => {
+    const templateName = user?.roles.includes('coordinateur')
+      ? 'invitationActiveCompteCoordo'
+      : 'invitationActiveCompte';
     return mailer.render(__dirname, templateName, {
       user,
       link: utils.getDashboardUrl(`/invitation/${user.token}`),
