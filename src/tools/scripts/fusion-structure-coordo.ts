@@ -33,14 +33,6 @@ const misesEnRelationStructure = (app) => (structureDoublon) =>
     statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
   });
 
-const findOneAndUpdateStructure = (app) => (structureId, query) =>
-  app
-    .service(service.structures)
-    .Model.findOneAndUpdate(
-      { _id: structureId },
-      { ...query },
-      { returnOriginal: false },
-    );
 const updateStructurePG = (pool) => async (idPG, datePG) =>
   pool.query(
     `
@@ -78,6 +70,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   try {
     const options = program.opts();
     const pool = new Pool();
+    const today = new Date();
 
     if (
       Number.isNaN(Number(options.structureActif)) ||
@@ -103,13 +96,14 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
       return;
     }
-    const coselecCoordo = structureDoublon.coselec.findLast(
+    const coselecCoordo = structureDoublon.coselec.filter(
       (i) => i?.type === 'coordinateur',
     );
     const countCoordoAccepte = structureDoublon?.demandesCoordinateur.filter(
-      (i) => i.statut === 'validee',
+      (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
     );
-    if (countCoordoAccepte.length === 0 && !coselecCoordo) {
+
+    if (countCoordoAccepte.length === 0) {
       logger.error(
         `La structure ${structureDoublon.idPG} a 0 poste coordo attribué !`,
       );
@@ -119,72 +113,90 @@ execute(__filename, async ({ app, logger, exit }) => {
       structureActif.idPG,
       dayjs(structureDoublon.updatedAt).format('YYYY-MM-DD'),
     );
-    const structureAConserver = await findOneAndUpdateStructure(app)(
-      structureActif._id,
-      {
-        $set: {
-          updatedAt: structureDoublon.updatedAt,
-        },
-        $push: {
-          ...(coselecCoordo && {
-            coselec: {
-              nombreConseillersCoselec:
-                getCoselec(structureActif).nombreConseillersCoselec +
-                countCoordoAccepte.length,
-              avisCoselec: 'POSITIF',
-              insertedAt: coselecCoordo.insertedAt,
-              type: 'coordinateur',
-              ...(checkStructurePhase2(
-                structureActif?.conventionnement?.statut,
-              ) && {
-                phaseConventionnement: PhaseConventionnement.PHASE_2,
-              }),
+
+    const structureAConserver = await app
+      .service(service.structures)
+      .Model.findOneAndUpdate(
+        { _id: structureActif._id },
+        {
+          $set: {
+            updatedAt: structureDoublon.updatedAt,
+          },
+          $push: {
+            ...(coselecCoordo.length > 0 && {
+              coselec: {
+                nombreConseillersCoselec:
+                  getCoselec(structureActif).nombreConseillersCoselec +
+                  coselecCoordo.length,
+                avisCoselec: 'POSITIF',
+                insertedAt: today,
+                type: 'coordinateur',
+                ...(checkStructurePhase2(
+                  structureActif?.conventionnement?.statut,
+                ) && {
+                  phaseConventionnement: PhaseConventionnement.PHASE_2,
+                }),
+              },
+            }),
+            demandesCoordinateur: {
+              $each: structureDoublon.demandesCoordinateur,
             },
-          }),
-          demandesCoordinateur: {
-            $each: structureDoublon.demandesCoordinateur,
           },
         },
-      },
-    );
-    const today = new Date();
+        { returnOriginal: false, rawResult: true },
+      );
+    if (structureAConserver.lastErrorObject.n === 0) {
+      logger.error(
+        `La structure ${structureActif.idPG} n'a pas été mis à jour!`,
+      );
+      return;
+    }
     await updateStructurePG(pool)(
       structureDoublon.idPG,
       dayjs(today).format('YYYY-MM-DD'),
     );
-    const structureDoublonSuiteFusion = await findOneAndUpdateStructure(app)(
-      structureDoublon._id,
-      {
-        $set: {
-          statut: 'ABANDON',
-          userCreated: false,
-          updatedAt: today,
-        },
-        $push: {
-          coselec: {
-            nombreConseillersCoselec: 0,
-            avisCoselec: 'POSITIF',
-            insertedAt: today,
+    const structureDoublonSuiteFusion = await app
+      .service(service.structures)
+      .Model.findOneAndUpdate(
+        { _id: structureDoublon._id },
+        {
+          $set: {
+            statut: 'ABANDON',
+            userCreated: false,
+            updatedAt: today,
           },
+          $push: {
+            coselec: {
+              nombreConseillersCoselec: 0,
+              avisCoselec: 'POSITIF',
+              insertedAt: today,
+            },
+          },
+          $unset: { demandesCoordinateur: '' },
         },
-        $unset: { demandesCoordinateur: '' },
-      },
-    );
+        { returnOriginal: false, rawResult: true },
+      );
+    if (structureDoublonSuiteFusion.lastErrorObject.n === 0) {
+      logger.error(
+        `La structure ${structureDoublon.idPG} n'a pas été mis à jour!`,
+      );
+      return;
+    }
     await userUpdatedStructureDoublon(app)(structureDoublon);
-    await miseEnRelationMajCache(app)(structureAConserver);
-    await miseEnRelationMajCache(app)(structureDoublonSuiteFusion);
+    await miseEnRelationMajCache(app)(structureAConserver.value);
+    await miseEnRelationMajCache(app)(structureDoublonSuiteFusion.value);
     logger.info(
       `Structure ${options.structureActif} passe de ${
         getCoselec(structureActif).nombreConseillersCoselec
       } poste(s) à ${
-        getCoselec(structureAConserver).nombreConseillersCoselec
+        getCoselec(structureAConserver.value).nombreConseillersCoselec
       } dont ${countCoordoAccepte.length} poste(s) coordo`,
     );
     logger.info(
       `Structure ${options.structureDoublon} passe de ${
         getCoselec(structureDoublon).nombreConseillersCoselec
       } poste(s) dont ${countCoordoAccepte.length} poste(s) coordo à ${
-        getCoselec(structureDoublonSuiteFusion).nombreConseillersCoselec
+        getCoselec(structureDoublonSuiteFusion.value).nombreConseillersCoselec
       } poste (ABANDON)`,
     );
   } catch (error) {
