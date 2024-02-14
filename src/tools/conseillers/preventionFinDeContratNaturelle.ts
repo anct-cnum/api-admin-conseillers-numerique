@@ -64,7 +64,7 @@ const getEmailsStructure = (app) => async (conseiller) => {
     }
   }
   if (
-    conseiller?.supHierarchique ??
+    conseiller?.supHierarchique &&
     !emailsStructure.includes(conseiller?.supHierarchique?.email)
   ) {
     emailsStructure.push(conseiller.supHierarchique.email);

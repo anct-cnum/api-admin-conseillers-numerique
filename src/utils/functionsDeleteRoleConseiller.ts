@@ -172,7 +172,7 @@ const deleteConseillerInCoordinateurs = (app) => async (conseillerId) => {
     },
   );
   await app.service(service.misesEnRelation).Model.updateMany(
-    { 'conseiler.$id': conseillerId },
+    { 'conseiller.$id': conseillerId },
     {
       $unset: {
         'conseillerObj.coordinateurs': '',

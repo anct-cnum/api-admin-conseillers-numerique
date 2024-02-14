@@ -145,7 +145,7 @@ const checkAndUpdatePermanence =
           },
         },
       );
-      await app.service(service.misesEnRelation).updateOne(
+      await app.service(service.misesEnRelation).updateMany(
         {
           'conseiller.$id': conseillerId,
         },
