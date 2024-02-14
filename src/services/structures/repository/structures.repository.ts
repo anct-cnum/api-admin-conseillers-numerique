@@ -4,6 +4,17 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
 
+type IConseiller = {
+  idPG: number;
+  nom: string;
+  prenom: string;
+  _id: string;
+  statut: string;
+  phaseConventionnement: string;
+  reconventionnement: boolean;
+  typeDeContrat: string;
+};
+
 const countStructures = async (ability, read, app) =>
   app
     .service(service.structures)
@@ -122,7 +133,11 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
+const getConseillersByStatus = (
+  conseillers: IConseiller[],
+  statuts: string[],
+  phase = undefined,
+) => {
   return conseillers.filter(
     (conseiller) =>
       statuts.includes(conseiller.statut) &&
