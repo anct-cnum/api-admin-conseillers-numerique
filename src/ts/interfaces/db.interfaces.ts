@@ -119,6 +119,8 @@ export interface IMisesEnRelation {
   contratCoordinateur: boolean | undefined;
 
   banniereRefusRecrutement: boolean | undefined;
+
+  phaseConventionnement: string | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
