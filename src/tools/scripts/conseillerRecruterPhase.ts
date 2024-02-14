@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// ts-node src/tools/scripts/conseillerRecruterPhase2.ts -c XXX -s XXX -p X
+// ts-node src/tools/scripts/conseillerRecruterPhase.ts -c XXX -s XXX -p X
 
 import { program } from 'commander';
 import { ObjectId } from 'mongodb';
