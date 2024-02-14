@@ -4,6 +4,7 @@ import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';
 import { IRequest } from '../ts/interfaces/global.interfaces';
 import { PhaseConventionnement } from '../ts/enum';
+import { IStructures } from '../ts/interfaces/db.interfaces';
 
 /**
  * On cherche le bon coselec avec avis POSITIF :
@@ -48,6 +49,38 @@ const getCoselecPositifConventionnement = (structure) => {
     : null;
 };
 
+const getCoselecPositifConventionnementInitial = (structure: IStructures) => {
+  if (structure.statut === 'VALIDATION_COSELEC') {
+    // récupérer le premier coselec positif de la structure (conventionnement initial)
+    const coselecs = structure.coselec
+      .filter(
+        (coselec) =>
+          coselec.nombreConseillersCoselec > 0 &&
+          coselec.avisCoselec === 'POSITIF',
+      )
+      .sort((a, b) => a.insertedAt.getTime() - b.insertedAt.getTime());
+
+    return coselecs.length > 0 ? coselecs[0] : null;
+  }
+  return null;
+};
+
+const getCoselecPositifAvantAbandon = (structure: IStructures) => {
+  // récupérer le dernier coselec positif de la structure avant l'abandon
+  if (structure?.coselec?.length > 0) {
+    const coselecs = structure.coselec
+      .filter(
+        (coselec) =>
+          coselec.nombreConseillersCoselec > 0 &&
+          coselec.avisCoselec === 'POSITIF',
+      )
+      .sort((a, b) => b.insertedAt.getTime() - a.insertedAt.getTime());
+
+    return coselecs.length > 0 ? coselecs[0] : null;
+  }
+  return null;
+};
+
 /**
  * On cherche le dernier Coselec en fonction du numéro.
  * Le numéro est de la forme "COSELEC 2"
@@ -86,7 +119,7 @@ const getCoselecConventionnement = (structure) => {
 };
 
 const getTimestampByDate = (date?: Date) =>
-  date != null ? new Date(date).getTime() : 0;
+  date instanceof Date ? date.getTime() : 0;
 
 const deleteUser = async (app: Application, req: IRequest, email: string) => {
   await app
@@ -125,6 +158,8 @@ export {
   getCoselecConventionnement,
   getLastCoselec,
   getCoselec,
+  getCoselecPositifConventionnementInitial,
+  getCoselecPositifAvantAbandon,
   deleteUser,
   deleteRoleUser,
   formatDateGMT,

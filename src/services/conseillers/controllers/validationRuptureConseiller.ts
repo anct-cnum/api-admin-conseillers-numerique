@@ -402,6 +402,20 @@ const validationRuptureConseiller =
         });
         return;
       }
+      const miseEnRelationRenouvellementEnCours: IMisesEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          'conseiller.$id': conseiller._id,
+          'structure.$id': structure._id,
+          statut: { $eq: 'renouvellement_initiee' },
+        });
+      if (miseEnRelationRenouvellementEnCours) {
+        res.status(404).json({
+          message: `Une demande de renouvellement de contrat est en cours pour ce conseiller`,
+        });
+        return;
+      }
       if (
         new Date(dateFinDeContrat) > new Date(miseEnRelation?.dateFinDeContrat)
       ) {

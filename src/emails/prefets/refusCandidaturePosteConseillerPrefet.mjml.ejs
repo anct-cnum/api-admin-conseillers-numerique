@@ -1,0 +1,43 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header-structure.mjml.ejs', { utils }); %>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Nous avons le regret de vous informer que la structure <strong><%= nomStructure %></strong>, dont vous avez soutenu
+            la candidature dans le cadre de <strong>l&rsquo;AMI Conseiller num&eacute;rique, s&rsquo;est vue refuser le(s) poste(s) demand&eacute;(s).</strong>
+          </mj-text>
+          <mj-text align="left">
+            Dans un contexte de financement contraint, cette d&eacute;cision a &eacute;t&eacute; prise
+            tant au regard de la qualit&eacute; de la candidature d&eacute;pos&eacute;e par la structure
+            que de la r&eacute;partition des postes de conseillers num&eacute;riques sur le territoire.
+            Ont ainsi &eacute;t&eacute; &eacute;valu&eacute;s :
+            <%- include('../commun/justification-refus-candidature-conseiller.mjml.ejs'); %>
+          </mj-text>
+          <mj-text align="left">
+            La structure a &eacute;t&eacute; inform&eacute;e par email de cette d&eacute;cision.
+          </mj-text>
+          <mj-text align="left">
+            L&rsquo;&eacute;quipe Soci&eacute;t&eacute; num&eacute;rique reste disponible &agrave; l&rsquo;adresse&nbsp;
+            <a target="_blank" style="color: #0063CB;" href="mailto:societe.numerique@anct.gouv.fr">
+              societe.numerique@anct.gouv.fr
+            </a>
+            &nbsp;pour toute question.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+      <%- include('../commun/footer.mjml.ejs'); %>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

@@ -1,0 +1,40 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header-structure.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Nous avons le regret de vous informer que votre demande de poste de <strong>Conseiller
+            num&eacute;rique, n&rsquo;a pas &eacute;t&eacute; retenue</strong> par l&rsquo;ANCT.
+          </mj-text>
+          <%- include('../commun/justification-refus-candidature-conseiller.mjml.ejs'); %>
+          <mj-text align="left">
+            Dans un contexte de financement contraint, cette d&eacute;cision a &eacute;t&eacute; prise
+            tant au regard de la qualit&eacute; de la candidature d&eacute;pos&eacute;e que de la
+            r&eacute;partition des postes de conseillers num&eacute;riques sur le territoire.
+            Ont ainsi &eacute;t&eacute; &eacute;valu&eacute;s :
+            <%- include('../commun/justification-refus-candidature-conseiller.mjml.ejs'); %>
+          </mj-text>
+          <mj-text align="left">
+            Votre pr&eacute;fecture a &eacute;t&eacute; inform&eacute;e par email de cette
+            d&eacute;cision et se tient &agrave; votre disposition pour r&eacute;pondre &agrave;
+            l&rsquo;ensemble de vos questions.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+      <%- include('../commun/footer.mjml.ejs'); %>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

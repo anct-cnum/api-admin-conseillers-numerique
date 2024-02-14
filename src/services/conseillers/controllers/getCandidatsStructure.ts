@@ -167,7 +167,11 @@ const getCandidatsStructure =
       const conseillerIds = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
-        .find()
+        .find({
+          statut: {
+            $nin: ['finalisee_rupture', 'terminee_naturelle'],
+          },
+        })
         .select({ 'conseillerObj._id': 1, _id: 0 });
       let candidats: IConseillersWithMiseEnRelation[] =
         await getCandidatsStructureAvecFiltre(app)(
