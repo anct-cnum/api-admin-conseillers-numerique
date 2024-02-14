@@ -57,6 +57,12 @@ const validationRenouvellementContrat =
             $set: {
               statut: 'terminee',
             },
+            $unset: {
+              emetteurRupture: '',
+              dateRupture: '',
+              motifRupture: '',
+              dossierIncompletRupture: '',
+            },
           },
         );
       res
