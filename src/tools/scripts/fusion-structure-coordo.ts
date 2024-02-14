@@ -147,7 +147,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
     if (structureAConserver.lastErrorObject.n === 0) {
       logger.error(
-        `La structure ${structureActif.idPG} n'a pas été mis à jour!`,
+        `La structure ${structureActif.idPG} n'a pas été mise à jour!`,
       );
       return;
     }
@@ -178,7 +178,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
     if (structureDoublonSuiteFusion.lastErrorObject.n === 0) {
       logger.error(
-        `La structure ${structureDoublon.idPG} n'a pas été mis à jour!`,
+        `La structure ${structureDoublon.idPG} n'a pas été mise à jour!`,
       );
       return;
     }
