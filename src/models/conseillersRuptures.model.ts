@@ -1,6 +1,6 @@
 import { Model, Mongoose } from 'mongoose';
 import { Application } from '../declarations';
-import { ConseillersRuptures } from '../ts/interfaces/db.interfaces';
+import { IConseillersRuptures } from '../ts/interfaces/db.interfaces';
 
 const mongoose = require('mongoose');
 const dbref = require('mongoose-dbref');
@@ -11,7 +11,7 @@ const loaded = dbref.install(mongoose);
 export default function (app: Application): Model<any> {
   const modelName = 'conseillersRuptures';
   const mongooseClient: Mongoose = app.get('mongooseClient');
-  const schema = new mongooseClient.Schema<ConseillersRuptures>(
+  const schema = new mongooseClient.Schema<IConseillersRuptures>(
     {
       conseillerId: { type: 'ObjectId' },
       structureId: { type: 'ObjectId' },
