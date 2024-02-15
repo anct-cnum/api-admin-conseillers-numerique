@@ -39,7 +39,11 @@
             </span>
              en bas du mail pour être redirigé sur la page de connexion.
           </mj-text>
-            <%- include('../coordinateurs/lien-invitation.mjml.ejs', { utils }); %>
+          <mj-section >
+            <mj-column>
+              <mj-image align="left" width="350px" alt="lien d'invitation" src="<%= utils.getPublicUrl('/assets/img/email/mailInvitationCoordinateur/lien_invitation.png') %>" />
+            </mj-column>
+          </mj-section>
           <mj-text font-weight="bold" color="#4A86E8" align="left">
             2. Création du compte
           </mj-text>
@@ -49,7 +53,11 @@
           <mj-text align="left">
             🔹 Cliquez sur le bouton «Créer un compte » en bas du formulaire de connexion
           </mj-text>
-          <%- include('../coordinateurs/formulaire.mjml.ejs', { utils }); %>
+          <mj-section >
+            <mj-column>
+              <mj-image align="left" width="350px" alt="formulaire" src="<%= utils.getPublicUrl('/assets/img/email/mailInvitationCoordinateur/formulaire.png') %>" />
+            </mj-column>
+          </mj-section>
           <mj-text align="left">
             🔹 Renseignez vos informations
           </mj-text>
@@ -65,7 +73,11 @@
             </mj-text>
             que vous utilisez pour vous connecter à l’espace Coop Coordinateur.
           </mj-text>
-          <%- include('../coordinateurs/creation-compte.mjml.ejs', { utils }); %>
+          <mj-section >
+            <mj-column>
+              <mj-image align="left" width="350px" alt="formulaire" src="<%= utils.getPublicUrl('/assets/img/email/mailInvitationCoordinateur/creation_compte.png') %>" />
+            </mj-column>
+          </mj-section>
           <mj-text align="left">
             🤔 Si au bout de 10 minutes vous n’avez pas reçu d’e-mail pour activer
             votre compte, vérifiez dans vos spams et sinon cliquez sur le bouton “Renvoyer l’email de vérification” pour renvoyer le courriel.
