@@ -231,17 +231,8 @@ const deleteCandidatById =
         motif === 'doublon'
           ? {
               'conseiller.$id': new ObjectId(idConseiller),
-              'conseillerObj.email': email,
-              statut: {
-                $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
-              },
             }
-          : {
-              'conseillerObj.email': email,
-              statut: {
-                $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
-              },
-            };
+          : {};
 
       const nbDoublonsReel = await app
         .service(service.conseillers)
@@ -268,6 +259,10 @@ const deleteCandidatById =
         .Model.aggregate([
           {
             $match: {
+              'conseillerObj.email': email,
+              statut: {
+                $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
+              },
               ...instructionSuppressionMER,
               $and: [checkAccessMiseEnRelation],
             },
