@@ -8,7 +8,7 @@ import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
 import { candidatSupprimePix } from '../../../emails';
-import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
+// import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
 const { Pool } = require('pg');
 
@@ -248,12 +248,12 @@ const deleteCandidatById =
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .find(instructionSuppression);
-
+      /*
       const checkAccessMiseEnRelation = checkAccessReadRequestMisesEnRelation(
         app,
         req,
       );
-
+      */
       const misesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
@@ -264,7 +264,7 @@ const deleteCandidatById =
                 $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
               },
               ...instructionSuppressionMER,
-              $and: [checkAccessMiseEnRelation],
+              // $and: [checkAccessMiseEnRelation],
             },
           },
           {
