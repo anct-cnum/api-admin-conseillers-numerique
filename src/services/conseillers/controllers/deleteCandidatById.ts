@@ -8,7 +8,7 @@ import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
 import { candidatSupprimePix } from '../../../emails';
-// import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
+import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
 const { Pool } = require('pg');
 
@@ -231,9 +231,13 @@ const deleteCandidatById =
         motif === 'doublon'
           ? {
               'conseiller.$id': new ObjectId(idConseiller),
+              'conseillerObj.email': email,
+              statut: {},
             }
-          : {};
-
+          : { 'conseillerObj.email': email, statut: {} };
+      instructionSuppressionMER.statut = {
+        $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
+      };
       const nbDoublonsReel = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
@@ -248,30 +252,26 @@ const deleteCandidatById =
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .find(instructionSuppression);
-      /*
+
       const checkAccessMiseEnRelation = checkAccessReadRequestMisesEnRelation(
         app,
         req,
       );
-      */
+
       const misesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.aggregate([
           {
             $match: {
-              'conseillerObj.email': email,
-              statut: {
-                $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
-              },
               ...instructionSuppressionMER,
-              // $and: [checkAccessMiseEnRelation],
+              $and: [checkAccessMiseEnRelation],
             },
           },
           {
             $project: {
               statut: 1,
-              conseillerId: '$conseiller.$id',
-              structureId: '$structure.$id',
+              conseillerId: '$conseillerObj._id',
+              structureId: '$structureObj._id',
               dateRecrutement: 1,
               dateDebutDeContrat: 1,
               dateFinDeContrat: 1,
