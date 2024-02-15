@@ -232,12 +232,17 @@ const deleteCandidatById =
           ? {
               'conseiller.$id': new ObjectId(idConseiller),
               'conseillerObj.email': email,
-              statut: {},
+              statut: {
+                $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
+              },
             }
-          : { 'conseillerObj.email': email, statut: {} };
-      instructionSuppressionMER.statut = {
-        $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
-      };
+          : {
+              'conseillerObj.email': email,
+              statut: {
+                $in: ['finalisee_rupture', 'terminee', 'terminee_naturelle'],
+              },
+            };
+
       const nbDoublonsReel = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
