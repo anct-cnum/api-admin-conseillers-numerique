@@ -12,7 +12,7 @@ const getMisesEnRelationsFinaliseesNaturelles =
       },
       {
         $group: {
-          _id: '$conseiller.$id',
+          _id: '$conseillerObj._id',
           terminee_naturelle: {
             $sum: {
               $cond: [

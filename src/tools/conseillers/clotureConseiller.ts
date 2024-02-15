@@ -135,7 +135,7 @@ const checkAndUpdatePermanence =
       });
 
     if (countPermanence === 0) {
-      await app.service(service.conseillers).updateOne(
+      await app.service(service.conseillers).Model.updateOne(
         {
           _id: conseillerId,
         },
@@ -145,7 +145,7 @@ const checkAndUpdatePermanence =
           },
         },
       );
-      await app.service(service.misesEnRelation).updateMany(
+      await app.service(service.misesEnRelation).Model.updateMany(
         {
           'conseiller.$id': conseillerId,
         },
