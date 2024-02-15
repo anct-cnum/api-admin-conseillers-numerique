@@ -102,11 +102,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.emailCN
               ? miseEnrelation.conseiller?.emailCN?.address
               : ''
-          };${
-            miseEnrelation.conseiller?.emailPro
-              ? miseEnrelation.conseiller.emailPro
-              : ''
-          }\n`,
+          };${miseEnrelation.conseiller?.emailPro ?? ''}\n`,
         );
       }),
     );
@@ -758,7 +754,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Contact principal de la structure',
       'Nom',
       'Prénom',
-      'Email Professionnelle',
+      'Email professionnel',
+      'Email professionnel secondaire',
       'Compte Coop activé',
       'Téléphone professionnel',
       'Email personnelle',
@@ -798,6 +795,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
                 miseEnRelation.statut,
                 miseEnRelation?.dossierIncompletRupture,
               )})`,
+            miseEnRelation.conseillerObj?.emailPro
+              ? miseEnRelation.conseillerObj.emailPro
+              : 'Non renseigné',
             miseEnRelation.conseillerObj?.mattermost?.login ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
