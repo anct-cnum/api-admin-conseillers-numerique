@@ -58,7 +58,7 @@ const checkIfCcp1 = (statut) =>
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire\n',
   );
   try {
     await Promise.all(
@@ -102,7 +102,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.emailCN
               ? miseEnrelation.conseiller?.emailCN?.address
               : ''
-          };\n`,
+          };${miseEnrelation.conseiller?.emailPro ?? ''}\n`,
         );
       }),
     );
@@ -754,7 +754,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Contact principal de la structure',
       'Nom',
       'Prénom',
-      'Email Professionnelle',
+      'Email professionnel',
+      'Email professionnel secondaire',
       'Compte Coop activé',
       'Téléphone professionnel',
       'Email personnelle',
@@ -794,6 +795,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
                 miseEnRelation.statut,
                 miseEnRelation?.dossierIncompletRupture,
               )})`,
+            miseEnRelation.conseillerObj?.emailPro
+              ? miseEnRelation.conseillerObj.emailPro
+              : 'Non renseigné',
             miseEnRelation.conseillerObj?.mattermost?.login ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
