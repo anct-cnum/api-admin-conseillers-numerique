@@ -108,6 +108,8 @@ const getDetailStructureById =
                   _id: 0,
                   statut: 1,
                   phaseConventionnement: 1,
+                  reconventionnement: 1,
+                  typeDeContrat: 1,
                   'conseillerObj.idPG': 1,
                   'conseillerObj.nom': 1,
                   'conseillerObj._id': 1,
