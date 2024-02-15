@@ -58,7 +58,7 @@ const checkIfCcp1 = (statut) =>
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire\n',
   );
   try {
     await Promise.all(
@@ -73,9 +73,10 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
-            ?.email};${miseEnrelation.conseiller?.codePostal};${miseEnrelation
-            .conseiller?.nomCommune};${miseEnrelation.conseiller
-            ?.codeDepartement};${
+            ?.email};${
+            miseEnrelation.conseiller?.estCoordinateur ? 'oui' : 'non'
+          };${miseEnrelation.conseiller?.codePostal};${miseEnrelation.conseiller
+            ?.nomCommune};${miseEnrelation.conseiller?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
@@ -101,7 +102,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.emailCN
               ? miseEnrelation.conseiller?.emailCN?.address
               : ''
-          };\n`,
+          };${miseEnrelation.conseiller?.emailPro ?? ''}\n`,
         );
       }),
     );
@@ -753,7 +754,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Contact principal de la structure',
       'Nom',
       'Prénom',
-      'Email Professionnelle',
+      'Email professionnel',
+      'Email professionnel secondaire',
       'Compte Coop activé',
       'Téléphone professionnel',
       'Email personnelle',
@@ -793,6 +795,9 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
                 miseEnRelation.statut,
                 miseEnRelation?.dossierIncompletRupture,
               )})`,
+            miseEnRelation.conseillerObj?.emailPro
+              ? miseEnRelation.conseillerObj.emailPro
+              : 'Non renseigné',
             miseEnRelation.conseillerObj?.mattermost?.login ? 'Oui' : 'Non',
             miseEnRelation.conseillerObj?.telephonePro,
             miseEnRelation.conseillerObj?.email,
@@ -819,6 +824,61 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
               'Non renseignée',
             miseEnRelation.conseillerObj?.supHierarchique?.numeroTelephone ??
               'Non renseigné',
+          ].join(csvCellSeparator),
+        ),
+      ].join(csvLineSeparator),
+    );
+    res.end();
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite au niveau de la création du csv",
+    });
+    throw new Error(error);
+  }
+};
+const generateCsvConseillersCoordonnes = async (conseillers, res: Response) => {
+  try {
+    const fileHeaders = [
+      'Id',
+      'Nom',
+      'Prénom',
+      'Mail personnel',
+      'Mail conseiller numérique',
+      'Structure',
+      'Code postal',
+      'Date de début de contrat',
+      'Date de fin de formation',
+      'Certification',
+      'Activé',
+      'CRA saisi',
+      'Nom supérieur',
+      'Prénom supérieur',
+      'Fonction supérieur',
+      'Mail supérieur',
+      'Téléphone supérieur',
+    ];
+    res.write(
+      [
+        fileHeaders.join(csvCellSeparator),
+        ...conseillers.map((conseiller) =>
+          [
+            conseiller.idPG,
+            conseiller.nom,
+            conseiller.prenom,
+            conseiller.emailPerso,
+            conseiller.emailCN,
+            conseiller.nomStructure,
+            conseiller.codePostal,
+            formatDate(conseiller.dateDebutDeContrat),
+            formatDate(conseiller.dateFinDeFormation),
+            conseiller.certificationPix ? 'Oui' : 'Non',
+            conseiller.compteCoopActif ? 'Oui' : 'Non',
+            conseiller.craCount,
+            conseiller.nomSuperieurHierarchique,
+            conseiller.prenomSuperieurHierarchique,
+            conseiller.fonctionSuperieurHierarchique,
+            conseiller.emailSuperieurHierarchique,
+            conseiller.telephoneSuperieurHierarchique,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
@@ -1043,6 +1103,7 @@ export {
   generateCsvStatistiques,
   generateCsvTerritoires,
   generateCsvConseillers,
+  generateCsvConseillersCoordonnes,
   generateCsvListeStructures,
   generateCsvListeGestionnaires,
   generateCsvHistoriqueDossiersConvention,

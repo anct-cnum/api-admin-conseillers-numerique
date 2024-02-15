@@ -119,6 +119,8 @@ export interface IMisesEnRelation {
   contratCoordinateur: boolean | undefined;
 
   banniereRefusRecrutement: boolean | undefined;
+
+  phaseConventionnement: string | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -367,6 +369,8 @@ export interface IStructures {
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  codeCom: string | null;
+  coselec: ICoselec[];
   conventionnement: {
     statut: string;
     motif: string;
@@ -406,6 +410,18 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+}
+
+interface ICoselec {
+  nombreConseillersCoselec: number;
+  avisCoselec: string;
+  numero?: string;
+  phaseConventionnement?: string;
+  type?: string;
+  observationsReferent?: string;
+  prioritaireCoselec?: string;
+  validateur?: string;
+  insertedAt: Date;
 }
 
 interface IPrefet {
@@ -595,15 +611,31 @@ export interface ICras {
   createdAt: Date;
 }
 
-export interface ConseillersSupprimes {
+export interface IConseillersSupprimes {
   _id: ObjectId;
   deletedAt: Date;
   motif: string;
   conseiller: object;
   actionUser: object;
+  historiqueContrats: IHistoriqueContrats[];
 }
 
-export interface ConseillersRuptures {
+interface IHistoriqueContrats {
+  conseillerId: Types.ObjectId;
+  structureId: Types.ObjectId;
+  dateRecrutement: Date;
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
+  typeDeContrat: String;
+  reconventionnement: Boolean;
+  phaseConventionnement: String;
+  miseEnRelationReconventionnement: Types.ObjectId;
+  miseEnRelationConventionnement: Types.ObjectId;
+  dateRupture: Date;
+  motifRupture: String;
+}
+
+export interface IConseillersRuptures {
   _id: ObjectId;
   conseillerId: Types.ObjectId;
   structureId: Types.ObjectId;

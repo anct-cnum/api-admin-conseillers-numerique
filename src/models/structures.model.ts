@@ -34,6 +34,21 @@ export default function (app: Application): Model<any> {
     { _id: false, strict: false },
   );
 
+  const coselecSchema = new Schema(
+    {
+      nombreConseillersCoselec: Number,
+      avisCoselec: String,
+      numero: String,
+      phaseConventionnement: String,
+      type: String,
+      observationsReferent: String,
+      prioritaireCoselec: String,
+      validateur: String,
+      insertedAt: Date,
+    },
+    { _id: false, strict: false },
+  );
+
   const demandeCoselecSchema = new Schema(
     {
       id: { type: 'ObjectId' },
@@ -154,6 +169,8 @@ export default function (app: Application): Model<any> {
       coordonneesInsee: { type: Object },
 
       adresseInsee2Ban: { type: Object },
+
+      coselec: { type: [coselecSchema] },
 
       prefet: { type: [prefetSchema], default: undefined },
 

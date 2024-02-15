@@ -7,3 +7,4 @@ datas/exports/*
 .clever.json
 .idea/
 dist
+.vscode

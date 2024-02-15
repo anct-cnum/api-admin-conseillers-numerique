@@ -4,6 +4,17 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
 
+type IConseiller = {
+  idPG: number;
+  nom: string;
+  prenom: string;
+  _id: string;
+  statut: string;
+  phaseConventionnement: string;
+  reconventionnement: boolean;
+  typeDeContrat: string;
+};
+
 const countStructures = async (ability, read, app) =>
   app
     .service(service.structures)
@@ -122,12 +133,25 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
+const getConseillersByStatus = (
+  conseillers: IConseiller[],
+  statuts: string[],
+  phase = undefined,
+) => {
   return conseillers.filter(
     (conseiller) =>
       statuts.includes(conseiller.statut) &&
       conseiller.phaseConventionnement === phase,
   );
+};
+
+const filterAvisAdmin = (avisAdmin: string | undefined) => {
+  if (avisAdmin) {
+    return { statut: avisAdmin };
+  }
+  return {
+    statut: { $in: ['VALIDATION_COSELEC', 'REFUS_COSELEC'] },
+  };
 };
 
 const filterAvisPrefet = (avisPrefet: string | undefined) => {
@@ -144,10 +168,22 @@ const filterAvisPrefet = (avisPrefet: string | undefined) => {
 };
 
 const filterStatutDemandeConseiller = (statut: string) => {
-  if (statut !== 'toutes') {
+  if (statut === 'NOUVELLE') {
+    return { statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] } };
+  }
+  if (statut !== 'toutes' && statut !== 'NOUVELLE') {
     return { statut: { $eq: statut } };
   }
-  return { statut: { $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COSELEC'] } };
+  return {
+    statut: {
+      $in: [
+        'CREEE',
+        'EXAMEN_COMPLEMENTAIRE_COSELEC',
+        'VALIDATION_COSELEC',
+        'REFUS_COSELEC',
+      ],
+    },
+  };
 };
 
 export {
@@ -167,6 +203,7 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  filterAvisAdmin,
   filterAvisPrefet,
   filterStatutDemandeConseiller,
 };

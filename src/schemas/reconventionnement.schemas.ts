@@ -43,6 +43,7 @@ const validHistoriqueConvention = Joi.object({
     new Error('Le filtre département est invalide'),
   ),
   region: Joi.string().error(new Error('Le filtre région est invalide')),
+  avisAdmin: Joi.string().error(new Error('Le filtre avis admin est invalide')),
 });
 
 const updateReconventionnement = Joi.object({

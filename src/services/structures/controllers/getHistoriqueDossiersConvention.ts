@@ -25,6 +25,7 @@ const getStructures =
     searchByNomStructure: string,
     region: string,
     departement: string,
+    avisAdmin: string,
   ) =>
     app.service(service.structures).Model.aggregate([
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
@@ -36,6 +37,8 @@ const getStructures =
               typeConvention,
               dateDebut,
               dateFin,
+              avisAdmin,
+              ['VALIDATION_COSELEC', 'REFUS_COSELEC'],
             ),
             filterSearchBar(searchByNomStructure),
           ],
@@ -52,6 +55,8 @@ const getStructures =
           demandesCoselec: 1,
           coselec: 1,
           statut: 1,
+          createdAt: 1,
+          prefet: { $arrayElemAt: ['$prefet', -1] },
           conventionnement: 1,
         },
       },
@@ -67,6 +72,7 @@ const getHistoriqueDossiersConvention =
       searchByNomStructure,
       region,
       departement,
+      avisAdmin,
     } = req.query;
     const dateDebut: Date = new Date(req.query.dateDebut);
     const dateFin: Date = new Date(req.query.dateFin);
@@ -83,6 +89,7 @@ const getHistoriqueDossiersConvention =
         searchByNomStructure,
         region,
         departement,
+        avisAdmin,
       });
       if (pageValidation.error) {
         res.status(400).json({ message: pageValidation.error.message });
@@ -122,6 +129,7 @@ const getHistoriqueDossiersConvention =
         searchByNomStructure,
         region,
         departement,
+        avisAdmin,
       );
       const structuresFormat = sortHistoriqueDossierConventionnement(
         type,
@@ -129,12 +137,7 @@ const getHistoriqueDossiersConvention =
         structures,
       );
       items.total = structuresFormat.length;
-      const totalConvention = await totalParHistoriqueConvention(
-        app,
-        req,
-        dateDebut,
-        dateFin,
-      );
+      const totalConvention = await totalParHistoriqueConvention(app, req);
       items.totalParConvention = {
         ...items.totalParConvention,
         ...totalConvention,
