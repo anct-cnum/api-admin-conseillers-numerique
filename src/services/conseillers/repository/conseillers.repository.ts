@@ -22,6 +22,7 @@ const formatStatutMisesEnRelation = (
     case 'nouvelle_rupture':
       return dossierIncompletRupture ? 'Pièces manquantes' : 'Rupture en cours';
     case 'finalisee_rupture':
+    case 'terminee_naturelle':
       return 'Sans mission';
     case 'finalisee':
       return 'En activité';
@@ -107,12 +108,12 @@ const filterDiplome = (diplome: string) => {
 const filterCCP1 = (ccp1: string) => {
   if (ccp1 === 'true') {
     return {
-      statut: { $in: ['RECRUTE', 'RUPTURE'] },
+      statut: { $in: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   if (ccp1 === 'false') {
     return {
-      statut: { $nin: ['RECRUTE', 'RUPTURE'] },
+      statut: { $nin: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   return {};
@@ -152,25 +153,28 @@ const filtrePiecesManquantes = (piecesManquantes: boolean) => {
   return {};
 };
 
-const filterIsRuptureMisesEnRelation = (
-  rupture: string,
+const filterByStatutContratMisesEnRelation = (
+  statutContrat: string,
   conseillerIdsRecruter: ObjectId[],
   structureIds: ObjectId[],
   conseillerIdsRupture: ObjectId[],
+  conseillerIdsTerminerNaturelle: ObjectId[],
   piecesManquantes: boolean,
 ) => {
-  switch (rupture) {
+  switch (statutContrat) {
     case 'nouvelle_rupture':
       return {
-        statut: { $eq: rupture },
+        statut: { $eq: statutContrat },
         'conseiller.$id': { $in: conseillerIdsRecruter },
         'structure.$id': { $in: structureIds },
         ...filtrePiecesManquantes(piecesManquantes),
       };
-    case 'finalisee_rupture':
+    case 'sans-mission':
       return {
-        statut: { $eq: rupture },
-        'conseiller.$id': { $in: conseillerIdsRupture },
+        statut: { $in: ['finalisee_rupture', 'terminee_naturelle'] },
+        'conseiller.$id': {
+          $in: [conseillerIdsRupture, conseillerIdsTerminerNaturelle],
+        },
       };
     case 'contrat':
       return {
@@ -189,6 +193,12 @@ const filterIsRuptureMisesEnRelation = (
           },
           {
             $and: [
+              { statut: { $eq: 'terminee_naturelle' } },
+              { 'conseiller.$id': { $in: conseillerIdsTerminerNaturelle } },
+            ],
+          },
+          {
+            $and: [
               { statut: { $in: ['nouvelle_rupture', 'finalisee'] } },
               { 'conseiller.$id': { $in: conseillerIdsRecruter } },
               { 'structure.$id': { $in: structureIds } },
@@ -199,18 +209,20 @@ const filterIsRuptureMisesEnRelation = (
   }
 };
 
-const filterIsRuptureConseiller = (
-  rupture: string,
+const filterByStatutConseiller = (
+  statut: string,
   dateDebut: Date,
   dateFin: Date,
 ) => {
-  switch (rupture) {
+  switch (statut) {
     case 'finalisee_rupture':
-      return { statut: { $eq: 'RUPTURE' } };
+    case 'terminee_naturelle':
+      return { statut: { $in: ['RUPTURE', 'TERMINE'] } };
     default: // contrat / nouvelle_rupture / finalisee_rupture
       return {
         $or: [
           { statut: { $eq: 'RUPTURE' } },
+          { statut: { $in: ['RUPTURE', 'TERMINE'] } },
           {
             statut: { $eq: 'RECRUTE' },
             datePrisePoste: { $gte: dateDebut, $lte: dateFin },
@@ -227,8 +239,8 @@ export {
   filterIsCoordinateur,
   filterNomAndEmailConseiller,
   filterNomStructure,
-  filterIsRuptureMisesEnRelation,
-  filterIsRuptureConseiller,
+  filterByStatutContratMisesEnRelation,
+  filterByStatutConseiller,
   filterRegion,
   filterDepartement,
   filterCv,

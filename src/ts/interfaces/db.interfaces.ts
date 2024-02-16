@@ -637,10 +637,21 @@ interface IHistoriqueContrats {
 
 export interface IConseillersRuptures {
   _id: ObjectId;
-  conseillerId: Types.ObjectId;
-  structureId: Types.ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
   dateRupture: Date;
   motifRupture: string;
+}
+
+export interface IConseillersTermines {
+  _id: ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
+  typeDeContrat: String;
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
+  phaseConventionnement: String;
+  reconventionnement: Boolean;
 }
 export interface AccessLogs {
   createdAt: Date;

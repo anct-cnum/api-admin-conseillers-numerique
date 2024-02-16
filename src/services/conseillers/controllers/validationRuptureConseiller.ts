@@ -13,33 +13,15 @@ import service from '../../../helpers/services';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
 import { deleteMailbox } from '../../../utils/gandi';
-import deleteAccount from '../../../utils/mattermost';
+import { deleteAccount } from '../../../utils/mattermost';
 import {
   conseillerRupturePix,
   conseillerRuptureStructure,
 } from '../../../emails';
+import { updateConseillersPG } from '../../../utils/functionsDeleteRoleConseiller';
 
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
-
-const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-      [email, disponible, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const conseillerRecruteReinscription =
   (app, req) =>

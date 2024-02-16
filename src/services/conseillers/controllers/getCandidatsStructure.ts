@@ -189,15 +189,6 @@ const getCandidatsStructure =
         candidats = await Promise.all(
           candidats.map(async (candidat) => {
             const item = { ...candidat };
-            if (item.statut === 'RECRUTE') {
-              item.miseEnRelation = await app
-                .service(service.misesEnRelation)
-                .Model.findOne({
-                  'conseiller.$id': item._id,
-                  'structure.$id': item.structureId,
-                })
-                .select({ statut: 1, _id: 0 });
-            }
             return item;
           }),
         );

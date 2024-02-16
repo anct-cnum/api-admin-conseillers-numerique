@@ -1,0 +1,40 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+  <mj-body>
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+    <mj-section padding="8px"></mj-section>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Bonjour <%= conseiller.prenom %>,
+            </mj-text>
+            <mj-text align="left">
+              Nous vous informons que vos acc&egrave;s &agrave; l&rsquo;espace Coop seront supprim&eacute;s dans 7 jours.</br>
+              Ce jour correspond &agrave; la date de fin de votre contrat Conseiller num&eacute;rique.
+            </mj-text>
+            <mj-text align="left">
+              Pass&eacute; cette date, nous vous recommandons d&rsquo;utiliser votre <a href="https://candidat.conseiller-numerique.gouv.fr/login" target="blank" rel="noopener noreferrer" ></a>espace candidat</a> pour mettre &agrave; jour vos informations de candidature.
+            </mj-text>
+            <mj-text align="left">
+              Si vous &ecirc;tes identifi&eacute;(e) dans un processus de recrutement avec une nouvelle structure, vos acc&egrave;s ne seront pas supprim&eacute;s. Dans ce cas, nous vous invitons &agrave; vous assurer aupr&egrave;s de votre futur employeur que la d&eacute;marche de recrutement a bien &eacute;t&eacute; r&eacute;alis&eacute;e sur le tableau de pilotage (espace professionnel conseiller num&eacute;rique pour les employeurs).
+            </mj-text>
+            <mj-text align="left">
+              <b>Vous avez des questions ?</b></br>
+              L&rsquo;&eacute;quipe support se tient &agrave; votre disposition :</br>
+              <span style="margin: 0 10px">-</span>Par email &agrave; l&rsquo;adresse : <a href="mailto:<%= emailSupport %>"><%= emailSupport %></a></br>
+            </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+      <mj-section padding="8px"></mj-section>
+      <mj-section>
+        <mj-column> <%- include('../commun/footer.mjml.ejs'); %></mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

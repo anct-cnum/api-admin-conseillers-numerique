@@ -9,6 +9,7 @@ const service = {
   permanences: 'permanences',
   conseillersSupprimes: 'conseillersSupprimes',
   conseillersRuptures: 'conseillersRuptures',
+  conseillersTermines: 'conseillersTermines',
   communes: 'communes',
   qpv: 'qpv',
 };

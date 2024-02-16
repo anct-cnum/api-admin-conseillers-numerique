@@ -191,14 +191,18 @@ const getDetailDossierConvention =
                 !conseiller?.phaseConventionnement &&
                 (conseiller.statut === 'finalisee' ||
                   conseiller.statut === 'nouvelle_rupture' ||
+                  conseiller.statut === 'terminee_naturelle' ||
                   conseiller.statut === 'terminee'),
             );
           structure[0].conseillersRenouveller =
             structure[0]?.conseillers?.filter(
               (conseiller) =>
                 conseiller.reconventionnement === true &&
-                conseiller.statutMiseEnrelation !== 'terminee' &&
-                conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
+                ![
+              'terminee',
+              'terminee_naturelle',
+              'renouvellement_initiee',
+            ].includes(conseiller.statutMiseEnrelation),
             );
         } else if (
           structure[0]?.conventionnement?.dossierConventionnement?.numero

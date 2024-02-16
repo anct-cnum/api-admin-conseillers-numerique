@@ -69,6 +69,7 @@
     "numero_demarche_association_reconventionnement": "DEMARCHE_SIMPLIFIEE_NUMERO_DEMARCHE_ASSOCIATION_RECONVENTIONNEMENT",
     "numero_demarche_association_conventionnement": "DEMARCHE_SIMPLIFIEE_NUMERO_DEMARCHE_ASSOCIATION_CONVENTIONNEMENT"
   },
+  "url_question_contrat": "QUESTION_FIN_CONTRAT",
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {
     "region": "AWS_REGION",

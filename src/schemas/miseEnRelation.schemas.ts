@@ -18,6 +18,7 @@ const validMiseEnRelation = Joi.object({
       'finalisee',
       'nouvelle_rupture',
       'finalisee_rupture',
+      'terminee_naturelle',
       'toutes',
     )
     .error(new Error('Le filtre statut est invalide')),

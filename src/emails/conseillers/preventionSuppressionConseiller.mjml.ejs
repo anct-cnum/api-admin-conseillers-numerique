@@ -1,0 +1,46 @@
+<mjml>
+
+  <%- include('../commun/head.mjml.ejs'); %>
+  <mj-body background-color="#f0f0f0">
+
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+      <mj-wrapper css-class="wrapper">
+
+          <mj-column>
+            <mj-text align="left">
+              Bonjour <%= conseiller.prenom %>,
+            </mj-text>
+            <mj-text align="left">
+              Ce mail pour vous rappeler que lorsque vous avez sign&eacute; votre contrat Conseiller num&eacute;rique, votre date de fin de
+              mission a &eacute;t&eacute; d&eacute;finie pour le <%= conseiller.dateFinDeContrat %>. Cette date est pour bientôt !
+            </mj-text>
+            <mj-text align="left">
+              <b>Si la date est incorrecte</b>, elle a pu être renseign&eacute;e sans avoir d&rsquo;info sur la date r&eacute;elle de fin, ou alors
+              la date de fin a &eacute;t&eacute; revue), contactez nous sur le mail support <a href="mailto:<%= emailSupport %>"><%= emailSupport %></a>
+              pour rester membre de la communaut&eacute; Conseiller num&eacute;rique et b&eacute;n&eacute;ficier de vos acc&egrave;s &agrave; la Coop.
+            </mj-text>
+            <mj-text align="left">
+              <b>Si la date est correcte</b> et que votre mission se termine, vos acc&egrave;s &agrave; l'outil Coop seront coup&eacute;s.
+            </mj-text>
+            <mj-text align="left">
+              Votre <a href="<%= espaceCandidat %>" target="blank" rel="noopener noreferrer">espace candidat</a> sera de nouveau accessible pour vous permettre de mettre &agrave; jour vos informations de candidature.
+            </mj-text>
+             <mj-text align="left">
+              Pour vous accompagner sur votre avenir professionnel, nous vous proposons un guide disponible <a href="https://labase.anct.gouv.fr/ressource/1745" target="blank" rel="noopener noreferrer">ici</a>
+              et de vous inscrire &agrave; <a href='<%= link %>' target="blank" rel="noopener noreferrer"
+              >la newsletter</a> destin&eacute;e au conseiller num&eacute;rique en fin de mission.
+            </mj-text>
+          </mj-column>
+      </mj-wrapper>
+      <mj-wrapper css-class="wrapper">
+        <mj-section>
+          <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+        </mj-section>
+        <mj-section padding="8px"></mj-section>
+        <mj-section>
+          <mj-column> <%- include('../commun/footer.mjml.ejs'); %></mj-column>
+        </mj-section>
+      </mj-wrapper>
+  </mj-body>
+</mjml>

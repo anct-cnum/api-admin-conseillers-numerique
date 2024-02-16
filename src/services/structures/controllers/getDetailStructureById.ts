@@ -96,6 +96,7 @@ const getDetailStructureById =
                           { $eq: ['nouvelle_rupture', '$statut'] },
                           { $eq: ['recrutee', '$statut'] },
                           { $eq: ['terminee', '$statut'] },
+                          { $eq: ['terminee_naturelle', '$statut'] },
                           { $eq: ['finalisee_rupture', '$statut'] },
                         ],
                       },

@@ -9,8 +9,8 @@ import {
   filterNomAndEmailConseiller,
   filterRegion,
   filterNomStructure,
-  filterIsRuptureConseiller,
-  filterIsRuptureMisesEnRelation,
+  filterByStatutConseiller,
+  filterByStatutContratMisesEnRelation,
   checkAccessReadRequestConseillers,
   filterDepartement,
 } from '../../conseillers/repository/conseillers.repository';
@@ -43,7 +43,7 @@ const getConseillersRecruter =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
+          ...filterByStatutConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
           ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
@@ -67,17 +67,19 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
     sortColonne: object,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -179,6 +181,9 @@ const getExportConseillersCsv =
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+      const conseillerTerminerNaturelle = conseillers.filter(
+        (conseiller) => conseiller.statut === 'TERMINE',
+      );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
@@ -188,6 +193,7 @@ const getExportConseillersCsv =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
         piecesManquantes as boolean,
         sortColonne,
       );
