@@ -645,8 +645,8 @@ export interface IConseillersRuptures {
 
 export interface IConseillersTermines {
   _id: ObjectId;
-  conseillerId: Types.ObjectId;
-  structureId: Types.ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
   typeDeContrat: String;
   dateDebutDeContrat: Date;
   dateFinDeContrat: Date;
