@@ -56,6 +56,7 @@ const updateEmailStructure =
       }
 
       let impactUser = true;
+      let newUserInvit = true;
       // Pas d'access control pour vérifier dans tous les users
       const emailExists: IUser = await app
         .service(service.users)
@@ -103,6 +104,9 @@ const updateEmailStructure =
           },
           { returnOriginal: false },
         );
+      if (!impactUser && structureUpdated.statut !== 'VALIDATION_COSELEC') {
+        newUserInvit = false;
+      }
       if (!structureUpdated.contact?.inactivite) {
         await app
           .service(service.misesEnRelation)
@@ -188,7 +192,7 @@ const updateEmailStructure =
           }
         }
       }
-      res.send({ emailUpdated: structureUpdated.contact.email });
+      res.send({ emailUpdated: structureUpdated.contact.email, newUserInvit });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });
