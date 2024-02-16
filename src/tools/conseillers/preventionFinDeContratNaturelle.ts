@@ -129,80 +129,84 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
       const conseiller = await getConseiller(app)(
         miseEnRelationFinContrat.conseiller.oid,
       );
-      logger.info(
-        // eslint-disable-next-line
-        `Le conseiller (idPG: ${conseiller.idPG}) possède un contrat en cours dont la date de fin de contrat est au ${dayjs(miseEnRelationFinContrat.dateFinDeContrat).format('DD-MM-YYYY')}.`,
-      );
-
-      if (fix) {
-        const conseillerUpdated = await updateConseiller(app)(conseiller._id);
+      if (conseiller) {
         logger.info(
-          `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
-        );
-        await updateMiseEnRelation(app)(miseEnRelationFinContrat._id).then(
-          async () => {
-            logger.info(
-              `Le conseiller (idPG: ${
-                conseiller.idPG
-              }) passe en fin de contrat naturelle - date de fin de contrat est au ${dayjs(
-                miseEnRelationFinContrat.dateFinDeContrat,
-              ).format('DD-MM-YYYY')}`,
-            );
-          },
+          // eslint-disable-next-line
+          `Le conseiller (idPG: ${conseiller.idPG}) possède un contrat en cours dont la date de fin de contrat est au ${dayjs(miseEnRelationFinContrat.dateFinDeContrat).format('DD-MM-YYYY')}.`,
         );
 
-        await updateCacheObj(app)(conseillerUpdated);
+        if (fix) {
+          const conseillerUpdated = await updateConseiller(app)(conseiller._id);
+          logger.info(
+            `Le conseiller a été passé en statut 'TERMINE' (id: ${conseiller._id})`,
+          );
+          await updateMiseEnRelation(app)(miseEnRelationFinContrat._id).then(
+            async () => {
+              logger.info(
+                `Le conseiller (idPG: ${
+                  conseiller.idPG
+                }) passe en fin de contrat naturelle - date de fin de contrat est au ${dayjs(
+                  miseEnRelationFinContrat.dateFinDeContrat,
+                ).format('DD-MM-YYYY')}`,
+              );
+            },
+          );
 
-        // Historisation du conseiller terminé
-        await createConseillersTermines(app)(
-          conseillerUpdated,
-          miseEnRelationFinContrat,
-        );
+          await updateCacheObj(app)(conseillerUpdated);
 
-        // Envoie de mail conseiller et structure
-        if (envoiEmail) {
-          const mailerInstance = mailer(app);
-          const messagePreventionFinContrat =
-            preventionSuppressionConseiller(mailerInstance);
-          const errorSmtpMailPreventionFinContratNaturelle =
-            await messagePreventionFinContrat
-              .send(conseiller)
-              .catch((errSmtp: Error) => {
-                logger.error(errSmtp);
-                Sentry.captureException(errSmtp);
-              });
-          if (errorSmtpMailPreventionFinContratNaturelle instanceof Error) {
-            logger.error(errorSmtpMailPreventionFinContratNaturelle.message);
-            Sentry.captureException(
-              errorSmtpMailPreventionFinContratNaturelle.message,
-            );
-          }
+          // Historisation du conseiller terminé
+          await createConseillersTermines(app)(
+            conseillerUpdated,
+            miseEnRelationFinContrat,
+          );
 
-          const messagePreventionFinContratStructure =
-            prenventionSuppressionConseillerStructure(mailerInstance);
-          const emailsStructure = await getEmailsStructure(app)(conseiller);
-          for (const emailStructure of emailsStructure) {
-            const errorSmtpMailPreventionFinContratStructure =
-              await messagePreventionFinContratStructure
-                .send(
-                  conseiller.idPG,
-                  miseEnRelationFinContrat.structureObj.idPG,
-                  emailStructure,
-                )
+          // Envoie de mail conseiller et structure
+          if (envoiEmail) {
+            const mailerInstance = mailer(app);
+            const messagePreventionFinContrat =
+              preventionSuppressionConseiller(mailerInstance);
+            const errorSmtpMailPreventionFinContratNaturelle =
+              await messagePreventionFinContrat
+                .send(conseiller)
                 .catch((errSmtp: Error) => {
                   logger.error(errSmtp);
                   Sentry.captureException(errSmtp);
                 });
-            if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
-              logger.error(errorSmtpMailPreventionFinContratStructure.message);
+            if (errorSmtpMailPreventionFinContratNaturelle instanceof Error) {
+              logger.error(errorSmtpMailPreventionFinContratNaturelle.message);
               Sentry.captureException(
-                errorSmtpMailPreventionFinContratStructure.message,
+                errorSmtpMailPreventionFinContratNaturelle.message,
               );
+            }
+
+            const messagePreventionFinContratStructure =
+              prenventionSuppressionConseillerStructure(mailerInstance);
+            const emailsStructure = await getEmailsStructure(app)(conseiller);
+            for (const emailStructure of emailsStructure) {
+              const errorSmtpMailPreventionFinContratStructure =
+                await messagePreventionFinContratStructure
+                  .send(
+                    conseiller.idPG,
+                    miseEnRelationFinContrat.structureObj.idPG,
+                    emailStructure,
+                  )
+                  .catch((errSmtp: Error) => {
+                    logger.error(errSmtp);
+                    Sentry.captureException(errSmtp);
+                  });
+              if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
+                logger.error(
+                  errorSmtpMailPreventionFinContratStructure.message,
+                );
+                Sentry.captureException(
+                  errorSmtpMailPreventionFinContratStructure.message,
+                );
+              }
             }
           }
         }
+        await delay(2000);
       }
-      await delay(2000);
     }
   } catch (error) {
     logger.error(error);
