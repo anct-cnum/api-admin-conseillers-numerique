@@ -166,7 +166,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
             preventionSuppressionConseiller(mailerInstance);
           const errorSmtpMailPreventionFinContratNaturelle =
             await messagePreventionFinContrat
-              .send(conseiller)
+              .send(conseiller, miseEnRelationFinContrat.dateFinDeContrat)
               .catch((errSmtp: Error) => {
                 logger.error(errSmtp);
                 Sentry.captureException(errSmtp);
