@@ -49,7 +49,7 @@ const getMisesEnRelationsFinaliseesNaturelles =
                 {
                   $eq: ['$statut', 'terminee_naturelle'],
                 },
-                '$structure.$id',
+                '$structureObj._id',
                 null,
               ],
             },
@@ -63,7 +63,7 @@ const getMisesEnRelationsFinaliseesNaturelles =
                     { $eq: ['$statut', 'finalisee'] },
                   ],
                 },
-                '$structure.$id',
+                '$structureObj._id',
                 null,
               ],
             },
