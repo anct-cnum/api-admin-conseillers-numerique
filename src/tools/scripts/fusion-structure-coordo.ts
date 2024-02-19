@@ -143,7 +143,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             },
           },
         },
-        { returnOriginal: false, rawResult: true },
+        { returnOriginal: false, includeResultMetadata: true },
       );
     if (structureAConserver.lastErrorObject.n === 0) {
       logger.error(
@@ -174,7 +174,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           },
           $unset: { demandesCoordinateur: '' },
         },
-        { returnOriginal: false, rawResult: true },
+        { returnOriginal: false, includeResultMetadata: true },
       );
     if (structureDoublonSuiteFusion.lastErrorObject.n === 0) {
       logger.error(

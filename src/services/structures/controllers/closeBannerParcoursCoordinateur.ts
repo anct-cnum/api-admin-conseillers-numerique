@@ -59,7 +59,9 @@ const closeBannerParcoursCoordinateur =
             _id: new ObjectId(idStructure),
             demandesCoordinateur: {
               $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+                id: {
+                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                },
               },
             },
             $or: [
@@ -90,7 +92,9 @@ const closeBannerParcoursCoordinateur =
             'structure.$id': new ObjectId(idStructure),
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+                id: {
+                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                },
               },
             },
             $or: [

@@ -56,7 +56,7 @@ const conseillerRelanceInvitation =
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
           {
             returnOriginal: false,
-            rawResult: true,
+            includeResultMetadata: true,
           },
         );
       if (users.lastErrorObject.n === 0) {

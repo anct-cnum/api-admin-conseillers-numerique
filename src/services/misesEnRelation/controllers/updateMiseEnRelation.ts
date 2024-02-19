@@ -109,7 +109,7 @@ const updateMiseEnRelation =
             $set: update,
             $unset: remove,
           },
-          { new: true, rawResult: true },
+          { new: true, includeResultMetadata: true },
         );
       if (miseEnRelation.lastErrorObject.n === 0) {
         res.status(404).json({

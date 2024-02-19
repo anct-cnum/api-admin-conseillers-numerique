@@ -48,7 +48,9 @@ const updateDemandeCoordinateurAvisPrefet =
             _id: new ObjectId(idStructure),
             demandesCoordinateur: {
               $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+                id: {
+                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                },
               },
             },
             $or: [
@@ -77,7 +79,9 @@ const updateDemandeCoordinateurAvisPrefet =
             'structure.$id': new ObjectId(idStructure),
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+                id: {
+                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                },
               },
             },
             $or: [

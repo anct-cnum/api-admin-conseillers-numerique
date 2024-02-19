@@ -57,7 +57,11 @@ const postInvitationStructure =
         user = await app.service(service.users).create({
           name: email.toLowerCase(),
           roles: ['structure'],
-          entity: new DBRef('structures', new ObjectId(structureId), database),
+          entity: new DBRef(
+            'structures',
+            ObjectId.createFromHexString(structureId),
+            database,
+          ),
           password: uuidv4(),
           token: uuidv4(),
           tokenCreatedAt: new Date(),
@@ -92,7 +96,7 @@ const postInvitationStructure =
             $set: {
               entity: new DBRef(
                 'structures',
-                new ObjectId(structureId),
+                ObjectId.createFromHexString(structureId),
                 database,
               ),
             },

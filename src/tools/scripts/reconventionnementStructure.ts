@@ -28,7 +28,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     );
     return;
   }
-  const structureId = new ObjectId(options.structureId);
+  const structureId = ObjectId.createFromHexString(options.structureId);
 
   const update = await app.service(service.structures).Model.updateOne(
     { _id: structureId },

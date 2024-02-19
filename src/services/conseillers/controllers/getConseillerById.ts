@@ -20,7 +20,7 @@ const getConseillerById =
       }
       const paramsRequest: any = {
         $match: {
-          _id: new ObjectId(idConseiller),
+          _id: ObjectId.createFromHexString(idConseiller),
         },
       };
       if (req.query.role === 'structure') {

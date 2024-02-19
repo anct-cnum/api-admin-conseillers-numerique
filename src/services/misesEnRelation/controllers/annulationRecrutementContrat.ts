@@ -26,7 +26,7 @@ const annulationRecrutementContrat =
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
-          _id: new ObjectId(idMiseEnRelation),
+          _id: ObjectId.createFromHexString(idMiseEnRelation),
           statut: 'recrutee',
         });
       if (!miseEnRelation) {
@@ -92,7 +92,7 @@ const annulationRecrutementContrat =
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           {
-            _id: new ObjectId(idMiseEnRelation),
+            _id: ObjectId.createFromHexString(idMiseEnRelation),
             statut: 'recrutee',
           },
           {
@@ -114,7 +114,7 @@ const annulationRecrutementContrat =
           },
           {
             returnOriginal: false,
-            rawResult: true,
+            includeResultMetadata: true,
           },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {

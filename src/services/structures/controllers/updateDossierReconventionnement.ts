@@ -142,8 +142,8 @@ const updateDossierReconventionnement =
           });
       }
 
-      misesEnRelationObjectIds = misesEnRelations?.map(
-        (miseEnRelation) => new ObjectId(miseEnRelation.miseEnRelationId),
+      misesEnRelationObjectIds = misesEnRelations?.map((miseEnRelation) =>
+        ObjectId.createFromHexString(miseEnRelation.miseEnRelationId),
       );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
@@ -168,7 +168,7 @@ const updateDossierReconventionnement =
           {
             $and: [
               { _id: { $nin: misesEnRelationObjectIds } },
-              { 'structure.$id': new ObjectId(structureId) },
+              { 'structure.$id': ObjectId.createFromHexString(structureId) },
               { statut: { $in: ['finalisee'] } },
             ],
           },

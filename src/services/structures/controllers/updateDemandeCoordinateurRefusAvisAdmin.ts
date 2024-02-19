@@ -86,7 +86,9 @@ const updateDemandeCoordinateurRefusAvisAdmin =
             _id: structure._id,
             demandesCoordinateur: {
               $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+                id: {
+                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                },
               },
             },
           },
@@ -109,7 +111,9 @@ const updateDemandeCoordinateurRefusAvisAdmin =
             'structure.$id': structure._id,
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
-                id: { $eq: new ObjectId(idDemandeCoordinateur) },
+                id: {
+                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                },
               },
             },
           },

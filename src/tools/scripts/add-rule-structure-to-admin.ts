@@ -48,7 +48,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
   const structure: IStructures = await app
     .service(service.structures)
-    .Model.findOne({ _id: new ObjectId(options.structureId) });
+    .Model.findOne({ _id: ObjectId.createFromHexString(options.structureId) });
 
   if (structure?.nom !== 'CAISSE DES DEPOTS ET CONSIGNATIONS') {
     logger.warn(
@@ -66,7 +66,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     $set: {
       entity: new DBRef(
         'structures',
-        new ObjectId(options.structureId),
+        ObjectId.createFromHexString(options.structureId),
         database,
       ),
     },

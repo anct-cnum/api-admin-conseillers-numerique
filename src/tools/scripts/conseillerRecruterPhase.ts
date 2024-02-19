@@ -27,8 +27,8 @@ execute(__filename, async ({ app, logger, exit }) => {
     return;
   }
   let queryUpdate = {};
-  const conseillerId = new ObjectId(options.conseillerId);
-  const structureId = new ObjectId(options.structureId);
+  const conseillerId = ObjectId.createFromHexString(options.conseillerId);
+  const structureId = ObjectId.createFromHexString(options.structureId);
   if (options.phase === '2') {
     queryUpdate = {
       $set: {

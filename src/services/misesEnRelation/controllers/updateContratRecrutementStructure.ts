@@ -250,7 +250,7 @@ const updateContratRecrutementStructure =
           contratUpdated,
           {
             new: true,
-            rawResult: true,
+            includeResultMetadata: true,
           },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {

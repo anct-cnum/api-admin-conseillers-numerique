@@ -142,7 +142,7 @@ const closeBanner =
           .Model.accessibleBy(req.ability, action.update)
           .updateOne(
             {
-              'conseiller.$id': new ObjectId(conseillerId),
+              'conseiller.$id': ObjectId.createFromHexString(conseillerId),
               'structure.$id': new ObjectId(req.params.id),
               statut: 'finalisee',
             },
