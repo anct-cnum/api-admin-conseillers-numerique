@@ -174,7 +174,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     const options = program.opts();
     const { fix, dateDebut } = options;
     const updatedAt = new Date();
-    // Premiere fin de contrat détectée en février 2021
+    // Première fin de contrat détectée en février 2021
     const datePremierPassage = dayjs(new Date('2021-02-01'))
       .startOf('date')
       .toDate();
