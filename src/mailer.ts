@@ -115,8 +115,8 @@ export default function (app: Application) {
               {
                 to: emailAddress,
                 subject,
-                from: `Conseiller Numérique France Services <${configurationSmtp.from}>`,
-                replyTo: `Conseiller Numérique France Services <${configurationSmtp.replyTo}>`,
+                from: `Conseiller Numérique <${configurationSmtp.from}>`,
+                replyTo: `Conseiller Numérique <${configurationSmtp.replyTo}>`,
                 list: {
                   help: getPublicUrl('/faq'),
                 },
