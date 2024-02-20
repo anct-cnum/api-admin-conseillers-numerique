@@ -56,6 +56,8 @@ export default function (app: Application) {
 
   const getSupportMail = () => configurationSmtp.replyTo;
 
+  const getDocumentPreparerSonAvenir = () => app.get('url_preparer_avenir');
+
   const initSentry = () => {
     if (config().sentry.enabled === 'true') {
       Sentry.init({
@@ -84,6 +86,7 @@ export default function (app: Application) {
     getEspaceCandidatUrl,
     getEspaceCoopUrl,
     getQuestionFinContratUrl,
+    getDocumentPreparerSonAvenir,
     getSupportMail,
   };
   return {
