@@ -52,7 +52,7 @@ export default function (app: Application, mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Réponse à candidature : recrutement de Conseiller(s) numérique(s) France Services',
+            'Réponse à candidature : recrutement de Conseiller(s) numérique(s)',
           body: await render(user),
         })
         .then(onSuccess)
