@@ -9,7 +9,7 @@ export default function (mailer) {
       prenom: conseiller.prenom,
       dateFinDeContrat,
       link: utils.getQuestionFinContratUrl(),
-      espaceCandidat: utils.getEspaceCandidatUrl(),
+      espaceCandidat: utils.getEspaceCandidatUrl('/login'),
       emailSupport: utils.getSupportMail(),
     });
   };
