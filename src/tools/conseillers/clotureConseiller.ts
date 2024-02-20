@@ -163,13 +163,21 @@ program
     '-f, --fix',
     'fix: cloture des comptes de conseillers avec un statut terminee_naturelle',
   )
+  .option(
+    '-dd, --dateDebut',
+    'dateDebut: cloture des comptes de conseillers à partir du 1er février 2021 pour le premier envoi',
+  )
   .parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
   try {
     const options = program.opts();
-    const { fix } = options;
+    const { fix, dateDebut } = options;
     const updatedAt = new Date();
+    // Premiere fin de contrat détectée en février 2021
+    const datePremierPassage = dayjs(new Date('2021-02-01'))
+      .startOf('date')
+      .toDate();
     const dateMoins2Mois = dayjs(updatedAt).subtract(2, 'month');
     const dateMoins2MoisDebut = dayjs(dateMoins2Mois).startOf('date').toDate();
     const dateMoins2MoisFin = dayjs(dateMoins2Mois).endOf('date').toDate();
@@ -181,7 +189,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     logger.info('Cloture des contrats passer en statut terminee_naturelle');
     const termineesNaturelles = await getMisesEnRelationsFinaliseesNaturelles(
       app,
-    )(dateMoins2MoisDebut, dateMoins2MoisFin);
+    )(dateDebut ? datePremierPassage : dateMoins2MoisDebut, dateMoins2MoisFin);
 
     if (termineesNaturelles.length === 0) {
       logger.info(`Fin de contrat naturelle : aucun contrat à clôturer`);
