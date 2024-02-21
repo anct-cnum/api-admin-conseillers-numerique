@@ -82,23 +82,12 @@ const getCoselecPositifAvantAbandon = (structure: IStructures) => {
 };
 
 /**
- * On cherche le dernier Coselec en fonction du numéro.
- * Le numéro est de la forme "COSELEC 2"
+ * On prend le dernier Coselec
  */
-const getLastCoselec = (structure) => {
-  let coselecs = null;
-  if ('coselec' in structure && structure.coselec !== null) {
-    coselecs = structure.coselec.sort((a, b) =>
-      a.numero !== null && b.numero !== null
-        ? ~~a.numero?.replace('COSELEC ', '') -
-          ~~b.numero?.replace('COSELEC ', '')
-        : -1,
-    );
-  }
-  return coselecs !== null && coselecs.length > 0
-    ? coselecs.slice(-1).pop()
+const getLastCoselec = (structure) =>
+  structure?.coselec !== null && structure.coselec?.length > 0
+    ? structure.coselec.slice(-1).pop()
     : null;
-};
 
 /**
  * Si la structure a été validée, on récupère le bon coselec positif
