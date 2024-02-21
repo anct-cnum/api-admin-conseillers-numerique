@@ -110,6 +110,7 @@ const annulationRecrutementContrat =
               contratCoordinateur: '',
               emetteurRecrutement: '',
               dateRecrutement: '',
+              phaseConventionnement: '',
             },
           },
           {
