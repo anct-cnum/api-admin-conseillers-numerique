@@ -35,6 +35,7 @@ if (config().sentry.enabled === 'true') {
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
+    ignoreErrors: [/request aborted/i],
   });
   // transaction/span/breadcrumb is attached to its own Hub instance
   app.use(Sentry.Handlers.requestHandler());
