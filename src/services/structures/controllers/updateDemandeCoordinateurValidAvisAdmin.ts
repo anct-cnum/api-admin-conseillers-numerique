@@ -104,9 +104,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             ],
             demandesCoordinateur: {
               $elemMatch: {
-                id: {
-                  $eq: new ObjectId(idDemandeCoordinateur),
-                },
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
           },
@@ -276,9 +274,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             _id: structure._id,
             demandesCoordinateur: {
               $elemMatch: {
-                id: {
-                  $eq: new ObjectId(idDemandeCoordinateur),
-                },
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
           },
@@ -301,9 +297,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             'structure.$id': structure._id,
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
-                id: {
-                  $eq: new ObjectId(idDemandeCoordinateur),
-                },
+                id: { $eq: new ObjectId(idDemandeCoordinateur) },
               },
             },
           },
