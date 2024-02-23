@@ -16,26 +16,30 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
     logger.info(`Nombre d'utilisateurs à traiter: ${users?.length}`);
 
     for (const user of users) {
-      try {
-        await app.service(service.users).Model.updateOne(
-          { _id: user._id },
-          {
-            $pull: { roles: 'coordinateur_coop' },
-            $push: { roles: 'coordinateur' },
-            $set: {
-              token: uuidv4(),
-              tokenCreatedAt: new Date(),
-              mailSentDate: null,
-              migrationDashboard: true,
+      if (user.passwordCreated === true) {
+        try {
+          await app.service(service.users).Model.updateOne(
+            { _id: user._id },
+            {
+              $pull: { roles: 'coordinateur_coop' },
+              $push: { roles: 'coordinateur' },
+              $set: {
+                token: uuidv4(),
+                tokenCreatedAt: new Date(),
+                mailSentDate: null,
+                migrationDashboard: true,
+              },
             },
-          },
-        );
+          );
 
-        logger.info(`L'utilisateur ${user._id} a été mis à jour`);
-      } catch (error) {
-        logger.error(
-          `Erreur lors du traitement de l'utilisateur ${user._id}: ${error}`,
-        );
+          logger.info(`L'utilisateur ${user._id} a été mis à jour`);
+        } catch (error) {
+          logger.error(
+            `Erreur lors du traitement de l'utilisateur ${user._id}: ${error}`,
+          );
+        }
+      } else {
+        logger.warn(`L'utilisateur ${user._id} est inactif`);
       }
     }
 
