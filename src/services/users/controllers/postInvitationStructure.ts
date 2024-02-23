@@ -23,7 +23,7 @@ const postInvitationStructure =
     const structure = await app
       .service(service.structures)
       .Model.accessibleBy(req.ability, action.read)
-      .findOne();
+      .findOne({ _id: new ObjectId(structureId) });
 
     if (structure.statut !== 'VALIDATION_COSELEC') {
       res.status(403).json({
