@@ -8,6 +8,7 @@ export default function (mailer) {
     return mailer.render(__dirname, templateName, {
       prenom: conseiller.prenom,
       link: utils.getQuestionFinContratUrl(),
+      documentAvenir: utils.getDocumentPreparerSonAvenir(),
       emailSupport: utils.getSupportMail(),
     });
   };

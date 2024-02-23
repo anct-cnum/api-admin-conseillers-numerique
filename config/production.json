@@ -59,6 +59,7 @@
     "numero_demarche_association_conventionnement": "DEMARCHE_SIMPLIFIEE_NUMERO_DEMARCHE_ASSOCIATION_CONVENTIONNEMENT"
   },
   "url_question_contrat": "QUESTION_FIN_CONTRAT",
+  "url_preparer_avenir": "DOCUMENT_PREPARER_AVENIR",
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {
     "region": "AWS_REGION",

@@ -11,6 +11,7 @@ export default function (mailer) {
       link: utils.getQuestionFinContratUrl(),
       espaceCandidat: utils.getEspaceCandidatUrl('/login'),
       emailSupport: utils.getSupportMail(),
+      documentAvenir: utils.getDocumentPreparerSonAvenir(),
     });
   };
 
