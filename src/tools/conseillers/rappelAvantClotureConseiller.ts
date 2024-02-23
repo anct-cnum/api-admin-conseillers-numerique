@@ -42,7 +42,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
           (structureId) => structureId !== null,
         );
       // Contrôler si le conseiller qui est en fin de contrat n'est pas réembauché (recrutee, finalisee)
-      if (structuresIdsRecruteeEtFinalisee.length > 0) {
+      if (structuresIdsRecruteeEtFinalisee.length === 0) {
         const conseiller = await getConseiller(app)(
           termineeNaturelle.conseillerId,
         );
