@@ -16,7 +16,7 @@ interface IMisesEnRelationExtended extends IMisesEnRelation {
 }
 
 interface RequestQuery {
-  actionT: string;
+  etat: string;
   structureId: string;
   motif: string;
 }
@@ -27,12 +27,12 @@ interface RequestBody {
 
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { actionT, structureId, motif }: RequestQuery = req.query;
+    const { etat, structureId, motif }: RequestQuery = req.query;
     const { misesEnRelations }: RequestBody = req.body;
     let statut: string;
 
     const updateValidation = updateReconventionnement.validate({
-      actionT,
+      etat,
       structureId,
       motif,
       misesEnRelations,
@@ -56,7 +56,7 @@ const updateDossierReconventionnement =
       return;
     }
     if (
-      actionT.trim() === 'valider' &&
+      etat.trim() === 'valider' &&
       !structure?.conventionnement?.dossierReconventionnement?.numero
     ) {
       res
@@ -65,7 +65,7 @@ const updateDossierReconventionnement =
       return;
     }
 
-    switch (actionT.trim()) {
+    switch (etat.trim()) {
       case 'enregistrer':
         statut = StatutConventionnement.RECONVENTIONNEMENT_INITIÉ;
         break;
