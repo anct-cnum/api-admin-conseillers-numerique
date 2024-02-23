@@ -104,7 +104,7 @@ const updateEmailStructure =
           },
           { returnOriginal: false },
         );
-      if (!impactUser && structureUpdated.statut !== 'VALIDATION_COSELEC') {
+      if (!impactUser || structureUpdated.statut !== 'VALIDATION_COSELEC') {
         newUserInvit = false;
       }
       if (!structureUpdated.contact?.inactivite) {
