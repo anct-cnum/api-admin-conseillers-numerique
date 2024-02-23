@@ -27,6 +27,10 @@ import {
 import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 import { checkStructurePhase2 } from '../repository/structures.repository';
 
+interface RequestBody {
+  idDemandeCoordinateur: string;
+}
+
 const { Pool } = require('pg');
 
 const checkIfStructurePhase2OrNew = (structure: IStructures) =>
@@ -51,7 +55,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const pool = new Pool();
-    const { idDemandeCoordinateur } = req.body;
+    const { idDemandeCoordinateur }: RequestBody = req.body;
     if (
       !ObjectId.isValid(idStructure) ||
       !ObjectId.isValid(idDemandeCoordinateur)
@@ -101,7 +105,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             demandesCoordinateur: {
               $elemMatch: {
                 id: {
-                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                  $eq: new ObjectId(idDemandeCoordinateur),
                 },
               },
             },
@@ -273,7 +277,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             demandesCoordinateur: {
               $elemMatch: {
                 id: {
-                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                  $eq: new ObjectId(idDemandeCoordinateur),
                 },
               },
             },
@@ -298,7 +302,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: {
-                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                  $eq: new ObjectId(idDemandeCoordinateur),
                 },
               },
             },

@@ -5,19 +5,34 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { updateReconventionnement } from '../../../schemas/reconventionnement.schemas';
 import { StatutConventionnement } from '../../../ts/enum';
-import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import {
+  IMisesEnRelation,
+  IStructures,
+} from '../../../ts/interfaces/db.interfaces';
+import { action } from '../../../helpers/accessControl/accessList';
+
+interface IMisesEnRelationExtended extends IMisesEnRelation {
+  miseEnRelationId: string;
+}
+
+interface RequestQuery {
+  actionT: string;
+  structureId: string;
+  motif: string;
+}
+
+interface RequestBody {
+  misesEnRelations: IMisesEnRelationExtended[];
+}
 
 const updateDossierReconventionnement =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const {
-      query: { action, structureId, motif },
-      body: { misesEnRelations },
-    } = req;
+    const { actionT, structureId, motif }: RequestQuery = req.query;
+    const { misesEnRelations }: RequestBody = req.body;
     let statut: string;
-    let misesEnRelationObjectIds: [string];
 
     const updateValidation = updateReconventionnement.validate({
-      action,
+      actionT,
       structureId,
       motif,
       misesEnRelations,
@@ -41,7 +56,7 @@ const updateDossierReconventionnement =
       return;
     }
     if (
-      action.trim() === 'valider' &&
+      actionT.trim() === 'valider' &&
       !structure?.conventionnement?.dossierReconventionnement?.numero
     ) {
       res
@@ -50,7 +65,7 @@ const updateDossierReconventionnement =
       return;
     }
 
-    switch (action.trim()) {
+    switch (actionT.trim()) {
       case 'enregistrer':
         statut = StatutConventionnement.RECONVENTIONNEMENT_INITIÉ;
         break;
@@ -142,8 +157,8 @@ const updateDossierReconventionnement =
           });
       }
 
-      misesEnRelationObjectIds = misesEnRelations?.map((miseEnRelation) =>
-        ObjectId.createFromHexString(miseEnRelation.miseEnRelationId),
+      const misesEnRelationObjectIds = misesEnRelations?.map(
+        (miseEnRelation) => new ObjectId(miseEnRelation.miseEnRelationId),
       );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
@@ -168,7 +183,7 @@ const updateDossierReconventionnement =
           {
             $and: [
               { _id: { $nin: misesEnRelationObjectIds } },
-              { 'structure.$id': ObjectId.createFromHexString(structureId) },
+              { 'structure.$id': new ObjectId(structureId) },
               { statut: { $in: ['finalisee'] } },
             ],
           },

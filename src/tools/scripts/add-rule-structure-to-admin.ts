@@ -8,6 +8,11 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 
+interface Options {
+  email: string | undefined;
+  structureId: string | undefined;
+}
+
 program.option('-e, --email <email>', "Email de l'utilisateur");
 program.option(
   '-s, --structureId <structureId>',
@@ -16,39 +21,35 @@ program.option(
 program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const options = program.opts();
+  const { email, structureId }: Options = program.opts();
 
-  if (
-    !options.email ||
-    !options.structureId ||
-    !ObjectId.isValid(options.structureId)
-  ) {
+  if (!email || !structureId || !ObjectId.isValid(structureId)) {
     logger.error(`Veuillez renseigner un email et un oid structure valide`);
     return;
   }
 
   const user: IUser = await app
     .service(service.users)
-    .Model.findOne({ name: options.email.toLowerCase() });
+    .Model.findOne({ name: email.toLowerCase() });
 
   if (user === null) {
-    logger.warn(`Utilisateur ${options.email} inconnu`);
+    logger.warn(`Utilisateur ${email} inconnu`);
     return;
   }
 
   if (!user.roles.includes('admin')) {
-    logger.warn(`Utilisateur ${options.email} non admin`);
+    logger.warn(`Utilisateur ${email} non admin`);
     return;
   }
 
   if (user.roles.includes('structure')) {
-    logger.warn(`Utilisateur ${options.email} a déjà le rôle structure`);
+    logger.warn(`Utilisateur ${email} a déjà le rôle structure`);
     return;
   }
 
   const structure: IStructures = await app
     .service(service.structures)
-    .Model.findOne({ _id: ObjectId.createFromHexString(options.structureId) });
+    .Model.findOne({ _id: new ObjectId(structureId) });
 
   if (structure?.nom !== 'CAISSE DES DEPOTS ET CONSIGNATIONS') {
     logger.warn(
@@ -64,18 +65,14 @@ execute(__filename, async ({ app, logger, exit }) => {
       roles: 'structure',
     },
     $set: {
-      entity: new DBRef(
-        'structures',
-        ObjectId.createFromHexString(options.structureId),
-        database,
-      ),
+      entity: new DBRef('structures', new ObjectId(structureId), database),
     },
   };
 
   await app
     .service(service.users)
-    .Model.updateOne({ name: options.email.toLowerCase() }, queryUpd);
+    .Model.updateOne({ name: email.toLowerCase() }, queryUpd);
 
-  logger.info(`Rôle structure ajouté pour l'utilisateur ${options.email}`);
+  logger.info(`Rôle structure ajouté pour l'utilisateur ${email}`);
   exit();
 });

@@ -6,10 +6,17 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { demandeCoordinateurAvisPrefet } from '../../../schemas/coordinateur.schemas';
 
+interface RequestBody {
+  avisPrefet: string;
+  idDemandeCoordinateur: string;
+  commentaire: string;
+}
+
 const updateDemandeCoordinateurAvisPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { avisPrefet, idDemandeCoordinateur, commentaire } = req.body;
+    const { avisPrefet, idDemandeCoordinateur, commentaire }: RequestBody =
+      req.body;
     const avisPrefetValidation = demandeCoordinateurAvisPrefet.validate({
       avisPrefet,
       idDemandeCoordinateur,
@@ -49,7 +56,7 @@ const updateDemandeCoordinateurAvisPrefet =
             demandesCoordinateur: {
               $elemMatch: {
                 id: {
-                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                  $eq: new ObjectId(idDemandeCoordinateur),
                 },
               },
             },
@@ -80,7 +87,7 @@ const updateDemandeCoordinateurAvisPrefet =
             'structureObj.demandesCoordinateur': {
               $elemMatch: {
                 id: {
-                  $eq: ObjectId.createFromHexString(idDemandeCoordinateur),
+                  $eq: new ObjectId(idDemandeCoordinateur),
                 },
               },
             },
