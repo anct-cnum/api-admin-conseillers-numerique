@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import logger from '../../logger';
 
 export default function (mailer) {
@@ -7,8 +6,8 @@ export default function (mailer) {
 
   const render = async (conseiller, dateFinDeContrat) => {
     return mailer.render(__dirname, templateName, {
-      prenom: conseiller.prenom,
-      dateFinDeContrat: dayjs(dateFinDeContrat).format('DD/MM/YYYY'),
+      prenom: conseiller.prenom[0].toUpperCase() + conseiller.prenom.slice(1),
+      dateFinDeContrat,
       link: utils.getQuestionFinContratUrl(),
       espaceCandidat: utils.getEspaceCandidatUrl('/login'),
       emailSupport: utils.getSupportMail(),
