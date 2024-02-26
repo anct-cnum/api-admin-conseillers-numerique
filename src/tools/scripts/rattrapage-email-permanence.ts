@@ -11,14 +11,14 @@ execute(__filename, async ({ app, logger, exit }) => {
       .service(service.permanences)
       .Model.find();
     const promises: Promise<void>[] = [];
-    const regexMail =
-      /^(([a-zA-Z0-9._-]+(\.[a-zA-Z0-9._-]+)*)|(\\".+\\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const regExpEmail =
+      /^([a-zA-Z0-9]+(?:[\\._-][a-zA-Z0-9]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     permanences.forEach((permanence) => {
       // eslint-disable-next-line no-async-promise-executor
       const p = new Promise<void>(async (resolve) => {
         if (
           permanence?.email?.length > 2 &&
-          !regexMail.test(permanence.email)
+          !regExpEmail.test(permanence.email)
         ) {
           const formatMail = permanence.email
             ?.normalize('NFD')
