@@ -27,6 +27,7 @@ const totalParStatutDemandesCoordinateur = async (
       {
         $match: {
           $and: [checkAccess],
+          statut: { $nin: ['ABANDON', 'DOUBLON'] },
         },
       },
       { $unwind: '$demandesCoordinateur' },
@@ -72,6 +73,7 @@ const getDemandesCoordo =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
+          statut: { $nin: ['ABANDON', 'DOUBLON'] },
           $and: [
             checkAccess,
             filterSearchBar(search),
