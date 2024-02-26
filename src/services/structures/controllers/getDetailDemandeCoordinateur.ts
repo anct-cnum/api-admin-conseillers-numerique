@@ -10,10 +10,14 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 
+interface RequestQuery {
+  idDemande: string;
+}
+
 const getDetailDemandeCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { idDemande } = req.query;
+    const { idDemande }: RequestQuery = req.query;
     try {
       if (!ObjectId.isValid(idStructure) || !ObjectId.isValid(idDemande)) {
         res.status(400).json({ message: 'Id incorrect' });
