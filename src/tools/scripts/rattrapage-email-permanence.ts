@@ -10,7 +10,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     const permanences: IPermanences[] = await app
       .service(service.permanences)
       .Model.find({
-        email: { ne: null },
+        email: { $ne: null },
       });
     const promises: Promise<void>[] = [];
     const regExpEmail =
