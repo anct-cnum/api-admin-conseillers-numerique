@@ -9,7 +9,9 @@ execute(__filename, async ({ app, logger, exit }) => {
   try {
     const permanences: IPermanences[] = await app
       .service(service.permanences)
-      .Model.find();
+      .Model.find({
+        email: { ne: null },
+      });
     const promises: Promise<void>[] = [];
     const regExpEmail =
       /^([a-zA-Z0-9]+(?:[\\._-][a-zA-Z0-9]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
