@@ -6,7 +6,7 @@ export default function (mailer) {
 
   const render = async (conseiller) => {
     return mailer.render(__dirname, templateName, {
-      conseiller,
+      prenom: conseiller.prenom[0].toUpperCase() + conseiller.prenom.slice(1),
       emailSupport: utils.getSupportMail(),
     });
   };

@@ -6,7 +6,7 @@ export default function (mailer) {
 
   const render = async (conseiller, dateFinDeContrat) => {
     return mailer.render(__dirname, templateName, {
-      prenom: conseiller.prenom,
+      prenom: conseiller.prenom[0].toUpperCase() + conseiller.prenom.slice(1),
       dateFinDeContrat,
       link: utils.getQuestionFinContratUrl(),
       espaceCandidat: utils.getEspaceCandidatUrl('/login'),
