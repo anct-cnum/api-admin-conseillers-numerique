@@ -25,13 +25,9 @@ import {
   validationCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
+import { checkIfStructurePrimoPhase2 } from '../repository/structures.repository';
 
 const { Pool } = require('pg');
-
-const checkIfStructurePrimoPhase2 = (structure: IStructures) =>
-  structure?.conventionnement?.statut ===
-    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2 ||
-  structure.statut === 'CREEE';
 
 const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
   try {
