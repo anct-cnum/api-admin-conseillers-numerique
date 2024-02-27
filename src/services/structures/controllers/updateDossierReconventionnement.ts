@@ -12,12 +12,12 @@ import {
 import { action } from '../../../helpers/accessControl/accessList';
 
 interface IMisesEnRelationExtended extends IMisesEnRelation {
-  miseEnRelationId: string;
+  miseEnRelationId: ObjectId;
 }
 
 interface RequestQuery {
   etat: string;
-  structureId: string;
+  structureId: ObjectId;
   motif: string;
 }
 
@@ -158,7 +158,7 @@ const updateDossierReconventionnement =
       }
 
       const misesEnRelationObjectIds = misesEnRelations?.map(
-        (miseEnRelation) => new ObjectId(miseEnRelation.miseEnRelationId),
+        (miseEnRelation) => miseEnRelation.miseEnRelationId,
       );
 
       // On modifie le statut de la mise en relation en fonction de l'action demandée par l'utilisateur (enregistrer ou envoyer)
@@ -183,7 +183,7 @@ const updateDossierReconventionnement =
           {
             $and: [
               { _id: { $nin: misesEnRelationObjectIds } },
-              { 'structure.$id': new ObjectId(structureId) },
+              { 'structure.$id': structureId },
               { statut: { $in: ['finalisee'] } },
             ],
           },
