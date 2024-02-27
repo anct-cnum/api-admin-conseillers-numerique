@@ -55,8 +55,9 @@ const getDatasStructures =
               app,
             );
             if (statsActivites) {
-              personnesAccompagnees =
-                await getPersonnesAccompagnees(statsActivites);
+              personnesAccompagnees = await getPersonnesAccompagnees(
+                statsActivites,
+              );
             }
           } catch (error) {
             res.status(500).json(error.message);
