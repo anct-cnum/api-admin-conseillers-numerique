@@ -19,9 +19,10 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
       {
         $unset: {
-          'coselec.$.phaseConventionnement': '', // A revoir car il unset que le 1er trouver
+          'coselec.$[x].phaseConventionnement': '',
         },
       },
+      { arrayFilters: [{ 'x.type': 'coordinateur' }] },
     );
 
   logger.info(
