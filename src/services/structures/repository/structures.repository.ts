@@ -3,6 +3,7 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
 type IConseiller = {
   idPG: number;
@@ -71,6 +72,11 @@ const checkStructurePhase2 = (statut: string) => {
   }
   return false;
 };
+// Dans le cas où on voudrait vérifier si la structure peut être ou est déjà Primo phase 2
+const checkIfStructurePrimoPhase2 = (structure: IStructures) =>
+  structure?.conventionnement?.statut ===
+    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2 ||
+  structure.statut === 'CREEE';
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
 
@@ -203,6 +209,7 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  checkIfStructurePrimoPhase2,
   filterAvisAdmin,
   filterAvisPrefet,
   filterStatutDemandeConseiller,
