@@ -90,16 +90,14 @@ execute(
           );
           if (dossierReconventionnement.nbPostesAttribuees > 1) {
             dossierReconventionnement.dateFinProchainContrat = new Date(
-              champs.find(
-                (champ: any) => champ.id === 'Q2hhbXAtMjkzOTk4OA==',
-              )?.date,
+              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkzOTk4OA==')
+                ?.date,
             );
           }
           if (dossierReconventionnement.nbPostesAttribuees === 1) {
             dossierReconventionnement.dateFinProchainContrat = new Date(
-              champs.find(
-                (champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1OA==',
-              )?.date,
+              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg4MzI1OA==')
+                ?.date,
             );
           }
           break;
@@ -111,16 +109,14 @@ execute(
           );
           if (dossierReconventionnement.nbPostesAttribuees > 1) {
             dossierReconventionnement.dateFinProchainContrat = new Date(
-              champs.find(
-                (champ: any) => champ.id === 'Q2hhbXAtMjk0MDAwNg==',
-              )?.date,
+              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjk0MDAwNg==')
+                ?.date,
             );
           }
           if (dossierReconventionnement.nbPostesAttribuees === 1) {
             dossierReconventionnement.dateFinProchainContrat = new Date(
-              champs.find(
-                (champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyNg==',
-              )?.date,
+              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyNg==')
+                ?.date,
             );
           }
           break;
@@ -132,16 +128,14 @@ execute(
           );
           if (dossierReconventionnement.nbPostesAttribuees > 1) {
             dossierReconventionnement.dateFinProchainContrat = new Date(
-              champs.find(
-                (champ: any) => champ.id === 'Q2hhbXAtMjk0MDAwNA==',
-              )?.date,
+              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjk0MDAwNA==')
+                ?.date,
             );
           }
           if (dossierReconventionnement.nbPostesAttribuees === 1) {
             dossierReconventionnement.dateFinProchainContrat = new Date(
-              champs.find(
-                (champ: any) => champ.id === 'Q2hhbXAtMjg3NDM2Mw==',
-              )?.date,
+              champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg3NDM2Mw==')
+                ?.date,
             );
           }
           break;

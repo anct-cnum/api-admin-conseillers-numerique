@@ -31,7 +31,7 @@ const authenticateMode =
                 ...userDecoded,
                 entity: new DBRef(
                   'users',
-                  ObjectId.createFromHexString(userDecoded.entity.$id),
+                  new ObjectId(userDecoded.entity.$id as string),
                   database,
                 ),
               };

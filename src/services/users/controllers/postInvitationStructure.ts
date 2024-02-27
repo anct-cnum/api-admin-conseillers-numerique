@@ -62,11 +62,7 @@ const postInvitationStructure =
         user = await app.service(service.users).create({
           name: email.toLowerCase(),
           roles: ['structure'],
-          entity: new DBRef(
-            'structures',
-            ObjectId.createFromHexString(structureId),
-            database,
-          ),
+          entity: new DBRef('structures', new ObjectId(structureId), database),
           password: uuidv4(),
           token: uuidv4(),
           tokenCreatedAt: new Date(),

@@ -9,8 +9,8 @@ import service from '../../helpers/services';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 
 interface Options {
-  email: string | undefined;
-  structureId: string | undefined;
+  email: string;
+  structureId: ObjectId;
 }
 
 program.option('-e, --email <email>', "Email de l'utilisateur");
@@ -49,7 +49,7 @@ execute(__filename, async ({ app, logger, exit }) => {
 
   const structure: IStructures = await app
     .service(service.structures)
-    .Model.findOne({ _id: new ObjectId(structureId) });
+    .Model.findOne({ _id: structureId });
 
   if (structure?.nom !== 'CAISSE DES DEPOTS ET CONSIGNATIONS') {
     logger.warn(
@@ -65,7 +65,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       roles: 'structure',
     },
     $set: {
-      entity: new DBRef('structures', new ObjectId(structureId), database),
+      entity: new DBRef('structures', structureId, database),
     },
   };
 

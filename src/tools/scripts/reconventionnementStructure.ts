@@ -9,8 +9,8 @@ import service from '../../helpers/services';
 import { StatutConventionnement } from '../../ts/enum';
 
 interface Options {
-  structureId: string | undefined;
-  statut: StatutConventionnement | undefined;
+  structureId: ObjectId;
+  statut: StatutConventionnement;
 }
 
 program.option('-s, --structureId <structureId>', 'id structure');
@@ -35,7 +35,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   }
 
   const update = await app.service(service.structures).Model.updateOne(
-    { _id: new ObjectId(structureId) },
+    { _id: structureId },
     {
       $set: {
         'conventionnement.statut': statut,
