@@ -48,7 +48,6 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     const datePlus2Mois = dayjs(dateDuJour).add(2, 'month');
     const datePlus2MoisDebut = dayjs(datePlus2Mois).startOf('date').toDate();
     const datePlus2MoisFin = dayjs(datePlus2Mois).endOf('date').toDate();
-
     const misesEnRelationsFinContrat = await getMisesEnRelationsFinContrat(app)(
       datePlus2MoisDebut,
       datePlus2MoisFin,
@@ -87,7 +86,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               miseEnRelationFinContrat.structureObj.idPG,
               emailStructure,
               dayjs(miseEnRelationFinContrat.dateFinDeContrat).format(
-                'DD-MM-YYYY',
+                'DD/MM/YYYY',
               ),
             )
             .catch((errSmtp: Error) => {
