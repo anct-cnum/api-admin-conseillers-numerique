@@ -56,6 +56,7 @@ const updateEmailStructure =
       }
 
       let impactUser = true;
+      let newUserInvit = true;
       // Pas d'access control pour vérifier dans tous les users
       const emailExists: IUser = await app
         .service(service.users)
@@ -103,44 +104,55 @@ const updateEmailStructure =
           },
           { returnOriginal: false },
         );
-
-      if (
-        structureUpdated.contact?.inactivite === true &&
-        structureUpdated.statut === 'VALIDATION_COSELEC'
-      ) {
-        let errorSmtpMail: Error | null = null;
-        await app
-          .service(service.structures)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            { _id: new ObjectId(idStructure) },
-            {
-              $set: {
-                userCreated: true,
-              },
-              $unset: {
-                'contact.inactivite': '',
-                userCreationError: '',
-              },
-            },
-          );
-
+      if (!impactUser || structureUpdated.statut !== 'VALIDATION_COSELEC') {
+        newUserInvit = false;
+      }
+      if (!structureUpdated.contact?.inactivite) {
         await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .updateMany(
             { 'structure.$id': new ObjectId(idStructure) },
-            {
-              $set: {
-                'structureObj.userCreated': true,
-                'structureObj.contact.email': email,
-              },
-              $unset: {
-                'structureObj.contact.inactivite': '',
-                'structureObj.userCreationError': '',
-              },
-            },
+            { $set: { 'structureObj.contact.email': email } },
           );
+      }
+
+      if (structureUpdated.statut === 'VALIDATION_COSELEC') {
+        let errorSmtpMail: Error | null = null;
+        if (structureUpdated.contact?.inactivite === true) {
+          await app
+            .service(service.structures)
+            .Model.accessibleBy(req.ability, action.update)
+            .findOneAndUpdate(
+              { _id: new ObjectId(idStructure) },
+              {
+                $set: {
+                  userCreated: true,
+                },
+                $unset: {
+                  'contact.inactivite': '',
+                  userCreationError: '',
+                },
+              },
+            );
+
+          await app
+            .service(service.misesEnRelation)
+            .Model.accessibleBy(req.ability, action.update)
+            .updateMany(
+              { 'structure.$id': new ObjectId(idStructure) },
+              {
+                $set: {
+                  'structureObj.userCreated': true,
+                  'structureObj.contact.email': email,
+                },
+                $unset: {
+                  'structureObj.contact.inactivite': '',
+                  'structureObj.userCreationError': '',
+                },
+              },
+            );
+        }
 
         if (impactUser === true) {
           const connect = app.get('mongodb');
@@ -179,30 +191,8 @@ const updateEmailStructure =
             return;
           }
         }
-      } else {
-        await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .updateMany(
-            { 'structure.$id': new ObjectId(idStructure) },
-            { $set: { 'structureObj.contact.email': email } },
-          );
-
-        if (impactUser === true) {
-          await app
-            .service(service.users)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateOne(
-              {
-                name: structure.contact.email,
-                'entity.$id': new ObjectId(idStructure),
-                roles: { $in: ['structure'] },
-              },
-              { $set: { name: email } },
-            );
-        }
       }
-      res.send({ emailUpdated: structureUpdated.contact.email });
+      res.send({ emailUpdated: structureUpdated.contact.email, newUserInvit });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

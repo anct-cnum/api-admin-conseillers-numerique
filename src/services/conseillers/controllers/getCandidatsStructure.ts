@@ -9,7 +9,7 @@ import {
 import service from '../../../helpers/services';
 import { validCandidatsStructure } from '../../../schemas/conseillers.schemas';
 import {
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterPix,
   filterCv,
   filterDiplome,
@@ -30,7 +30,7 @@ const getTotalCandidatsStructure =
     diplome: string,
     cv: string,
     ccp1: string,
-    searchByName: string,
+    search: string,
   ) =>
     app.service(service.conseillers).Model.aggregate([
       {
@@ -52,7 +52,7 @@ const getTotalCandidatsStructure =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       { $group: { _id: null, count: { $sum: 1 } } },
@@ -67,7 +67,7 @@ const getCandidatsStructureAvecFiltre =
     diplome: string,
     cv: string,
     ccp1: string,
-    searchByName: string,
+    search: string,
     sortColonne: object,
     skip: string,
     limit: number,
@@ -92,7 +92,7 @@ const getCandidatsStructureAvecFiltre =
           ...filterCv(cv),
           ...filterDiplome(diplome),
           ...filterCCP1(ccp1),
-          ...filterNomConseiller(searchByName),
+          ...filterNomAndEmailConseiller(search),
         },
       },
       {
@@ -167,7 +167,11 @@ const getCandidatsStructure =
       const conseillerIds = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
-        .find()
+        .find({
+          statut: {
+            $nin: ['finalisee_rupture', 'terminee_naturelle'],
+          },
+        })
         .select({ 'conseillerObj._id': 1, _id: 0 });
       let candidats: IConseillersWithMiseEnRelation[] =
         await getCandidatsStructureAvecFiltre(app)(
@@ -185,15 +189,6 @@ const getCandidatsStructure =
         candidats = await Promise.all(
           candidats.map(async (candidat) => {
             const item = { ...candidat };
-            if (item.statut === 'RECRUTE') {
-              item.miseEnRelation = await app
-                .service(service.misesEnRelation)
-                .Model.findOne({
-                  'conseiller.$id': item._id,
-                  'structure.$id': item.structureId,
-                })
-                .select({ statut: 1, _id: 0 });
-            }
             return item;
           }),
         );

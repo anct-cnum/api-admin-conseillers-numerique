@@ -46,10 +46,10 @@ const findRegionNameByNumDepartement = (
   if (departement === '00') {
     return departementRegionTom.find(
       (dep: IDepartement) => dep.num_dep === codeCom,
-    ).region_name;
+    )?.region_name;
   }
   return departements.find((dep: IDepartement) => dep.num_dep === departement)
-    .region_name;
+    ?.region_name;
 };
 
 const findDepartementNameByNumDepartement = (
@@ -59,10 +59,10 @@ const findDepartementNameByNumDepartement = (
   if (departement === '00') {
     return departementRegionTom.find(
       (dep: IDepartement) => dep.num_dep === codeCom,
-    ).dep_name;
+    )?.dep_name;
   }
   return departements.find((dep: IDepartement) => dep.num_dep === departement)
-    .dep_name;
+    ?.dep_name;
 };
 
 export {

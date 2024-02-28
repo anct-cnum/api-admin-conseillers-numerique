@@ -5,9 +5,9 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
+import { validUpdateMisesEnRelation } from '../../../schemas/miseEnRelation.schemas';
 import { getCoselec } from '../../../utils';
 import { countConseillersRecrutees } from '../misesEnRelation.repository';
-import { validUpdateMisesEnRelation } from '../../../schemas/miseEnRelation.schemas';
 
 const updateMiseEnRelation =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -39,10 +39,7 @@ const updateMiseEnRelation =
         res.status(403).json({ message: "La structure n'existe pas" });
         return;
       }
-      if (
-        miseEnRelationVerif.statut === 'recrutee' ||
-        miseEnRelationVerif.statut === 'finalisee'
-      ) {
+      if (req.body.statut === 'finalisee') {
         const dernierCoselec = getCoselec(structure);
         if (dernierCoselec !== null) {
           // Nombre de candidats déjà recrutés pour cette structure
@@ -62,8 +59,6 @@ const updateMiseEnRelation =
             return;
           }
         }
-      }
-      if (req.body.statut === 'finalisee') {
         remove = {
           emetteurRupture: '',
           dateRupture: '',

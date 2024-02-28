@@ -40,7 +40,7 @@ const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
   const pool = new Pool();
-  if (Number.isNaN(options.idPG)) {
+  if (Number.isNaN(Number(options.idPG))) {
     logger.error(`Veuillez renseigner un idPG valide.`);
     return;
   }

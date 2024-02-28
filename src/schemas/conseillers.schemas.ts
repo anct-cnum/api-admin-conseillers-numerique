@@ -22,12 +22,29 @@ const validConseillers = Joi.object({
     new Error('Le filtre coordinateur est invalide'),
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
   departement: Joi.string().error(
     new Error('Le filtre département est invalide'),
   ),
   piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
+  ),
+});
+const validConseillersCoordonnes = Joi.object({
+  skip: Joi.number().required().error(new Error('La pagination est invalide')),
+  ordre: Joi.number().required().error(new Error('Le tri est invalide')),
+  nomOrdre: Joi.string()
+    .required()
+    .error(new Error('Le nom du tri est invalide')),
+  searchByConseiller: Joi.string().error(
+    new Error('La recherche par conseiller est invalide'),
+  ),
+  searchByStructure: Joi.string().error(
+    new Error('La recherche par structure est invalide'),
+  ),
+  region: Joi.string().error(new Error('Le filtre région est invalide')),
+  departement: Joi.string().error(
+    new Error('Le filtre département est invalide'),
   ),
 });
 
@@ -52,10 +69,12 @@ const validExportConseillers = Joi.object({
     new Error('Le filtre coordinateur est invalide'),
   ),
   rupture: Joi.string().error(new Error('Le filtre rupture est invalide')),
-  region: Joi.string().error(new Error('Le filtre region est invalide')),
-  departement: Joi.string().error(
-    new Error('Le filtre département est invalide'),
-  ),
+  region: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le filtre région est invalide')),
+  departement: Joi.string()
+    .allow(null, '')
+    .error(new Error('Le filtre département est invalide')),
   piecesManquantes: Joi.string().error(
     new Error('Le filtre pièces manquantes est invalide'),
   ),
@@ -63,7 +82,7 @@ const validExportConseillers = Joi.object({
 
 const validCandidats = Joi.object({
   skip: Joi.number().required().error(new Error('La pagination est invalide')),
-  searchByNomCandidat: Joi.string().error(
+  search: Joi.string().error(
     new Error('La recherche par nom du candidat est invalide'),
   ),
   departement: Joi.string().error(
@@ -92,4 +111,5 @@ export {
   validExportConseillers,
   validCandidats,
   validCandidatsStructure,
+  validConseillersCoordonnes,
 };

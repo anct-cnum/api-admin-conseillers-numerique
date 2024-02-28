@@ -7,9 +7,9 @@ import { validConseillers } from '../../../schemas/conseillers.schemas';
 import {
   checkAccessReadRequestConseillers,
   filterIsCoordinateur,
-  filterIsRuptureMisesEnRelation,
-  filterIsRuptureConseiller,
-  filterNomConseiller,
+  filterByStatutContratMisesEnRelation,
+  filterByStatutConseiller,
+  filterNomAndEmailConseiller,
   filterNomStructure,
   filterRegion,
   formatStatutMisesEnRelation,
@@ -26,16 +26,18 @@ const getTotalConseillersRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -71,9 +73,9 @@ const getConseillersRecruter =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
+          ...filterByStatutConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
-          ...filterNomConseiller(searchByConseiller),
+          ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],
@@ -95,6 +97,7 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
     sortColonne: object,
     skip: string,
@@ -103,11 +106,12 @@ const getMisesEnRelationRecruter =
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -208,6 +212,9 @@ const getConseillersStatutRecrute =
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+      const conseillerTerminerNaturelle = conseillers.filter(
+        (conseiller) => conseiller.statut === 'TERMINE',
+      );
 
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
@@ -218,6 +225,7 @@ const getConseillersStatutRecrute =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
         piecesManquantes as boolean,
         sortColonne,
         skip as string,
@@ -255,6 +263,7 @@ const getConseillersStatutRecrute =
           conseillers.map((conseiller) => conseiller.structureId),
           conseillerRecruter.map((conseiller) => conseiller._id),
           conseillerRupture.map((conseiller) => conseiller._id),
+          conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
           piecesManquantes as boolean,
         );
         items.data = misesEnRelation;

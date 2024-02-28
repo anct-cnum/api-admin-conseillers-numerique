@@ -13,28 +13,16 @@ const checkAccessReadRequestMisesEnRelation = async (
     .Model.accessibleBy(req.ability, action.read)
     .getQuery();
 
-const filterNomConseiller = (nom: string) => {
-  const inputSearchBar = nom?.trim();
-  if (inputSearchBar) {
-    return {
-      $or: [
-        {
-          nomPrenomStr: {
-            $regex: `(?'name'${inputSearchBar}.*$)`,
-            $options: 'i',
-          },
-        },
-        {
-          prenomNomStr: {
-            $regex: `(?'name'${inputSearchBar}.*$)`,
-            $options: 'i',
-          },
-        },
-        { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
-      ],
-    };
-  }
-  return {};
+const filterRegionConseillerObj = (region: string) => {
+  return region
+    ? { $expr: { $eq: ['$conseillerObj.codeRegion', region] } }
+    : {};
+};
+
+const filterDepartementConseillerObj = (departement: string) => {
+  return departement
+    ? { $expr: { $eq: ['$conseillerObj.codeDepartement', departement] } }
+    : {};
 };
 
 const filterNomConseillerOrStructure = (nom: string) => {
@@ -112,12 +100,12 @@ const filterDiplome = (diplome: string) => {
 const filterCCP1 = (ccp1: string) => {
   if (ccp1 === 'true') {
     return {
-      'conseillerObj.statut': { $in: ['RECRUTE', 'RUPTURE'] },
+      'conseillerObj.statut': { $in: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   if (ccp1 === 'false') {
     return {
-      'conseillerObj.statut': { $nin: ['RECRUTE', 'RUPTURE'] },
+      'conseillerObj.statut': { $nin: ['RECRUTE', 'TERMINE', 'RUPTURE'] },
     };
   }
   return {};
@@ -151,7 +139,12 @@ const filterStatutContrat = (statut: string) => {
   }
   return {
     statut: {
-      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
+      $in: [
+        'recrutee',
+        'nouvelle_rupture',
+        'renouvellement_initiee',
+        'terminee_naturelle',
+      ],
     },
   };
 };
@@ -187,9 +180,14 @@ const filterStatutContratHistorique = (statut: string) => {
       statut: 'finalisee_rupture',
     };
   }
+  if (statut === 'terminee_naturelle') {
+    return {
+      statut: 'terminee_naturelle',
+    };
+  }
   return {
     statut: {
-      $in: ['finalisee', 'finalisee_rupture'],
+      $in: ['finalisee', 'finalisee_rupture', 'terminee_naturelle'],
     },
   };
 };
@@ -201,7 +199,7 @@ const totalHistoriqueContrat = async (app: Application, checkAccess) => {
       $match: {
         $and: [checkAccess],
         statut: {
-          $in: ['finalisee_rupture', 'finalisee'],
+          $in: ['finalisee_rupture', 'finalisee', 'terminee_naturelle'],
         },
       },
     },
@@ -313,7 +311,8 @@ const countCoordinateurRecrutees = async (
 
 export {
   checkAccessReadRequestMisesEnRelation,
-  filterNomConseiller,
+  filterRegionConseillerObj,
+  filterDepartementConseillerObj,
   filterNomConseillerOrStructure,
   filterDepartement,
   filterRegion,

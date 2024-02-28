@@ -25,13 +25,9 @@ import {
   validationCandidaturePosteCoordinateurPrefet,
 } from '../../../emails';
 import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
+import { checkIfStructurePrimoPhase2 } from '../repository/structures.repository';
 
 const { Pool } = require('pg');
-
-const checkIfStructurePhase2 = (structure: IStructures) =>
-  structure?.conventionnement?.statut ===
-    StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ ||
-  structure.statut === 'CREEE';
 
 const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
   try {
@@ -221,7 +217,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
               avisCoselec: 'POSITIF',
               insertedAt: new Date(),
               type: 'coordinateur',
-              ...(checkIfStructurePhase2(structure) && {
+              ...(checkIfStructurePrimoPhase2(structure) && {
                 phaseConventionnement: PhaseConventionnement.PHASE_2,
               }),
             },
@@ -234,7 +230,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
               avisCoselec: 'POSITIF',
               insertedAt: new Date(),
               type: 'coordinateur',
-              ...(checkIfStructurePhase2(structure) && {
+              ...(checkIfStructurePrimoPhase2(structure) && {
                 phaseConventionnement: PhaseConventionnement.PHASE_2,
               }),
             },

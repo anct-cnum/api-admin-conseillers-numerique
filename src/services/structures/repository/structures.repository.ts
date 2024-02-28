@@ -3,6 +3,18 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
+import { IStructures } from '../../../ts/interfaces/db.interfaces';
+
+type IConseiller = {
+  idPG: number;
+  nom: string;
+  prenom: string;
+  _id: string;
+  statut: string;
+  phaseConventionnement: string;
+  reconventionnement: boolean;
+  typeDeContrat: string;
+};
 
 const countStructures = async (ability, read, app) =>
   app
@@ -60,6 +72,11 @@ const checkStructurePhase2 = (statut: string) => {
   }
   return false;
 };
+// Dans le cas où on voudrait vérifier si la structure peut être ou est déjà Primo phase 2
+const checkIfStructurePrimoPhase2 = (structure: IStructures) =>
+  structure?.conventionnement?.statut ===
+    StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2 ||
+  structure.statut === 'CREEE';
 
 const filterRegion = (region: string) => (region ? { codeRegion: region } : {});
 
@@ -122,12 +139,57 @@ const getNameStructure =
       .findOne({ idPG: idStructure })
       .select({ nom: 1, _id: 0 });
 
-const getConseillersByStatus = (conseillers, statuts, phase = undefined) => {
+const getConseillersByStatus = (
+  conseillers: IConseiller[],
+  statuts: string[],
+  phase = undefined,
+) => {
   return conseillers.filter(
     (conseiller) =>
       statuts.includes(conseiller.statut) &&
       conseiller.phaseConventionnement === phase,
   );
+};
+
+const filterAvisAdmin = (avisAdmin: string | undefined) => {
+  if (avisAdmin) {
+    return { statut: avisAdmin };
+  }
+  return {
+    statut: { $in: ['VALIDATION_COSELEC', 'REFUS_COSELEC'] },
+  };
+};
+
+const filterAvisPrefet = (avisPrefet: string | undefined) => {
+  if (avisPrefet === 'sans-avis') {
+    return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
+  }
+  if (avisPrefet === 'favorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'POSITIF' } };
+  }
+  if (avisPrefet === 'défavorable') {
+    return { 'lastPrefet.avisPrefet': { $eq: 'NÉGATIF' } };
+  }
+  return {};
+};
+
+const filterStatutDemandeConseiller = (statut: string) => {
+  if (statut === 'NOUVELLE') {
+    return { statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] } };
+  }
+  if (statut !== 'toutes' && statut !== 'NOUVELLE') {
+    return { statut: { $eq: statut } };
+  }
+  return {
+    statut: {
+      $in: [
+        'CREEE',
+        'EXAMEN_COMPLEMENTAIRE_COSELEC',
+        'VALIDATION_COSELEC',
+        'REFUS_COSELEC',
+      ],
+    },
+  };
 };
 
 export {
@@ -147,4 +209,8 @@ export {
   getNameStructure,
   getConseillersByStatus,
   checkStructurePhase2,
+  checkIfStructurePrimoPhase2,
+  filterAvisAdmin,
+  filterAvisPrefet,
+  filterStatutDemandeConseiller,
 };

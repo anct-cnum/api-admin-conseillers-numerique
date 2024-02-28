@@ -6,11 +6,11 @@ import service from '../../../helpers/services';
 import { validExportConseillers } from '../../../schemas/conseillers.schemas';
 import {
   filterIsCoordinateur,
-  filterNomConseiller,
+  filterNomAndEmailConseiller,
   filterRegion,
   filterNomStructure,
-  filterIsRuptureConseiller,
-  filterIsRuptureMisesEnRelation,
+  filterByStatutConseiller,
+  filterByStatutContratMisesEnRelation,
   checkAccessReadRequestConseillers,
   filterDepartement,
 } from '../../conseillers/repository/conseillers.repository';
@@ -43,9 +43,9 @@ const getConseillersRecruter =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
-          ...filterIsRuptureConseiller(rupture, dateDebut, dateFin),
+          ...filterByStatutConseiller(rupture, dateDebut, dateFin),
           ...filterIsCoordinateur(isCoordinateur),
-          ...filterNomConseiller(searchByConseiller),
+          ...filterNomAndEmailConseiller(searchByConseiller),
           ...filterRegion(region),
           ...filterDepartement(departement),
           $and: [checkAccess],
@@ -67,17 +67,19 @@ const getMisesEnRelationRecruter =
     structureIds: ObjectId[],
     conseillerIdsRecruter: ObjectId[],
     conseillerIdsRupture: ObjectId[],
+    conseillerTerminerNaturelle: ObjectId[],
     piecesManquantes: boolean,
     sortColonne: object,
   ) =>
     app.service(service.misesEnRelation).Model.aggregate([
       {
         $match: {
-          ...filterIsRuptureMisesEnRelation(
+          ...filterByStatutContratMisesEnRelation(
             rupture,
             conseillerIdsRecruter,
             structureIds,
             conseillerIdsRupture,
+            conseillerTerminerNaturelle,
             piecesManquantes,
           ),
           ...filterNomStructure(searchByStructure),
@@ -92,6 +94,7 @@ const getMisesEnRelationRecruter =
           'conseillerObj.prenom': 1,
           'conseillerObj.nom': 1,
           'conseillerObj.emailCN.address': 1,
+          'conseillerObj.emailPro': 1,
           'conseillerObj.mattermost.login': 1,
           statut: 1,
           dossierIncompletRupture: 1,
@@ -178,6 +181,9 @@ const getExportConseillersCsv =
       const conseillerRupture = conseillers.filter(
         (conseiller) => conseiller.statut === 'RUPTURE',
       );
+      const conseillerTerminerNaturelle = conseillers.filter(
+        (conseiller) => conseiller.statut === 'TERMINE',
+      );
       misesEnRelation = await getMisesEnRelationRecruter(
         app,
         checkAccesMisesEnRelation,
@@ -187,6 +193,7 @@ const getExportConseillersCsv =
         conseillers.map((conseiller) => conseiller.structureId),
         conseillerRecruter.map((conseiller) => conseiller._id),
         conseillerRupture.map((conseiller) => conseiller._id),
+        conseillerTerminerNaturelle.map((conseiller) => conseiller._id),
         piecesManquantes as boolean,
         sortColonne,
       );

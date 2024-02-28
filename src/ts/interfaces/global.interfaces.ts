@@ -35,6 +35,7 @@ export interface Ressource {
   permanences: string;
   conseillersSupprimes: string;
   conseillersRuptures: string;
+  conseillersTermines: string;
   qpv: string;
   communes: string;
   hubs: string;
@@ -86,6 +87,12 @@ export interface IConfigurationDemarcheSimplifiee {
   url_entreprise_conventionnement: string;
   url_structure_publique_conventionnement: string;
   numero_demarche_recrutement_coordinateur: string;
+  numero_demarche_association_reconventionnement: string;
+  numero_demarche_entreprise_reconventionnement: string;
+  numero_demarche_structure_publique_reconventionnement: string;
+  numero_demarche_association_conventionnement: string;
+  numero_demarche_entreprise_conventionnement: string;
+  numero_demarche_structure_publique_conventionnement: string;
 }
 
 export interface IMattermost {

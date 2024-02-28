@@ -25,6 +25,7 @@ const ressource: Ressource = {
   permanences: 'permanences',
   conseillersSupprimes: 'conseillersSupprimes',
   conseillersRuptures: 'conseillersRuptures',
+  conseillersTermines: 'conseillersTermines',
   qpv: 'qpv',
   communes: 'communes',
   hubs: 'hubs',

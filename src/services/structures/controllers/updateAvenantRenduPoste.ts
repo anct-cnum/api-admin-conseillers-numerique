@@ -75,7 +75,7 @@ const updateAvenantRenduPoste =
       const structureObject = {
         'demandesCoselec.$.statut': 'validee',
         'demandesCoselec.$.banniereValidationAvenant': true,
-        'structureObj.demandesCoselec.$.validateurAvenant': {
+        'demandesCoselec.$.validateurAvenant': {
           email: req.user?.name,
           date: dateValidation,
         },

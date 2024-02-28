@@ -52,6 +52,12 @@ export default function (app: Application) {
 
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
 
+  const getQuestionFinContratUrl = () => app.get('url_question_contrat');
+
+  const getSupportMail = () => configurationSmtp.replyTo;
+
+  const getDocumentPreparerSonAvenir = () => app.get('url_preparer_avenir');
+
   const initSentry = () => {
     if (config().sentry.enabled === 'true') {
       Sentry.init({
@@ -79,6 +85,9 @@ export default function (app: Application) {
     getPixSupportMail,
     getEspaceCandidatUrl,
     getEspaceCoopUrl,
+    getQuestionFinContratUrl,
+    getDocumentPreparerSonAvenir,
+    getSupportMail,
   };
   return {
     utils,
@@ -115,8 +124,8 @@ export default function (app: Application) {
               {
                 to: emailAddress,
                 subject,
-                from: `Conseiller Numérique France Services <${configurationSmtp.from}>`,
-                replyTo: `Conseiller Numérique France Services <${configurationSmtp.replyTo}>`,
+                from: `Conseiller Numérique <${configurationSmtp.from}>`,
+                replyTo: `Conseiller Numérique <${configurationSmtp.replyTo}>`,
                 list: {
                   help: getPublicUrl('/faq'),
                 },

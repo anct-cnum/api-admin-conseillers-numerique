@@ -18,28 +18,10 @@ import {
   conseillerRupturePix,
   conseillerRuptureStructure,
 } from '../../../emails';
+import { updateConseillersPG } from '../../../utils/functionsDeleteRoleConseiller';
 
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
-
-const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-      [email, disponible, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const conseillerRecruteReinscription =
   (app, req) =>
@@ -417,6 +399,20 @@ const validationRuptureConseiller =
       if (!miseEnRelation) {
         res.status(404).json({
           message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
+        });
+        return;
+      }
+      const miseEnRelationRenouvellementEnCours: IMisesEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          'conseiller.$id': conseiller._id,
+          'structure.$id': structure._id,
+          statut: { $eq: 'renouvellement_initiee' },
+        });
+      if (miseEnRelationRenouvellementEnCours) {
+        res.status(404).json({
+          message: `Une demande de renouvellement de contrat est en cours pour ce conseiller`,
         });
         return;
       }

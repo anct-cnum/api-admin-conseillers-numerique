@@ -32,6 +32,17 @@ const deleteAccount =
     let user: undefined | IUser;
     let deleteMessageSuccess: string = '';
     try {
+      user = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: new ObjectId(idUser) });
+
+      if (user?.roles.includes('coordinateur')) {
+        return res.status(409).json({
+          message:
+            "Le compte avec le rôle 'coordinateur' ne peut pas être modifié ou supprimé.",
+        });
+      }
       if (roleSuppression === 'tous') {
         const isContactStructure = await checkIfUserIsContactStructure(
           app,

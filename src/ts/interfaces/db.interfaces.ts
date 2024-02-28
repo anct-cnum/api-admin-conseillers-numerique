@@ -119,6 +119,8 @@ export interface IMisesEnRelation {
   contratCoordinateur: boolean | undefined;
 
   banniereRefusRecrutement: boolean | undefined;
+
+  phaseConventionnement: string | undefined;
 }
 export interface IConseillers {
   _id: ObjectId;
@@ -362,11 +364,13 @@ export interface IStructures {
     inactivite: boolean;
   };
   insee: Iinsee;
-  codeCom: string | null;
   estZRR: boolean;
+  prefet: IPrefet[];
   qpvStatut: string;
   qpvListe: Array<object>;
   reseau: Reseau;
+  codeCom: string | null;
+  coselec: ICoselec[];
   conventionnement: {
     statut: string;
     motif: string;
@@ -414,6 +418,26 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+}
+
+interface ICoselec {
+  nombreConseillersCoselec: number;
+  avisCoselec: string;
+  numero?: string;
+  phaseConventionnement?: string;
+  type?: string;
+  observationsReferent?: string;
+  prioritaireCoselec?: string;
+  validateur?: string;
+  insertedAt: Date;
+}
+
+interface IPrefet {
+  avisPrefet: string;
+  commentairePrefet: string;
+  insertedAt: Date;
+  idStructureTransfert?: ObjectId;
+  banniereValidationAvisPrefet?: boolean;
 }
 
 export interface IDemandesCoordinateur {
@@ -595,22 +619,48 @@ export interface ICras {
   createdAt: Date;
 }
 
-export interface ConseillersSupprimes {
+export interface IConseillersSupprimes {
   _id: ObjectId;
   deletedAt: Date;
   motif: string;
   conseiller: object;
   actionUser: object;
+  historiqueContrats: IHistoriqueContrats[];
 }
 
-export interface ConseillersRuptures {
-  _id: ObjectId;
+interface IHistoriqueContrats {
   conseillerId: Types.ObjectId;
   structureId: Types.ObjectId;
+  dateRecrutement: Date;
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
+  typeDeContrat: String;
+  reconventionnement: Boolean;
+  phaseConventionnement: String;
+  miseEnRelationReconventionnement: Types.ObjectId;
+  miseEnRelationConventionnement: Types.ObjectId;
+  dateRupture: Date;
+  motifRupture: String;
+}
+
+export interface IConseillersRuptures {
+  _id: ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
   dateRupture: Date;
   motifRupture: string;
 }
 
+export interface IConseillersTermines {
+  _id: ObjectId;
+  conseillerId: ObjectId;
+  structureId: ObjectId;
+  typeDeContrat: String;
+  dateDebutDeContrat: Date;
+  dateFinDeContrat: Date;
+  phaseConventionnement: String;
+  reconventionnement: Boolean;
+}
 export interface AccessLogs {
   createdAt: Date;
   name: string;

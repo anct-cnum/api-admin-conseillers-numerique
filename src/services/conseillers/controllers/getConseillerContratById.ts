@@ -1,7 +1,10 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IConfigurationDemarcheSimplifiee,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestConseillers } from '../repository/conseillers.repository';
 import { action } from '../../../helpers/accessControl/accessList';
@@ -37,11 +40,6 @@ const getConseillerContratById =
               from: 'misesEnRelation',
               let: {
                 idConseiller: '$_id',
-                statutMisesEnrelation: [
-                  'nouvelle_rupture',
-                  'finalisee',
-                  'finalisee_rupture',
-                ],
               },
               as: 'misesEnRelation',
               pipeline: [
@@ -60,6 +58,7 @@ const getConseillerContratById =
                             { $eq: ['nouvelle_rupture', '$statut'] },
                             { $eq: ['finalisee_rupture', '$statut'] },
                             { $eq: ['renouvellement_initiee', '$statut'] },
+                            { $eq: ['terminee_naturelle', '$statut'] },
                           ],
                         },
                       },
@@ -152,15 +151,26 @@ const getConseillerContratById =
         res.status(404).json({ message: 'Mise en relation non trouvée' });
         return;
       }
+      conseiller[0].renouvellementEnCours =
+        !!conseiller[0].misesEnRelation.find(
+          (miseEnRelation) =>
+            String(miseEnRelation.structureObj._id) ===
+              String(conseiller[0].structureId) &&
+            miseEnRelation.statut === 'renouvellement_initiee',
+        );
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           _id: new ObjectId(conseiller[0].contrat?.structureObj?._id),
         });
+      const demarcheSimplifiee: IConfigurationDemarcheSimplifiee = app.get(
+        'demarche_simplifiee',
+      );
       const typeDossierDS: ITypeDossierDS | undefined =
         getTypeDossierDemarcheSimplifiee(
           structure?.insee?.unite_legale?.forme_juridique?.libelle,
+          demarcheSimplifiee,
         );
       if (typeDossierDS === null) {
         res.status(500).json({
