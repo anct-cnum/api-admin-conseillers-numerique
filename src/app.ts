@@ -16,6 +16,7 @@ import appHooks from './app.hooks';
 import channels from './channels';
 import authentication from './authentication';
 import mongoose from './mongoose';
+import swagger from './swagger';
 
 const app = express(feathers());
 
@@ -82,6 +83,8 @@ app.configure(authentication);
 app.configure(services);
 // Set up event channels (see channels.js)
 app.configure(channels);
+// Set up swagger
+app.configure(swagger);
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
