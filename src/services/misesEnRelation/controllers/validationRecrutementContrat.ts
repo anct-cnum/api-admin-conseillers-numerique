@@ -3,15 +3,25 @@ import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
-import { IRequest } from '../../../ts/interfaces/global.interfaces';
+import {
+  IMattermost,
+  IRequest,
+} from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { getCoselec } from '../../../utils';
-import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { countConseillersRecrutees } from '../misesEnRelation.repository';
+import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
+import {
+  checkAccessReadRequestMisesEnRelation,
+  countConseillersRecrutees,
+} from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
+import {
+  transfertChannelDepartementConseiller,
+  transfertChannelHubConseiller,
+} from '../../../utils/mattermost';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -113,15 +123,65 @@ const validationRecrutementContrat =
       );
       const coselec = getCoselec(structure);
       const nombreConseillersCoselec = coselec?.nombreConseillersCoselec ?? 0;
-      const dateRupture =
-        miseEnRelationVerif.conseillerObj?.ruptures?.slice(-1)[0]?.dateRupture;
+      const miseEnRelationAccess = await checkAccessReadRequestMisesEnRelation(
+        app,
+        req,
+      );
+      // récupération de la date de fin du dernier contrat ou de la date de rupture pour migrer les CRA qui ont été créés après
+      const miseEnRelationSansMission = await app
+        .service(service.misesEnRelation)
+        .Model.aggregate([
+          {
+            $match: {
+              'conseiller.$id': miseEnRelationVerif.conseillerObj?._id,
+              $and: [miseEnRelationAccess],
+              $or: [
+                {
+                  statut: 'terminee_naturelle',
+                  dateFinDeContrat: { $exists: true },
+                },
+                { statut: 'finalisee_rupture', dateRupture: { $exists: true } },
+              ],
+            },
+          },
+          {
+            $project: {
+              structureObj: 1,
+              dateToMigrateCRA: {
+                $max: [
+                  {
+                    $cond: {
+                      if: { $eq: ['$statut', 'terminee_naturelle'] },
+                      then: '$dateFinDeContrat',
+                      else: null,
+                    },
+                  },
+                  {
+                    $cond: {
+                      if: { $eq: ['$statut', 'finalisee_rupture'] },
+                      then: '$dateRupture',
+                      else: null,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            $sort: { dateToMigrateCRA: -1 },
+          },
+          {
+            $limit: 1,
+          },
+        ]);
       if (
-        dateRupture &&
-        dateRupture > miseEnRelationVerif?.dateDebutDeContrat
+        miseEnRelationSansMission.length > 0 &&
+        miseEnRelationSansMission[0].dateToMigrateCRA >
+          miseEnRelationVerif?.dateDebutDeContrat
       ) {
         res.status(400).json({
           message:
-            'La date de rupture est postérieure à la date de début de contrat',
+            'Action non autorisée : la date de début de contrat est antérieure à la date de fin du dernier contrat ou de rupture',
         });
         return;
       }
@@ -162,78 +222,109 @@ const validationRecrutementContrat =
         false,
         datePG,
       );
-      const userAccount = await app
+      // vérification si le conseiller possède encore son adresse mail conseiller numérique
+      const userEstEncoreConseillerNumerique = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
-        .findOne({
-          name: miseEnRelationVerif.conseillerObj.email,
-          roles: { $in: ['candidat'] },
+        .countDocuments({
+          name: miseEnRelationVerif.conseillerObj?.emailCN?.address,
+          roles: { $in: ['conseiller'] },
         });
-      const passwordHash = bcrypt.hashSync(uuidv4(), 10);
-      if (userAccount === null) {
-        const canCreate = req.ability.can(action.create, ressource.users);
-        if (!canCreate) {
-          res.status(403).json({
-            message: `Accès refusé, vous n'êtes pas autorisé à créer un utilisateur`,
-          });
-          return;
-        }
-        user = await app.service(service.users).create({
-          name: miseEnRelationVerif.conseillerObj.email,
-          prenom: miseEnRelationVerif.conseillerObj.prenom,
-          nom: miseEnRelationVerif.conseillerObj.nom,
-          password: passwordHash, // random password (required to create user)
-          roles: Array('conseiller'),
-          entity: new DBRef(
-            'conseillers',
-            miseEnRelationVerif.conseillerObj._id,
-            database,
-          ),
-          token: uuidv4(),
-          mailSentDate: null,
-          passwordCreated: false,
-          createdAt: new Date(),
-        });
-        if (!user) {
-          res.status(400).json({
-            message: "L'utilisateur n'a pas été créé",
-          });
-          return;
-        }
-      } else {
-        const userUpdated = await app
+      if (userEstEncoreConseillerNumerique === 0) {
+        const userAccount = await app
           .service(service.users)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            { name: miseEnRelationVerif.conseillerObj?.email },
-            {
-              $set: {
-                prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
-                nom: miseEnRelationVerif.conseillerObj?.nom,
-                password: passwordHash,
-                roles: Array('conseiller'),
-                token: uuidv4(),
-                mailSentDate: null,
-                passwordCreated: false,
-                entity: new DBRef(
-                  'conseillers',
-                  miseEnRelationVerif.conseillerObj._id,
-                  database,
-                ),
-              },
-              $unset: {
-                resetPasswordCnil: '',
-              },
-            },
-            { returnOriginal: false, rawResult: true },
-          );
-        if (userUpdated.lastErrorObject.n === 0) {
-          res.status(400).json({
-            message: "L'utilisateur n'a pas été mise à jour",
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({
+            name: miseEnRelationVerif.conseillerObj.email,
+            roles: { $in: ['candidat'] },
           });
-          return;
+        const passwordHash = bcrypt.hashSync(uuidv4(), 10);
+        if (userAccount === null) {
+          const canCreate = req.ability.can(action.create, ressource.users);
+          if (!canCreate) {
+            res.status(403).json({
+              message: `Accès refusé, vous n'êtes pas autorisé à créer un utilisateur`,
+            });
+            return;
+          }
+          user = await app.service(service.users).create({
+            name: miseEnRelationVerif.conseillerObj.email,
+            prenom: miseEnRelationVerif.conseillerObj.prenom,
+            nom: miseEnRelationVerif.conseillerObj.nom,
+            password: passwordHash, // random password (required to create user)
+            roles: Array('conseiller'),
+            entity: new DBRef(
+              'conseillers',
+              miseEnRelationVerif.conseillerObj._id,
+              database,
+            ),
+            token: uuidv4(),
+            mailSentDate: null,
+            passwordCreated: false,
+            createdAt: new Date(),
+          });
+          if (!user) {
+            res.status(400).json({
+              message: "L'utilisateur n'a pas été créé",
+            });
+            return;
+          }
+        } else {
+          const userUpdated = await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.update)
+            .findOneAndUpdate(
+              { name: miseEnRelationVerif.conseillerObj?.email },
+              {
+                $set: {
+                  prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
+                  nom: miseEnRelationVerif.conseillerObj?.nom,
+                  password: passwordHash,
+                  roles: Array('conseiller'),
+                  token: uuidv4(),
+                  mailSentDate: null,
+                  passwordCreated: false,
+                  entity: new DBRef(
+                    'conseillers',
+                    miseEnRelationVerif.conseillerObj._id,
+                    database,
+                  ),
+                },
+                $unset: {
+                  resetPasswordCnil: '',
+                },
+              },
+              { returnOriginal: false, rawResult: true },
+            );
+          if (userUpdated.lastErrorObject.n === 0) {
+            res.status(400).json({
+              message: "L'utilisateur n'a pas été mise à jour",
+            });
+            return;
+          }
+          user = userUpdated.value;
         }
-        user = userUpdated.value;
+      }
+      if (
+        miseEnRelationSansMission[0].structureObj.codeDepartement !==
+          miseEnRelationVerif.structureObj.codeDepartement &&
+        miseEnRelationVerif.conseillerObj?.mattermost?.id
+      ) {
+        const ancienneStructure: IStructures =
+          miseEnRelationSansMission[0].structureObj;
+        const structureDestination: IStructures =
+          miseEnRelationVerif.structureObj;
+        const mattermost: IMattermost = app.get('mattermost');
+        await transfertChannelDepartementConseiller(app, mattermost)(
+          structureDestination,
+          ancienneStructure,
+          miseEnRelationVerif.conseillerObj,
+        );
+        await transfertChannelHubConseiller(app, req, mattermost)(
+          structureDestination,
+          ancienneStructure,
+          miseEnRelationVerif.conseillerObj,
+        );
       }
       const conseillerUpdated = await app
         .service(service.conseillers)
@@ -333,18 +424,15 @@ const validationRecrutementContrat =
             },
           },
         );
-      const query = conseillerUpdated.value?.ruptures
-        ? { $gt: dateRupture }
-        : { $gte: miseEnRelationUpdated.value?.dateDebutDeContrat };
-      const matchCras = {
-        'conseiller.$id': conseillerUpdated.value?._id,
-        'cra.dateAccompagnement': query,
-      };
-      const countCras: number = await app
-        .service(service.cras)
-        .Model.accessibleBy(req.ability, action.read)
-        .countDocuments(matchCras);
-      if (countCras >= 1) {
+
+      if (miseEnRelationSansMission.length > 0) {
+        // création du match pour récupérer les CRA à migrer (créés après la date de fin de contrat ou de rupture)
+        const matchCras = {
+          'conseiller.$id': conseillerUpdated.value?._id,
+          'cra.dateAccompagnement': {
+            $gt: miseEnRelationSansMission[0].dateToMigrateCRA,
+          },
+        };
         await app
           .service(service.cras)
           .Model.accessibleBy(req.ability, action.update)

@@ -15,6 +15,7 @@ import conseillersTermines from './conseillersTermines/conseillersTermines.servi
 import accessLogs from './accessLogs/accessLogs.service';
 import communes from './communes/communes.service';
 import qpv from './qpv/qpv.service';
+import hubs from './hubs/hubs.service';
 
 export default function (app: Application): void {
   app.configure(users);
@@ -33,4 +34,5 @@ export default function (app: Application): void {
   app.configure(accessLogs);
   app.configure(communes);
   app.configure(qpv);
+  app.configure(hubs);
 }

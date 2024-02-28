@@ -38,6 +38,7 @@ export interface Ressource {
   conseillersTermines: string;
   qpv: string;
   communes: string;
+  hubs: string;
 }
 
 export interface IStructuresConseillers {
@@ -92,4 +93,12 @@ export interface IConfigurationDemarcheSimplifiee {
   numero_demarche_association_conventionnement: string;
   numero_demarche_entreprise_conventionnement: string;
   numero_demarche_structure_publique_conventionnement: string;
+}
+
+export interface IMattermost {
+  endPoint: string;
+  login: string;
+  password: string;
+  teamId: string;
+  hubTeamId: string;
 }

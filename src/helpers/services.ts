@@ -12,6 +12,7 @@ const service = {
   conseillersTermines: 'conseillersTermines',
   communes: 'communes',
   qpv: 'qpv',
+  hubs: 'hubs',
 };
 
 export default service;

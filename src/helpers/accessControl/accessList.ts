@@ -28,6 +28,7 @@ const ressource: Ressource = {
   conseillersTermines: 'conseillersTermines',
   qpv: 'qpv',
   communes: 'communes',
+  hubs: 'hubs',
 };
 
 const functionnality: Functionnality = {

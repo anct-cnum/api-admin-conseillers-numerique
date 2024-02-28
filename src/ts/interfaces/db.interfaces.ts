@@ -394,6 +394,14 @@ export interface IStructures {
   demandesCoordinateur: IDemandesCoordinateur[];
 }
 
+export interface IHubs {
+  _id: ObjectId;
+  name: string;
+  region_names?: string[];
+  departements?: string[];
+  channelId: string;
+}
+
 interface IDemandesCoselec {
   statut: string;
   type: string;
