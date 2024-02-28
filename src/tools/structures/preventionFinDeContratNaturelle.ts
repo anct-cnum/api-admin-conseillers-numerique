@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-await-in-loop */
 
-// Lancement de ce script : ts-node src/tools/structures/preventionFinDeContratNaturelle.ts -f
+// Lancement de ce script : ts-node src/tools/structures/preventionFinDeContratNaturelle.ts
 
 import dayjs from 'dayjs';
 import execute from '../utils';
