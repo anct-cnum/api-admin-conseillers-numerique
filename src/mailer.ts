@@ -58,6 +58,9 @@ export default function (app: Application) {
 
   const getDocumentPreparerSonAvenir = () => app.get('url_preparer_avenir');
 
+  const getAideConseillerNumeriqueUrl = (pathUrl: string) =>
+    `${app.get('url_aide_conseiller_numerique')}${pathUrl}`;
+
   const initSentry = () => {
     if (config().sentry.enabled === 'true') {
       Sentry.init({
@@ -87,6 +90,7 @@ export default function (app: Application) {
     getEspaceCoopUrl,
     getQuestionFinContratUrl,
     getDocumentPreparerSonAvenir,
+    getAideConseillerNumeriqueUrl,
     getSupportMail,
   };
   return {
