@@ -167,7 +167,6 @@ const validationRecrutementContrat =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           name: miseEnRelationVerif.conseillerObj.email,
-          roles: { $in: ['candidat'] },
         });
       const passwordHash = bcrypt.hashSync(uuidv4(), 10);
       if (userAccount === null) {
@@ -223,6 +222,8 @@ const validationRecrutementContrat =
               },
               $unset: {
                 resetPasswordCnil: '',
+                sub: '',
+                refreshToken: '',
               },
             },
             { returnOriginal: false, rawResult: true },
