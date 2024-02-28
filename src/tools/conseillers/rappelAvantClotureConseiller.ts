@@ -20,7 +20,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
     const dateFinContrat = dayjs(today).add(7, 'day').subtract(2, 'month');
     const dateFinContratDebut = dayjs(dateFinContrat).startOf('date').toDate();
     const dateFinContratFin = dayjs(dateFinContrat).endOf('date').toDate();
-    console.log(dateFinContratDebut, dateFinContratFin);
+
     logger.info(
       `Envoi d'un rappel par email avant la clôture du contrat des conseillers`,
     );
