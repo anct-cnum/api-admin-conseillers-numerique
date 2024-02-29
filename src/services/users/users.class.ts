@@ -3,8 +3,6 @@ import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
-  getAccessibleData,
-  getAccessibleDataAggregate,
   getUsers,
   getGestionnaires,
   postInvitationAdmin,
@@ -12,7 +10,6 @@ import {
   postInvitationHub,
   postInvitationPrefet,
   postGestionnaireRelanceInvitation,
-  updateAccessibleData,
   verifyToken,
   signIn,
   signOut,
@@ -52,21 +49,6 @@ export default class Users extends Service {
      *     summary: Rafraichir le token
      */
     app.post('/refresh-token', getRefreshToken(app));
-
-    app.get('/custom-route-get', authenticateMode(app), getAccessibleData(app));
-
-    app.get(
-      '/custom-route-get-aggregate',
-      authenticateMode(app),
-      createAbilities(app),
-      getAccessibleDataAggregate(app),
-    );
-    app.patch(
-      '/custom-route-update/:id',
-      authenticateMode(app),
-      createAbilities(app),
-      updateAccessibleData(app),
-    );
     /**
      * @openapi
      * /inviteAccountPrefet:
