@@ -36,55 +36,126 @@ export class Stats implements ServiceMethods<Data> {
     this.options = options;
     this.app = app;
     this.options = options;
-
+    /**
+     * @openapi
+     * '/stats/nationales/cras':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques nationales des cras
+     */
     app.get(
       '/stats/nationales/cras',
       authenticateMode(app),
       createAbilities(app),
       getStatsNationales(app),
     );
+    /**
+     * @openapi
+     * '/stats/nationales/cras/grand-reseau':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques d'un grand réseau
+     */
     app.get(
       '/stats/nationales/cras/grand-reseau',
       authenticateMode(app),
       createAbilities(app),
       getStatsNationalesGrandReseau(app),
     );
+    /**
+     * @openapi
+     * '/stats/structure/cras':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques des cras d'une structure
+     */
     app.get(
       '/stats/structure/cras',
       authenticateMode(app),
       createAbilities(app),
       getStatsStructure(app),
     );
+    /**
+     * @openapi
+     * '/stats/conseiller/cras':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques des cras d'un conseiller
+     */
     app.get(
       '/stats/conseiller/cras',
       authenticateMode(app),
       createAbilities(app),
       getStatsConseiller(app),
     );
+    /**
+     * @openapi
+     * '/stats/recrutement/conseiller/cras':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques des cras d'un conseiller (sans accès control)
+     */
     app.get(
       '/stats/recrutement/conseiller/cras',
       authenticateMode(app),
       createAbilities(app),
       getStatsConseillerParcoursRecrutement(app),
     );
+    /**
+     * @openapi
+     * '/stats/datas/structures':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques des cras d'un conseiller (sans accès control)
+     */
     app.get(
       '/stats/datas/structures',
       authenticateMode(app),
       createAbilities(app),
       getDatasStructures(app, options),
     );
+    /**
+     * @openapi
+     * '/stats/territoires':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques des territoires
+     */
     app.get(
       '/stats/territoires',
       authenticateMode(app),
       createAbilities(app),
       getStatsTerritoires(app, options),
     );
+    /**
+     * @openapi
+     * '/stats/territoire':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les informations d'un territoire
+     */
     app.get(
       '/stats/territoire',
       authenticateMode(app),
       createAbilities(app),
       getStatsTerritoire(app),
     );
+    /**
+     * @openapi
+     * '/stats/territoire/cra':
+     *  get:
+     *     tags:
+     *     - Stats
+     *     summary: Récupérer les statistiques d'un territoire
+     */
     app.get(
       '/stats/territoire/cra',
       authenticateMode(app),

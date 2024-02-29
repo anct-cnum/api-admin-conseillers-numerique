@@ -15,7 +15,7 @@ export default function (app: Application): Model<any> {
   const geometrySchema = new Schema(
     {
       type: String,
-      coordinates: [Array],
+      coordinates: [[Number]],
     },
     { _id: false, strict: false },
   );
