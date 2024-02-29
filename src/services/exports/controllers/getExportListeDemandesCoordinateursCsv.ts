@@ -32,6 +32,9 @@ const getDemandesCoordo =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
+          statut: {
+            $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COORDINATEUR'],
+          },
           $and: [
             checkAccess,
             filterSearchBar(search),
