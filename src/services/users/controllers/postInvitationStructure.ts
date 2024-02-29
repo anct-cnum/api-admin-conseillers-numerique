@@ -14,11 +14,16 @@ import {
   envoiEmailMultiRole,
 } from '../../../utils/email';
 
+interface RequestBody {
+  email: string;
+  structureId: string;
+}
+
 const { v4: uuidv4 } = require('uuid');
 
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { email, structureId } = req.body;
+    const { email, structureId }: RequestBody = req.body;
 
     const structure = await app
       .service(service.structures)
