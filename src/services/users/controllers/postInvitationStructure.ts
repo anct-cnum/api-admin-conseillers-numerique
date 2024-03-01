@@ -81,7 +81,7 @@ const postInvitationStructure =
         }
         await envoiEmailInvit(app, req, mailer, user);
         await envoiEmailInformationValidationCoselec(app, mailer, user);
-        messageSuccess = `La structure ${email} a bien été invité(e), un mail de création de compte lui a été envoyé(e)`;
+        messageSuccess = `La structure ${email} a bien été invitée, un mail de création de compte lui a été envoyée`;
       } else {
         if (oldUser.roles.includes('structure')) {
           res.status(409).json({
