@@ -171,6 +171,13 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 miseEnRelationRefusRecrutement;
             }
             user._doc.nomStructure = structure.nom;
+          } else if (user.roles.includes('coordinateur')) {
+            const conseiller = await app
+              .service(service.conseillers)
+              .Model.findOne({ _id: user.entity.oid });
+            if (!conseiller.estCoordinateur) {
+              return res.status(401).json('Connexion refusée');
+            }
           }
           // envoi du refresh token dans un cookie
           res.cookie(
