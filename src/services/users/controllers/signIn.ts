@@ -172,10 +172,13 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             }
             user._doc.nomStructure = structure.nom;
           } else if (user.roles.includes('coordinateur')) {
-            const conseiller = await app
+            const countCoordinateur = await app
               .service(service.conseillers)
-              .Model.findOne({ _id: user.entity.oid });
-            if (!conseiller.estCoordinateur) {
+              .Model.countDocuments({
+                _id: user.entity.oid,
+                estCoordinateur: true,
+              });
+            if (countCoordinateur === 0) {
               return res.status(401).json('Connexion refusée');
             }
           }
