@@ -139,7 +139,9 @@ execute(__filename, async ({ app, logger, exit }) => {
                 {
                   $set: {
                     dateDebutDeContrat: dateDebutObject,
-                    dateFinDeContrat: dateFinObject,
+                    ...(contrat['CT V1'] !== 'CDI'
+                      ? { dateFinDeContrat: dateFinObject }
+                      : {}),
                     typeDeContrat: contrat['CT V1'],
                   },
                 },
