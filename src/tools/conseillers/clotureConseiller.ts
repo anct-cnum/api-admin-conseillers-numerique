@@ -257,16 +257,24 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               );
 
               // suppression des outils (Mattermost, Gandi)
-              await deleteMattermostAccount(app)(conseiller)
-                .then(async () => {
-                  await deleteMailboxCloture(app)(conseiller._id, user.name);
-                })
-                .then(async () => {
-                  logger.info(
-                    `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
-                  );
-                });
 
+              // Suppression compte Mattermost
+              if (conseiller.mattermost?.id !== undefined) {
+                await deleteMattermostAccount(app)(conseiller)
+                  .then(async () => {
+                    if (user.name !== undefined) {
+                      await deleteMailboxCloture(app)(
+                        conseiller._id,
+                        user.name,
+                      );
+                    }
+                  })
+                  .then(async () => {
+                    logger.info(
+                      `Les comptes Mattermost et Gandi du conseiller (id: ${conseiller._id} ont été supprimé`,
+                    );
+                  });
+              }
               // Mise à jour du cache Obj
               await updateCacheObj(app)(conseillerUpdated);
 
