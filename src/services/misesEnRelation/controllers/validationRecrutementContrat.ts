@@ -294,7 +294,7 @@ const validationRecrutementContrat =
                   resetPasswordCnil: '',
                 },
               },
-              { returnOriginal: false, rawResult: true },
+              { returnOriginal: false, includeResultMetadata: true },
             );
           if (userUpdated.lastErrorObject.n === 0) {
             res.status(400).json({
@@ -302,7 +302,6 @@ const validationRecrutementContrat =
             });
             return;
           }
-          user = userUpdated.value;
         }
       }
       if (
@@ -355,7 +354,7 @@ const validationRecrutementContrat =
               emailPro: '',
             },
           },
-          { returnOriginal: false, rawResult: true },
+          { returnOriginal: false, includeResultMetadata: true },
         );
       if (conseillerUpdated.lastErrorObject.n === 0) {
         res.status(404).json({
@@ -382,7 +381,7 @@ const validationRecrutementContrat =
             _id: new ObjectId(idMiseEnRelation),
           },
           objectMiseEnRelationUpdated,
-          { returnOriginal: false, rawResult: true },
+          { returnOriginal: false, includeResultMetadata: true },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {
         res.status(404).json({

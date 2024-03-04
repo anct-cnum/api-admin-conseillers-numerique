@@ -11,10 +11,14 @@ import {
 } from '../../../emails';
 import { IStructures, IUser } from '../../../ts/interfaces/db.interfaces';
 
+interface RequestBody {
+  idDemandeCoordinateur: string;
+}
+
 const updateDemandeCoordinateurRefusAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { idDemandeCoordinateur } = req.body;
+    const { idDemandeCoordinateur }: RequestBody = req.body;
     if (
       !ObjectId.isValid(idStructure) ||
       !ObjectId.isValid(idDemandeCoordinateur)

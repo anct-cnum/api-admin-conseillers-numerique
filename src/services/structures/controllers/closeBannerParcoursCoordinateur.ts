@@ -5,10 +5,15 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
+interface RequestBody {
+  idDemandeCoordinateur: string;
+  typeBanner: string;
+}
+
 const closeBannerParcoursCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { idDemandeCoordinateur, typeBanner } = req.body;
+    const { idDemandeCoordinateur, typeBanner }: RequestBody = req.body;
     try {
       if (
         !ObjectId.isValid(idStructure) ||

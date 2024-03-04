@@ -8,33 +8,37 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import { StatutConventionnement } from '../../ts/enum';
 
+interface Options {
+  structureId: ObjectId;
+  statut: StatutConventionnement;
+}
+
 program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-st, --statut <statut>', 'statut');
 program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const options = program.opts();
+  const { statut, structureId }: Options = program.opts();
   const valueConvention = Object.values(StatutConventionnement).filter((i) =>
     i.match(/RECONVENTIONNEMENT/g),
   );
-  if (!ObjectId.isValid(options.structureId)) {
+  if (!ObjectId.isValid(structureId)) {
     logger.error(`Veuillez renseigner un id structure.`);
     return;
   }
 
-  if (!valueConvention.includes(options.statut)) {
+  if (!valueConvention.includes(statut)) {
     logger.error(
       `Veuillez saisir un statut de reconventionnement, parmi la liste : ${valueConvention}`,
     );
     return;
   }
-  const structureId = new ObjectId(options.structureId);
 
   const update = await app.service(service.structures).Model.updateOne(
     { _id: structureId },
     {
       $set: {
-        'conventionnement.statut': options.statut,
+        'conventionnement.statut': statut,
       },
     },
   );
@@ -43,12 +47,12 @@ execute(__filename, async ({ app, logger, exit }) => {
       { 'structure.$id': structureId },
       {
         $set: {
-          'structureObj.conventionnement.statut': options.statut,
+          'structureObj.conventionnement.statut': statut,
         },
       },
     );
     logger.info(
-      `Modification effectuée pour la structure ${structureId} en statut ${options.statut}`,
+      `Modification effectuée pour la structure ${structureId} en statut ${statut}`,
     );
   } else {
     logger.info(`Structure non trouvée.`);

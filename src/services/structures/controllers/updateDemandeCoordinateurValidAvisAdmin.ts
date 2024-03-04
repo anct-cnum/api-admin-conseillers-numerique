@@ -27,6 +27,10 @@ import {
 import { queryGetDossierDemarcheSimplifiee } from '../repository/demarchesSimplifiees.repository';
 import { checkIfStructurePrimoPhase2 } from '../repository/structures.repository';
 
+interface RequestBody {
+  idDemandeCoordinateur: string;
+}
+
 const { Pool } = require('pg');
 
 const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
@@ -47,7 +51,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const pool = new Pool();
-    const { idDemandeCoordinateur } = req.body;
+    const { idDemandeCoordinateur }: RequestBody = req.body;
     if (
       !ObjectId.isValid(idStructure) ||
       !ObjectId.isValid(idDemandeCoordinateur)
