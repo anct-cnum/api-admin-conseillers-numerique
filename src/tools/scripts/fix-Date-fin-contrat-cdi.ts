@@ -20,7 +20,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       },
     );
   logger.info(
-    `${updateMisesEnRelationTypeCdi.modifiedCount} misesEnRelations de type CDI ont eu la date de fin de contrat effacé`,
+    `${updateMisesEnRelationTypeCdi.modifiedCount} misesEnRelations de type CDI ont eu la date de fin de contrat effacée`,
   );
   exit();
 });
