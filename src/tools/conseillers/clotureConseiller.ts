@@ -259,7 +259,7 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
               // suppression des outils (Mattermost, Gandi)
 
               // Suppression compte Mattermost
-              if (conseiller.mattermost?.id !== undefined) {
+              if (conseiller?.faker !== true) {
                 await deleteMattermostAccount(app)(conseiller)
                   .then(async () => {
                     if (user.name !== undefined) {
