@@ -69,6 +69,7 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
       entity: 1,
       mailSentCoselecDate: 1,
       mailSentCoselecCoordinateurDate: 1,
+      roles: 1,
     })
     .limit(limit);
 
