@@ -9,10 +9,7 @@ import execute from '../utils';
 import mailer from '../../mailer';
 import service from '../../helpers/services';
 import { getConseiller } from '../../utils/functionsDeleteRoleConseiller';
-import {
-  preventionSuppressionConseiller,
-  prenventionSuppressionConseillerStructure,
-} from '../../emails';
+import { preventionSuppressionConseiller } from '../../emails';
 
 const getMisesEnRelationsFinContrat = (app) => async (dateDuJourFin) =>
   app.service(service.misesEnRelation).Model.find({
@@ -51,26 +48,6 @@ const updateConseiller = (app) => async (idConseiller) =>
       new: true,
     },
   );
-
-const getEmailsStructure = (app) => async (conseiller) => {
-  const emailsStructure = [];
-  const usersStructure = await app.service(service.users).Model.find({
-    'entity.$id': conseiller.structureId,
-    roles: { $in: ['structure'] },
-  });
-  for (const userStructure of usersStructure) {
-    if (!emailsStructure.includes(userStructure?.name)) {
-      emailsStructure.push(userStructure.name);
-    }
-  }
-  if (
-    conseiller?.supHierarchique &&
-    !emailsStructure.includes(conseiller?.supHierarchique?.email)
-  ) {
-    emailsStructure.push(conseiller.supHierarchique.email);
-  }
-  return emailsStructure;
-};
 
 const createConseillersTermines =
   (app) => async (conseiller, miseEnRelationIdTerminee) => {
@@ -181,29 +158,6 @@ execute(__filename, async ({ app, logger, exit, delay, Sentry }) => {
             Sentry.captureException(
               errorSmtpMailPreventionFinContratNaturelle.message,
             );
-          }
-
-          const messagePreventionFinContratStructure =
-            prenventionSuppressionConseillerStructure(mailerInstance);
-          const emailsStructure = await getEmailsStructure(app)(conseiller);
-          for (const emailStructure of emailsStructure) {
-            const errorSmtpMailPreventionFinContratStructure =
-              await messagePreventionFinContratStructure
-                .send(
-                  conseiller.idPG,
-                  miseEnRelationFinContrat.structureObj.idPG,
-                  emailStructure,
-                )
-                .catch((errSmtp: Error) => {
-                  logger.error(errSmtp);
-                  Sentry.captureException(errSmtp);
-                });
-            if (errorSmtpMailPreventionFinContratStructure instanceof Error) {
-              logger.error(errorSmtpMailPreventionFinContratStructure.message);
-              Sentry.captureException(
-                errorSmtpMailPreventionFinContratStructure.message,
-              );
-            }
           }
         }
       }

@@ -12,6 +12,12 @@ export default function (mailer) {
       espaceCandidat: utils.getEspaceCandidatUrl('/login'),
       emailSupport: utils.getSupportMail(),
       documentAvenir: utils.getDocumentPreparerSonAvenir(),
+      demarcheRenouvellement: utils.getAideConseillerNumeriqueUrl(
+        'article/faire-une-demande-de-re-conventionnement-bemki2/',
+      ),
+      seRendreDisponible: utils.getAideConseillerNumeriqueUrl(
+        'article/se-rendre-disponible-pour-une-nouvelle-mission-vbd2n0/',
+      ),
     });
   };
 
@@ -30,7 +36,7 @@ export default function (mailer) {
       return mailer
         .createMailer()
         .sendEmail(conseiller.email, {
-          subject: 'Départ dans 2 mois',
+          subject: 'Suppression de votre accès Coop',
           body: await render(conseiller, dateFinDeContrat),
         })
         .then(onSuccess)

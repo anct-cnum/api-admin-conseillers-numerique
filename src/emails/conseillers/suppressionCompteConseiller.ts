@@ -10,6 +10,7 @@ export default function (mailer) {
       link: utils.getQuestionFinContratUrl(),
       documentAvenir: utils.getDocumentPreparerSonAvenir(),
       emailSupport: utils.getSupportMail(),
+      espaceCandidat: utils.getEspaceCandidatUrl('/login'),
     });
   };
 

@@ -60,6 +60,7 @@
   },
   "url_question_contrat": "QUESTION_FIN_CONTRAT",
   "url_preparer_avenir": "DOCUMENT_PREPARER_AVENIR",
+  "url_aide_conseiller_numerique": "AIDE_CONSEILLER_NUMERIQUE_URL",
   "api_entreprise": "API_ENTREPRISE_KEY",
   "aws": {
     "region": "AWS_REGION",

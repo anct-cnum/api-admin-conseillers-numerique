@@ -4,6 +4,7 @@ import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 import { getCoselec } from '../../utils';
 
 export default function (app: Application, mailer) {
+  const { utils } = mailer;
   const templateName = 'informationValidationCoselec';
 
   const render = async (user: IUser) => {
@@ -17,6 +18,9 @@ export default function (app: Application, mailer) {
       structure,
       nombreConseillersCoselec,
       mail: app.get('smtp').replyTo,
+      recrutementConseiller: utils.getAideConseillerNumeriqueUrl(
+        'article/comment-recruter-un-conseiller-numerique-sur-le-tableau-de-pilotage-9fszjs/',
+      ),
     });
   };
 

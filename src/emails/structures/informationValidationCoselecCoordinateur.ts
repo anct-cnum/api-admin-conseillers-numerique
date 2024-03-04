@@ -3,6 +3,7 @@ import service from '../../helpers/services';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 
 export default function (app: Application, mailer) {
+  const { utils } = mailer;
   const templateName = 'informationValidationCoselecCoordinateur';
 
   const render = async (user: IUser) => {
@@ -15,6 +16,9 @@ export default function (app: Application, mailer) {
       structure,
       nombreCoordinateursCoselec,
       mail: app.get('smtp').replyTo,
+      recrutementConseiller: utils.getAideConseillerNumeriqueUrl(
+        'article/comment-recruter-un-conseiller-numerique-sur-le-tableau-de-pilotage-9fszjs/',
+      ),
     });
   };
 
