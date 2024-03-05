@@ -71,7 +71,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation?.typeDeContrat ?? 'Non renseigné'
           };${miseEnrelation?.salaire ?? 'Non renseigné'};
           ${miseEnrelation.conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
-            miseEnrelation.conseiller?.emailCN &&
+            miseEnrelation.conseiller?.emailCN?.address &&
             miseEnrelation.conseiller?.mattermost?.id
               ? 'oui'
               : 'non'
