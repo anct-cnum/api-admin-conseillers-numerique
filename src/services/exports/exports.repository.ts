@@ -100,7 +100,7 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
           };${formatDate(
             miseEnrelation.conseiller?.datePrisePoste,
           )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
-            miseEnrelation.conseiller.mattermost?.id &&
+            miseEnrelation.conseiller?.mattermost?.id &&
             miseEnrelation.conseiller?.emailCN
               ? miseEnrelation.conseiller?.emailCN?.address
               : ''
