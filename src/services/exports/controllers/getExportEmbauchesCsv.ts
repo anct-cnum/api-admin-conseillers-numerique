@@ -83,7 +83,6 @@ const getExportEmbauchesCsv =
                 'conseiller.dateFinFormation': 1,
                 'conseiller.datePrisePoste': 1,
                 'conseiller.pix': 1,
-                'conseiller.emailCNError': 1,
                 'conseiller.mattermost': 1,
                 'structure.idPG': 1,
                 'structure._id': 1,
