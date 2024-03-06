@@ -6,9 +6,14 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import getDetailStructureById from './getDetailStructureById';
 
+interface RequestQuery {
+  type: string;
+  conseillerId: string;
+}
+
 const closeBanner =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { type, conseillerId } = req.query;
+    const { type, conseillerId }: RequestQuery = req.query;
     const filter = { _id: req.params.id };
 
     if (!ObjectId.isValid(req.params.id)) {

@@ -62,7 +62,7 @@ const updateContrat =
           contratUpdated,
           {
             new: true,
-            rawResult: true,
+            includeResultMetadata: true,
           },
         );
       if (miseEnRelation.lastErrorObject.n === 0) {

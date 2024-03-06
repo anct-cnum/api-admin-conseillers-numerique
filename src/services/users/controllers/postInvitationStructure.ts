@@ -14,16 +14,21 @@ import {
   envoiEmailMultiRole,
 } from '../../../utils/email';
 
+interface RequestBody {
+  email: string;
+  structureId: string;
+}
+
 const { v4: uuidv4 } = require('uuid');
 
 const postInvitationStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
-    const { email, structureId } = req.body;
+    const { email, structureId }: RequestBody = req.body;
 
     const structure = await app
       .service(service.structures)
       .Model.accessibleBy(req.ability, action.read)
-      .findOne();
+      .findOne({ _id: new ObjectId(structureId) });
 
     if (structure.statut !== 'VALIDATION_COSELEC') {
       res.status(403).json({
@@ -76,7 +81,7 @@ const postInvitationStructure =
         }
         await envoiEmailInvit(app, req, mailer, user);
         await envoiEmailInformationValidationCoselec(app, mailer, user);
-        messageSuccess = `La structure ${email} a bien été invité, un mail de création de compte lui a été envoyé`;
+        messageSuccess = `La structure ${email} a bien été invitée, un mail de création de compte lui a été envoyé`;
       } else {
         if (oldUser.roles.includes('structure')) {
           res.status(409).json({

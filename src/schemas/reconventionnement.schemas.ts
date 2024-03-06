@@ -47,10 +47,7 @@ const validHistoriqueConvention = Joi.object({
 });
 
 const updateReconventionnement = Joi.object({
-  action: Joi.string()
-    .trim()
-    .required()
-    .error(new Error("Le type d'action est invalide")),
+  etat: Joi.string().trim().required().error(new Error("L'état est invalide")),
   structureId: Joi.string()
     .required()
     .error(new Error("L'identifiant de structure est invalide")),

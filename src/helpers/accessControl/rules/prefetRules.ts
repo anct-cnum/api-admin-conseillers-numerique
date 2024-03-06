@@ -11,9 +11,8 @@ const getConseillersIds = async (
   structures: ObjectId[],
 ) => {
   try {
-    const conseillersIds: ObjectId[] = await getConseillersById(app)(
-      structures,
-    );
+    const conseillersIds: ObjectId[] =
+      await getConseillersById(app)(structures);
 
     return conseillersIds;
   } catch (error) {

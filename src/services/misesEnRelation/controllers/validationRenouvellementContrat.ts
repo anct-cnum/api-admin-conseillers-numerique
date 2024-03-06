@@ -36,7 +36,7 @@ const validationRenouvellementContrat =
               banniereValidationRenouvellement: true,
             },
           },
-          { returnOriginal: false, rawResult: true },
+          { returnOriginal: false, includeResultMetadata: true },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {
         res.status(404).json({

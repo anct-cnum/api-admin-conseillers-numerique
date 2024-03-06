@@ -110,11 +110,12 @@ const annulationRecrutementContrat =
               contratCoordinateur: '',
               emetteurRecrutement: '',
               dateRecrutement: '',
+              phaseConventionnement: '',
             },
           },
           {
             returnOriginal: false,
-            rawResult: true,
+            includeResultMetadata: true,
           },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {

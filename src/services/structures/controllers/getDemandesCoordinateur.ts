@@ -27,6 +27,9 @@ const totalParStatutDemandesCoordinateur = async (
       {
         $match: {
           $and: [checkAccess],
+          statut: {
+            $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COORDINATEUR'],
+          },
         },
       },
       { $unwind: '$demandesCoordinateur' },
@@ -72,6 +75,9 @@ const getDemandesCoordo =
       { $addFields: { idPGStr: { $toString: '$idPG' } } },
       {
         $match: {
+          statut: {
+            $in: ['CREEE', 'VALIDATION_COSELEC', 'REFUS_COORDINATEUR'],
+          },
           $and: [
             checkAccess,
             filterSearchBar(search),

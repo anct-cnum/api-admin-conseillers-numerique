@@ -53,8 +53,7 @@ export default function (app: Application, mailer, req: IRequest) {
       return mailer
         .createMailer()
         .sendEmail(user.name, {
-          subject:
-            'Activer votre espace candidat Conseillers numériques France Services',
+          subject: 'Activer votre espace candidat Conseillers numériques',
           body: await render(user),
         })
         .then(onSuccess)

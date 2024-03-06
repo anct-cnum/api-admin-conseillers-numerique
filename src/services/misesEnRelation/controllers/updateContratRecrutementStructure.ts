@@ -16,6 +16,8 @@ import {
   IMisesEnRelation,
   IStructures,
 } from '../../../ts/interfaces/db.interfaces';
+import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
+import { PhaseConventionnement } from '../../../ts/enum';
 
 const updateContratRecrutementStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -102,6 +104,11 @@ const updateContratRecrutementStructure =
             date: new Date(),
           },
         });
+        if (checkStructurePhase2(structure?.conventionnement?.statut)) {
+          Object.assign(contratUpdated.$set, {
+            phaseConventionnement: PhaseConventionnement.PHASE_2,
+          });
+        }
       }
       if (dateFinDeContrat !== null) {
         contratUpdated.$set.dateFinDeContrat = new Date(dateFinDeContrat);
@@ -250,7 +257,7 @@ const updateContratRecrutementStructure =
           contratUpdated,
           {
             new: true,
-            rawResult: true,
+            includeResultMetadata: true,
           },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {
