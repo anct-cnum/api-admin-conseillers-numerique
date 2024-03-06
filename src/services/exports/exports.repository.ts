@@ -69,8 +69,9 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation?.dateDebutDeContrat,
           )};${formatDate(miseEnrelation?.dateFinDeContrat)};${
             miseEnrelation?.typeDeContrat ?? 'Non renseigné'
-          };${miseEnrelation?.salaire ?? 'Non renseigné'};
-          ${miseEnrelation.conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
+          };${miseEnrelation?.salaire ?? 'Non renseigné'};${
+            miseEnrelation.conseiller?.prenom
+          };${miseEnrelation.conseiller?.nom};${
             miseEnrelation.conseiller?.emailCN &&
             miseEnrelation.conseiller?.mattermost?.id
               ? 'oui'
@@ -79,23 +80,29 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
           };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller?.email};${
             miseEnrelation.conseiller?.estCoordinateur ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.codePostal};
-          ${miseEnrelation.conseiller?.nomCommune};${miseEnrelation.conseiller?.codeDepartement};${
+          };${miseEnrelation.conseiller?.codePostal};${
+            miseEnrelation.conseiller?.nomCommune
+          };${miseEnrelation.conseiller?.codeDepartement};${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${checkIfCcp1(miseEnrelation.conseiller?.statut)};${miseEnrelation.structure?.siret};
-          ${miseEnrelation.structure?.idPG};${miseEnrelation.structure?._id};
-          ${miseEnrelation.structure?.nom};${miseEnrelation.structure?.type};${formatAdresseStructure(
+          };${checkIfCcp1(miseEnrelation.conseiller?.statut)};${miseEnrelation.structure?.siret};${
+            miseEnrelation.structure?.idPG
+          };${miseEnrelation.structure?._id};${
+            miseEnrelation.structure?.nom
+          };${miseEnrelation.structure?.type};${formatAdresseStructure(
             miseEnrelation.structure.insee,
-          )};${miseEnrelation.structure?.codePostal};
-          ${miseEnrelation.structure?.codeCommune};${miseEnrelation.structure?.codeDepartement};
-          ${miseEnrelation.structure?.codeRegion};${miseEnrelation.structure?.contact?.prenom};
-          ${miseEnrelation.structure?.contact?.nom};${miseEnrelation.structure?.contact?.telephone};
-          ${miseEnrelation.structure?.contact?.email};${miseEnrelation.conseiller?.idPG};
-          ${miseEnrelation.conseiller?._id};${coselec !== null ? coselec?.numero : ''};${
+          )};${miseEnrelation.structure?.codePostal};${
+            miseEnrelation.structure?.codeCommune
+          };${miseEnrelation.structure?.codeDepartement};${
+            miseEnrelation.structure?.codeRegion
+          };${miseEnrelation.structure?.contact?.prenom};${miseEnrelation.structure?.contact?.nom};${
+            miseEnrelation.structure?.contact?.telephone
+          };${miseEnrelation.structure?.contact?.email};${miseEnrelation.conseiller?.idPG};${
+            miseEnrelation.conseiller?._id
+          };${coselec !== null ? coselec?.numero : ''};${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
           };${formatDate(
             miseEnrelation.conseiller?.datePrisePoste,
