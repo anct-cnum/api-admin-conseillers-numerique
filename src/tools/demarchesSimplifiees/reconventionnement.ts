@@ -263,8 +263,9 @@ execute(
                     dossier.dateDerniereModification,
                   ),
                   nbPostesAttribuees:
+                    dossier.nbPostesAttribuees ??
                     structure?.conventionnement?.dossierReconventionnement
-                      ?.nbPostesAttribuees ?? dossier.nbPostesAttribuees,
+                      ?.nbPostesAttribuees,
                 },
               },
             );
@@ -314,8 +315,9 @@ execute(
                     dossier.dateDerniereModification,
                   ),
                   nbPostesAttribuees:
+                    dossier.nbPostesAttribuees ??
                     structure?.conventionnement?.dossierReconventionnement
-                      ?.nbPostesAttribuees ?? dossier.nbPostesAttribuees,
+                      ?.nbPostesAttribuees,
                 },
               },
             );
