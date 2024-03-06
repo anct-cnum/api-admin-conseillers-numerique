@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable prettier/prettier */
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
