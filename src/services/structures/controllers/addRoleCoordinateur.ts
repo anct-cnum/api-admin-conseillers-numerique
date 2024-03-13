@@ -1,10 +1,14 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IMisesEnRelation } from '../../../ts/interfaces/db.interfaces';
+import { deleteRoleUser } from '../../../utils';
+import { envoiEmailInvit } from '../../../utils/email';
+import mailer from '../../../mailer';
 
 const addRoleCoordinateur =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -81,7 +85,71 @@ const addRoleCoordinateur =
         return;
       }
 
-      const conseiller = await app
+      const conseillerUser = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ 'entity.$id': new ObjectId(conseillerId) });
+      if (!conseillerUser) {
+        res.status(404).json({
+          message:
+            'Le conseiller ne possède pas de compte (doublon ou inactivité)',
+        });
+        return;
+      }
+
+      if (!conseillerUser?.passwordCreated) {
+        res.status(409).json({
+          message: "Le conseiller n'a pas encore activé son compte",
+        });
+        return;
+      }
+
+      const user = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            'entity.$id': new ObjectId(conseillerId),
+            roles: { $in: ['conseiller'] },
+          },
+          {
+            $push: { roles: ['coordinateur'] },
+            $set: {
+              token: uuidv4(),
+              tokenCreatedAt: new Date(),
+              mailSentDate: null,
+              migrationDashboard: true,
+            },
+          },
+        );
+
+      if (user.modifiedCount === 0) {
+        res
+          .status(404)
+          .json({ message: "L'utilisateur n'a pas été mis à jour" });
+      }
+
+      const errorSmtpMail: Error | null = await envoiEmailInvit(
+        app,
+        req,
+        mailer,
+        user,
+      );
+
+      if (errorSmtpMail instanceof Error) {
+        await deleteRoleUser(app, req, user.name, {
+          $pull: {
+            roles: 'coordinateur',
+          },
+        });
+        res.status(503).json({
+          message:
+            "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+        });
+        return;
+      }
+
+      const updatedConseiller = await app
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
@@ -93,7 +161,7 @@ const addRoleCoordinateur =
           { $set: { estCoordinateur: true } },
         );
 
-      if (conseiller.modifiedCount === 0) {
+      if (updatedConseiller.modifiedCount === 0) {
         res
           .status(404)
           .json({ message: "Le conseiller n'a pas été mise à jour" });
@@ -114,22 +182,6 @@ const addRoleCoordinateur =
         });
       }
 
-      const user = await app
-        .service(service.users)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          {
-            'entity.$id': new ObjectId(conseillerId),
-            roles: { $in: ['conseiller'] },
-          },
-          { $push: { roles: ['coordinateur_coop'] } },
-        );
-
-      if (user.modifiedCount === 0) {
-        res
-          .status(404)
-          .json({ message: "L'utilisateur n'a pas été mis à jour" });
-      }
       if (
         demandesCoordinateurValider.some(
           (demande) => !demande?.miseEnRelationId,
