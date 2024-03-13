@@ -172,6 +172,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             }
             user._doc.nomStructure = structure.nom;
           } else if (user.roles.includes('coordinateur')) {
+            user._doc.roles = ['coordinateur']; // FIX ordre rôle
             const countCoordinateur = await app
               .service(service.conseillers)
               .Model.countDocuments({
