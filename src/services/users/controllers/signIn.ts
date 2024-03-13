@@ -178,6 +178,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 _id: user.entity.oid,
                 estCoordinateur: true,
               });
+            user._doc.roles = ['coordinateur'];
             if (countCoordinateur === 0) {
               return res.status(401).json('Connexion refusée');
             }
