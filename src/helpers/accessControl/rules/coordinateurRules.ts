@@ -39,6 +39,10 @@ const getConseillers = async (
         };
         break;
       default:
+        query = {
+          _id: { $eq: null },
+        };
+        break;
     }
     try {
       conseillers = await app.service(service.conseillers).Model.aggregate([
