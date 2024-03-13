@@ -44,8 +44,14 @@ const getConseillers = async (
       conseillers = await app.service(service.conseillers).Model.aggregate([
         {
           $match: {
-            ...query,
-            _id: { $ne: userId },
+            $and: [
+              {
+                ...query,
+              },
+              {
+                _id: { $ne: userId },
+              },
+            ],
           },
         },
         {
