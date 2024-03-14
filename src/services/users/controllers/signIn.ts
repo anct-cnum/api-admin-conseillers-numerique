@@ -22,6 +22,7 @@ const allowedRoles = [
 ];
 
 const axios = require('axios');
+const { v4: uuidv4 } = require('uuid');
 
 const signIn = (app: Application) => async (req: IRequest, res: Response) => {
   // vérification du token provenant du frontend par le serveur d'authentification
@@ -173,6 +174,22 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             user._doc.nomStructure = structure.nom;
           } else if (user.roles.includes('coordinateur')) {
             user._doc.roles = ['coordinateur']; // FIX ordre rôle
+            if (user.passwordCreated === false) {
+              await app.service(service.users).Model.updateOne(
+                { _id: user._id },
+                {
+                  $set: {
+                    token: req.query.verificationToken ?? uuidv4(),
+                    tokenCreatedAt: new Date(),
+                  },
+                  $unset: {
+                    sub: '',
+                    refreshToken: '',
+                  },
+                },
+              );
+              return res.status(401).json('Connexion refusée');
+            }
             const countCoordinateur = await app
               .service(service.conseillers)
               .Model.countDocuments({
