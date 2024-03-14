@@ -174,14 +174,14 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             user._doc.nomStructure = structure.nom;
           } else if (user.roles.includes('coordinateur')) {
             user._doc.roles = ['coordinateur']; // FIX ordre rôle
-            const getCoordinateur = await app
+            const coordinateur = await app
               .service(service.conseillers)
               .Model.findOne({
                 _id: user.entity.oid,
               });
             if (
-              getCoordinateur?.estCoordinateur !== true ||
-              getCoordinateur?.emailCN?.address !== keycloakUser.email
+              coordinateur?.estCoordinateur !== true ||
+              coordinateur?.emailCN?.address !== keycloakUser.email
             ) {
               await app.service(service.users).Model.updateOne(
                 { _id: user._id },
