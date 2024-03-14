@@ -174,7 +174,15 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             user._doc.nomStructure = structure.nom;
           } else if (user.roles.includes('coordinateur')) {
             user._doc.roles = ['coordinateur']; // FIX ordre rôle
-            if (user.passwordCreated === false) {
+            const getCoordinateur = await app
+              .service(service.conseillers)
+              .Model.findOne({
+                _id: user.entity.oid,
+              });
+            if (
+              getCoordinateur?.estCoordinateur !== true ||
+              getCoordinateur?.emailCN?.address !== keycloakUser.email
+            ) {
               await app.service(service.users).Model.updateOne(
                 { _id: user._id },
                 {
@@ -188,15 +196,6 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                   },
                 },
               );
-              return res.status(401).json('Connexion refusée');
-            }
-            const countCoordinateur = await app
-              .service(service.conseillers)
-              .Model.countDocuments({
-                _id: user.entity.oid,
-                estCoordinateur: true,
-              });
-            if (countCoordinateur === 0) {
               return res.status(401).json('Connexion refusée');
             }
           }
