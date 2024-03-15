@@ -187,7 +187,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 { _id: user._id },
                 {
                   $set: {
-                    token: req.query.verificationToken ?? uuidv4(),
+                    token: uuidv4(),
                     tokenCreatedAt: new Date(),
                   },
                   $unset: {
