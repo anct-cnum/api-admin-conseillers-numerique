@@ -14,8 +14,11 @@ import {
 } from '../../utils/geography';
 
 execute(__filename, async ({ app, logger, Sentry, exit }) => {
-  const dateMoins1Jour = new Date();
-  dateMoins1Jour.setDate(dateMoins1Jour.getDate() - 1);
+  const dateMoins1Heure = new Date();
+  const datePlus1Heure = new Date();
+  dateMoins1Heure.setHours(dateMoins1Heure.getHours() - 1);
+  datePlus1Heure.setHours(datePlus1Heure.getHours() + 1);
+
   const structures: IStructures[] = await app
     .service(service.structures)
     .Model.find({
@@ -23,11 +26,11 @@ execute(__filename, async ({ app, logger, Sentry, exit }) => {
       statut: 'VALIDATION_COSELEC',
       $or: [
         {
-          coselecAt: { $gte: dateMoins1Jour },
+          coselecAt: { $gte: dateMoins1Heure, $lte: datePlus1Heure },
         },
         {
           'historique.changement': 'siret',
-          'historique.date': { $gte: dateMoins1Jour },
+          'historique.date': { $gte: dateMoins1Heure, $lte: datePlus1Heure },
         },
       ],
     });
