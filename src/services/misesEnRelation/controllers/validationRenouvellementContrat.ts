@@ -49,9 +49,7 @@ const validationRenouvellementContrat =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: new ObjectId(
-              miseEnRelationVerif.miseEnRelationConventionnement,
-            ),
+            _id: miseEnRelationVerif.miseEnRelationConventionnement,
           },
           {
             $set: {
@@ -62,6 +60,49 @@ const validationRenouvellementContrat =
               dateRupture: '',
               motifRupture: '',
               dossierIncompletRupture: '',
+            },
+          },
+        );
+      await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: miseEnRelationVerif.structure.oid,
+            demandesCoordinateur: {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId:
+                  miseEnRelationVerif.miseEnRelationConventionnement,
+              },
+            },
+          },
+          {
+            $set: {
+              'demandesCoordinateur.$.miseEnRelationId': new ObjectId(
+                idMiseEnRelation,
+              ),
+            },
+          },
+        );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': miseEnRelationVerif.structure.oid,
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId:
+                  miseEnRelationVerif.miseEnRelationConventionnement,
+              },
+            },
+          },
+          {
+            $set: {
+              'structureObj.demandesCoordinateur.$.miseEnRelationId':
+                new ObjectId(idMiseEnRelation),
             },
           },
         );
