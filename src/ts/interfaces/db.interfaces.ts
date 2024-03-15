@@ -371,6 +371,7 @@ export interface IStructures {
   reseau: Reseau;
   codeCom: string | null;
   coselec: ICoselec[];
+  coordinateurCandidature: boolean;
   conventionnement: {
     statut: string;
     motif: string;
