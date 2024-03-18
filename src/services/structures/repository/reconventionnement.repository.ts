@@ -10,7 +10,7 @@ import {
   checkAccessReadRequestStructures,
   checkStructurePhase2,
   filterAvisAdmin,
-  filterAvisPrefet,
+  filterAvisPrefetPrimoEntrante,
 } from './structures.repository';
 import {
   getCoselec,
@@ -29,7 +29,7 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
     return {
       statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
       coordinateurCandidature: false,
-      ...filterAvisPrefet(avisPrefet),
+      ...filterAvisPrefetPrimoEntrante(avisPrefet),
     };
   }
   if (typeConvention === 'avenantAjoutPoste') {
@@ -720,6 +720,6 @@ export {
   totalParHistoriqueConvention,
   sortDossierConventionnement,
   sortHistoriqueDossierConventionnement,
-  sortArrayConventionnement,
   sortExportHistoriqueDossierConventionnement,
+  sortArrayConventionnement,
 };

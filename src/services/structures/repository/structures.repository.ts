@@ -4,6 +4,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
+// eslint-disable-next-line import/no-cycle
 import { sortArrayConventionnement } from './reconventionnement.repository';
 
 type IConseiller = {
@@ -326,14 +327,14 @@ const sortGestionDemandesConseiller = (
   structures: any,
 ) => {
   let avenantSort: any = [];
-  let conventionnement: any = [];
+  let structurePrimoEntrante: any = [];
   if (type === 'demandePoste') {
     avenantSort = formatAvenantForDemandeConseiller(
       structures,
       'en_cours',
       'ajout',
     );
-    conventionnement = formatStructureForDemandeConseiller(structures, [
+    structurePrimoEntrante = formatStructureForDemandeConseiller(structures, [
       'CREEE',
       'EXAMEN_COMPLEMENTAIRE_COSELEC',
     ]);
@@ -344,7 +345,7 @@ const sortGestionDemandesConseiller = (
       'validee',
       'ajout',
     );
-    conventionnement = formatStructureForDemandeConseiller(structures, [
+    structurePrimoEntrante = formatStructureForDemandeConseiller(structures, [
       'VALIDATION_COSELEC',
     ]);
   }
@@ -354,7 +355,7 @@ const sortGestionDemandesConseiller = (
       'refusee',
       'ajout',
     );
-    conventionnement = formatStructureForDemandeConseiller(structures, [
+    structurePrimoEntrante = formatStructureForDemandeConseiller(structures, [
       'REFUS_COSELEC',
     ]);
   }
@@ -365,14 +366,14 @@ const sortGestionDemandesConseiller = (
       'retrait',
     );
   }
-  const structureFormat = avenantSort.concat(conventionnement);
+  const structureFormat = avenantSort.concat(structurePrimoEntrante);
 
   return sortArrayConventionnement(structureFormat, ordre);
 };
 
 const totalParDemandesConseiller = async (app: Application, req: IRequest) => {
   const checkAccess = await checkAccessReadRequestStructures(app, req);
-  const conventionnement = await app
+  const structurePrimoEntrante = await app
     .service(service.structures)
     .Model.aggregate([
       {
@@ -434,14 +435,15 @@ const totalParDemandesConseiller = async (app: Application, req: IRequest) => {
         element._id.type === 'retrait' && element._id.statut === 'en_cours',
     )?.count ?? 0;
   const totalStructureDemandePoste =
-    conventionnement.find(
+    structurePrimoEntrante.find(
       (element) => element._id === 'CREEE' || 'EXAMEN_COMPLEMENTAIRE_COSELEC',
     )?.count ?? 0;
   const totalStructurePosteValider =
-    conventionnement.find((element) => element._id === 'VALIDATION_COSELEC')
-      ?.count ?? 0;
+    structurePrimoEntrante.find(
+      (element) => element._id === 'VALIDATION_COSELEC',
+    )?.count ?? 0;
   const totalStructurePosteRefuser =
-    conventionnement.find((element) => element._id === 'REFUS_COSELEC')
+    structurePrimoEntrante.find((element) => element._id === 'REFUS_COSELEC')
       ?.count ?? 0;
   const totalDemandePoste =
     totalAvenantAjoutPosteEnCours + totalStructureDemandePoste;
@@ -478,6 +480,7 @@ export {
   checkIfStructurePrimoPhase2,
   filterAvisAdmin,
   filterAvisPrefet,
+  filterAvisPrefetPrimoEntrante,
   filterStatutDemandeConseiller,
   filterStatutDemandeDePostes,
   sortGestionDemandesConseiller,

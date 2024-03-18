@@ -18,7 +18,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 const getStructures =
   (app: Application, checkAccess) =>
   async (
-    typeConvention: string,
+    statutDemande: string,
     search: string,
     region: string,
     departement: string,
@@ -36,7 +36,7 @@ const getStructures =
           $and: [
             checkAccess,
             filterSearchBar(search),
-            filterStatutDemandeDePostes(typeConvention, avisPrefet),
+            filterStatutDemandeDePostes(statutDemande, avisPrefet),
           ],
           ...filterRegion(region),
           ...filterDepartement(departement),
@@ -61,7 +61,7 @@ const getDemandesConseiller =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const {
       page,
-      statut,
+      statutDemande,
       nomOrdre,
       ordre,
       search,
@@ -72,7 +72,7 @@ const getDemandesConseiller =
     try {
       const demandesConseillerValidation = validDemandesConseiller.validate({
         page,
-        statut,
+        statutDemande,
         nomOrdre,
         ordre,
         search,
@@ -113,14 +113,14 @@ const getDemandesConseiller =
       };
       const checkAccess = await checkAccessReadRequestStructures(app, req);
       const structures: IStructures[] = await getStructures(app, checkAccess)(
-        statut,
+        statutDemande,
         search,
         region,
         departement,
         avisPrefet,
       );
       const structuresFormat = sortGestionDemandesConseiller(
-        statut,
+        statutDemande,
         ordre,
         structures,
       );

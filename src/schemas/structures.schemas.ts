@@ -109,7 +109,9 @@ const validExportCandidatsCoordinateurs = Joi.object({
 
 const validDemandesConseiller = Joi.object({
   page: Joi.number().required().error(new Error('La pagination est invalide')),
-  statut: Joi.string().required().error(new Error('Le statut est invalide')),
+  statutDemande: Joi.string()
+    .required()
+    .error(new Error('Le statut de la demande est invalide')),
   ordre: Joi.number().required().error(new Error('Le tri est invalide')),
   nomOrdre: Joi.string()
     .required()
