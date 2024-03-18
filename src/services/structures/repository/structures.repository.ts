@@ -201,7 +201,7 @@ const filterAvisPrefet = (avisPrefet: string | undefined) => {
   if (avisPrefet === 'sans-avis') {
     return { avisPrefet: { $exists: false } };
   }
-  return { avisPrefet: { $eq: avisPrefet } };
+  return { avisPrefet: avisPrefet };
 };
 
 const filterStatutDemandeDePostes = (type: string, avisPrefet: string) => {
