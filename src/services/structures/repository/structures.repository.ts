@@ -284,23 +284,21 @@ const formatAvenantForDemandeConseiller = (
   structures
     .filter((structure) => structure?.demandesCoselec?.length > 0)
     .map((structure) => {
-      const avenantEnCours = structure.demandesCoselec.find(
+      const avenant = structure.demandesCoselec.find(
         (demande) => demande.statut === statut && demande.type === type,
       );
-      if (!avenantEnCours) {
+      if (!avenant) {
         return {};
       }
-      avenantEnCours.dateSorted = avenantEnCours.emetteurAvenant.date;
-      avenantEnCours.typeConvention =
-        avenantEnCours.type === 'retrait'
-          ? 'avenantRenduPoste'
-          : 'avenantAjoutPoste';
-      avenantEnCours.idPG = structure.idPG;
-      avenantEnCours.nom = structure.nom;
-      avenantEnCours.idStructure = structure._id;
-      avenantEnCours.codePostal = structure.codePostal;
+      avenant.dateSorted = avenant.emetteurAvenant.date;
+      avenant.typeConvention =
+        avenant.type === 'retrait' ? 'avenantRenduPoste' : 'avenantAjoutPoste';
+      avenant.idPG = structure.idPG;
+      avenant.nom = structure.nom;
+      avenant.idStructure = structure._id;
+      avenant.codePostal = structure.codePostal;
 
-      return avenantEnCours;
+      return avenant;
     });
 
 const formatStructureForDemandeConseiller = (
@@ -326,54 +324,54 @@ const sortGestionDemandesConseiller = (
   ordre: number,
   structures: any,
 ) => {
-  let avenantSort: any = [];
-  let structurePrimoEntrante: any = [];
+  let avenants: any = [];
+  let structuresPrimoEntrante: any = [];
   if (type === 'demandePoste') {
-    avenantSort = formatAvenantForDemandeConseiller(
+    avenants = formatAvenantForDemandeConseiller(
       structures,
       'en_cours',
       'ajout',
     );
-    structurePrimoEntrante = formatStructureForDemandeConseiller(structures, [
+    structuresPrimoEntrante = formatStructureForDemandeConseiller(structures, [
       'CREEE',
       'EXAMEN_COMPLEMENTAIRE_COSELEC',
     ]);
   }
   if (type === 'posteValider') {
-    avenantSort = formatAvenantForDemandeConseiller(
+    avenants = formatAvenantForDemandeConseiller(
       structures,
       'validee',
       'ajout',
     );
-    structurePrimoEntrante = formatStructureForDemandeConseiller(structures, [
+    structuresPrimoEntrante = formatStructureForDemandeConseiller(structures, [
       'VALIDATION_COSELEC',
     ]);
   }
   if (type === 'posteRefuser') {
-    avenantSort = formatAvenantForDemandeConseiller(
+    avenants = formatAvenantForDemandeConseiller(
       structures,
       'refusee',
       'ajout',
     );
-    structurePrimoEntrante = formatStructureForDemandeConseiller(structures, [
+    structuresPrimoEntrante = formatStructureForDemandeConseiller(structures, [
       'REFUS_COSELEC',
     ]);
   }
   if (type === 'posteRendu') {
-    avenantSort = formatAvenantForDemandeConseiller(
+    avenants = formatAvenantForDemandeConseiller(
       structures,
       'en_cours',
       'retrait',
     );
   }
-  const structureFormat = avenantSort.concat(structurePrimoEntrante);
+  const structureFormat = avenants.concat(structuresPrimoEntrante);
 
   return sortArrayConventionnement(structureFormat, ordre);
 };
 
 const totalParDemandesConseiller = async (app: Application, req: IRequest) => {
   const checkAccess = await checkAccessReadRequestStructures(app, req);
-  const structurePrimoEntrante = await app
+  const structuresPrimoEntrante = await app
     .service(service.structures)
     .Model.aggregate([
       {
@@ -435,15 +433,15 @@ const totalParDemandesConseiller = async (app: Application, req: IRequest) => {
         element._id.type === 'retrait' && element._id.statut === 'en_cours',
     )?.count ?? 0;
   const totalStructureDemandePoste =
-    structurePrimoEntrante.find(
+    structuresPrimoEntrante.find(
       (element) => element._id === 'CREEE' || 'EXAMEN_COMPLEMENTAIRE_COSELEC',
     )?.count ?? 0;
   const totalStructurePosteValider =
-    structurePrimoEntrante.find(
+    structuresPrimoEntrante.find(
       (element) => element._id === 'VALIDATION_COSELEC',
     )?.count ?? 0;
   const totalStructurePosteRefuser =
-    structurePrimoEntrante.find((element) => element._id === 'REFUS_COSELEC')
+    structuresPrimoEntrante.find((element) => element._id === 'REFUS_COSELEC')
       ?.count ?? 0;
   const totalDemandePoste =
     totalAvenantAjoutPosteEnCours + totalStructureDemandePoste;
