@@ -291,7 +291,7 @@ const formatAvenantForDemandeConseiller = (
         return {};
       }
       avenant.dateSorted = avenant.emetteurAvenant.date;
-      avenant.typeConvention =
+      avenant.statutDemande =
         avenant.type === 'retrait' ? 'avenantRenduPoste' : 'avenantAjoutPoste';
       avenant.idPG = structure.idPG;
       avenant.nom = structure.nom;
@@ -315,7 +315,7 @@ const formatStructureForDemandeConseiller = (
       return {
         ...structure,
         dateSorted: structure.createdAt,
-        typeConvention: 'structure',
+        statutDemande: 'structurePrimoEntrante',
       };
     });
 
