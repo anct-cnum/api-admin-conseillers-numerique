@@ -29,7 +29,10 @@ execute(
   __filename,
   async ({ app, logger, graphQLClient, demarcheSimplifiee, exit }) => {
     const options = program.opts();
-    if (Number.isNaN(options.idPG) || Number.isNaN(options.numero)) {
+    if (
+      Number.isNaN(Number(options.idPG)) ||
+      Number.isNaN(Number(options.numero))
+    ) {
       logger.error('Les options ne sont pas correctes');
       return;
     }
