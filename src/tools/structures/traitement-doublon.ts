@@ -12,7 +12,7 @@ program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
-  if (Number.isNaN(options.idPG)) {
+  if (Number.isNaN(Number(options.idPG))) {
     logger.error(`Veuillez renseigner un idPG valide.`);
     return;
   }

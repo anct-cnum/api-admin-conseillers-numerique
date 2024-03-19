@@ -39,7 +39,7 @@ const updateDemandeConseillerValidAvisAdmin =
       return;
     }
     if (
-      Number.isNaN(nombreConseillersCoselec) ||
+      Number.isNaN(Number(nombreConseillersCoselec)) ||
       nombreConseillersCoselec < 1
     ) {
       res
