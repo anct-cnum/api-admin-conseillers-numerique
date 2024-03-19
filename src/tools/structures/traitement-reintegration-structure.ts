@@ -11,9 +11,12 @@ program.option('-i, --idPG <idPG>', 'idPG de la structure');
 program.option('-d, --demande <demande>', 'nombre de poste demander');
 program.parse(process.argv);
 
+const { Pool } = require('pg');
+
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
   const nombrePosteDemander = Number(options.demande ?? '1');
+  const pool = new Pool();
 
   if (Number.isNaN(Number(options.idPG))) {
     logger.error(`Veuillez renseigner un idPG valide.`);
@@ -31,6 +34,13 @@ execute(__filename, async ({ app, logger, exit }) => {
     );
     return;
   }
+  await pool.query(
+    `
+      UPDATE djapp_hostorganization
+      SET coaches_requested = $2
+      WHERE id = $1`,
+    [structure.idPG, nombrePosteDemander],
+  );
   const structureUpdated = await app
     .service(service.structures)
     .Model.updateOne(
