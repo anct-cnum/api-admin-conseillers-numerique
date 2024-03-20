@@ -6,7 +6,6 @@ import {
   StatutConventionnement,
 } from '../../../ts/enum';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
-// eslint-disable-next-line import/no-cycle
 import {
   checkAccessReadRequestStructures,
   checkStructurePhase2,

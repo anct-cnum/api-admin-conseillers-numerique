@@ -4,7 +4,6 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
-// eslint-disable-next-line import/no-cycle
 import { sortArrayConventionnement } from './reconventionnement.repository';
 
 type IConseiller = {

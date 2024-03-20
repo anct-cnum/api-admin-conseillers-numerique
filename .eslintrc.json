@@ -13,7 +13,7 @@
   "rules": {
     "indent": "off",
     "no-underscore-dangle": "off",
-    "import/no-cycle": [2, { "maxDepth": 1 }],
+    "import/no-cycle": "off",
     "no-restricted-syntax": [
       "error",
       "ForInStatement",

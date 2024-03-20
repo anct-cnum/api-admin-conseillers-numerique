@@ -372,6 +372,7 @@ export interface IStructures {
   codeCom: string | null;
   coselec: ICoselec[];
   coordinateurCandidature: boolean;
+  coordinateurTypeContrat: null | string;
   conventionnement: {
     statut: string;
     motif: string;
