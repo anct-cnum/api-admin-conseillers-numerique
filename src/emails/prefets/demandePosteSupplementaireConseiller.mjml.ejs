@@ -1,0 +1,54 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header-structure.mjml.ejs', { utils }); %>
+
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column>
+          <mj-text align="left">
+            Madame, Monsieur,
+          </mj-text>
+          <mj-text align="left">
+            Dans le cadre du dispositif <strong>Conseiller numérique</strong>, une demande d’attribution de poste(s) supplémentaire(s) a été
+            déposée par <%= nomStructure %>. Préalablement à l’instruction de cette demande d’attribution de poste(s) par l’ANCT,
+            <strong>il vous est demandé de formuler un avis sur cette candidature</strong>.
+          </mj-text>
+          <mj-text align="left">
+            Pour ce faire, vous devez vous rendre sur votre
+            <a rel="noopener noreferrer" style="color: #0063CB;" target="_blank" href="<%= pilotage %>">
+              Tableau de pilotage Conseiller numérique
+            </a>
+            et suivre les étapes décrites dans
+            <a rel="noopener noreferrer" style="color: #0063CB;" target="_blank" href="https://outline.incubateur.anct.gouv.fr/s/55ab97ba-b4fc-469e-bdab-91bdb0ca921c">
+              ce guide pas-à-pas
+            </a>.
+          </mj-text>
+          <mj-button href="<%= pilotagePrefet %>" background-color="#060091" color="white" font-size="16px" font-weight="bold">
+            J'instruis cette demande
+          </mj-button>
+          <mj-text align="left">
+            Pour toute question d’ordre stratégique, le Programme société numérique reste à votre disposition à l’adresse
+            <a style="color: #0063CB;" href="mailto:societe.numerique@anct.gouv.fr">
+              societe.numerique@anct.gouv.fr
+            </a>.
+          </mj-text>
+          <mj-text align="left">
+            Pour toute question d’ordre technique, notre support&nbsp;(
+            <a style="color: #0063CB;" href="mailto:<%= mail %>">
+              <%= mail %>
+            </a>
+            )&nbsp;est compétent.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper css-class="wrapper">
+      <mj-section>
+        <mj-column> <%- include('../commun/signature.mjml.ejs'); %> </mj-column>
+      </mj-section>
+      <%- include('../commun/footer.mjml.ejs'); %>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
