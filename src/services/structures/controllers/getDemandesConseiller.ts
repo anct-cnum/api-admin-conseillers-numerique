@@ -89,7 +89,8 @@ const getDemandesConseiller =
       const items: {
         total: number;
         data: object;
-        structureBannerAvisPrefetOpen: object;
+        structurePrimoEntranteBannerAvisPrefetOpen: object;
+        ajoutPosteBannerAvisPrefetOpen: object;
         totalParDemandesConseiller: {
           totalDemandePoste: number;
           totalPosteValider: number;
@@ -101,7 +102,8 @@ const getDemandesConseiller =
       } = {
         total: 0,
         data: [],
-        structureBannerAvisPrefetOpen: [],
+        structurePrimoEntranteBannerAvisPrefetOpen: [],
+        ajoutPosteBannerAvisPrefetOpen: [],
         totalParDemandesConseiller: {
           totalDemandePoste: 0,
           totalPosteValider: 0,
@@ -124,28 +126,28 @@ const getDemandesConseiller =
         ordre,
         structures,
       );
-      items.structureBannerAvisPrefetOpen = await app
+      items.structurePrimoEntranteBannerAvisPrefetOpen = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .find({
-          $or: [
-            {
-              prefet: {
-                $elemMatch: {
-                  banniereValidationAvisPrefet: true,
-                },
-              },
+          prefet: {
+            $elemMatch: {
+              banniereValidationAvisPrefet: true,
             },
-            {
-              demandesCoselec: {
-                $elemMatch: {
-                  banniereValidationAvisPrefet: true,
-                },
-              },
-            },
-          ],
+          },
         })
         .select({ nom: 1, 'prefet.$': 1 });
+      items.ajoutPosteBannerAvisPrefetOpen = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          demandesCoselec: {
+            $elemMatch: {
+              banniereValidationAvisPrefet: true,
+            },
+          },
+        })
+        .select({ nom: 1, 'demandesCoselec.$': 1 });
       items.total = structuresFormat.length;
       const totalParDemandes = await totalParDemandesConseiller(app, req);
       items.totalParDemandesConseiller = {
