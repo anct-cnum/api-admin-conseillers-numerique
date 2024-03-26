@@ -7,6 +7,7 @@ import {
 import { getTimestampByDate } from '../../../utils';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { countCoordinateurRecrutees } from '../../misesEnRelation/misesEnRelation.repository';
+import { filterAvisPrefet } from '../../structures/repository/structures.repository';
 
 export interface ExtendedDemandesCoordinateur extends IDemandesCoordinateur {
   nomStructure?: string;
@@ -26,16 +27,6 @@ const formatStatutDemandeCoordinateur = (statut: string): string => {
     default:
       return 'Non renseigné';
   }
-};
-
-const filterAvisPrefet = (avisPrefet: string | undefined) => {
-  if (avisPrefet === undefined) {
-    return {};
-  }
-  if (avisPrefet === 'sans-avis') {
-    return { avisPrefet: { $exists: false } };
-  }
-  return { avisPrefet: { $eq: avisPrefet } };
 };
 
 const checkAvisPrefet = (
