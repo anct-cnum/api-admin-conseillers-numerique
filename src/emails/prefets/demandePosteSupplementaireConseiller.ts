@@ -82,8 +82,9 @@ export default function (app: Application, mailer) {
           },
           {
             $set: {
-              'demandesCoselec.$.mailErrorSendDatePrefet': 'smtpError',
-              'demandesCoselec.$.mailErrorDetailSendDatePrefet': err.message,
+              'demandesCoselec.$.prefet.mailErrorSendDatePrefet': 'smtpError',
+              'demandesCoselec.$.prefet.mailErrorDetailSendDatePrefet':
+                err.message,
             },
           },
         );
