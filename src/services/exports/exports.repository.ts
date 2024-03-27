@@ -328,7 +328,7 @@ const generateCsvConseillersWithoutCRA = async (
               getFormatHistoriqueGroupeCRA(
                 -1,
                 statCnfsWithoutCRA.groupeCRAHistorique,
-              )[0].numero,
+              )[0]?.numero,
             ),
             statCnfsWithoutCRA.structure.idPG,
             statCnfsWithoutCRA.structure.siret,
