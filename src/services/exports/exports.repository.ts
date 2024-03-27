@@ -324,12 +324,7 @@ const generateCsvConseillersWithoutCRA = async (
                 statCnfsWithoutCRA.groupeCRAHistorique,
               )[0]['dateMailSendConseillerM+1,5'],
             ),
-            formatDate(
-              getFormatHistoriqueGroupeCRA(
-                -1,
-                statCnfsWithoutCRA.groupeCRAHistorique,
-              )[0]?.numero,
-            ),
+            statCnfsWithoutCRA.groupeCRA,
             statCnfsWithoutCRA.structure.idPG,
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
