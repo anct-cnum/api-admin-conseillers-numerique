@@ -51,6 +51,7 @@ const getExportConseillersWithoutCRACsv =
             codeDepartement: 1,
             telephone: 1,
             groupeCRAHistorique: 1,
+            groupeCRA: 1,
             'structure.idPG': 1,
             'structure.siret': 1,
             'structure.nom': 1,
