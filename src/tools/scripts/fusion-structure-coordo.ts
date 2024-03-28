@@ -120,6 +120,8 @@ execute(__filename, async ({ app, logger, exit }) => {
         {
           $set: {
             updatedAt: structureDoublon.updatedAt,
+            coordinateurCandidature: true,
+            coordinateurTypeContrat: structureDoublon.coordinateurTypeContrat,
           },
           $push: {
             ...(coselecCoordo.length > 0 && {

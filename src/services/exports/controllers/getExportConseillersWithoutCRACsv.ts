@@ -43,6 +43,7 @@ const getExportConseillersWithoutCRACsv =
         { $unwind: '$structure' },
         {
           $project: {
+            idPG: 1,
             prenom: 1,
             nom: 1,
             emailCN: 1,
@@ -50,6 +51,7 @@ const getExportConseillersWithoutCRACsv =
             codeDepartement: 1,
             telephone: 1,
             groupeCRAHistorique: 1,
+            groupeCRA: 1,
             'structure.idPG': 1,
             'structure.siret': 1,
             'structure.nom': 1,

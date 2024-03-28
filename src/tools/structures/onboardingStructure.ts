@@ -14,17 +14,25 @@ import {
 } from '../../utils/geography';
 
 execute(__filename, async ({ app, logger, Sentry, exit }) => {
+  const dateMoins1Heure = new Date();
+  const datePlus1Heure = new Date();
+  dateMoins1Heure.setHours(dateMoins1Heure.getHours() - 1);
+  datePlus1Heure.setHours(datePlus1Heure.getHours() + 1);
+
   const structures: IStructures[] = await app
     .service(service.structures)
     .Model.find({
       siret: { $ne: null },
-      insee: { $exists: false },
-      coordonneesInsee: { $exists: false },
-      adresseInsee2Ban: { $exists: false },
-      qpvStatut: { $exists: false },
-      qpvListe: { $exists: false },
-      estZRR: null,
       statut: 'VALIDATION_COSELEC',
+      $or: [
+        {
+          coselecAt: { $gte: dateMoins1Heure, $lte: datePlus1Heure },
+        },
+        {
+          'historique.changement': 'siret',
+          'historique.date': { $gte: dateMoins1Heure, $lte: datePlus1Heure },
+        },
+      ],
     });
   if (structures.length === 0) {
     exit();

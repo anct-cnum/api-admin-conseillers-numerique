@@ -7,114 +7,22 @@ import {
   filterSearchBar,
   filterRegion,
   filterDepartement,
-  filterAvisPrefet,
-  filterStatutDemandeConseiller,
+  filterStatutDemandeDePostes,
+  sortGestionDemandesConseiller,
+  totalParDemandesConseiller,
 } from '../repository/structures.repository';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 import { validDemandesConseiller } from '../../../schemas/structures.schemas';
 import { action } from '../../../helpers/accessControl/accessList';
-import { getCoselecPositifConventionnementInitial } from '../../../utils';
-
-const getTotalStructures =
-  (app: Application, checkAccess) =>
-  async (
-    statut: string,
-    search: string,
-    region: string,
-    departement: string,
-    avisPrefet: string,
-  ) =>
-    app.service(service.structures).Model.aggregate([
-      {
-        $addFields: {
-          idPGStr: { $toString: '$idPG' },
-          lastPrefet: { $arrayElemAt: ['$prefet', -1] },
-        },
-      },
-      {
-        $match: {
-          coordinateurCandidature: false,
-          $and: [
-            checkAccess,
-            filterSearchBar(search),
-            filterAvisPrefet(avisPrefet),
-            filterStatutDemandeConseiller(statut),
-          ],
-          ...filterRegion(region),
-          ...filterDepartement(departement),
-        },
-      },
-      { $group: { _id: null, count: { $sum: 1 } } },
-      { $project: { _id: 0, count_structures: '$count' } },
-    ]);
-
-const totalParStatutDemandesConseiller = async (
-  app: Application,
-  checkAccess,
-) => {
-  const countDemandesConseiller = await app
-    .service(service.structures)
-    .Model.aggregate([
-      {
-        $match: {
-          $and: [checkAccess],
-          statut: {
-            $in: [
-              'CREEE',
-              'VALIDATION_COSELEC',
-              'REFUS_COSELEC',
-              'EXAMEN_COMPLEMENTAIRE_COSELEC',
-            ],
-          },
-          coordinateurCandidature: false,
-        },
-      },
-      {
-        $group: {
-          _id: '$statut',
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-  const totalDemandesConseillerEnCours = countDemandesConseiller
-    .filter(
-      (demandeConseiller) =>
-        demandeConseiller._id === 'CREEE' ||
-        demandeConseiller._id === 'EXAMEN_COMPLEMENTAIRE_COSELEC',
-    )
-    .reduce((acc, demandeConseiller) => acc + demandeConseiller.count, 0);
-  const totalDemandesConseillerValider =
-    countDemandesConseiller.find(
-      (demandeConseiller) => demandeConseiller._id === 'VALIDATION_COSELEC',
-    )?.count ?? 0;
-  const totalDemandesConseillerRefuser =
-    countDemandesConseiller.find(
-      (demandeConseiller) => demandeConseiller._id === 'REFUS_COSELEC',
-    )?.count ?? 0;
-  const total =
-    totalDemandesConseillerEnCours +
-    totalDemandesConseillerValider +
-    totalDemandesConseillerRefuser;
-
-  return {
-    nouvelleCandidature: totalDemandesConseillerEnCours,
-    candidatureValider: totalDemandesConseillerValider,
-    candidatureNonRetenus: totalDemandesConseillerRefuser,
-    total,
-  };
-};
 
 const getStructures =
   (app: Application, checkAccess) =>
   async (
-    statut: string,
+    statutDemande: string,
     search: string,
     region: string,
     departement: string,
     avisPrefet: string,
-    sortColonne: string,
-    skip: string,
-    limit: number,
   ) =>
     app.service(service.structures).Model.aggregate([
       {
@@ -125,12 +33,10 @@ const getStructures =
       },
       {
         $match: {
-          coordinateurCandidature: false,
           $and: [
             checkAccess,
             filterSearchBar(search),
-            filterAvisPrefet(avisPrefet),
-            filterStatutDemandeConseiller(statut),
+            filterStatutDemandeDePostes(statutDemande, avisPrefet),
           ],
           ...filterRegion(region),
           ...filterDepartement(departement),
@@ -140,6 +46,7 @@ const getStructures =
         $project: {
           nom: 1,
           codePostal: 1,
+          demandesCoselec: 1,
           idPG: 1,
           createdAt: 1,
           coselec: 1,
@@ -148,18 +55,13 @@ const getStructures =
           prefet: '$lastPrefet',
         },
       },
-      { $sort: sortColonne },
-      {
-        $skip: Number(skip) > 0 ? (Number(skip) - 1) * Number(limit) : 0,
-      },
-      { $limit: Number(limit) },
     ]);
 
 const getDemandesConseiller =
   (app: Application, options) => async (req: IRequest, res: Response) => {
     const {
       page,
-      statut,
+      statutDemande,
       nomOrdre,
       ordre,
       search,
@@ -170,7 +72,7 @@ const getDemandesConseiller =
     try {
       const demandesConseillerValidation = validDemandesConseiller.validate({
         page,
-        statut,
+        statutDemande,
         nomOrdre,
         ordre,
         search,
@@ -187,45 +89,44 @@ const getDemandesConseiller =
       const items: {
         total: number;
         data: object;
-        structureBannerAvisPrefetOpen: object;
+        structurePrimoEntranteBannerAvisPrefetOpen: object;
+        ajoutPosteBannerAvisPrefetOpen: object;
         totalParDemandesConseiller: {
-          nouvelleCandidature: number;
-          candidatureValider: number;
-          candidatureNonRetenus: number;
-          total: number;
+          totalDemandePoste: number;
+          totalPosteValider: number;
+          totalPosteRefuser: number;
+          totalPosteRenduEnCours: number;
         };
         limit: number;
         skip: number;
       } = {
         total: 0,
         data: [],
-        structureBannerAvisPrefetOpen: [],
+        structurePrimoEntranteBannerAvisPrefetOpen: [],
+        ajoutPosteBannerAvisPrefetOpen: [],
         totalParDemandesConseiller: {
-          nouvelleCandidature: 0,
-          candidatureValider: 0,
-          candidatureNonRetenus: 0,
-          total: 0,
+          totalDemandePoste: 0,
+          totalPosteValider: 0,
+          totalPosteRefuser: 0,
+          totalPosteRenduEnCours: 0,
         },
         limit: 0,
         skip: 0,
       };
-      const sortColonne = JSON.parse(`{"${nomOrdre}":${ordre}}`);
       const checkAccess = await checkAccessReadRequestStructures(app, req);
       const structures: IStructures[] = await getStructures(app, checkAccess)(
-        statut,
+        statutDemande,
         search,
         region,
         departement,
         avisPrefet,
-        sortColonne,
-        page,
-        options.paginate.default,
       );
-      items.totalParDemandesConseiller = await totalParStatutDemandesConseiller(
-        app,
-        checkAccess,
+      const structuresFormat = sortGestionDemandesConseiller(
+        statutDemande,
+        ordre,
+        structures,
       );
-      items.structureBannerAvisPrefetOpen = await app
+      items.structurePrimoEntranteBannerAvisPrefetOpen = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.read)
         .find({
@@ -236,24 +137,29 @@ const getDemandesConseiller =
           },
         })
         .select({ nom: 1, 'prefet.$': 1 });
-      if (structures.length > 0) {
-        const totalStructures = await getTotalStructures(app, checkAccess)(
-          statut,
-          search,
-          region,
-          departement,
-          avisPrefet,
-        );
-        items.data = structures.map((structure) => ({
-          ...structure,
-          nombreConseillersCoselec:
-            getCoselecPositifConventionnementInitial(structure)
-              ?.nombreConseillersCoselec ?? 0,
-        }));
-        items.total = totalStructures[0]?.count_structures;
-        items.limit = options.paginate.default;
-        items.skip = Number(page);
-      }
+      items.ajoutPosteBannerAvisPrefetOpen = await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          demandesCoselec: {
+            $elemMatch: {
+              banniereValidationAvisPrefet: true,
+            },
+          },
+        })
+        .select({ nom: 1, 'demandesCoselec.$': 1 });
+      items.total = structuresFormat.length;
+      const totalParDemandes = await totalParDemandesConseiller(app, req);
+      items.totalParDemandesConseiller = {
+        ...items.totalParDemandesConseiller,
+        ...totalParDemandes,
+      };
+      items.data = structuresFormat.slice(
+        (page - 1) * options.paginate.default,
+        page * options.paginate.default,
+      );
+      items.limit = options.paginate.default;
+      items.skip = page;
       res.status(200).json(items);
     } catch (error) {
       if (error.name === 'ForbiddenError') {

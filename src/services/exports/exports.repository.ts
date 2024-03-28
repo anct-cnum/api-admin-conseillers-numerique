@@ -284,6 +284,7 @@ const generateCsvConseillersWithoutCRA = async (
 ) => {
   try {
     const fileHeaders = [
+      "id Conum",
       'Nom',
       'Prénom',
       'Email @conseiller-numerique.fr',
@@ -291,7 +292,8 @@ const generateCsvConseillersWithoutCRA = async (
       'Code département du conseiller',
       'Numéro de téléphone du conseiller',
       "Date d'envoi du mail M+1",
-      "Date d'envoi du mail M+1,5",
+      "Date d'envoi du mail M+1.5",
+      "Groupe CRA",
       'Id de la structure',
       'Siret de la structure',
       'Nom de la structure',
@@ -303,6 +305,7 @@ const generateCsvConseillersWithoutCRA = async (
         fileHeaders.join(csvCellSeparator),
         ...conseillers.map((statCnfsWithoutCRA) =>
           [
+            statCnfsWithoutCRA.idPG,
             statCnfsWithoutCRA.nom,
             statCnfsWithoutCRA.prenom,
             statCnfsWithoutCRA.emailCN?.address,
@@ -321,6 +324,7 @@ const generateCsvConseillersWithoutCRA = async (
                 statCnfsWithoutCRA.groupeCRAHistorique,
               )[0]['dateMailSendConseillerM+1,5'],
             ),
+            statCnfsWithoutCRA.groupeCRA,
             statCnfsWithoutCRA.structure.idPG,
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,

@@ -371,6 +371,8 @@ export interface IStructures {
   reseau: Reseau;
   codeCom: string | null;
   coselec: ICoselec[];
+  coordinateurCandidature: boolean;
+  coordinateurTypeContrat: null | string;
   conventionnement: {
     statut: string;
     motif: string;
@@ -409,6 +411,11 @@ interface IDemandesCoselec {
   validateurAvenant?: {
     date: Date;
     email: string;
+  };
+  prefet?: {
+    mailSendDatePrefet: string;
+    mailErrorSentPrefet?: string;
+    mailErrorDetailSentPrefet?: Date;
   };
 }
 
