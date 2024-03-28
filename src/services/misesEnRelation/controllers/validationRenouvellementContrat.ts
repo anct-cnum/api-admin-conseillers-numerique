@@ -23,6 +23,10 @@ const validationRenouvellementContrat =
         });
         return;
       }
+      const miseEnRelationProchainTerminee = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: miseEnRelationVerif.miseEnRelationConventionnement });
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -34,6 +38,12 @@ const validationRenouvellementContrat =
             $set: {
               statut: 'finalisee',
               banniereValidationRenouvellement: true,
+              ...(miseEnRelationProchainTerminee?.contratCoordinateur && {
+                contratCoordinateur: true,
+                banniereAjoutRoleCoordinateur:
+                  miseEnRelationProchainTerminee?.banniereAjoutRoleCoordinateur ===
+                  true,
+              }),
             },
           },
           { returnOriginal: false, includeResultMetadata: true },
