@@ -412,6 +412,11 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+  prefet?: {
+    mailSendDatePrefet: string;
+    mailErrorSentPrefet?: string;
+    mailErrorDetailSentPrefet?: Date;
+  };
 }
 
 interface ICoselec {
