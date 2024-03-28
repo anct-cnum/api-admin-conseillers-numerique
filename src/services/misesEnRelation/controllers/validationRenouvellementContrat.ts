@@ -27,6 +27,17 @@ const validationRenouvellementContrat =
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: miseEnRelationVerif.miseEnRelationConventionnement });
+      if (
+        !['finalisee', 'nouvelle_rupture'].includes(
+          miseEnRelationVerif?.statut,
+        ) ||
+        !miseEnRelationProchainTerminee
+      ) {
+        res.status(404).json({
+          message: 'Le renouvellement est impossible pour ce contrat.',
+        });
+        return;
+      }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
