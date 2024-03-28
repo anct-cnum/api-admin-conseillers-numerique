@@ -9,6 +9,9 @@ import getDetailStructureById from './getDetailStructureById';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
 import { getCoselec } from '../../../utils';
+import mailer from '../../../mailer';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
+import { demandePosteSupplementaireConseiller } from '../../../emails';
 
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -107,6 +110,40 @@ const createAvenant =
           { 'structure.$id': new ObjectId(id) },
           { $push: { 'structureObj.demandesCoselec': demandeCoselec } },
         );
+
+      if (type === 'ajout') {
+        const prefets: IUser[] = await app
+          .service(service.users)
+          .Model.find({
+            roles: { $in: ['prefet'] },
+            departement: getStructure.codeDepartement,
+          })
+          .select({ _id: 0, name: 1 });
+        if (prefets.length > 0) {
+          const mailerInstance = mailer(app);
+          const promises: Promise<void>[] = [];
+          const messageDemandePosteConseiller =
+            demandePosteSupplementaireConseiller(app, mailerInstance);
+          await prefets.forEach(async (prefet) => {
+            // eslint-disable-next-line no-async-promise-executor
+            const p = new Promise<void>(async (resolve, reject) => {
+              const errorSmtpMailDemandePoste =
+                await messageDemandePosteConseiller
+                  .send(prefet.name, getStructure, demandeCoselec.id)
+                  .catch((errSmtp: Error) => {
+                    return errSmtp;
+                  });
+              if (errorSmtpMailDemandePoste instanceof Error) {
+                reject();
+                return;
+              }
+              resolve(p);
+            });
+            promises.push(p);
+          });
+          await Promise.allSettled(promises);
+        }
+      }
 
       await getDetailStructureById(app)(req, res);
     } catch (error) {
