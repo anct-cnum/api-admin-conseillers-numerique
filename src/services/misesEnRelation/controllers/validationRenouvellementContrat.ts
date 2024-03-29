@@ -29,7 +29,7 @@ const validationRenouvellementContrat =
         .findOne({ _id: miseEnRelationVerif.miseEnRelationConventionnement });
       if (
         !['finalisee', 'nouvelle_rupture'].includes(
-          miseEnRelationVerif?.statut,
+          miseEnRelationProchainTerminee?.statut,
         ) ||
         !miseEnRelationProchainTerminee
       ) {
