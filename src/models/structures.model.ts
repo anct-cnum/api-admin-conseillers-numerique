@@ -65,6 +65,7 @@ export default function (app: Application): Model<any> {
       emetteurAvenant: Object,
       type: String,
       statut: String,
+      prefet: Object,
       banniereValidationAvenant: Boolean,
       phaseConventionnement: String,
       nombreDePostesAccordes: Number,
