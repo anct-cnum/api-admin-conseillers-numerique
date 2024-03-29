@@ -19,7 +19,6 @@ const closeBannerAvenantAvisPrefet =
         .updateOne(
           {
             _id: new ObjectId(idStructure),
-            coordinateurCandidature: false,
             'demandesCoselec.banniereValidationAvisPrefet': true,
           },
           {
