@@ -41,7 +41,7 @@ const updateAvenantAvisPrefetPosteSupplementaire =
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             _id: new ObjectId(idStructure),
             demandesCoselec: {
@@ -54,13 +54,28 @@ const updateAvenantAvisPrefetPosteSupplementaire =
               'demandesCoselec.$.banniereValidationAvisPrefet': true,
             },
           },
+          { returnOriginal: false, includeResultMetadata: true },
         );
-      if (structure.modifiedCount === 0) {
+      if (structure.lastErrorObject.n === 0) {
         res
           .status(404)
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
+      const objectStructureUpdated = {
+        $set: {
+          structureObj: structure.value,
+        },
+      };
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': new ObjectId(idStructure),
+          },
+          objectStructureUpdated,
+        );
       res.status(200).json({ success: true });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
