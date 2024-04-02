@@ -51,8 +51,7 @@
     },
     {
       "message": "🚨 Un mot de passe est détecté",
-      "regex": "(?:pwd|secret|token|api_key|api-key|api_token|api-token|xkeysib)",
-      "nonBlocking": "true"
+      "regex": "(?:pwd|secret|token|api_key|api-key|api_token|api-token|xkeysib)"
     },
     {
       "message": "📧 Une adresse email est détecté",
