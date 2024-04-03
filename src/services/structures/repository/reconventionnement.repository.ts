@@ -11,6 +11,7 @@ import {
   checkStructurePhase2,
   filterAvisAdmin,
   filterAvisPrefetPrimoEntrante,
+  filterAvisPrefetAvenantAjoutPoste,
 } from './structures.repository';
 import {
   getCoselec,
@@ -38,6 +39,7 @@ const filterStatut = (typeConvention: string, avisPrefet: string) => {
         $elemMatch: {
           statut: { $eq: 'en_cours' },
           type: { $eq: 'ajout' },
+          ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
         },
       },
     };
