@@ -167,8 +167,13 @@ const validationRecrutementContrat =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           name: miseEnRelationVerif.conseillerObj.email,
-          roles: { $in: ['candidat'] },
         });
+      if (!userAccount.roles.includes('candidat')) {
+        res.status(409).json({
+          message: `Action non autorisée : l'adresse mail personnelle du conseiller possède déjà un rôle ${userAccount.roles[0]} `,
+        });
+        return;
+      }
       const passwordHash = bcrypt.hashSync(uuidv4(), 10);
       if (userAccount === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
