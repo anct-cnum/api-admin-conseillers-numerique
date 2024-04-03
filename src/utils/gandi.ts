@@ -57,7 +57,7 @@ const deleteMailboxCloture = (app) => async (conseillerId, login) => {
       method: 'get',
       url: `${gandi.endPoint}/mailboxes/${gandi.domain}?login=${login}`,
       headers: {
-        Authorization: `Apikey ${gandi.token}`,
+        Authorization: `Bearer ${gandi.token}`,
       },
     });
 
@@ -68,7 +68,7 @@ const deleteMailboxCloture = (app) => async (conseillerId, login) => {
         url: `${gandi.endPoint}/mailboxes/${gandi.domain}/${mailbox.data[0].id}`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Apikey ${gandi.token}`,
+          Authorization: `Bearer ${gandi.token}`,
         },
       });
       await app.service(service.conseillers).Model.updateOne(
