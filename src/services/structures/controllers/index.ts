@@ -29,6 +29,7 @@ import updateDemandeConseillerAvisPrefet from './updateDemandeConseillerAvisPref
 import closeBannerDemandeConseillerAvisPrefet from './closeBannerDemandeConseillerAvisPrefet';
 import closeBannerAvenantAvisPrefet from './closeBannerAvenantAvisPrefet';
 import updateAvenantAvisPrefetPosteSupplementaire from './updateAvenantAvisPrefetPosteSupplementaire';
+import updateCommentaireAvisPrefet from './updateCommentaireAvisPrefet';
 import updateCommentaireAvenantAvisPrefet from './updateCommentaireAvenantAvisPrefet';
 
 export {
@@ -63,5 +64,6 @@ export {
   closeBannerDemandeConseillerAvisPrefet,
   closeBannerAvenantAvisPrefet,
   updateAvenantAvisPrefetPosteSupplementaire,
+  updateCommentaireAvisPrefet,
   updateCommentaireAvenantAvisPrefet,
 };

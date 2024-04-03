@@ -33,6 +33,7 @@ import {
   closeBannerDemandeConseillerAvisPrefet,
   closeBannerAvenantAvisPrefet,
   updateAvenantAvisPrefetPosteSupplementaire,
+  updateCommentaireAvisPrefet,
   updateCommentaireAvenantAvisPrefet,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
@@ -131,6 +132,12 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateDemandeConseillerAvisPrefet(app),
+    );
+    app.patch(
+      '/avis/prefet/commentaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateCommentaireAvisPrefet(app),
     );
     app.patch(
       '/banner/prefet/conseiller/:id',
@@ -240,7 +247,6 @@ export default class Structures extends Service {
       createAbilities(app),
       updateCommentaireAvenantAvisPrefet(app),
     );
-
     app.patch(
       '/structure/add-role-coordinateur/:id',
       authenticateMode(app),
