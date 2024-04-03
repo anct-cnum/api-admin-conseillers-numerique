@@ -170,7 +170,7 @@ const validationRecrutementContrat =
         });
       if (!userAccount.roles.includes('candidat')) {
         res.status(409).json({
-          message: `Action non autorisée : l'adresse mail personnelle du conseiller possède déjà un rôle ${userAccount.roles} `,
+          message: `Action non autorisée : l'adresse mail personnelle du conseiller possède déjà un rôle ${userAccount.roles[0]} `,
         });
         return;
       }
