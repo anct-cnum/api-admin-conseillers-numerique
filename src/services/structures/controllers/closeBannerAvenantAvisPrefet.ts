@@ -39,7 +39,6 @@ const closeBannerAvenantAvisPrefet =
         .updateMany(
           {
             'structure.$id': new ObjectId(idStructure),
-            'structureObj.coordinateurCandidature': false,
             'structureObj.demandesCoselec.banniereValidationAvisPrefet': true,
           },
           {

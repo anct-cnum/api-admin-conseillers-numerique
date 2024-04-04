@@ -26,37 +26,28 @@ const updateCommentaireAvisPrefet =
       }
       const structurePrefet = await app
         .service(service.structures)
-        .Model.accessibleBy(req.ability, action.update)
-        .findOne({
-          _id: new ObjectId(idStructure),
-        });
-      const prefetObj =
-        structurePrefet.prefet[structurePrefet.prefet.length - 1];
-      prefetObj.commentairePrefet = commentaire;
-      prefetObj.banniereValidationAvisPrefet = true;
-      await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .Model.aggregate([
+          { $match: { _id: new ObjectId(idStructure) } },
           {
-            _id: new ObjectId(idStructure),
-          },
-          {
-            $pop: {
-              prefet: -1,
+            $addFields: {
+              lastPrefet: { $arrayElemAt: ['$prefet', -1] },
             },
           },
-        );
+        ]);
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           {
             _id: new ObjectId(idStructure),
+            prefet: {
+              $in: [structurePrefet[0].lastPrefet],
+            },
           },
           {
-            $push: {
-              prefet: prefetObj,
+            $set: {
+              'prefet.$.commentairePrefet': commentaire,
+              'prefet.$.banniereValidationAvisPrefet': true,
             },
           },
           {
