@@ -27,6 +27,10 @@ import getDemandesConseiller from './getDemandesConseiller';
 import getDetailDemandeConseiller from './getDetailDemandeConseiller';
 import updateDemandeConseillerAvisPrefet from './updateDemandeConseillerAvisPrefet';
 import closeBannerDemandeConseillerAvisPrefet from './closeBannerDemandeConseillerAvisPrefet';
+import closeBannerAvenantAvisPrefet from './closeBannerAvenantAvisPrefet';
+import updateAvenantAvisPrefetPosteSupplementaire from './updateAvenantAvisPrefetPosteSupplementaire';
+import updateCommentaireAvisPrefet from './updateCommentaireAvisPrefet';
+import updateCommentaireAvenantAvisPrefet from './updateCommentaireAvenantAvisPrefet';
 
 export {
   getStructures,
@@ -58,4 +62,8 @@ export {
   getDetailDemandeConseiller,
   updateDemandeConseillerAvisPrefet,
   closeBannerDemandeConseillerAvisPrefet,
+  closeBannerAvenantAvisPrefet,
+  updateAvenantAvisPrefetPosteSupplementaire,
+  updateCommentaireAvisPrefet,
+  updateCommentaireAvenantAvisPrefet,
 };
