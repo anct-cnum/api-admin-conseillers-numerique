@@ -33,7 +33,14 @@ const updateCommentaireAvisPrefet =
               lastPrefet: { $arrayElemAt: ['$prefet', -1] },
             },
           },
+          {
+            $project: {
+              _id: 0,
+              lastPrefet: '$lastPrefet',
+            },
+          },
         ]);
+
       const structure = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
