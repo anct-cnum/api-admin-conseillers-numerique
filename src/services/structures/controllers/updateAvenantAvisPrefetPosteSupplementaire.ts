@@ -12,7 +12,25 @@ const updateAvenantAvisPrefetPosteSupplementaire =
     const { avisPrefet, commentaire, idDemandeCoselec, idStructureTransfert } =
       req.body;
 
+    if (idDemandeCoselec && !ObjectId.isValid(idDemandeCoselec)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
     if (idStructureTransfert && !ObjectId.isValid(idStructureTransfert)) {
+      res.status(400).json({ message: 'Id incorrect' });
+      return;
+    }
+    const checkIdDemandeCoselec = await app
+      .service(service.structures)
+      .Model.accessibleBy(req.ability, action.update)
+      .countDocuments({
+        demandesCoselec: {
+          $elemMatch: {
+            id: idDemandeCoselec,
+          },
+        },
+      });
+    if (checkIdDemandeCoselec === 0) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
@@ -20,7 +38,6 @@ const updateAvenantAvisPrefetPosteSupplementaire =
       avisPrefet,
       commentaire,
     });
-
     if (avisPrefetValidation.error) {
       res.status(400).json({ message: avisPrefetValidation.error.message });
       return;
