@@ -193,14 +193,14 @@ const filterStatutDemandeConseiller = (statut: string) => {
   };
 };
 
-const filterAvisPrefet = (avisPrefet: string | undefined) => {
+const filterAvisPrefetAvenantAjoutPoste = (avisPrefet: string | undefined) => {
   if (avisPrefet === undefined) {
     return {};
   }
   if (avisPrefet === 'sans-avis') {
-    return { avisPrefet: { $exists: false } };
+    return { 'prefet.avis': { $exists: false } };
   }
-  return { avisPrefet: { $eq: avisPrefet } };
+  return { 'prefet.avis': { $eq: avisPrefet } };
 };
 
 const filterStatutDemandeDePostes = (type: string, avisPrefet: string) => {
@@ -217,7 +217,7 @@ const filterStatutDemandeDePostes = (type: string, avisPrefet: string) => {
             $elemMatch: {
               statut: { $eq: 'validee' },
               type: { $eq: 'ajout' },
-              ...filterAvisPrefet(avisPrefet),
+              ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
             },
           },
         },
@@ -237,7 +237,7 @@ const filterStatutDemandeDePostes = (type: string, avisPrefet: string) => {
             $elemMatch: {
               statut: { $eq: 'refuser' },
               type: { $eq: 'ajout' },
-              ...filterAvisPrefet(avisPrefet),
+              ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
             },
           },
         },
@@ -267,7 +267,7 @@ const filterStatutDemandeDePostes = (type: string, avisPrefet: string) => {
           $elemMatch: {
             statut: { $eq: 'en_cours' },
             type: { $eq: 'ajout' },
-            ...filterAvisPrefet(avisPrefet),
+            ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
           },
         },
       },
@@ -476,7 +476,7 @@ export {
   checkStructurePhase2,
   checkIfStructurePrimoPhase2,
   filterAvisAdmin,
-  filterAvisPrefet,
+  filterAvisPrefetAvenantAjoutPoste,
   filterAvisPrefetPrimoEntrante,
   filterStatutDemandeConseiller,
   filterStatutDemandeDePostes,
