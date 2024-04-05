@@ -17,21 +17,7 @@ const updateCommentaireAvenantAvisPrefet =
       res.status(400).json({ message: avisPrefetValidation.error.message });
       return;
     }
-    const checkIdDemandeCoselec = await app
-      .service(service.structures)
-      .Model.accessibleBy(req.ability, action.update)
-      .countDocuments({
-        demandesCoselec: {
-          $elemMatch: {
-            id: idDemandeCoselec,
-          },
-        },
-      });
-    if (checkIdDemandeCoselec === 0) {
-      res.status(400).json({ message: 'Id incorrect' });
-      return;
-    }
-    if (!ObjectId.isValid(idStructure)) {
+    if (!ObjectId.isValid(idStructure) || !ObjectId.isValid(idDemandeCoselec)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
@@ -49,7 +35,6 @@ const updateCommentaireAvenantAvisPrefet =
           {
             $set: {
               'demandesCoselec.$.prefet.commentaire': commentaire,
-              'demandesCoselec.$.banniereValidationAvisPrefet': true,
             },
           },
           { returnOriginal: false, includeResultMetadata: true },
@@ -60,11 +45,6 @@ const updateCommentaireAvenantAvisPrefet =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      const objectStructureUpdated = {
-        $set: {
-          structureObj: structure.value,
-        },
-      };
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -72,9 +52,15 @@ const updateCommentaireAvenantAvisPrefet =
           {
             'structure.$id': new ObjectId(idStructure),
           },
-          objectStructureUpdated,
+          {
+            $set: {
+              structureObj: structure.value,
+            },
+          },
         );
-      res.status(200).json({ success: true });
+      res
+        .status(200)
+        .json({ demandesCoselec: structure.value.demandesCoselec });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

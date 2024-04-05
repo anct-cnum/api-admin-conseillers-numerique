@@ -19,11 +19,11 @@ const closeBannerAvenantAvisPrefet =
         .updateOne(
           {
             _id: new ObjectId(idStructure),
-            'demandesCoselec.banniereValidationAvisPrefet': true,
+            'demandesCoselec.prefet.banniereValidationAvis': true,
           },
           {
             $set: {
-              'demandesCoselec.$.banniereValidationAvisPrefet': false,
+              'demandesCoselec.$.prefet.banniereValidationAvis': false,
             },
           },
         );
@@ -39,11 +39,11 @@ const closeBannerAvenantAvisPrefet =
         .updateMany(
           {
             'structure.$id': new ObjectId(idStructure),
-            'structureObj.demandesCoselec.banniereValidationAvisPrefet': true,
+            'structureObj.demandesCoselec.prefet.banniereValidationAvis': true,
           },
           {
             $set: {
-              'structureObj.demandesCoselec.$.banniereValidationAvisPrefet':
+              'structureObj.demandesCoselec.$.prefet.banniereValidationAvis':
                 false,
             },
           },

@@ -54,7 +54,6 @@ const updateCommentaireAvisPrefet =
           {
             $set: {
               'prefet.$.commentairePrefet': commentaire,
-              'prefet.$.banniereValidationAvisPrefet': true,
             },
           },
           {
@@ -82,7 +81,7 @@ const updateCommentaireAvisPrefet =
           },
           objectStructureUpdated,
         );
-      res.status(200).json({ success: true });
+      res.status(200).json({ prefet: structure.value.prefet.pop() });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

@@ -37,26 +37,62 @@ const updateDemandeConseillerAvisPrefet =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const structure = await app
+      const countStructure = await app
         .service(service.structures)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          {
-            _id: new ObjectId(idStructure),
-            coordinateurCandidature: false,
-            statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+        .Model.countDocuments({
+          _id: new ObjectId(idStructure),
+          prefet: {
+            $elemMatch: { avisPrefet: { $in: ['POSITIF', 'NÉGATIF'] } },
           },
-          {
-            $push: {
-              prefet: updatedPrefet,
+          statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+        });
+      if (countStructure !== 0) {
+        const structureUpdated = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(idStructure),
+              coordinateurCandidature: false,
+              statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+              prefet: {
+                $elemMatch: { avisPrefet: { $in: ['POSITIF', 'NÉGATIF'] } },
+              },
             },
-          },
-        );
-      if (structure.modifiedCount === 0) {
-        res
-          .status(404)
-          .json({ message: "La structure n'a pas été mise à jour" });
-        return;
+            {
+              $set: {
+                'prefet.$': updatedPrefet,
+              },
+            },
+          );
+        if (structureUpdated.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "La structure n'a pas été mise à jour" });
+          return;
+        }
+      } else {
+        const structureUpdated = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(idStructure),
+              coordinateurCandidature: false,
+              statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+            },
+            {
+              $push: {
+                prefet: updatedPrefet,
+              },
+            },
+          );
+        if (structureUpdated.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "La structure n'a pas été mise à jour" });
+          return;
+        }
       }
       res.status(200).json({ success: true });
     } catch (error) {

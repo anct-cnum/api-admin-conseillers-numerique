@@ -413,7 +413,6 @@ interface IDemandesCoselec {
     email: string;
   };
   prefet: IPrefetAvenant;
-  banniereValidationAvisPrefet?: boolean;
 }
 
 interface ICoselec {
@@ -441,9 +440,8 @@ interface IPrefetAvenant {
   commentaire: string;
   insertedAt: Date;
   idStructureTransfert?: ObjectId;
-  mailSendDatePrefet: string;
-  mailErrorSentPrefet?: string;
-  mailErrorDetailSentPrefet?: Date;
+  validateur?: string;
+  banniereValidationAvis?: boolean;
 }
 
 export interface IDemandesCoordinateur {
