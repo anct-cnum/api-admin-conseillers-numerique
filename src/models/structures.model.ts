@@ -48,7 +48,18 @@ export default function (app: Application): Model<any> {
     },
     { _id: false, strict: false },
   );
-
+  const avenantPrefetSchema = new Schema(
+    {
+      avis: String,
+      commentaire: String,
+      insertedAt: Date,
+      mailSendDatePrefet: Date,
+      mailErrorSendDatePrefet: Date,
+      mailErrorDetailSendDatePrefet: Date,
+      idStructureTransfert: { type: 'ObjectId' },
+    },
+    { _id: false, strict: false },
+  );
   const demandeCoselecSchema = new Schema(
     {
       id: { type: 'ObjectId' },
@@ -57,13 +68,14 @@ export default function (app: Application): Model<any> {
       emetteurAvenant: Object,
       type: String,
       statut: String,
-      prefet: Object,
+      prefet: { type: avenantPrefetSchema, default: undefined },
       banniereValidationAvenant: Boolean,
       phaseConventionnement: String,
       nombreDePostesAccordes: Number,
       nombreDePostesRendus: Number,
       validateurAvenant: Object,
       nbPostesAvantDemande: Number,
+      banniereValidationAvisPrefet: Boolean,
     },
     { _id: false, strict: false },
   );
