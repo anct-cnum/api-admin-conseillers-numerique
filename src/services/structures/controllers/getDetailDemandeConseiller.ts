@@ -46,8 +46,10 @@ const getDetailDemandeConseiller =
       structure[0].nombreConseillersCoselec =
         getCoselec(structure[0])?.nombreConseillersCoselec ?? 0;
       if (
-        !['POSITIF', 'NÉGATIF'].includes(structure[0]?.prefet?.avisPrefet) &&
-        structure[0]?.statut === 'CREEE'
+        structure[0]?.statut === 'CREEE' ||
+        structure[0]?.demandesCoselec?.some(
+          (demande) => demande.statut === 'en_cours',
+        )
       ) {
         const listeStructure = await app
           .service(service.structures)

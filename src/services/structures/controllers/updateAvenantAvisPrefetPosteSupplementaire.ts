@@ -12,25 +12,11 @@ const updateAvenantAvisPrefetPosteSupplementaire =
     const { avisPrefet, commentaire, idDemandeCoselec, idStructureTransfert } =
       req.body;
 
-    if (idDemandeCoselec && !ObjectId.isValid(idDemandeCoselec)) {
+    if (!ObjectId.isValid(idDemandeCoselec) || !ObjectId.isValid(idStructure)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
     if (idStructureTransfert && !ObjectId.isValid(idStructureTransfert)) {
-      res.status(400).json({ message: 'Id incorrect' });
-      return;
-    }
-    const checkIdDemandeCoselec = await app
-      .service(service.structures)
-      .Model.accessibleBy(req.ability, action.update)
-      .countDocuments({
-        demandesCoselec: {
-          $elemMatch: {
-            id: idDemandeCoselec,
-          },
-        },
-      });
-    if (checkIdDemandeCoselec === 0) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
@@ -46,6 +32,8 @@ const updateAvenantAvisPrefetPosteSupplementaire =
       avis: avisPrefet,
       commentaire,
       insertedAt: new Date(),
+      banniereValidationAvis: true,
+      validateur: req.user?.name,
       ...(idStructureTransfert && {
         idStructureTransfert,
       }),
@@ -68,7 +56,6 @@ const updateAvenantAvisPrefetPosteSupplementaire =
           {
             $set: {
               'demandesCoselec.$.prefet': updatedPrefet,
-              'demandesCoselec.$.banniereValidationAvisPrefet': true,
             },
           },
           { returnOriginal: false, includeResultMetadata: true },
@@ -79,11 +66,6 @@ const updateAvenantAvisPrefetPosteSupplementaire =
           .json({ message: "La structure n'a pas été mise à jour" });
         return;
       }
-      const objectStructureUpdated = {
-        $set: {
-          structureObj: structure.value,
-        },
-      };
       await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -91,7 +73,11 @@ const updateAvenantAvisPrefetPosteSupplementaire =
           {
             'structure.$id': new ObjectId(idStructure),
           },
-          objectStructureUpdated,
+          {
+            $set: {
+              structureObj: structure.value,
+            },
+          },
         );
       res.status(200).json({ success: true });
     } catch (error) {

@@ -1,6 +1,4 @@
 import { Application } from '@feathersjs/express';
-import { ObjectId } from 'mongodb';
-import service from '../../helpers/services';
 import logger from '../../logger';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 
@@ -19,93 +17,13 @@ export default function (app: Application, mailer) {
 
   return {
     render,
-    send: async (
-      mailPrefet: string,
-      structure: IStructures,
-      idDemandeCoselec: ObjectId,
-    ) => {
+    send: async (mailPrefet: string, structure: IStructures) => {
       const onSuccess = async () => {
-        await app.service(service.structures).Model.updateOne(
-          {
-            _id: structure._id,
-            demandesCoselec: {
-              $elemMatch: {
-                id: idDemandeCoselec,
-              },
-            },
-          },
-          {
-            $set: {
-              'demandesCoselec.$.prefet.mailSendDatePrefet': new Date(),
-            },
-            $unset: {
-              'demandesCoselec.$.prefet.mailErrorSendDatePrefet': '',
-              'demandesCoselec.$.prefet.mailErrorDetailSendDatePrefet': '',
-            },
-          },
-        );
-        await app.service(service.misesEnRelation).Model.updateMany(
-          {
-            'structure.$id': structure._id,
-            'structureObj.demandesCoselec': {
-              $elemMatch: {
-                id: idDemandeCoselec,
-              },
-            },
-          },
-          {
-            $set: {
-              'structureObj.demandesCoselec.$.prefet.mailSendDatePrefet':
-                new Date(),
-            },
-            $unset: {
-              'structureObj.demandesCoselec.$.prefet.mailErrorSendDatePrefet':
-                '',
-              'structureObj.demandesCoselec.$.prefet.mailErrorDetailSendDatePrefet':
-                '',
-            },
-          },
-        );
         logger.info(
           `Email envoyé avec succès pour l'information d'une demande de poste(s) supplémentaire(s) au préfet ${mailPrefet}`,
         );
       };
       const onError = async (err: Error) => {
-        await app.service(service.structures).Model.updateOne(
-          {
-            _id: structure._id,
-            demandesCoselec: {
-              $elemMatch: {
-                id: idDemandeCoselec,
-              },
-            },
-          },
-          {
-            $set: {
-              'demandesCoselec.$.prefet.mailErrorSendDatePrefet': 'smtpError',
-              'demandesCoselec.$.prefet.mailErrorDetailSendDatePrefet':
-                err.message,
-            },
-          },
-        );
-        await app.service(service.misesEnRelation).Model.updateMany(
-          {
-            'structure.$id': structure._id,
-            'structureObj.demandesCoselec': {
-              $elemMatch: {
-                id: idDemandeCoselec,
-              },
-            },
-          },
-          {
-            $set: {
-              'structureObj.demandesCoselec.$.prefet.mailErrorSendDatePrefet':
-                'smtpError',
-              'structureObj.demandesCoselec.$.prefet.mailErrorDetailSendDatePrefet':
-                err.message,
-            },
-          },
-        );
         throw err;
       };
 

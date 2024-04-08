@@ -143,7 +143,7 @@ const getDemandesConseiller =
         .find({
           demandesCoselec: {
             $elemMatch: {
-              banniereValidationAvisPrefet: true,
+              'prefet.banniereValidationAvis': true,
             },
           },
         })

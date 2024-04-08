@@ -129,7 +129,7 @@ const createAvenant =
             const p = new Promise<void>(async (resolve, reject) => {
               const errorSmtpMailDemandePoste =
                 await messageDemandePosteConseiller
-                  .send(prefet.name, getStructure, demandeCoselec.id)
+                  .send(prefet.name, getStructure)
                   .catch((errSmtp: Error) => {
                     return errSmtp;
                   });
