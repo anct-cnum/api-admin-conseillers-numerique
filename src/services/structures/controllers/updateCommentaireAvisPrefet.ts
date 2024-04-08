@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { commentaireConseillerAvisPrefet } from '../../../schemas/structures.schemas';
+import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 
 const updateCommentaireAvisPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -24,13 +25,22 @@ const updateCommentaireAvisPrefet =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
+      const checkAccess = checkAccessReadRequestStructures(app, req);
       const structurePrefet = await app
         .service(service.structures)
         .Model.aggregate([
-          { $match: { _id: new ObjectId(idStructure) } },
           {
             $addFields: {
               lastPrefet: { $arrayElemAt: ['$prefet', -1] },
+            },
+          },
+          {
+            $match: {
+              _id: new ObjectId(idStructure),
+              $and: [checkAccess],
+              coordinateurCandidature: false,
+              statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+              'lastPrefet.avisPrefet': { $in: ['NÉGATIF', 'POSITIF'] },
             },
           },
           {
@@ -40,6 +50,10 @@ const updateCommentaireAvisPrefet =
             },
           },
         ]);
+      if (structurePrefet.length === 0) {
+        res.status(404).json({ message: "La structure n'existe pas" });
+        return;
+      }
 
       const structure = await app
         .service(service.structures)
