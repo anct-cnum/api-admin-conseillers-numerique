@@ -142,6 +142,14 @@ const demandeConseillerAvisPrefet = Joi.object({
     .error(new Error('Le commentaire est invalide')),
 });
 
+const commentaireConseillerAvisPrefet = Joi.object({
+  commentaire: Joi.string()
+    .trim()
+    .min(10)
+    .max(1000)
+    .required()
+    .error(new Error('Le commentaire est invalide')),
+});
 export {
   validStructures,
   validExportStructures,
@@ -153,4 +161,5 @@ export {
   validExportCandidatsCoordinateurs,
   validDemandesConseiller,
   demandeConseillerAvisPrefet,
+  commentaireConseillerAvisPrefet,
 };

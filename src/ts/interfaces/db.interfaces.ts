@@ -420,11 +420,7 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
-  prefet?: {
-    mailSendDatePrefet: string;
-    mailErrorSentPrefet?: string;
-    mailErrorDetailSentPrefet?: Date;
-  };
+  prefet: IPrefetAvenant;
 }
 
 interface ICoselec {
@@ -445,6 +441,15 @@ interface IPrefet {
   insertedAt: Date;
   idStructureTransfert?: ObjectId;
   banniereValidationAvisPrefet?: boolean;
+}
+
+interface IPrefetAvenant {
+  avis: string;
+  commentaire: string;
+  insertedAt: Date;
+  idStructureTransfert?: ObjectId;
+  validateur?: string;
+  banniereValidationAvis?: boolean;
 }
 
 export interface IDemandesCoordinateur {

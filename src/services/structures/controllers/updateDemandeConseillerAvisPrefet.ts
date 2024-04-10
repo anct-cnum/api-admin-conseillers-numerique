@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { demandeConseillerAvisPrefet } from '../../../schemas/structures.schemas';
+import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 
 const updateDemandeConseillerAvisPrefet =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -37,26 +38,76 @@ const updateDemandeConseillerAvisPrefet =
         res.status(400).json({ message: 'Id incorrect' });
         return;
       }
-      const structure = await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          {
+      const checkAccess = await checkAccessReadRequestStructures(app, req);
+      const structure = await app.service(service.structures).Model.aggregate([
+        {
+          $addFields: {
+            lastPrefet: { $arrayElemAt: ['$prefet', -1] },
+          },
+        },
+        {
+          $match: {
             _id: new ObjectId(idStructure),
+            $and: [checkAccess],
             coordinateurCandidature: false,
             statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+            'lastPrefet.avisPrefet': { $in: ['NÉGATIF', 'POSITIF'] },
           },
-          {
-            $push: {
-              prefet: updatedPrefet,
+        },
+        {
+          $project: {
+            _id: 0,
+            lastPrefet: '$lastPrefet',
+          },
+        },
+      ]);
+      if (structure.length === 1) {
+        const structureUpdated = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(idStructure),
+              coordinateurCandidature: false,
+              statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+              prefet: {
+                $in: [structure[0].lastPrefet],
+              },
             },
-          },
-        );
-      if (structure.modifiedCount === 0) {
-        res
-          .status(404)
-          .json({ message: "La structure n'a pas été mise à jour" });
-        return;
+            {
+              $set: {
+                'prefet.$': updatedPrefet,
+              },
+            },
+          );
+        if (structureUpdated.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "La structure n'a pas été mise à jour" });
+          return;
+        }
+      } else {
+        const structureUpdated = await app
+          .service(service.structures)
+          .Model.accessibleBy(req.ability, action.update)
+          .updateOne(
+            {
+              _id: new ObjectId(idStructure),
+              coordinateurCandidature: false,
+              statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+            },
+            {
+              $push: {
+                prefet: updatedPrefet,
+              },
+            },
+          );
+        if (structureUpdated.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "La structure n'a pas été mise à jour" });
+          return;
+        }
       }
       res.status(200).json({ success: true });
     } catch (error) {

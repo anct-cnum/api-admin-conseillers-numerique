@@ -222,6 +222,18 @@ const validationRecrutementContrat =
         false,
         datePG,
       );
+      const userAccount = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          name: miseEnRelationVerif.conseillerObj.email,
+        });
+      if (!userAccount.roles.includes('candidat')) {
+        res.status(409).json({
+          message: `Action non autorisée : l'adresse mail personnelle du conseiller possède déjà un rôle ${userAccount.roles[0]} `,
+        });
+        return;
+      }
       // vérification si le conseiller possède encore son adresse mail conseiller numérique
       const userEstEncoreConseillerNumerique = await app
         .service(service.users)
@@ -231,13 +243,6 @@ const validationRecrutementContrat =
           roles: { $in: ['conseiller'] },
         });
       if (userEstEncoreConseillerNumerique === 0) {
-        const userAccount = await app
-          .service(service.users)
-          .Model.accessibleBy(req.ability, action.read)
-          .findOne({
-            name: miseEnRelationVerif.conseillerObj.email,
-            roles: { $in: ['candidat'] },
-          });
         const passwordHash = bcrypt.hashSync(uuidv4(), 10);
         if (userAccount === null) {
           const canCreate = req.ability.can(action.create, ressource.users);
