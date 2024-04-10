@@ -8,6 +8,14 @@ import service from '../../../helpers/services';
 import { avenantAjoutPoste } from '../../../schemas/structures.schemas';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../repository/structures.repository';
+import mailer from '../../../mailer';
+import { IUser } from '../../../ts/interfaces/db.interfaces';
+import {
+  confirmationAttributionPostePrefet,
+  confirmationAttributionPoste,
+  refusAttributionPostePrefet,
+  refusAttributionPoste,
+} from '../../../emails';
 
 const { Pool } = require('pg');
 
@@ -183,7 +191,7 @@ const updateAvenantAjoutPoste =
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             _id: new ObjectId(idStructure),
             demandesCoselec: {
@@ -195,8 +203,11 @@ const updateAvenantAjoutPoste =
             statut: 'VALIDATION_COSELEC',
           },
           paramsUpdateCollectionStructure,
+          {
+            new: true,
+          },
         );
-      if (structureUpdated.modifiedCount === 0) {
+      if (!structureUpdated) {
         res.status(400).json({ message: "L'avenant n'a pas pu être modifié" });
         return;
       }
@@ -216,6 +227,96 @@ const updateAvenantAjoutPoste =
           },
           paramsUpdateCollectionMiseEnRelation,
         );
+      const prefets: IUser[] = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.read)
+        .find({
+          roles: { $in: ['prefet'] },
+          departement: structureUpdated.codeDepartement,
+        })
+        .select({ _id: 0, name: 1 });
+
+      const mailerInstance = mailer(app);
+      if (prefets.length > 0) {
+        const promises: Promise<void>[] = [];
+        if (statut === 'POSITIF') {
+          const messageConfirmationAttributionPoste =
+            confirmationAttributionPostePrefet(mailerInstance);
+          await prefets.forEach(async (prefet) => {
+            // eslint-disable-next-line no-async-promise-executor
+            const p = new Promise<void>(async (resolve, reject) => {
+              const errorSmtpMailAttributionPoste =
+                await messageConfirmationAttributionPoste
+                  .send(prefet, structureUpdated, nbDePosteAccorder)
+                  .catch((errSmtp: Error) => {
+                    return errSmtp;
+                  });
+              if (errorSmtpMailAttributionPoste instanceof Error) {
+                reject();
+                return;
+              }
+              resolve(p);
+            });
+            promises.push(p);
+          });
+        } else {
+          const messageRefusAttributionPoste =
+            refusAttributionPostePrefet(mailerInstance);
+          await prefets.forEach(async (prefet) => {
+            // eslint-disable-next-line no-async-promise-executor
+            const p = new Promise<void>(async (resolve, reject) => {
+              const errorSmtpMailAttributionPoste =
+                await messageRefusAttributionPoste
+                  .send(prefet, structureUpdated)
+                  .catch((errSmtp: Error) => {
+                    return errSmtp;
+                  });
+              if (errorSmtpMailAttributionPoste instanceof Error) {
+                reject();
+                return;
+              }
+              resolve(p);
+            });
+            promises.push(p);
+          });
+        }
+        await Promise.allSettled(promises);
+      }
+      if (structureUpdated?.contact?.email) {
+        if (statut === 'POSITIF') {
+          const messageAttributionPoste = confirmationAttributionPoste(
+            app,
+            mailerInstance,
+          );
+          const errorSmtpMailAttributionPoste = await messageAttributionPoste
+            .send(structureUpdated, nbDePosteAccorder)
+            .catch((errSmtp: Error) => {
+              return errSmtp;
+            });
+          if (errorSmtpMailAttributionPoste instanceof Error) {
+            res.status(503).json({
+              message: errorSmtpMailAttributionPoste.message,
+            });
+            return;
+          }
+        } else {
+          const messageAttributionPoste = refusAttributionPoste(
+            app,
+            mailerInstance,
+          );
+          const errorSmtpMailAttributionPoste = await messageAttributionPoste
+            .send(structureUpdated)
+            .catch((errSmtp: Error) => {
+              return errSmtp;
+            });
+          if (errorSmtpMailAttributionPoste instanceof Error) {
+            res.status(503).json({
+              message: errorSmtpMailAttributionPoste.message,
+            });
+            return;
+          }
+        }
+      }
       res.status(200).json({
         statutAvenantAjoutPosteUpdated:
           statut === 'POSITIF' ? 'validee' : 'refusee',

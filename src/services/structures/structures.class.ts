@@ -31,6 +31,10 @@ import {
   updateDemandeConseillerRefusAvisAdmin,
   updateDemandeConseillerAvisPrefet,
   closeBannerDemandeConseillerAvisPrefet,
+  closeBannerAvenantAvisPrefet,
+  updateAvenantAvisPrefetPosteSupplementaire,
+  updateCommentaireAvisPrefet,
+  updateCommentaireAvenantAvisPrefet,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -130,10 +134,22 @@ export default class Structures extends Service {
       updateDemandeConseillerAvisPrefet(app),
     );
     app.patch(
+      '/avis/prefet/commentaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateCommentaireAvisPrefet(app),
+    );
+    app.patch(
       '/banner/prefet/conseiller/:id',
       authenticateMode(app),
       createAbilities(app),
       closeBannerDemandeConseillerAvisPrefet(app),
+    );
+    app.patch(
+      '/banner/avenant/prefet/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerAvenantAvisPrefet(app),
     );
     app.get(
       '/demandes/coordinateurs',
@@ -218,6 +234,18 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateAvenantRenduPoste(app),
+    );
+    app.patch(
+      '/avenant/avis/prefet/poste-supplementaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateAvenantAvisPrefetPosteSupplementaire(app),
+    );
+    app.patch(
+      '/avenant/avis/prefet/commentaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateCommentaireAvenantAvisPrefet(app),
     );
     app.patch(
       '/structure/add-role-coordinateur/:id',

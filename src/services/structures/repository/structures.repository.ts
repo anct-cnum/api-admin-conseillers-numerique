@@ -4,6 +4,7 @@ import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { StatutConventionnement } from '../../../ts/enum';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
+import { sortArrayConventionnement } from './reconventionnement.repository';
 
 type IConseiller = {
   idPG: number;
@@ -160,7 +161,7 @@ const filterAvisAdmin = (avisAdmin: string | undefined) => {
   };
 };
 
-const filterAvisPrefet = (avisPrefet: string | undefined) => {
+const filterAvisPrefetPrimoEntrante = (avisPrefet: string | undefined) => {
   if (avisPrefet === 'sans-avis') {
     return { 'lastPrefet.avisPrefet': { $nin: ['NÉGATIF', 'POSITIF'] } };
   }
@@ -192,6 +193,270 @@ const filterStatutDemandeConseiller = (statut: string) => {
   };
 };
 
+const filterAvisPrefetAvenantAjoutPoste = (avisPrefet: string | undefined) => {
+  if (avisPrefet === undefined) {
+    return {};
+  }
+  if (avisPrefet === 'sans-avis') {
+    return { 'prefet.avis': { $exists: false } };
+  }
+  return { 'prefet.avis': { $eq: avisPrefet } };
+};
+
+const filterStatutDemandeDePostes = (type: string, avisPrefet: string) => {
+  if (type === 'posteValider') {
+    return {
+      $or: [
+        {
+          statut: { $eq: 'VALIDATION_COSELEC' },
+          coordinateurCandidature: false,
+          ...filterAvisPrefetPrimoEntrante(avisPrefet),
+        },
+        {
+          demandesCoselec: {
+            $elemMatch: {
+              statut: { $eq: 'validee' },
+              type: { $eq: 'ajout' },
+              ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
+            },
+          },
+        },
+      ],
+    };
+  }
+  if (type === 'posteRefuser') {
+    return {
+      $or: [
+        {
+          statut: { $eq: 'REFUS_COSELEC' },
+          coordinateurCandidature: false,
+          ...filterAvisPrefetPrimoEntrante(avisPrefet),
+        },
+        {
+          demandesCoselec: {
+            $elemMatch: {
+              statut: { $eq: 'refuser' },
+              type: { $eq: 'ajout' },
+              ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
+            },
+          },
+        },
+      ],
+    };
+  }
+  if (type === 'posteRendu') {
+    return {
+      demandesCoselec: {
+        $elemMatch: {
+          statut: { $eq: 'en_cours' },
+          type: { $eq: 'retrait' },
+        },
+      },
+    };
+  }
+
+  return {
+    $or: [
+      {
+        statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
+        coordinateurCandidature: false,
+        ...filterAvisPrefetPrimoEntrante(avisPrefet),
+      },
+      {
+        demandesCoselec: {
+          $elemMatch: {
+            statut: { $eq: 'en_cours' },
+            type: { $eq: 'ajout' },
+            ...filterAvisPrefetAvenantAjoutPoste(avisPrefet),
+          },
+        },
+      },
+    ],
+  };
+};
+
+const formatAvenantForDemandeConseiller = (
+  structures,
+  statut: string,
+  type: string,
+) =>
+  structures
+    .filter((structure) => structure?.demandesCoselec?.length > 0)
+    .map((structure) => {
+      const avenant = structure.demandesCoselec.find(
+        (demande) => demande.statut === statut && demande.type === type,
+      );
+      if (!avenant) {
+        return {};
+      }
+      avenant.dateSorted = avenant.emetteurAvenant.date;
+      avenant.statutDemande =
+        avenant.type === 'retrait' ? 'avenantRenduPoste' : 'avenantAjoutPoste';
+      avenant.idPG = structure.idPG;
+      avenant.nom = structure.nom;
+      avenant.idStructure = structure._id;
+      avenant.codePostal = structure.codePostal;
+
+      return avenant;
+    });
+
+const formatStructureForDemandeConseiller = (
+  structures: IStructures[],
+  status: string[],
+) =>
+  structures
+    .filter(
+      (structure: IStructures) =>
+        status.includes(structure?.statut) &&
+        !structure.coordinateurCandidature,
+    )
+    .map((structure: IStructures) => {
+      return {
+        ...structure,
+        dateSorted: structure.createdAt,
+        statutDemande: 'structurePrimoEntrante',
+      };
+    });
+
+const sortGestionDemandesConseiller = (
+  type: string,
+  ordre: number,
+  structures: any,
+) => {
+  let avenants: any = [];
+  let structuresPrimoEntrante: any = [];
+  if (type === 'demandePoste') {
+    avenants = formatAvenantForDemandeConseiller(
+      structures,
+      'en_cours',
+      'ajout',
+    );
+    structuresPrimoEntrante = formatStructureForDemandeConseiller(structures, [
+      'CREEE',
+      'EXAMEN_COMPLEMENTAIRE_COSELEC',
+    ]);
+  }
+  if (type === 'posteValider') {
+    avenants = formatAvenantForDemandeConseiller(
+      structures,
+      'validee',
+      'ajout',
+    );
+    structuresPrimoEntrante = formatStructureForDemandeConseiller(structures, [
+      'VALIDATION_COSELEC',
+    ]);
+  }
+  if (type === 'posteRefuser') {
+    avenants = formatAvenantForDemandeConseiller(
+      structures,
+      'refusee',
+      'ajout',
+    );
+    structuresPrimoEntrante = formatStructureForDemandeConseiller(structures, [
+      'REFUS_COSELEC',
+    ]);
+  }
+  if (type === 'posteRendu') {
+    avenants = formatAvenantForDemandeConseiller(
+      structures,
+      'en_cours',
+      'retrait',
+    );
+  }
+  const structureFormat = avenants.concat(structuresPrimoEntrante);
+
+  return sortArrayConventionnement(structureFormat, ordre);
+};
+
+const totalParDemandesConseiller = async (app: Application, req: IRequest) => {
+  const checkAccess = await checkAccessReadRequestStructures(app, req);
+  const structuresPrimoEntrante = await app
+    .service(service.structures)
+    .Model.aggregate([
+      {
+        $match: {
+          $and: [checkAccess],
+          statut: {
+            $in: [
+              'CREEE',
+              'EXAMEN_COMPLEMENTAIRE_COSELEC',
+              'VALIDATION_COSELEC',
+              'REFUS_COSELEC',
+            ],
+          },
+          coordinateurCandidature: false,
+        },
+      },
+      {
+        $group: {
+          _id: '$statut',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+  const countAvenant = await app.service(service.structures).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+      },
+    },
+    { $unwind: '$demandesCoselec' },
+    {
+      $group: {
+        _id: {
+          statut: '$demandesCoselec.statut',
+          type: '$demandesCoselec.type',
+        },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+  const totalAvenantAjoutPosteEnCours =
+    countAvenant.find(
+      (element) =>
+        element._id.type === 'ajout' && element._id.statut === 'en_cours',
+    )?.count ?? 0;
+  const totalAvenantAjoutPosteValider =
+    countAvenant.find(
+      (element) =>
+        element._id.type === 'ajout' && element._id.statut === 'validee',
+    )?.count ?? 0;
+  const totalAvenantAjoutPosteRefuser =
+    countAvenant.find(
+      (element) =>
+        element._id.type === 'ajout' && element._id.statut === 'refusee',
+    )?.count ?? 0;
+  const totalPosteRenduEnCours =
+    countAvenant.find(
+      (element) =>
+        element._id.type === 'retrait' && element._id.statut === 'en_cours',
+    )?.count ?? 0;
+  const totalStructureDemandePoste =
+    structuresPrimoEntrante.find(
+      (element) => element._id === 'CREEE' || 'EXAMEN_COMPLEMENTAIRE_COSELEC',
+    )?.count ?? 0;
+  const totalStructurePosteValider =
+    structuresPrimoEntrante.find(
+      (element) => element._id === 'VALIDATION_COSELEC',
+    )?.count ?? 0;
+  const totalStructurePosteRefuser =
+    structuresPrimoEntrante.find((element) => element._id === 'REFUS_COSELEC')
+      ?.count ?? 0;
+  const totalDemandePoste =
+    totalAvenantAjoutPosteEnCours + totalStructureDemandePoste;
+  const totalPosteValider =
+    totalAvenantAjoutPosteValider + totalStructurePosteValider;
+  const totalPosteRefuser =
+    totalAvenantAjoutPosteRefuser + totalStructurePosteRefuser;
+
+  return {
+    totalDemandePoste,
+    totalPosteValider,
+    totalPosteRefuser,
+    totalPosteRenduEnCours,
+  };
+};
+
 export {
   checkAccessReadRequestStructures,
   filterDepartement,
@@ -211,6 +476,10 @@ export {
   checkStructurePhase2,
   checkIfStructurePrimoPhase2,
   filterAvisAdmin,
-  filterAvisPrefet,
+  filterAvisPrefetAvenantAjoutPoste,
+  filterAvisPrefetPrimoEntrante,
   filterStatutDemandeConseiller,
+  filterStatutDemandeDePostes,
+  sortGestionDemandesConseiller,
+  totalParDemandesConseiller,
 };

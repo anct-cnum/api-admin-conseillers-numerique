@@ -5,6 +5,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import service from '../../../helpers/services';
 import { checkAccessReadRequestStructures } from '../repository/structures.repository';
 import { action } from '../../../helpers/accessControl/accessList';
+import { getCoselec } from '../../../utils';
 
 const getDetailDemandeConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -27,6 +28,8 @@ const getDetailDemandeConseiller =
             prefet: { $arrayElemAt: ['$prefet', -1] },
             nombreConseillersSouhaites: 1,
             createdAt: 1,
+            demandesCoselec: 1,
+            coselec: 1,
             statut: 1,
             idPG: 1,
             nom: 1,
@@ -40,9 +43,13 @@ const getDetailDemandeConseiller =
         });
         return;
       }
+      structure[0].nombreConseillersCoselec =
+        getCoselec(structure[0])?.nombreConseillersCoselec ?? 0;
       if (
-        !['POSITIF', 'NÉGATIF'].includes(structure[0]?.prefet?.avisPrefet) &&
-        structure[0]?.statut === 'CREEE'
+        structure[0]?.statut === 'CREEE' ||
+        structure[0]?.demandesCoselec?.some(
+          (demande) => demande.statut === 'en_cours',
+        )
       ) {
         const listeStructure = await app
           .service(service.structures)

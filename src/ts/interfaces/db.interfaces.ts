@@ -371,6 +371,8 @@ export interface IStructures {
   reseau: Reseau;
   codeCom: string | null;
   coselec: ICoselec[];
+  coordinateurCandidature: boolean;
+  coordinateurTypeContrat: null | string;
   conventionnement: {
     statut: string;
     motif: string;
@@ -410,6 +412,7 @@ interface IDemandesCoselec {
     date: Date;
     email: string;
   };
+  prefet: IPrefetAvenant;
 }
 
 interface ICoselec {
@@ -430,6 +433,15 @@ interface IPrefet {
   insertedAt: Date;
   idStructureTransfert?: ObjectId;
   banniereValidationAvisPrefet?: boolean;
+}
+
+interface IPrefetAvenant {
+  avis: string;
+  commentaire: string;
+  insertedAt: Date;
+  idStructureTransfert?: ObjectId;
+  validateur?: string;
+  banniereValidationAvis?: boolean;
 }
 
 export interface IDemandesCoordinateur {

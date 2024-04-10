@@ -23,6 +23,21 @@ const validationRenouvellementContrat =
         });
         return;
       }
+      const miseEnRelationProchainTerminee = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({ _id: miseEnRelationVerif.miseEnRelationConventionnement });
+      if (
+        !['finalisee', 'nouvelle_rupture'].includes(
+          miseEnRelationProchainTerminee?.statut,
+        ) ||
+        !miseEnRelationProchainTerminee
+      ) {
+        res.status(404).json({
+          message: 'Le renouvellement est impossible pour ce contrat.',
+        });
+        return;
+      }
       const miseEnRelationUpdated = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.update)
@@ -34,6 +49,12 @@ const validationRenouvellementContrat =
             $set: {
               statut: 'finalisee',
               banniereValidationRenouvellement: true,
+              ...(miseEnRelationProchainTerminee?.contratCoordinateur && {
+                contratCoordinateur: true,
+                banniereAjoutRoleCoordinateur:
+                  miseEnRelationProchainTerminee?.banniereAjoutRoleCoordinateur ===
+                  true,
+              }),
             },
           },
           { returnOriginal: false, includeResultMetadata: true },
@@ -49,9 +70,7 @@ const validationRenouvellementContrat =
         .Model.accessibleBy(req.ability, action.update)
         .updateOne(
           {
-            _id: new ObjectId(
-              miseEnRelationVerif.miseEnRelationConventionnement,
-            ),
+            _id: miseEnRelationVerif.miseEnRelationConventionnement,
           },
           {
             $set: {
@@ -62,6 +81,49 @@ const validationRenouvellementContrat =
               dateRupture: '',
               motifRupture: '',
               dossierIncompletRupture: '',
+            },
+          },
+        );
+      await app
+        .service(service.structures)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateOne(
+          {
+            _id: miseEnRelationVerif.structure.oid,
+            demandesCoordinateur: {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId:
+                  miseEnRelationVerif.miseEnRelationConventionnement,
+              },
+            },
+          },
+          {
+            $set: {
+              'demandesCoordinateur.$.miseEnRelationId': new ObjectId(
+                idMiseEnRelation,
+              ),
+            },
+          },
+        );
+      await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.update)
+        .updateMany(
+          {
+            'structure.$id': miseEnRelationVerif.structure.oid,
+            'structureObj.demandesCoordinateur': {
+              $elemMatch: {
+                statut: 'validee',
+                miseEnRelationId:
+                  miseEnRelationVerif.miseEnRelationConventionnement,
+              },
+            },
+          },
+          {
+            $set: {
+              'structureObj.demandesCoordinateur.$.miseEnRelationId':
+                new ObjectId(idMiseEnRelation),
             },
           },
         );
