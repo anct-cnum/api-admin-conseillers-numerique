@@ -235,18 +235,63 @@ export default class Conseillers extends Service {
       createAbilities(app),
       getConseillerContratById(app),
     );
+    /**
+     * @openapi
+     * '/conseiller/rupture/validation/{id}':
+     *  patch:
+     *     tags:
+     *     - Conseiller
+     *     summary: Validation d'une rupture par l'ID du conseiller.
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: Object ID du conseiller.
+     *         schema:
+     *           type: string
+     */
     app.patch(
       '/conseiller/rupture/validation/:id',
       authenticateMode(app),
       createAbilities(app),
       validationRuptureConseiller(app),
     );
+    /**
+     * @openapi
+     * '/candidat/relance-invitation/{id}':
+     *  patch:
+     *     tags:
+     *     - Conseiller
+     *     summary: Modifier l'état de la rupture en incomplet par l'ID du conseiller.
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: Object ID du conseiller.
+     *         schema:
+     *           type: string
+     */
     app.patch(
       '/conseiller/rupture/incomplet/:id',
       authenticateMode(app),
       createAbilities(app),
       dossierIncompletRuptureConseiller(app),
     );
+    /**
+     * @openapi
+     * '/candidat/{id}/cv':
+     *  get:
+     *     tags:
+     *     - Conseiller
+     *     summary: Récupérer le Curiculum Vitae d'un candidat par son ID.
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: Object ID du candidat.
+     *         schema:
+     *           type: string
+     */
     app.get(
       '/candidat/:id/cv',
       authenticateMode(app),
