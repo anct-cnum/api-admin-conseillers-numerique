@@ -46,7 +46,7 @@ const candidatRelanceInvitation =
         .findOneAndUpdate(
           { _id: conseillerUser._id },
           { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
-          { returnOriginal: false, rawResult: true },
+          { returnOriginal: false, includeResultMetadata: true },
         );
       if (users.lastErrorObject.n === 0) {
         res.status(409).json({

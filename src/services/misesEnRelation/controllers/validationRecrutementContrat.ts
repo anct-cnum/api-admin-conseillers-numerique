@@ -167,8 +167,13 @@ const validationRecrutementContrat =
         .Model.accessibleBy(req.ability, action.read)
         .findOne({
           name: miseEnRelationVerif.conseillerObj.email,
-          roles: { $in: ['candidat'] },
         });
+      if (!userAccount.roles.includes('candidat')) {
+        res.status(409).json({
+          message: `Action non autorisée : l'adresse mail personnelle du conseiller possède déjà un rôle ${userAccount.roles[0]} `,
+        });
+        return;
+      }
       const passwordHash = bcrypt.hashSync(uuidv4(), 10);
       if (userAccount === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
@@ -225,7 +230,7 @@ const validationRecrutementContrat =
                 resetPasswordCnil: '',
               },
             },
-            { returnOriginal: false, rawResult: true },
+            { returnOriginal: false, includeResultMetadata: true },
           );
         if (userUpdated.lastErrorObject.n === 0) {
           res.status(400).json({
@@ -264,7 +269,7 @@ const validationRecrutementContrat =
               emailPro: '',
             },
           },
-          { returnOriginal: false, rawResult: true },
+          { returnOriginal: false, includeResultMetadata: true },
         );
       if (conseillerUpdated.lastErrorObject.n === 0) {
         res.status(404).json({
@@ -291,7 +296,7 @@ const validationRecrutementContrat =
             _id: new ObjectId(idMiseEnRelation),
           },
           objectMiseEnRelationUpdated,
-          { returnOriginal: false, rawResult: true },
+          { returnOriginal: false, includeResultMetadata: true },
         );
       if (miseEnRelationUpdated.lastErrorObject.n === 0) {
         res.status(404).json({

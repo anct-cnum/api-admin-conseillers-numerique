@@ -31,6 +31,10 @@ import {
   updateDemandeConseillerRefusAvisAdmin,
   updateDemandeConseillerAvisPrefet,
   closeBannerDemandeConseillerAvisPrefet,
+  closeBannerAvenantAvisPrefet,
+  updateAvenantAvisPrefetPosteSupplementaire,
+  updateCommentaireAvisPrefet,
+  updateCommentaireAvenantAvisPrefet,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -342,11 +346,18 @@ export default class Structures extends Service {
      *           type: string
      */
     app.patch(
+      '/avis/prefet/commentaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateCommentaireAvisPrefet(app),
+    );
+    app.patch(
       '/banner/prefet/conseiller/:id',
       authenticateMode(app),
       createAbilities(app),
       closeBannerDemandeConseillerAvisPrefet(app),
     );
+<<<<<<< HEAD
     /**
      * @openapi
      * '/demandes/coordinateurs':
@@ -355,6 +366,14 @@ export default class Structures extends Service {
      *     - Structure
      *     summary: Récupérer la liste des structures postulant pour un poste coordinateur
      */
+=======
+    app.patch(
+      '/banner/avenant/prefet/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      closeBannerAvenantAvisPrefet(app),
+    );
+>>>>>>> recette
     app.get(
       '/demandes/coordinateurs',
       authenticateMode(app),
@@ -628,6 +647,18 @@ export default class Structures extends Service {
      *         schema:
      *           type: string
      */
+    app.patch(
+      '/avenant/avis/prefet/poste-supplementaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateAvenantAvisPrefetPosteSupplementaire(app),
+    );
+    app.patch(
+      '/avenant/avis/prefet/commentaire/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      updateCommentaireAvenantAvisPrefet(app),
+    );
     app.patch(
       '/structure/add-role-coordinateur/:id',
       authenticateMode(app),

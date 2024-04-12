@@ -48,7 +48,7 @@ export default function (app: Application): void {
       tags: [
         {
           name: 'Conseiller',
-          description: 'Routes lié aux conseillers (11 routes)',
+          description: 'Routes lié aux conseillers (14 routes)',
         },
         {
           name: 'ConseillerRupture',

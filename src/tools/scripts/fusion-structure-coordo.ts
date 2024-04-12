@@ -7,8 +7,7 @@ import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { getCoselec } from '../../utils';
-import { PhaseConventionnement } from '../../ts/enum';
-import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
+import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 
 const { Pool } = require('pg');
 
@@ -121,6 +120,8 @@ execute(__filename, async ({ app, logger, exit }) => {
         {
           $set: {
             updatedAt: structureDoublon.updatedAt,
+            coordinateurCandidature: true,
+            coordinateurTypeContrat: structureDoublon.coordinateurTypeContrat,
           },
           $push: {
             ...(coselecCoordo.length > 0 && {
@@ -131,9 +132,8 @@ execute(__filename, async ({ app, logger, exit }) => {
                 avisCoselec: 'POSITIF',
                 insertedAt: today,
                 type: 'coordinateur',
-                ...(checkStructurePhase2(
-                  structureActif?.conventionnement?.statut,
-                ) && {
+                ...(structureActif?.conventionnement?.statut ===
+                  StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2 && {
                   phaseConventionnement: PhaseConventionnement.PHASE_2,
                 }),
               },
@@ -143,7 +143,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             },
           },
         },
-        { returnOriginal: false, rawResult: true },
+        { returnOriginal: false, includeResultMetadata: true },
       );
     if (structureAConserver.lastErrorObject.n === 0) {
       logger.error(
@@ -174,7 +174,7 @@ execute(__filename, async ({ app, logger, exit }) => {
           },
           $unset: { demandesCoordinateur: '' },
         },
-        { returnOriginal: false, rawResult: true },
+        { returnOriginal: false, includeResultMetadata: true },
       );
     if (structureDoublonSuiteFusion.lastErrorObject.n === 0) {
       logger.error(

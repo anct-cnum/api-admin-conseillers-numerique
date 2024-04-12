@@ -21,9 +21,8 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
           await app.service(service.users).Model.updateOne(
             { _id: user._id },
             {
-              $pull: { roles: 'coordinateur_coop' },
-              $push: { roles: 'coordinateur' },
               $set: {
+                roles: ['conseiller', 'coordinateur'],
                 token: uuidv4(),
                 tokenCreatedAt: new Date(),
                 mailSentDate: null,

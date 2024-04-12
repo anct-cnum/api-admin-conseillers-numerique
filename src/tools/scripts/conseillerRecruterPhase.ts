@@ -9,17 +9,23 @@ import execute from '../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 
+interface Options {
+  conseillerId: ObjectId;
+  structureId: ObjectId;
+  phase: string;
+}
+
 program.option('-c, --conseillerId <conseillerId>', 'id conseiller');
 program.option('-s, --structureId <structureId>', 'id structure');
 program.option('-p, --phase <phase>', 'phase 1 ou 2');
 program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {
-  const options = program.opts();
+  const { conseillerId, structureId, phase }: Options = program.opts();
   if (
-    !ObjectId.isValid(options.structureId) ||
-    !ObjectId.isValid(options.conseillerId) ||
-    !options.phase
+    !ObjectId.isValid(structureId) ||
+    !ObjectId.isValid(conseillerId) ||
+    !phase
   ) {
     logger.error(
       `Veuillez renseigner un id conseiller & un id structure valide & et la phase précise (1 ou 2)`,
@@ -27,9 +33,7 @@ execute(__filename, async ({ app, logger, exit }) => {
     return;
   }
   let queryUpdate = {};
-  const conseillerId = new ObjectId(options.conseillerId);
-  const structureId = new ObjectId(options.structureId);
-  if (options.phase === '2') {
+  if (phase === '2') {
     queryUpdate = {
       $set: {
         phaseConventionnement: PhaseConventionnement.PHASE_2,
@@ -39,7 +43,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         miseEnRelationConventionnement: '',
       },
     };
-  } else if (options.phase === '1') {
+  } else if (phase === '1') {
     queryUpdate = {
       $unset: {
         phaseConventionnement: '',
@@ -75,7 +79,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   );
   if (update.matchedCount === 1) {
     logger.info(
-      `Le contrat en cours (finalisee) du conseiller ${conseillerId} est de phase ${options.phase} (structure: ${structure?.nom})`,
+      `Le contrat en cours (finalisee) du conseiller ${conseillerId} est de phase ${phase} (structure: ${structure?.nom})`,
     );
     const contrats = await app.service(service.misesEnRelation).Model.find({
       'conseiller.$id': conseillerId,

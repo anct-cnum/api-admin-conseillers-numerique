@@ -107,7 +107,7 @@ const addRoleCoordinateur =
       const user = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
+        .findOneAndUpdate(
           {
             'entity.$id': new ObjectId(conseillerId),
             roles: { $in: ['conseiller'] },
@@ -121,6 +121,7 @@ const addRoleCoordinateur =
               migrationDashboard: true,
             },
           },
+          { returnOriginal: false, includeResultMetadata: true },
         );
 
       if (user.modifiedCount === 0) {
@@ -133,7 +134,7 @@ const addRoleCoordinateur =
         app,
         req,
         mailer,
-        user,
+        user.value,
       );
 
       if (errorSmtpMail instanceof Error) {

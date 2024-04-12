@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Response } from 'express';
@@ -58,51 +60,102 @@ const checkIfCcp1 = (statut) =>
 
 const generateCsvCandidat = async (misesEnRelations, res: Response) => {
   res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire\n',
+    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;Compte activé;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire\n',
   );
   try {
     await Promise.all(
       misesEnRelations.map(async (miseEnrelation) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
-          `${formatDate(miseEnrelation.conseiller?.createdAt)};${formatDate(
-            miseEnrelation?.dateDebutDeContrat,
-          )};${formatDate(miseEnrelation?.dateFinDeContrat)};${
+          `${
+            formatDate(miseEnrelation.conseiller?.createdAt)
+          };${
+            formatDate(miseEnrelation?.dateDebutDeContrat)
+          };${
+            formatDate(miseEnrelation?.dateFinDeContrat)
+          };${
             miseEnrelation?.typeDeContrat ?? 'Non renseigné'
-          };${miseEnrelation?.salaire ?? 'Non renseigné'};${miseEnrelation
-            .conseiller?.prenom};${miseEnrelation.conseiller?.nom};${
+          };${
+            miseEnrelation?.salaire ?? 'Non renseigné'
+          };${
+            miseEnrelation.conseiller?.prenom
+          };${
+            miseEnrelation.conseiller?.nom
+          };${
+            miseEnrelation.conseiller?.emailCN?.address &&
+            miseEnrelation.conseiller?.mattermost?.id
+              ? 'oui'
+              : 'non'
+          };${
             miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.telephone};${miseEnrelation.conseiller
-            ?.email};${
+          };${
+            miseEnrelation.conseiller?.telephone
+          };${
+            miseEnrelation.conseiller?.email
+          };${
             miseEnrelation.conseiller?.estCoordinateur ? 'oui' : 'non'
-          };${miseEnrelation.conseiller?.codePostal};${miseEnrelation.conseiller
-            ?.nomCommune};${miseEnrelation.conseiller?.codeDepartement};${
+          };${
+            miseEnrelation.conseiller?.codePostal
+          };${
+            miseEnrelation.conseiller?.nomCommune
+          };${
+            miseEnrelation.conseiller?.codeDepartement
+          };${
             miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
           };${
             miseEnrelation.conseiller?.pix
               ? miseEnrelation.conseiller?.pix.palier
               : ''
-          };${checkIfCcp1(miseEnrelation.conseiller?.statut)};${miseEnrelation
-            .structure?.siret};${miseEnrelation.structure
-            ?.idPG};${miseEnrelation.structure?._id};${miseEnrelation.structure
-            ?.nom};${miseEnrelation.structure?.type};${formatAdresseStructure(
-            miseEnrelation.structure.insee,
-          )};${miseEnrelation.structure?.codePostal};${miseEnrelation.structure
-            ?.codeCommune};${miseEnrelation.structure
-            ?.codeDepartement};${miseEnrelation.structure
-            ?.codeRegion};${miseEnrelation.structure?.contact
-            ?.prenom};${miseEnrelation.structure?.contact?.nom};${miseEnrelation
-            .structure?.contact?.telephone};${miseEnrelation.structure?.contact
-            ?.email};${miseEnrelation.conseiller?.idPG};${miseEnrelation
-            .conseiller?._id};${coselec !== null ? coselec?.numero : ''};${
+          };${
+            checkIfCcp1(miseEnrelation.conseiller?.statut)
+          };${
+            miseEnrelation.structure?.siret
+          };${
+            miseEnrelation.structure?.idPG
+          };${
+            miseEnrelation.structure?._id
+          };${
+            miseEnrelation.structure?.nom
+          };${
+            miseEnrelation.structure?.type
+          };${
+            formatAdresseStructure(miseEnrelation.structure.insee)
+          };${
+            miseEnrelation.structure?.codePostal
+          };${
+            miseEnrelation.structure?.codeCommune
+          };${
+            miseEnrelation.structure?.codeDepartement
+          };${
+            miseEnrelation.structure?.codeRegion
+          };${
+            miseEnrelation.structure?.contact?.prenom
+          };${
+            miseEnrelation.structure?.contact?.nom
+          };${
+            miseEnrelation.structure?.contact?.telephone
+          };${
+            miseEnrelation.structure?.contact?.email
+          };${
+            miseEnrelation.conseiller?.idPG
+          };${
+            miseEnrelation.conseiller?._id
+          };${
+            coselec !== null ? coselec?.numero : ''
+          };${
             coselec !== null ? coselec?.nombreConseillersCoselec : 0
-          };${formatDate(
-            miseEnrelation.conseiller?.datePrisePoste,
-          )};${formatDate(miseEnrelation.conseiller?.dateFinFormation)};${
-            miseEnrelation.conseiller?.emailCN
+          };${
+            formatDate(miseEnrelation.conseiller?.datePrisePoste)
+          };${
+            formatDate(miseEnrelation.conseiller?.dateFinFormation)
+          };${
+            miseEnrelation.conseiller?.mattermost?.id &&
+            miseEnrelation.conseiller?.emailCN?.address
               ? miseEnrelation.conseiller?.emailCN?.address
               : ''
-          };${miseEnrelation.conseiller?.emailPro ?? ''}\n`,
+          };${
+            miseEnrelation.conseiller?.emailPro ?? ''
+          }\n`,
         );
       }),
     );
@@ -231,6 +284,7 @@ const generateCsvConseillersWithoutCRA = async (
 ) => {
   try {
     const fileHeaders = [
+      "id Conum",
       'Nom',
       'Prénom',
       'Email @conseiller-numerique.fr',
@@ -238,7 +292,8 @@ const generateCsvConseillersWithoutCRA = async (
       'Code département du conseiller',
       'Numéro de téléphone du conseiller',
       "Date d'envoi du mail M+1",
-      "Date d'envoi du mail M+1,5",
+      "Date d'envoi du mail M+1.5",
+      "Groupe CRA",
       'Id de la structure',
       'Siret de la structure',
       'Nom de la structure',
@@ -250,6 +305,7 @@ const generateCsvConseillersWithoutCRA = async (
         fileHeaders.join(csvCellSeparator),
         ...conseillers.map((statCnfsWithoutCRA) =>
           [
+            statCnfsWithoutCRA.idPG,
             statCnfsWithoutCRA.nom,
             statCnfsWithoutCRA.prenom,
             statCnfsWithoutCRA.emailCN?.address,
@@ -268,6 +324,7 @@ const generateCsvConseillersWithoutCRA = async (
                 statCnfsWithoutCRA.groupeCRAHistorique,
               )[0]['dateMailSendConseillerM+1,5'],
             ),
+            statCnfsWithoutCRA.groupeCRA,
             statCnfsWithoutCRA.structure.idPG,
             statCnfsWithoutCRA.structure.siret,
             statCnfsWithoutCRA.structure.nom,
@@ -343,8 +400,7 @@ const generateCsvStructure = async (
             structure.type === 'PRIVATE' ? 'privée' : 'publique'
           };${structure.statut};${structure.codePostal};${
             structure.codeCommune
-          };${structure.codeDepartement};${structure.codeRegion};${structure
-            .contact?.telephone};${structure.contact?.email};${
+          };${structure.codeDepartement};${structure.codeRegion};${structure.contact?.telephone};${structure.contact?.email};${
             structure.userCreated ? 'oui' : 'non'
           };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${
             structure.nombreConseillersSouhaites ?? 0

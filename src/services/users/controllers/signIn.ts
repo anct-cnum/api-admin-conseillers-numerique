@@ -22,6 +22,7 @@ const allowedRoles = [
 ];
 
 const axios = require('axios');
+const { v4: uuidv4 } = require('uuid');
 
 const signIn = (app: Application) => async (req: IRequest, res: Response) => {
   // vérification du token provenant du frontend par le serveur d'authentification
@@ -171,6 +172,32 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
                 miseEnRelationRefusRecrutement;
             }
             user._doc.nomStructure = structure.nom;
+          } else if (user.roles.includes('coordinateur')) {
+            user._doc.roles = ['coordinateur']; // FIX ordre rôle
+            const coordinateur = await app
+              .service(service.conseillers)
+              .Model.findOne({
+                _id: user.entity.oid,
+              });
+            if (
+              coordinateur?.estCoordinateur !== true ||
+              coordinateur?.emailCN?.address !== keycloakUser.email
+            ) {
+              await app.service(service.users).Model.updateOne(
+                { _id: user._id },
+                {
+                  $set: {
+                    token: uuidv4(),
+                    tokenCreatedAt: new Date(),
+                  },
+                  $unset: {
+                    sub: '',
+                    refreshToken: '',
+                  },
+                },
+              );
+              return res.status(401).json('Connexion refusée');
+            }
           }
           // envoi du refresh token dans un cookie
           res.cookie(
