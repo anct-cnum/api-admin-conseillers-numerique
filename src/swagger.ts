@@ -63,7 +63,7 @@ export default function (app: Application): void {
         { name: 'Stats', description: 'Routes lié aux stats (9 routes)' },
         {
           name: 'Structure',
-          description: 'Routes lié aux structures (31 routes)',
+          description: 'Routes lié aux structures (35 routes)',
         },
         {
           name: 'User',

@@ -332,11 +332,11 @@ export default class Structures extends Service {
     );
     /**
      * @openapi
-     * '/banner/prefet/conseiller/{id}':
+     * '/avis/prefet/conseiller/{id}':
      *  patch:
      *     tags:
      *     - Structure
-     *     summary: Fermer la bannière de confirmation d'un avis du préfet pour une structure primo entrante (COSELEC AUTO)
+     *     summary: Mettre à jour le commentaire de l'avis du préfet pour une structure primo entrante (COSELEC AUTO)
      *     parameters:
      *       - in: path
      *         name: id
@@ -351,13 +351,27 @@ export default class Structures extends Service {
       createAbilities(app),
       updateCommentaireAvisPrefet(app),
     );
+    /**
+     * @openapi
+     * '/banner/prefet/conseiller/{id}':
+     *  patch:
+     *     tags:
+     *     - Structure
+     *     summary: Fermer la bannière de confirmation d'un avis du préfet pour une structure primo entrante (COSELEC AUTO)
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: id de la structure.
+     *         schema:
+     *           type: string
+     */
     app.patch(
       '/banner/prefet/conseiller/:id',
       authenticateMode(app),
       createAbilities(app),
       closeBannerDemandeConseillerAvisPrefet(app),
     );
-<<<<<<< HEAD
     /**
      * @openapi
      * '/demandes/coordinateurs':
@@ -366,14 +380,20 @@ export default class Structures extends Service {
      *     - Structure
      *     summary: Récupérer la liste des structures postulant pour un poste coordinateur
      */
-=======
     app.patch(
       '/banner/avenant/prefet/:id',
       authenticateMode(app),
       createAbilities(app),
       closeBannerAvenantAvisPrefet(app),
     );
->>>>>>> recette
+    /**
+     * @openapi
+     * '/demandes/coordinateurs':
+     *  get:
+     *     tags:
+     *     - Structure
+     *     summary: Récupérer la liste des structures postulant pour un poste coordinateur
+     */
     app.get(
       '/demandes/coordinateurs',
       authenticateMode(app),
@@ -634,11 +654,11 @@ export default class Structures extends Service {
     );
     /**
      * @openapi
-     * '/structure/add-role-coordinateur/{id}':
+     * '/avenant/avis/prefet/poste-supplementaire/{id}':
      *  patch:
      *     tags:
      *     - Structure
-     *     summary: Ajouter le rôle de coordinateur à un conseiller d'une structure
+     *     summary: Ajouter un avis préfet sur un postes supplémentaire par l'ID de la structure
      *     parameters:
      *       - in: path
      *         name: id
@@ -653,12 +673,42 @@ export default class Structures extends Service {
       createAbilities(app),
       updateAvenantAvisPrefetPosteSupplementaire(app),
     );
+    /**
+     * @openapi
+     * '/avenant/avis/prefet/commentaire/{id}':
+     *  patch:
+     *     tags:
+     *     - Structure
+     *     summary: Modifier l'avis d'un commentaire en tant que préfet par l'ID de la structure
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: id de la structure.
+     *         schema:
+     *           type: string
+     */
     app.patch(
       '/avenant/avis/prefet/commentaire/:id',
       authenticateMode(app),
       createAbilities(app),
       updateCommentaireAvenantAvisPrefet(app),
     );
+    /**
+     * @openapi
+     * '/structure/add-role-coordinateur/{id}':
+     *  patch:
+     *     tags:
+     *     - Structure
+     *     summary: Ajouter le rôle de coordinateur à un conseiller d'une structure
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         description: id de la structure.
+     *         schema:
+     *           type: string
+     */
     app.patch(
       '/structure/add-role-coordinateur/:id',
       authenticateMode(app),
