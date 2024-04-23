@@ -193,12 +193,29 @@ const getDetailDossierConvention =
                   conseiller.statut === 'nouvelle_rupture' ||
                   conseiller.statut === 'terminee'),
             );
-          structure[0].conseillersRenouveller =
-            structure[0]?.conseillers?.filter(
-              (conseiller) =>
+          structure[0].conseillersRenouveller = structure[0]?.conseillers
+            ?.filter((conseiller) => {
+              const conseillerEstSelectionne =
                 conseiller.reconventionnement === true &&
-                conseiller.statutMiseEnrelation !== 'terminee' &&
-                conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
+                conseiller.statutMiseEnrelation !== 'nouvelle_rupture' &&
+                conseiller.statutMiseEnrelation !== 'terminee';
+              const conseillerEstSelectionneAvecEditionDeContrat =
+                conseiller.statutMiseEnrelation === 'renouvellement_initiee';
+              const conseillerEstEnRenouvellementConfirme =
+                conseiller.statutMiseEnrelation === 'finalisee';
+
+              return (
+                conseillerEstSelectionne ||
+                conseillerEstSelectionneAvecEditionDeContrat ||
+                conseillerEstEnRenouvellementConfirme
+              );
+            })
+            .filter(
+              (conseiller, index, conseillers) =>
+                index ===
+                conseillers.findIndex(
+                  (element) => element.idPG === conseiller.idPG,
+                ),
             );
         } else if (
           structure[0]?.conventionnement?.dossierConventionnement?.numero
