@@ -360,7 +360,7 @@ const formatAvenantForHistoriqueDossierConventionnement = (
       }
       return avenants.map((avenant) => {
         const item = avenant;
-        item.dateSorted = avenant.emetteurAvenant.date;
+        item.dateSorted = avenant?.validateurAvenant?.date;
         item.typeConvention =
           avenant.type === 'retrait'
             ? 'avenantRenduPoste'
@@ -404,7 +404,7 @@ const formatReconventionnementForExportHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
-      item.dateSorted = item?.dateDeCreation;
+      item.dateSorted = item?.dateDerniereModification;
       item.idPG = structure.idPG;
       item.nom = structure.nom;
       item.statutConventionnement = structure.conventionnement.statut;
@@ -503,7 +503,7 @@ const formatConventionnementForExportHistoriqueDossierConventionnement = (
       const item = structure;
       const coselecInitial =
         getCoselecPositifConventionnementInitial(structure);
-      item.dateSorted = structure.createdAt;
+      item.dateSorted = coselecInitial?.insertedAt;
       item.phaseConventionnement = coselecInitial?.phaseConventionnement
         ? PhaseConventionnement.PHASE_2
         : PhaseConventionnement.PHASE_1;
@@ -615,7 +615,7 @@ const formatAvenantForExportHistoriqueDossierConventionnement = (
       }
       return avenants.map((avenant) => {
         const item = avenant;
-        item.dateSorted = avenant.emetteurAvenant.date;
+        item.dateSorted = avenant?.validateurAvenant?.date;
         item.idPG = structure.idPG;
         item.nom = structure.nom;
         item.siret = structure.siret;

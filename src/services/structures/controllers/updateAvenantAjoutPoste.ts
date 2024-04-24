@@ -110,8 +110,8 @@ const updateAvenantAjoutPoste =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
+      const dateCoselec = new Date();
       if (statut === 'POSITIF') {
-        const dateCoselec = new Date();
         const datePG = dayjs(dateCoselec).format('YYYY-MM-DD');
         paramsUpdateCollectionStructure.$set = {
           coselecAt: dateCoselec,
@@ -158,10 +158,18 @@ const updateAvenantAjoutPoste =
         paramsUpdateCollectionStructure.$set = {
           'demandesCoselec.$.statut': 'refusee',
           'demandesCoselec.$.banniereValidationAvenant': true,
+          'demandesCoselec.$.validateurAvenant': {
+            email: req.user?.name,
+            date: dateCoselec,
+          },
         };
         paramsUpdateCollectionMiseEnRelation.$set = {
           'structureObj.demandesCoselec.$.statut': 'refusee',
           'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
+          'structureObj.demandesCoselec.$.validateurAvenant': {
+            email: req.user?.name,
+            date: dateCoselec,
+          },
         };
         paramsUpdateCollectionStructure.$push = {
           coselec: {
