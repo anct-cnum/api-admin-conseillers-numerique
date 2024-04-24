@@ -361,6 +361,8 @@ const formatAvenantForHistoriqueDossierConventionnement = (
       return avenants.map((avenant) => {
         const item = avenant;
         item.dateSorted = avenant?.validateurAvenant?.date;
+        item.dateDeCoselec = avenant?.validateurAvenant?.date;
+        item.dateDeLaDemande = avenant?.emetteurAvenant?.date;
         item.typeConvention =
           avenant.type === 'retrait'
             ? 'avenantRenduPoste'
@@ -384,7 +386,9 @@ const formatReconventionnementForHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
-      item.dateSorted = item?.dateDeCreation;
+      item.dateDeLaDemande = item?.dateDeCreation;
+      item.dateDeCoselec = item?.dateDerniereModification;
+      item.dateSorted = item?.dateDerniereModification;
       item.idPG = structure.idPG;
       item.nom = structure.nom;
       item._id = structure._id;
@@ -458,7 +462,9 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
       const item = structure;
       const coselecInitial =
         getCoselecPositifConventionnementInitial(structure);
-      item.dateSorted = structure.createdAt;
+      item.dateDeLaDemande = structure.createdAt;
+      item.dateDeCoselec = coselecInitial?.insertedAt;
+      item.dateSorted = coselecInitial?.insertedAt;
       item.typeConvention = 'conventionnement';
       item.nombreConseillersCoselec =
         coselecInitial?.nombreConseillersCoselec ?? 0;
@@ -538,7 +544,7 @@ const formatAbandonForExportHistoriqueDossierConventionnement = (structures) =>
     .map((structure) => {
       const item = structure;
       const coselecInitial = getCoselecPositifAvantAbandon(structure);
-      item.dateSorted = structure.createdAt;
+      item.dateSorted = coselecInitial.insertedAt;
       item.phaseConventionnement = coselecInitial?.phaseConventionnement
         ? PhaseConventionnement.PHASE_2
         : PhaseConventionnement.PHASE_1;
