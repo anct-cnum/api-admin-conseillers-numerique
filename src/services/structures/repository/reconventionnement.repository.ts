@@ -17,6 +17,7 @@ import {
   getCoselec,
   getCoselecPositifAvantAbandon,
   getCoselecPositifConventionnementInitial,
+  getLastCoselec,
   getTimestampByDate,
 } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
@@ -360,7 +361,9 @@ const formatAvenantForHistoriqueDossierConventionnement = (
       }
       return avenants.map((avenant) => {
         const item = avenant;
-        item.dateSorted = avenant.emetteurAvenant.date;
+        item.dateSorted = avenant?.validateurAvenant?.date;
+        item.dateDeCoselec = avenant?.validateurAvenant?.date;
+        item.dateDeLaDemande = avenant?.emetteurAvenant?.date;
         item.typeConvention =
           avenant.type === 'retrait'
             ? 'avenantRenduPoste'
@@ -384,7 +387,9 @@ const formatReconventionnementForHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
-      item.dateSorted = item?.dateDeCreation;
+      item.dateDeLaDemande = item?.dateDeCreation;
+      item.dateDeCoselec = item?.dateDerniereModification;
+      item.dateSorted = item?.dateDerniereModification;
       item.idPG = structure.idPG;
       item.nom = structure.nom;
       item._id = structure._id;
@@ -404,7 +409,7 @@ const formatReconventionnementForExportHistoriqueDossierConventionnement = (
     )
     .map((structure) => {
       const item = structure.conventionnement.dossierReconventionnement;
-      item.dateSorted = item?.dateDeCreation;
+      item.dateSorted = item?.dateDerniereModification;
       item.idPG = structure.idPG;
       item.nom = structure.nom;
       item.statutConventionnement = structure.conventionnement.statut;
@@ -415,7 +420,7 @@ const formatReconventionnementForExportHistoriqueDossierConventionnement = (
       item.nbPostesApresDemande = valideCoselec;
       item.siret = structure.siret;
       item.type = 'Reconventionnement';
-      item.numeroDossierDS = item.numero;
+      item.numeroDossierDS = item.numero ?? 'non renseigné';
       item.variation = 0;
       item.codeDepartement = structure.codeDepartement;
       item.departement = findDepartementNameByNumDepartement(
@@ -458,7 +463,9 @@ const formatConventionnementForHistoriqueDossierConventionnement = (
       const item = structure;
       const coselecInitial =
         getCoselecPositifConventionnementInitial(structure);
-      item.dateSorted = structure.createdAt;
+      item.dateDeLaDemande = structure.createdAt;
+      item.dateDeCoselec = coselecInitial?.insertedAt;
+      item.dateSorted = coselecInitial?.insertedAt;
       item.typeConvention = 'conventionnement';
       item.nombreConseillersCoselec =
         coselecInitial?.nombreConseillersCoselec ?? 0;
@@ -503,7 +510,7 @@ const formatConventionnementForExportHistoriqueDossierConventionnement = (
       const item = structure;
       const coselecInitial =
         getCoselecPositifConventionnementInitial(structure);
-      item.dateSorted = structure.createdAt;
+      item.dateSorted = coselecInitial?.insertedAt;
       item.phaseConventionnement = coselecInitial?.phaseConventionnement
         ? PhaseConventionnement.PHASE_2
         : PhaseConventionnement.PHASE_1;
@@ -538,7 +545,9 @@ const formatAbandonForExportHistoriqueDossierConventionnement = (structures) =>
     .map((structure) => {
       const item = structure;
       const coselecInitial = getCoselecPositifAvantAbandon(structure);
-      item.dateSorted = structure.createdAt;
+      const dernierCoselec = getLastCoselec(structure);
+      item.dateSorted =
+        coselecInitial?.insertedAt ?? dernierCoselec?.insertedAt;
       item.phaseConventionnement = coselecInitial?.phaseConventionnement
         ? PhaseConventionnement.PHASE_2
         : PhaseConventionnement.PHASE_1;
@@ -615,7 +624,7 @@ const formatAvenantForExportHistoriqueDossierConventionnement = (
       }
       return avenants.map((avenant) => {
         const item = avenant;
-        item.dateSorted = avenant.emetteurAvenant.date;
+        item.dateSorted = avenant?.validateurAvenant?.date;
         item.idPG = structure.idPG;
         item.nom = structure.nom;
         item.siret = structure.siret;
