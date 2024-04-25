@@ -98,6 +98,7 @@ const getDetailStructureById =
                           { $eq: ['terminee', '$statut'] },
                           { $eq: ['terminee_naturelle', '$statut'] },
                           { $eq: ['finalisee_rupture', '$statut'] },
+                          { $eq: ['renouvellement_initiee', '$statut'] },
                         ],
                       },
                     },
@@ -229,7 +230,12 @@ const getDetailStructureById =
         ['recrutee'],
         PhaseConventionnement.PHASE_2,
       );
-
+      const conseillersValiderRenouvellementReconventionnement =
+        getConseillersByStatus(
+          conseillers,
+          ['renouvellement_initiee'],
+          PhaseConventionnement.PHASE_2,
+        );
       const conseillersFinaliseeRuptureReconventionnement =
         getConseillersByStatus(
           conseillers,
@@ -275,6 +281,7 @@ const getDetailStructureById =
       Object.assign(structure[0], {
         conseillersValiderConventionnement,
         conseillersValiderReconventionnement,
+        conseillersValiderRenouvellementReconventionnement,
         conseillersFinaliseeRuptureReconventionnement,
         conseillersFinaliseeRuptureConventionnement,
         conseillersNouvelleRuptureReconventionnement,
