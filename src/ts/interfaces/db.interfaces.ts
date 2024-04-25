@@ -382,14 +382,14 @@ export interface IStructures {
       dateFinProchainContrat: Date;
       nbPostesAttribuees: number;
       statut: string;
-      dateDernierModification: Date;
+      dateDerniereModification: Date;
       banniereValidation?: boolean;
     };
     dossierConventionnement: {
       numero: number;
       dateDeCreation: Date;
       statut: string;
-      dateDernierModification: Date;
+      dateDerniereModification: Date;
     };
   };
   demandesCoselec: IDemandesCoselec[];
