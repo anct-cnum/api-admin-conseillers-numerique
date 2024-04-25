@@ -17,6 +17,7 @@ import {
   getCoselec,
   getCoselecPositifAvantAbandon,
   getCoselecPositifConventionnementInitial,
+  getLastCoselec,
   getTimestampByDate,
 } from '../../../utils';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
@@ -419,7 +420,7 @@ const formatReconventionnementForExportHistoriqueDossierConventionnement = (
       item.nbPostesApresDemande = valideCoselec;
       item.siret = structure.siret;
       item.type = 'Reconventionnement';
-      item.numeroDossierDS = item.numero;
+      item.numeroDossierDS = item.numero ?? 'non renseigné';
       item.variation = 0;
       item.codeDepartement = structure.codeDepartement;
       item.departement = findDepartementNameByNumDepartement(
@@ -544,7 +545,9 @@ const formatAbandonForExportHistoriqueDossierConventionnement = (structures) =>
     .map((structure) => {
       const item = structure;
       const coselecInitial = getCoselecPositifAvantAbandon(structure);
-      item.dateSorted = coselecInitial.insertedAt;
+      const dernierCoselec = getLastCoselec(structure);
+      item.dateSorted =
+        coselecInitial?.insertedAt ?? dernierCoselec?.insertedAt;
       item.phaseConventionnement = coselecInitial?.phaseConventionnement
         ? PhaseConventionnement.PHASE_2
         : PhaseConventionnement.PHASE_1;
