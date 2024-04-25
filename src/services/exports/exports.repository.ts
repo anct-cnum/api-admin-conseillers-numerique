@@ -1064,6 +1064,7 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Département',
       'Région',
       'Type de conventionnement',
+      'ID structure transfert',
     ];
 
     res.write(
@@ -1085,6 +1086,7 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.phaseConventionnement === PhaseConventionnement.PHASE_2
               ? AffichagePhaseConventionnement.PHASE_2
               : AffichagePhaseConventionnement.PHASE_1,
+              structure.prefet?.idStructureTransfert,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
