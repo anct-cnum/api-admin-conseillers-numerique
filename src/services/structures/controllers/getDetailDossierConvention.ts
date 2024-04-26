@@ -84,32 +84,37 @@ const getDetailStructureWithConseillers =
 
 const miseEnRelationConseillerStructure =
   (app: Application, checkAccessMiseEnRelation) =>
-  async (idStructure: string, idsConseiller: ObjectId[]) =>
-    app.service(service.misesEnRelation).Model.aggregate([
-      {
-        $match: {
-          'structure.$id': new ObjectId(idStructure),
-          'conseiller.$id': { $in: idsConseiller },
-          $and: [checkAccessMiseEnRelation],
+    async (idStructure: string, idsConseiller: ObjectId[]) =>
+      app.service(service.misesEnRelation).Model.aggregate([
+        {
+          $match: {
+            'structure.$id': new ObjectId(idStructure),
+            'conseiller.$id': { $in: idsConseiller },
+            $and: [checkAccessMiseEnRelation],
+          },
         },
-      },
-      {
-        $project: {
-          dateRecrutement: 1,
-          statut: 1,
-          dateRupture: 1,
-          'conseillerObj.idPG': 1,
-          'conseillerObj.nom': 1,
-          'conseillerObj.prenom': 1,
-          'conseillerObj._id': 1,
-          reconventionnement: 1,
-          phaseConventionnement: 1,
-          dateFinDeContrat: 1,
-          dateDebutDeContrat: 1,
-          typeDeContrat: 1,
+        {
+          $sort: { dateDebutDeContrat: -1 },
         },
-      },
-    ]);
+        {
+          $project: {
+            dateRecrutement: 1,
+            statut: 1,
+            dateRupture: 1,
+            'conseillerObj.idPG': 1,
+            'conseillerObj.nom': 1,
+            'conseillerObj.prenom': 1,
+            'conseillerObj._id': 1,
+            reconventionnement: 1,
+            phaseConventionnement: 1,
+            dateFinDeContrat: 1,
+            dateDebutDeContrat: 1,
+            typeDeContrat: 1,
+            miseEnRelationConventionnement: 1,
+            miseEnRelationReconventionnement: 1,
+          },
+        },
+      ]);
 
 const getDetailDossierConvention =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -194,22 +199,12 @@ const getDetailDossierConvention =
                   conseiller.statut === 'terminee'),
             );
           structure[0].conseillersRenouveller = structure[0]?.conseillers
-            ?.filter((conseiller) => {
-              const conseillerEstSelectionne =
-                conseiller.reconventionnement === true &&
-                conseiller.statutMiseEnrelation !== 'nouvelle_rupture' &&
-                conseiller.statutMiseEnrelation !== 'terminee';
-              const conseillerEstSelectionneAvecEditionDeContrat =
-                conseiller.statutMiseEnrelation === 'renouvellement_initiee';
-              const conseillerEstEnRenouvellementConfirme =
-                conseiller.statutMiseEnrelation === 'finalisee';
-
-              return (
-                conseillerEstSelectionne ||
-                conseillerEstSelectionneAvecEditionDeContrat ||
-                conseillerEstEnRenouvellementConfirme
-              );
-            })
+            ?.filter(
+              (conseiller) =>
+                conseiller.reconventionnement === true ||
+                conseiller.miseEnRelationConventionnement ||
+                conseiller.miseEnRelationReconventionnement,
+            )
             .filter(
               (conseiller, index, conseillers) =>
                 index ===
