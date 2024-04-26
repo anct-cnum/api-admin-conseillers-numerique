@@ -84,37 +84,37 @@ const getDetailStructureWithConseillers =
 
 const miseEnRelationConseillerStructure =
   (app: Application, checkAccessMiseEnRelation) =>
-    async (idStructure: string, idsConseiller: ObjectId[]) =>
-      app.service(service.misesEnRelation).Model.aggregate([
-        {
-          $match: {
-            'structure.$id': new ObjectId(idStructure),
-            'conseiller.$id': { $in: idsConseiller },
-            $and: [checkAccessMiseEnRelation],
-          },
+  async (idStructure: string, idsConseiller: ObjectId[]) =>
+    app.service(service.misesEnRelation).Model.aggregate([
+      {
+        $match: {
+          'structure.$id': new ObjectId(idStructure),
+          'conseiller.$id': { $in: idsConseiller },
+          $and: [checkAccessMiseEnRelation],
         },
-        {
-          $sort: { dateDebutDeContrat: -1 },
+      },
+      {
+        $sort: { dateDebutDeContrat: -1 },
+      },
+      {
+        $project: {
+          dateRecrutement: 1,
+          statut: 1,
+          dateRupture: 1,
+          'conseillerObj.idPG': 1,
+          'conseillerObj.nom': 1,
+          'conseillerObj.prenom': 1,
+          'conseillerObj._id': 1,
+          reconventionnement: 1,
+          phaseConventionnement: 1,
+          dateFinDeContrat: 1,
+          dateDebutDeContrat: 1,
+          typeDeContrat: 1,
+          miseEnRelationConventionnement: 1,
+          miseEnRelationReconventionnement: 1,
         },
-        {
-          $project: {
-            dateRecrutement: 1,
-            statut: 1,
-            dateRupture: 1,
-            'conseillerObj.idPG': 1,
-            'conseillerObj.nom': 1,
-            'conseillerObj.prenom': 1,
-            'conseillerObj._id': 1,
-            reconventionnement: 1,
-            phaseConventionnement: 1,
-            dateFinDeContrat: 1,
-            dateDebutDeContrat: 1,
-            typeDeContrat: 1,
-            miseEnRelationConventionnement: 1,
-            miseEnRelationReconventionnement: 1,
-          },
-        },
-      ]);
+      },
+    ]);
 
 const getDetailDossierConvention =
   (app: Application) => async (req: IRequest, res: Response) => {
