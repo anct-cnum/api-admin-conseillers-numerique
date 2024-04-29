@@ -94,6 +94,9 @@ const miseEnRelationConseillerStructure =
         },
       },
       {
+        $sort: { dateDebutDeContrat: -1 },
+      },
+      {
         $project: {
           dateRecrutement: 1,
           statut: 1,
@@ -107,6 +110,8 @@ const miseEnRelationConseillerStructure =
           dateFinDeContrat: 1,
           dateDebutDeContrat: 1,
           typeDeContrat: 1,
+          miseEnRelationConventionnement: 1,
+          miseEnRelationReconventionnement: 1,
         },
       },
     ]);
@@ -193,12 +198,19 @@ const getDetailDossierConvention =
                   conseiller.statut === 'nouvelle_rupture' ||
                   conseiller.statut === 'terminee'),
             );
-          structure[0].conseillersRenouveller =
-            structure[0]?.conseillers?.filter(
+          structure[0].conseillersRenouveller = structure[0]?.conseillers
+            ?.filter(
               (conseiller) =>
-                conseiller.reconventionnement === true &&
-                conseiller.statutMiseEnrelation !== 'terminee' &&
-                conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
+                conseiller.reconventionnement === true ||
+                conseiller.miseEnRelationConventionnement ||
+                conseiller.miseEnRelationReconventionnement,
+            )
+            .filter(
+              (conseiller, index, conseillers) =>
+                index ===
+                conseillers.findIndex(
+                  (element) => element.idPG === conseiller.idPG,
+                ),
             );
         } else if (
           structure[0]?.conventionnement?.dossierConventionnement?.numero
