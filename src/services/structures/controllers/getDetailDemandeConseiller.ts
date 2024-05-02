@@ -55,7 +55,7 @@ const getDetailDemandeConseiller =
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
           .find({
-            statut: 'VALIDATION_COSELEC',
+            statut: { $in: ['VALIDATION_COSELEC', 'ABANDON'] },
             _id: { $ne: structure[0]._id },
           })
           .select({ nom: 1, idPG: 1 });
