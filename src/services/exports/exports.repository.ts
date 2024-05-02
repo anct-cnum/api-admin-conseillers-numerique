@@ -1059,12 +1059,12 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Nombre de postes après COSELEC',
       'Variation',
       'Type de la demande',
+      'ID structure transfert',
       'N° DS',
       'Code département',
       'Département',
       'Région',
       'Type de conventionnement',
-      'ID structure transfert',
     ];
 
     res.write(
@@ -1079,6 +1079,7 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.nbPostesApresDemande,
             structure.variation,
             structure.type,
+            structure.prefet?.idStructureTransfert,
             structure.numeroDossierDS,
             structure.codeDepartement,
             structure.departement,
@@ -1086,7 +1087,6 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.phaseConventionnement === PhaseConventionnement.PHASE_2
               ? AffichagePhaseConventionnement.PHASE_2
               : AffichagePhaseConventionnement.PHASE_1,
-              structure.prefet?.idStructureTransfert,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
