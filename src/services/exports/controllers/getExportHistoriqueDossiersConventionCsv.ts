@@ -86,6 +86,7 @@ const getExportHistoriqueDossiersConventionCsv =
               coselec: 1,
               demandesCoselec: 1,
               codeCom: 1,
+              prefet: { $arrayElemAt: ['$prefet', -1] },
             },
           },
         ]);
