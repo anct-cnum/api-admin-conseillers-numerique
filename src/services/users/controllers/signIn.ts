@@ -16,7 +16,7 @@ const allowedRoles = [
   'admin',
   'structure',
   'prefet',
-  'hub_coop',
+  'hub',
   'grandReseau',
   'coordinateur',
 ];

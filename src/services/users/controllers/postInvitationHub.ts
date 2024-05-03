@@ -37,7 +37,7 @@ const postInvitationHub =
           nom,
           prenom,
           hub,
-          roles: ['hub_coop'],
+          roles: ['hub'],
           password: uuidv4(),
           token: uuidv4(),
           migrationDashboard: true,
