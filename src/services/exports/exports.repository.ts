@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc';
 import { Response } from 'express';
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { formatDateGMT, getCoselec } from '../../utils';
+import { formatDateGMT, getCoselec, getCoselecLabel } from '../../utils';
 import service from '../../helpers/services';
 import {
   IMisesEnRelation,
@@ -67,94 +67,54 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
       misesEnRelations.map(async (miseEnrelation) => {
         const coselec = getCoselec(miseEnrelation.structure);
         res.write(
-          `${
-            formatDate(miseEnrelation.conseiller?.createdAt)
-          };${
-            formatDate(miseEnrelation?.dateDebutDeContrat)
-          };${
-            formatDate(miseEnrelation?.dateFinDeContrat)
-          };${
-            miseEnrelation?.typeDeContrat ?? 'Non renseigné'
-          };${
-            miseEnrelation?.salaire ?? 'Non renseigné'
-          };${
-            miseEnrelation.conseiller?.prenom
-          };${
-            miseEnrelation.conseiller?.nom
-          };${
-            miseEnrelation.conseiller?.emailCN?.address &&
+          `${formatDate(miseEnrelation.conseiller?.createdAt)
+          };${formatDate(miseEnrelation?.dateDebutDeContrat)
+          };${formatDate(miseEnrelation?.dateFinDeContrat)
+          };${miseEnrelation?.typeDeContrat ?? 'Non renseigné'
+          };${miseEnrelation?.salaire ?? 'Non renseigné'
+          };${miseEnrelation.conseiller?.prenom
+          };${miseEnrelation.conseiller?.nom
+          };${miseEnrelation.conseiller?.emailCN?.address &&
             miseEnrelation.conseiller?.mattermost?.id
-              ? 'oui'
-              : 'non'
-          };${
-            miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
-          };${
-            miseEnrelation.conseiller?.telephone
-          };${
-            miseEnrelation.conseiller?.email
-          };${
-            miseEnrelation.conseiller?.estCoordinateur ? 'oui' : 'non'
-          };${
-            miseEnrelation.conseiller?.codePostal
-          };${
-            miseEnrelation.conseiller?.nomCommune
-          };${
-            miseEnrelation.conseiller?.codeDepartement
-          };${
-            miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
-          };${
-            miseEnrelation.conseiller?.pix
-              ? miseEnrelation.conseiller?.pix.palier
-              : ''
-          };${
-            checkIfCcp1(miseEnrelation.conseiller?.statut)
-          };${
-            miseEnrelation.structure?.siret
-          };${
-            miseEnrelation.structure?.idPG
-          };${
-            miseEnrelation.structure?._id
-          };${
-            miseEnrelation.structure?.nom
-          };${
-            miseEnrelation.structure?.type
-          };${
-            formatAdresseStructure(miseEnrelation.structure.insee)
-          };${
-            miseEnrelation.structure?.codePostal
-          };${
-            miseEnrelation.structure?.codeCommune
-          };${
-            miseEnrelation.structure?.codeDepartement
-          };${
-            miseEnrelation.structure?.codeRegion
-          };${
-            miseEnrelation.structure?.contact?.prenom
-          };${
-            miseEnrelation.structure?.contact?.nom
-          };${
-            miseEnrelation.structure?.contact?.telephone
-          };${
-            miseEnrelation.structure?.contact?.email
-          };${
-            miseEnrelation.conseiller?.idPG
-          };${
-            miseEnrelation.conseiller?._id
-          };${
-            coselec !== null ? coselec?.numero : ''
-          };${
-            coselec !== null ? coselec?.nombreConseillersCoselec : 0
-          };${
-            formatDate(miseEnrelation.conseiller?.datePrisePoste)
-          };${
-            formatDate(miseEnrelation.conseiller?.dateFinFormation)
-          };${
-            miseEnrelation.conseiller?.mattermost?.id &&
+            ? 'oui'
+            : 'non'
+          };${miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
+          };${miseEnrelation.conseiller?.telephone
+          };${miseEnrelation.conseiller?.email
+          };${miseEnrelation.conseiller?.estCoordinateur ? 'oui' : 'non'
+          };${miseEnrelation.conseiller?.codePostal
+          };${miseEnrelation.conseiller?.nomCommune
+          };${miseEnrelation.conseiller?.codeDepartement
+          };${miseEnrelation.conseiller.estDiplomeMedNum ? 'oui' : 'non'
+          };${miseEnrelation.conseiller?.pix
+            ? miseEnrelation.conseiller?.pix.palier
+            : ''
+          };${checkIfCcp1(miseEnrelation.conseiller?.statut)
+          };${miseEnrelation.structure?.siret
+          };${miseEnrelation.structure?.idPG
+          };${miseEnrelation.structure?._id
+          };${miseEnrelation.structure?.nom
+          };${miseEnrelation.structure?.type
+          };${formatAdresseStructure(miseEnrelation.structure.insee)
+          };${miseEnrelation.structure?.codePostal
+          };${miseEnrelation.structure?.codeCommune
+          };${miseEnrelation.structure?.codeDepartement
+          };${miseEnrelation.structure?.codeRegion
+          };${miseEnrelation.structure?.contact?.prenom
+          };${miseEnrelation.structure?.contact?.nom
+          };${miseEnrelation.structure?.contact?.telephone
+          };${miseEnrelation.structure?.contact?.email
+          };${miseEnrelation.conseiller?.idPG
+          };${miseEnrelation.conseiller?._id
+          };${coselec !== null ? coselec?.numero : ''
+          };${coselec !== null ? coselec?.nombreConseillersCoselec : 0
+          };${formatDate(miseEnrelation.conseiller?.datePrisePoste)
+          };${formatDate(miseEnrelation.conseiller?.dateFinFormation)
+          };${miseEnrelation.conseiller?.mattermost?.id &&
             miseEnrelation.conseiller?.emailCN?.address
-              ? miseEnrelation.conseiller?.emailCN?.address
-              : ''
-          };${
-            miseEnrelation.conseiller?.emailPro ?? ''
+            ? miseEnrelation.conseiller?.emailCN?.address
+            : ''
+          };${miseEnrelation.conseiller?.emailPro ?? ''
           }\n`,
         );
       }),
@@ -257,10 +217,9 @@ const generateCsvConseillersHub = async (exportsHub: any, res: Response) => {
   try {
     for (const exportHub of exportsHub) {
       res.write(
-        `${exportHub.conseiller.nom};${exportHub.conseiller.prenom};${
-          exportHub.conseiller?.mattermost?.id
-            ? exportHub.conseiller?.emailCN?.address
-            : 'compte COOP non créé'
+        `${exportHub.conseiller.nom};${exportHub.conseiller.prenom};${exportHub.conseiller?.mattermost?.id
+          ? exportHub.conseiller?.emailCN?.address
+          : 'compte COOP non créé'
         };${exportHub.nom};${exportHub.contact?.email};${formatAdresseStructure(
           exportHub.insee,
         )};${exportHub.codeRegion};\n`,
@@ -331,9 +290,9 @@ const generateCsvConseillersWithoutCRA = async (
             statCnfsWithoutCRA.structure.codePostal,
             statCnfsWithoutCRA.structure?.contact?.telephone?.length >= 10
               ? statCnfsWithoutCRA.structure?.contact?.telephone.replace(
-                  /[- ]/g,
-                  '',
-                )
+                /[- ]/g,
+                '',
+              )
               : 'Non renseigné',
           ].join(csvCellSeparator),
         ),
@@ -385,60 +344,46 @@ const generateCsvStructure = async (
         }
         let adresse = `${structure?.insee?.adresse?.numero_voie ?? ''}
         ${structure?.insee?.adresse?.type_voie ?? ''}
-        ${structure?.insee?.adresse?.libelle_voie ?? ''}\n${
-          structure?.insee?.adresse?.complement_adresse
+        ${structure?.insee?.adresse?.libelle_voie ?? ''}\n${structure?.insee?.adresse?.complement_adresse
             ? `${structure.insee.adresse.complement_adresse}\n`
             : ''
-        }${structure?.insee?.adresse?.code_postal ?? ''} ${
-          structure?.insee?.adresse?.libelle_commune ?? ''
-        }`;
+          }${structure?.insee?.adresse?.code_postal ?? ''} ${structure?.insee?.adresse?.libelle_commune ?? ''
+          }`;
 
         adresse = adresse.replace(/["',]/g, '');
 
         res.write(
-          `${structure.siret};${structure.idPG};${structure.nom};${
-            structure.type === 'PRIVATE' ? 'privée' : 'publique'
-          };${structure.statut};${structure.codePostal};${
-            structure.codeCommune
-          };${structure.codeDepartement};${structure.codeRegion};${structure.contact?.telephone};${structure.contact?.email};${
-            structure.userCreated ? 'oui' : 'non'
-          };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${
-            structure.nombreConseillersSouhaites ?? 0
-          };${structure.statut === 'VALIDATION_COSELEC' ? 'oui' : 'non'};${
-            structure.statut === 'VALIDATION_COSELEC'
-              ? coselec?.nombreConseillersCoselec
-              : 0
-          };${
-            structure.statut === 'VALIDATION_COSELEC' ? coselec?.numero : ''
-          };${structure.estZRR ? 'oui' : 'non'};${
-            structure.qpvStatut ?? 'Non défini'
-          };${structure?.qpvListe ? structure.qpvListe.length : 0};${label};${
-            structure.insee?.unite_legale?.personne_morale_attributs
+          `${structure.siret};${structure.idPG};${structure.nom};${structure.type === 'PRIVATE' ? 'privée' : 'publique'
+          };${structure.statut};${structure.codePostal};${structure.codeCommune
+          };${structure.codeDepartement};${structure.codeRegion};${structure.contact?.telephone};${structure.contact?.email};${structure.userCreated ? 'oui' : 'non'
+          };${userPrincipal?.sub ? 'oui' : 'non'};${countMisesEnRelation};${structure.nombreConseillersSouhaites ?? 0
+          };${structure.statut === 'VALIDATION_COSELEC' ? 'oui' : 'non'};${structure.statut === 'VALIDATION_COSELEC'
+            ? coselec?.nombreConseillersCoselec
+            : 0
+          };${structure.statut === 'VALIDATION_COSELEC' ? getCoselecLabel(coselec) : ''
+          };${structure.estZRR ? 'oui' : 'non'};${structure.qpvStatut ?? 'Non défini'
+          };${structure?.qpvListe ? structure.qpvListe.length : 0};${label};${structure.insee?.unite_legale?.personne_morale_attributs
+            ?.raison_sociale
+            ? structure.insee?.unite_legale?.personne_morale_attributs
               ?.raison_sociale
-              ? structure.insee?.unite_legale?.personne_morale_attributs
-                  ?.raison_sociale
-              : ''
-          };${
-            structure.insee?.adresse?.libelle_commune
-              ? structure.insee?.adresse?.libelle_commune
-              : ''
-          };${
-            structure.insee?.adresse?.code_commune
-              ? structure.insee?.adresse?.code_commune
-              : ''
-          };"${adresse}";${
-            structure.insee?.unite_legale?.forme_juridique?.libelle ?? ''
-          };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''};"${
-            users.length > 0
-              ? users
-                  .filter(
-                    (u) =>
-                      u.name?.toLowerCase() !==
-                      structure.contact?.email?.toLowerCase(),
-                  )
-                  .map((u) => u.name?.toLowerCase())
-                  .join(',')
-              : ''
+            : ''
+          };${structure.insee?.adresse?.libelle_commune
+            ? structure.insee?.adresse?.libelle_commune
+            : ''
+          };${structure.insee?.adresse?.code_commune
+            ? structure.insee?.adresse?.code_commune
+            : ''
+          };"${adresse}";${structure.insee?.unite_legale?.forme_juridique?.libelle ?? ''
+          };${structure.reseau ? 'oui' : 'non'};${structure?.reseau ?? ''};"${users.length > 0
+            ? users
+              .filter(
+                (u) =>
+                  u.name?.toLowerCase() !==
+                  structure.contact?.email?.toLowerCase(),
+              )
+              .map((u) => u.name?.toLowerCase())
+              .join(',')
+            : ''
           }"\n`,
         );
       }),
@@ -556,42 +501,30 @@ const generateCsvStatistiques = async (
 ) => {
   try {
     const general = [
-      `Général\nPersonnes totales accompagnées durant cette période;${
-        statistiques.nbTotalParticipant +
-        statistiques.nbAccompagnementPerso +
-        statistiques.nbDemandePonctuel -
-        statistiques.nbParticipantsRecurrents
-      }\nAccompagnements totaux enregistrés (dont récurrent);${
-        statistiques.nbTotalParticipant +
-        statistiques.nbAccompagnementPerso +
-        statistiques.nbDemandePonctuel
-      }\nAteliers réalisés;${
-        statistiques.nbAteliers
-      }\nTotal des participants aux ateliers;${
-        statistiques.nbTotalParticipant
-      }\nAccompagnements individuels;${
-        statistiques.nbAccompagnementPerso
-      }\nDemandes ponctuelles;${
-        statistiques.nbDemandePonctuel
-      }\nAccompagnements avec suivi;${
-        statistiques.nbUsagersBeneficiantSuivi
-      }\nPourcentage du total des usagers accompagnés sur cette période;${
-        statistiques.tauxTotalUsagersAccompagnes
-      }\nAccompagnements individuels;${
-        statistiques.nbUsagersAccompagnementIndividuel
-      }\nAccompagnements en atelier collectif;${
-        statistiques.nbUsagersAtelierCollectif
-      }\nRedirections vers une autre structure agréée;${
-        statistiques.nbReconduction
+      `Général\nPersonnes totales accompagnées durant cette période;${statistiques.nbTotalParticipant +
+      statistiques.nbAccompagnementPerso +
+      statistiques.nbDemandePonctuel -
+      statistiques.nbParticipantsRecurrents
+      }\nAccompagnements totaux enregistrés (dont récurrent);${statistiques.nbTotalParticipant +
+      statistiques.nbAccompagnementPerso +
+      statistiques.nbDemandePonctuel
+      }\nAteliers réalisés;${statistiques.nbAteliers
+      }\nTotal des participants aux ateliers;${statistiques.nbTotalParticipant
+      }\nAccompagnements individuels;${statistiques.nbAccompagnementPerso
+      }\nDemandes ponctuelles;${statistiques.nbDemandePonctuel
+      }\nAccompagnements avec suivi;${statistiques.nbUsagersBeneficiantSuivi
+      }\nPourcentage du total des usagers accompagnés sur cette période;${statistiques.tauxTotalUsagersAccompagnes
+      }\nAccompagnements individuels;${statistiques.nbUsagersAccompagnementIndividuel
+      }\nAccompagnements en atelier collectif;${statistiques.nbUsagersAtelierCollectif
+      }\nRedirections vers une autre structure agréée;${statistiques.nbReconduction
       }`,
     ];
     const statsThemes = [
       '\nThèmes des accompagnements',
       ...(statistiques.statsThemes?.map(
         (theme) =>
-          `\n${
-            labelsCorrespondance.find((label) => label.nom === theme.nom)
-              ?.correspondance ?? theme.nom
+          `\n${labelsCorrespondance.find((label) => label.nom === theme.nom)
+            ?.correspondance ?? theme.nom
           };${theme.valeur};${theme.percent}%`,
       ) ?? []),
       '',
@@ -679,8 +612,7 @@ const generateCsvStatistiques = async (
             )
             .map(
               (orderedStatEvolution) =>
-                `\n${mois[orderedStatEvolution.mois]};${
-                  orderedStatEvolution.totalCras
+                `\n${mois[orderedStatEvolution.mois]};${orderedStatEvolution.totalCras
                 }`,
             ),
           '',
@@ -744,7 +676,7 @@ const generateCsvTerritoires = async (
             ...codeAndNomTerritoire(territoire, statsTerritoire),
             statsTerritoire.CRAEnregistres,
             statsTerritoire.personnesAccompagnees -
-              statsTerritoire.personnesRecurrentes,
+            statsTerritoire.personnesRecurrentes,
             statsTerritoire.personnesAccompagnees,
             statsTerritoire.nombreConseillersCoselec,
             statsTerritoire.cnfsActives,
@@ -783,7 +715,7 @@ const generateCsvTerritoiresPrefet = async (
           [
             ...codeAndNomTerritoire(territoire, statsTerritoire),
             statsTerritoire.personnesAccompagnees -
-              statsTerritoire.personnesRecurrentes,
+            statsTerritoire.personnesRecurrentes,
             statsTerritoire.nombreConseillersCoselec,
             statsTerritoire.conseillersRecruter,
           ].join(csvCellSeparator),
@@ -847,10 +779,10 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
             miseEnRelation.conseillerObj?.emailCN?.address ??
-              `compte COOP non créé (${formatStatutMisesEnRelation(
-                miseEnRelation.statut,
-                miseEnRelation?.dossierIncompletRupture,
-              )})`,
+            `compte COOP non créé (${formatStatutMisesEnRelation(
+              miseEnRelation.statut,
+              miseEnRelation?.dossierIncompletRupture,
+            )})`,
             miseEnRelation.conseillerObj?.emailPro
               ? miseEnRelation.conseillerObj.emailPro
               : 'Non renseigné',
@@ -871,15 +803,15 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.conseillerObj.estCoordinateur ? 'Oui' : 'Non',
             miseEnRelation.craCount,
             miseEnRelation.conseillerObj?.supHierarchique?.nom ??
-              'Non renseigné',
+            'Non renseigné',
             miseEnRelation.conseillerObj?.supHierarchique?.prenom ??
-              'Non renseigné',
+            'Non renseigné',
             miseEnRelation.conseillerObj?.supHierarchique?.email ??
-              'Non renseigné',
+            'Non renseigné',
             miseEnRelation.conseillerObj?.supHierarchique?.fonction ??
-              'Non renseignée',
+            'Non renseignée',
             miseEnRelation.conseillerObj?.supHierarchique?.numeroTelephone ??
-              'Non renseigné',
+            'Non renseigné',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
