@@ -1053,6 +1053,7 @@ const generateCsvHistoriqueDossiersConvention = async (
   try {
     const fileHeaders = [
       'ID',
+      'Nom de la structure',
       'Siret plateforme',
       'Date COSELEC',
       'Nombre de postes avant COSELEC',
@@ -1073,13 +1074,14 @@ const generateCsvHistoriqueDossiersConvention = async (
         ...structures.map((structure) =>
           [
             structure.idPG,
+            structure.nom,
             structure.siret,
             formatDate(structure.dateSorted),
             structure.nbPostesAvantDemande,
             structure.nbPostesApresDemande,
             structure.variation,
             structure.type,
-            structure.prefet?.idStructureTransfert,
+            structure.transfertStructure?.idPG,
             structure.numeroDossierDS,
             structure.codeDepartement,
             structure.departement,
