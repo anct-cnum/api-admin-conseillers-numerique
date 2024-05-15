@@ -75,6 +75,7 @@ const getExportHistoriqueDossiersConventionCsv =
           {
             $project: {
               _id: 1,
+              nom: 1,
               siret: 1,
               idPG: 1,
               type: 1,
