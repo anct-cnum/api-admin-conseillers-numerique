@@ -33,7 +33,7 @@ execute(
     let dossiersAssociationsBrut = [];
 
     do {
-      if (arrayHasNextPage[0] === true) {
+      if (arrayHasNextPage[0]) {
         const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_structure_publique_reconventionnement,
@@ -48,7 +48,7 @@ execute(
         arrayHasNextPage[0] =
           demarcheStructurePublique.demarche.dossiers.pageInfo.hasNextPage;
       }
-      if (arrayHasNextPage[1] === true) {
+      if (arrayHasNextPage[1]) {
         const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_association_reconventionnement,
@@ -63,7 +63,7 @@ execute(
         arrayHasNextPage[1] =
           demarcheAssociation.demarche.dossiers.pageInfo.hasNextPage;
       }
-      if (arrayHasNextPage[2] === true) {
+      if (arrayHasNextPage[2]) {
         const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_entreprise_reconventionnement,
@@ -205,35 +205,36 @@ execute(
     const promises: Promise<void>[] = [];
 
     if (dossiers.length === 0) {
-      logger.info(`Aucun dossier trouvé`);
+      logger.info('Aucun dossier trouvé');
       return;
     }
 
     dossiers.forEach(async (dossier: IDossierDS) => {
       // eslint-disable-next-line no-async-promise-executor
-      const p = new Promise<void>(async (resolve) => {
+      const structurePromise = new Promise<void>(async (resolve) => {
         try {
-          const structure = await app
+          const structures = await app
             .service(service.structures)
-            .Model.findOne({ idPG: dossier.idPG });
+            .Model.find({ idPG: dossier.idPG });
 
-          if (
-            structure &&
-            structure.conventionnement?.dossierReconventionnement
-              ?.nbPostesAttribuees !== dossier.nbPostesAttribuees
-          ) {
-            logger.info(
-              `La structure [${dossier.idPG}] a un nombre de postes attribués différent : DossierDS [${dossier.nbPostesAttribuees}], Structure [${structure.conventionnement?.dossierReconventionnement?.nbPostesAttribuees}]`,
-            );
-          }
-          resolve(p);
+          structures.forEach((structure) => {
+            if (
+              structure.conventionnement?.dossierReconventionnement
+                ?.nbPostesAttribuees !== dossier.nbPostesAttribuees
+            ) {
+              logger.info(
+                `La structure [${structure.idPG}] a un nombre de postes attribués différent : DossierDS [${dossier.nbPostesAttribuees}], Structure [${structure.conventionnement?.dossierReconventionnement?.nbPostesAttribuees}]`,
+              );
+            }
+          });
+          resolve(structurePromise);
         } catch (e) {
           logger.error(e);
         }
       });
-      promises.push(p);
+      promises.push(structurePromise);
     });
     await Promise.allSettled(promises);
-    exit(0, 'Migration terminée');
+    exit(0, 'Analyse terminée');
   },
 );
