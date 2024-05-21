@@ -213,9 +213,10 @@ execute(
       // eslint-disable-next-line no-async-promise-executor
       const structurePromise = new Promise<void>(async (resolve) => {
         try {
-          const structures = await app
-            .service(service.structures)
-            .Model.find({ idPG: dossier.idPG });
+          const structures = await app.service(service.structures).Model.find({
+            'structure.conventionnement.dossierReconventionnement.numero':
+              dossier._id,
+          });
 
           structures.forEach((structure) => {
             if (
