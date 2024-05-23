@@ -100,6 +100,10 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
+const getCoselecLabel = (structure) => {
+  return structure?.numero || 'Non rensigné';
+};
+
 const getCoselecConventionnement = (structure) => {
   if (structure.statut === 'VALIDATION_COSELEC') {
     return getCoselecPositifConventionnement(structure);
@@ -153,4 +157,5 @@ export {
   deleteRoleUser,
   formatDateGMT,
   getTimestampByDate,
+  getCoselecLabel,
 };
