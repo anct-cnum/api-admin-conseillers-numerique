@@ -89,7 +89,10 @@ const postInvitationStructure =
           });
           return;
         }
-        if (oldUser.roles.includes('grandReseau')) {
+        if (
+          oldUser.roles.includes('grandReseau') ||
+          oldUser.roles.includes('hub')
+        ) {
           const query = {
             $push: {
               roles: 'structure',

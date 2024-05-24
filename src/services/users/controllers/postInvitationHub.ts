@@ -64,6 +64,24 @@ const postInvitationHub =
           .json(
             `Le hub ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
           );
+      } else if (oldUser.roles.include('structure')) {
+        const user = await app
+          .service(service.users)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            {
+              _id: oldUser._id,
+            },
+            {
+              $push: { roles: ['hub'] },
+            },
+            { returnOriginal: false, includeResultMetadata: true },
+          );
+        if (user.modifiedCount === 0) {
+          res
+            .status(404)
+            .json({ message: "L'utilisateur n'a pas été mis à jour" });
+        }
       } else {
         res.status(409).json({
           message: 'Ce compte est déjà utilisé',
