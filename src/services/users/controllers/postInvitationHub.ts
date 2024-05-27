@@ -64,7 +64,11 @@ const postInvitationHub =
           .json(
             `Le hub ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
           );
-      } else if (oldUser.roles.include('structure')) {
+      } else if (oldUser.roles.includes('hub')) {
+        res.status(409).json({
+          message: `${email} possède déjà le rôle Hub`,
+        });
+      } else if (oldUser.roles.includes('structure')) {
         const user = await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
@@ -74,6 +78,7 @@ const postInvitationHub =
             },
             {
               $push: { roles: ['hub'] },
+              $set: { nom, prenom, hub },
             },
             { returnOriginal: false, includeResultMetadata: true },
           );
@@ -81,7 +86,36 @@ const postInvitationHub =
           res
             .status(404)
             .json({ message: "L'utilisateur n'a pas été mis à jour" });
+          return;
         }
+
+        if (user.value?.sub) {
+          res
+            .status(200)
+            .json(
+              `Le rôle hub a bien été ajouté pour l'utilisateur actif ${email}`,
+            );
+          return;
+        }
+        const errorSmtpMail: Error | null = await envoiEmailInvit(
+          app,
+          req,
+          mailer,
+          user.value,
+        );
+        if (errorSmtpMail instanceof Error) {
+          await deleteUser(app, req, email);
+          res.status(503).json({
+            message:
+              "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
+          });
+          return;
+        }
+        res
+          .status(200)
+          .json(
+            `Le hub ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
+          );
       } else {
         res.status(409).json({
           message: 'Ce compte est déjà utilisé',
