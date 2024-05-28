@@ -24,6 +24,14 @@ const getDetailDemandeConseiller =
           },
         },
         {
+          $lookup: {
+            from: 'structures',
+            localField: 'prefet.idStructureTransfert',
+            foreignField: '_id',
+            as: 'structureTransfert',
+          },
+        },
+        {
           $project: {
             prefet: { $arrayElemAt: ['$prefet', -1] },
             nombreConseillersSouhaites: 1,
@@ -34,6 +42,8 @@ const getDetailDemandeConseiller =
             idPG: 1,
             nom: 1,
             contact: 1,
+            'structureTransfert.nom': 1,
+            'structureTransfert.idPG': 1,
           },
         },
       ]);

@@ -65,6 +65,14 @@ const getDetailStructureWithConseillers =
         },
       },
       {
+        $lookup: {
+          from: 'structures',
+          localField: 'demandesCoselec.prefet.idStructureTransfert',
+          foreignField: '_id',
+          as: 'structureTransfert',
+        },
+      },
+      {
         $project: {
           idPG: 1,
           nom: 1,
@@ -78,6 +86,8 @@ const getDetailStructureWithConseillers =
           conseillers: '$conseillers',
           prefet: { $arrayElemAt: ['$prefet', -1] },
           createdAt: 1,
+          'structureTransfert.idPG': 1,
+          'structureTransfert.nom': 1,
         },
       },
     ]);
