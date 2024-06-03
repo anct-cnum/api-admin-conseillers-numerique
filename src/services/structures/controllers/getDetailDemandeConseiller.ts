@@ -24,6 +24,30 @@ const getDetailDemandeConseiller =
           },
         },
         {
+          $project: {
+            prefet: {
+              $cond: {
+                if: {
+                  $eq: [
+                    { $arrayElemAt: ['$demandesCoselec.prefet', -1] },
+                    undefined,
+                  ],
+                },
+                then: { $arrayElemAt: ['$prefet', -1] },
+                else: { $arrayElemAt: ['$demandesCoselec.prefet', -1] },
+              },
+            },
+            nombreConseillersSouhaites: 1,
+            createdAt: 1,
+            demandesCoselec: 1,
+            coselec: 1,
+            statut: 1,
+            idPG: 1,
+            nom: 1,
+            contact: 1,
+          },
+        },
+        {
           $lookup: {
             from: 'structures',
             localField: 'prefet.idStructureTransfert',
@@ -32,8 +56,13 @@ const getDetailDemandeConseiller =
           },
         },
         {
+          $unwind: {
+            path: '$structureTransfert',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
           $project: {
-            prefet: { $arrayElemAt: ['$prefet', -1] },
             nombreConseillersSouhaites: 1,
             createdAt: 1,
             demandesCoselec: 1,

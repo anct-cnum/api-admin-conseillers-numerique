@@ -73,6 +73,12 @@ const getDetailStructureWithConseillers =
         },
       },
       {
+        $unwind: {
+          path: '$structureTransfert',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
           idPG: 1,
           nom: 1,
@@ -84,7 +90,6 @@ const getDetailStructureWithConseillers =
           nombreConseillersSouhaites: 1,
           insee: 1,
           conseillers: '$conseillers',
-          prefet: { $arrayElemAt: ['$prefet', -1] },
           createdAt: 1,
           'structureTransfert.idPG': 1,
           'structureTransfert.nom': 1,
