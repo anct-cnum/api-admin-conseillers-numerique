@@ -93,6 +93,7 @@ const getDetailStructureWithConseillers =
           createdAt: 1,
           'structureTransfert.idPG': 1,
           'structureTransfert.nom': 1,
+          prefet: { $arrayElemAt: ['$prefet', -1] },
         },
       },
     ]);
