@@ -25,7 +25,18 @@ const getDetailDemandeConseiller =
         },
         {
           $project: {
-            prefet: { $arrayElemAt: ['$prefet', -1] },
+            prefet: {
+              $cond: {
+                if: {
+                  $eq: [
+                    { $arrayElemAt: ['$demandesCoselec.prefet', -1] },
+                    undefined,
+                  ],
+                },
+                then: { $arrayElemAt: ['$prefet', -1] },
+                else: { $arrayElemAt: ['$demandesCoselec.prefet', -1] },
+              },
+            },
             nombreConseillersSouhaites: 1,
             createdAt: 1,
             demandesCoselec: 1,
@@ -34,6 +45,34 @@ const getDetailDemandeConseiller =
             idPG: 1,
             nom: 1,
             contact: 1,
+          },
+        },
+        {
+          $lookup: {
+            from: 'structures',
+            localField: 'prefet.idStructureTransfert',
+            foreignField: '_id',
+            as: 'structureTransfert',
+          },
+        },
+        {
+          $unwind: {
+            path: '$structureTransfert',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            nombreConseillersSouhaites: 1,
+            createdAt: 1,
+            demandesCoselec: 1,
+            coselec: 1,
+            statut: 1,
+            idPG: 1,
+            nom: 1,
+            contact: 1,
+            'structureTransfert.nom': 1,
+            'structureTransfert.idPG': 1,
           },
         },
       ]);
@@ -55,7 +94,7 @@ const getDetailDemandeConseiller =
           .service(service.structures)
           .Model.accessibleBy(req.ability, action.read)
           .find({
-            statut: 'VALIDATION_COSELEC',
+            statut: { $in: ['VALIDATION_COSELEC', 'ABANDON'] },
             _id: { $ne: structure[0]._id },
           })
           .select({ nom: 1, idPG: 1 });

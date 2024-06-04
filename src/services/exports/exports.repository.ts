@@ -992,6 +992,7 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Nombre de postes après COSELEC',
       'Variation',
       'Type de la demande',
+      'ID structure transfert',
       'N° DS',
       'Code département',
       'Département',

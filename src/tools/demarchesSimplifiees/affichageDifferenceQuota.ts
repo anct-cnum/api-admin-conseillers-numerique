@@ -209,6 +209,8 @@ execute(
       return;
     }
 
+    logger.info(`Le nombre de dossiers est: ${dossiers.length}`);
+
     dossiers.forEach(async (dossier: IDossierDS) => {
       // eslint-disable-next-line no-async-promise-executor
       const structurePromise = new Promise<void>(async (resolve) => {
