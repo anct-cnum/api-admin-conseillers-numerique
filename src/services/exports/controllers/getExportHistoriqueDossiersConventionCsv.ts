@@ -91,6 +91,13 @@ const getExportHistoriqueDossiersConventionCsv =
               structureID: {
                 $arrayElemAt: ['$prefet.idStructureTransfert', -1],
               },
+              structureTransfertAvenantIDs: {
+                $map: {
+                  input: '$demandesCoselec',
+                  as: 'demande',
+                  in: '$$demande.prefet.idStructureTransfert',
+                },
+              },
             },
           },
           {
@@ -113,6 +120,14 @@ const getExportHistoriqueDossiersConventionCsv =
             },
           },
           {
+            $lookup: {
+              from: 'structures',
+              localField: 'structureTransfertAvenantIDs',
+              foreignField: '_id',
+              as: 'structureTransfertAvenantDetails',
+            },
+          },
+          {
             $project: {
               _id: 1,
               nom: 1,
@@ -128,6 +143,8 @@ const getExportHistoriqueDossiersConventionCsv =
               demandesCoselec: 1,
               codeCom: 1,
               'transfertStructure.idPG': 1,
+              'structureTransfertAvenantDetails.idPG': 1,
+              'structureTransfertAvenantDetails._id': 1,
             },
           },
         ]);
