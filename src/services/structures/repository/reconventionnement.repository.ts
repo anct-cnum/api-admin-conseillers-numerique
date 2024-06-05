@@ -622,7 +622,17 @@ const formatAvenantForExportHistoriqueDossierConventionnement = (
       if (!avenants) {
         return [];
       }
-      return avenants.map((avenant) => {
+      const avenantsDétailsTransfert = avenants?.map((avenant) => {
+        const detail = structure?.structureTransfertAvenantDetails?.find(
+          (detaiil) =>
+            detaiil?._id.equals(avenant?.prefet?.idStructureTransfert),
+        );
+        return {
+          ...avenant,
+          transfertStructure: detail || null,
+        };
+      });
+      return avenantsDétailsTransfert.map((avenant) => {
         const item = avenant;
         item.dateSorted = avenant?.validateurAvenant?.date;
         item.idPG = structure.idPG;
