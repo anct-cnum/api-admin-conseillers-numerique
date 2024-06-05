@@ -624,8 +624,10 @@ const formatAvenantForExportHistoriqueDossierConventionnement = (
       }
       const avenantsDétailsTransfert = avenants?.map((avenant) => {
         const detail = structure?.structureTransfertAvenantDetails?.find(
-          (detaiil) =>
-            detaiil?._id.equals(avenant?.prefet?.idStructureTransfert),
+          (detailsStructureDeTransfert) =>
+            detailsStructureDeTransfert?._id.equals(
+              avenant?.prefet?.idStructureTransfert,
+            ),
         );
         return {
           ...avenant,
