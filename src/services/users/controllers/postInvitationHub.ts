@@ -6,7 +6,7 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { createUserHub } from '../../../schemas/users.schemas';
 import mailer from '../../../mailer';
 import { IUser } from '../../../ts/interfaces/db.interfaces';
-import { deleteUser } from '../../../utils/index';
+import { deleteUser, pullRoleHubUser } from '../../../utils/index';
 import { envoiEmailInvit } from '../../../utils/email';
 
 const { v4: uuidv4 } = require('uuid');
@@ -27,11 +27,11 @@ const postInvitationHub =
         res.status(400).json({ message: String(errorJoi?.error) });
         return;
       }
-      const oldUser = await app
+      const existedUser = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ name: email.toLowerCase() });
-      if (oldUser === null) {
+      if (existedUser === null) {
         const user: IUser = await app.service(service.users).create({
           name: email.toLowerCase(),
           nom,
@@ -64,17 +64,17 @@ const postInvitationHub =
           .json(
             `Le hub ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
           );
-      } else if (oldUser.roles.includes('hub')) {
+      } else if (existedUser.roles.includes('hub')) {
         res.status(409).json({
           message: `${email} possède déjà le rôle Hub`,
         });
-      } else if (oldUser.roles.includes('structure')) {
+      } else if (existedUser.roles.includes('structure')) {
         const user = await app
           .service(service.users)
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate(
             {
-              _id: oldUser._id,
+              _id: existedUser._id,
             },
             {
               $push: { roles: ['hub'] },
@@ -104,7 +104,7 @@ const postInvitationHub =
           user.value,
         );
         if (errorSmtpMail instanceof Error) {
-          await deleteUser(app, req, email);
+          await pullRoleHubUser(app, req, email);
           res.status(503).json({
             message:
               "Une erreur est survenue lors de l'envoi, veuillez réessayer dans quelques minutes",
@@ -114,7 +114,7 @@ const postInvitationHub =
         res
           .status(200)
           .json(
-            `Le hub ${email} a bien été invité, un mail de création de compte lui a été envoyé`,
+            `${email} a bien été invité, un mail de création de compte lui a été envoyé`,
           );
       } else {
         res.status(409).json({

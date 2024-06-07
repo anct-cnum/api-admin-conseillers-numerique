@@ -48,10 +48,10 @@ const postInvitationStructure =
       const connect = app.get('mongodb');
       const database = connect.substr(connect.lastIndexOf('/') + 1);
       // Pas d'access control car on controle si l'email n'existe pas déjà en base
-      const oldUser = await app
+      const existedUser = await app
         .service(service.users)
         .Model.findOne({ name: email.toLowerCase() });
-      if (oldUser === null) {
+      if (existedUser === null) {
         const canCreate = req.ability.can(action.create, ressource.users);
         if (!canCreate) {
           res.status(403).json({
@@ -83,15 +83,15 @@ const postInvitationStructure =
         await envoiEmailInformationValidationCoselec(app, mailer, user);
         messageSuccess = `La structure ${email} a bien été invitée, un mail de création de compte lui a été envoyé`;
       } else {
-        if (oldUser.roles.includes('structure')) {
+        if (existedUser.roles.includes('structure')) {
           res.status(409).json({
             message: `Ce compte possède déjà le rôle structure`,
           });
           return;
         }
         if (
-          oldUser.roles.includes('grandReseau') ||
-          oldUser.roles.includes('hub')
+          existedUser.roles.includes('grandReseau') ||
+          existedUser.roles.includes('hub')
         ) {
           const query = {
             $push: {
@@ -105,7 +105,7 @@ const postInvitationStructure =
               ),
             },
           };
-          if (!oldUser.sub) {
+          if (!existedUser.sub) {
             Object.assign(query.$set, {
               token: uuidv4(),
               tokenCreatedAt: new Date(),
@@ -114,8 +114,8 @@ const postInvitationStructure =
           }
           user = await app
             .service(service.users)
-            .Model.findOneAndUpdate(oldUser._id, query, { new: true });
-          if (!oldUser.sub) {
+            .Model.findOneAndUpdate(existedUser._id, query, { new: true });
+          if (!existedUser.sub) {
             errorSmtpMailInvit = await envoiEmailInvit(app, req, mailer, user);
             messageSuccess = `Le rôle structure a été ajouté au compte ${email}, un mail d'invitation à rejoindre le tableau de bord lui a été envoyé`;
           } else {

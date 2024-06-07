@@ -12,11 +12,13 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
     const users = await app.service(service.users).Model.find({
       roles: { $in: ['hub_coop'] },
     });
+    const date = new Date();
 
-    logger.info(`Nombre d'utilisateurs à traiter: ${users?.length}`);
+    logger.info(`Nombre d'utilisateurs à traiter: ${users.length}`);
 
     for (const user of users) {
-      if (user.passwordCreated === true) {
+      const activeUser = user.passwordCreated;
+      if (activeUser) {
         try {
           await app.service(service.users).Model.updateOne(
             { _id: user._id },
@@ -24,7 +26,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
               $set: {
                 roles: ['hub'],
                 token: uuidv4(),
-                tokenCreatedAt: new Date(),
+                tokenCreatedAt: date,
                 mailSentDate: null,
                 migrationDashboard: true,
               },
