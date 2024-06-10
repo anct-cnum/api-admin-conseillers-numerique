@@ -22,8 +22,8 @@ execute(__filename, async ({ app, logger, exit }) => {
     return;
   }
 
-  // pas de users existants grandReseau à migrer & 'hub_coop' en standbye
-  const allowedRoles = ['admin', 'structure', 'prefet'];
+  // pas de users existants grandReseau à migrer
+  const allowedRoles = ['admin', 'structure', 'prefet', 'hub'];
   if (options.email) {
     let query = {
       token: uuidv4(),
