@@ -59,7 +59,7 @@ const checkIfCcp1 = (statut) =>
   statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
 
 const generateCsvCandidat = async (misesEnRelations, response: Response) => {
-  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;Compte activé;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire'];
+  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;Compte activé;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Date du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire'];
 
   const formatterDate = (date: Date): string => {
     if (date !== undefined && date !== null) {
@@ -113,6 +113,7 @@ const generateCsvCandidat = async (misesEnRelations, response: Response) => {
         };${miseEnrelation.conseiller?.idPG
         };${miseEnrelation.conseiller?._id
         };${coselec?.numero ? coselec.numero : ''
+        };${coselec?.insertedAt ? formatterDate(coselec.insertedAt) : ''
         };${coselec?.nombreConseillersCoselec ? coselec.nombreConseillersCoselec : 0
         };${formatterDate(miseEnrelation.conseiller?.datePrisePoste)
         };${formatterDate(miseEnrelation.conseiller?.dateFinFormation)
