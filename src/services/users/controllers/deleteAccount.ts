@@ -104,13 +104,13 @@ const deleteAccount =
               },
             };
             break;
-          case 'hub_coop':
+          case 'hub':
             query = {
               $unset: {
                 hub: '',
               },
               $pull: {
-                roles: 'hub_coop',
+                roles: 'hub',
               },
             };
             break;

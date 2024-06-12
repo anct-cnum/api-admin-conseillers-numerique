@@ -120,6 +120,16 @@ const deleteUser = async (app: Application, req: IRequest, email: string) => {
     .Model.accessibleBy(req.ability, action.delete)
     .deleteOne({ name: email.toLowerCase() });
 };
+const pullRoleHubUser = async (
+  app: Application,
+  req: IRequest,
+  email: string,
+) => {
+  await app
+    .service(service.users)
+    .Model.accessibleBy(req.ability, action.update)
+    .updateOne({ name: email.toLowerCase() }, { $pull: { roles: 'hub' } });
+};
 
 const deleteRoleUser = async (
   app: Application,
@@ -154,6 +164,7 @@ export {
   getCoselecPositifConventionnementInitial,
   getCoselecPositifAvantAbandon,
   deleteUser,
+  pullRoleHubUser,
   deleteRoleUser,
   formatDateGMT,
   getTimestampByDate,

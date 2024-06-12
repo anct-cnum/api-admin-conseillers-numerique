@@ -77,13 +77,13 @@ execute(__filename, async ({ app, logger, exit }) => {
           reject();
         } else {
           trouvees += 1;
-          if (contrat['Date de début de CT\nJJ/MM/AAAA'].trim().length === 0) {
+          if (contrat['Date de début de CT JJ/MM/AAAA'].trim().length === 0) {
             logger.error(
               `Date de début manquante pour le contrat entre le conseiller ${contrat['ID CNFS']} et la structure ${contrat['ID SA']}`,
             );
             reject();
           } else if (
-            contrat['Date de fin de CT\nJJ/MM/AAAA'].trim().length === 0 &&
+            contrat['Date de fin de CT JJ/MM/AAAA'].trim().length === 0 &&
             contrat['CT V1'] !== 'CDI'
           ) {
             logger.error(
@@ -92,7 +92,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             reject();
           } else {
             const [jourDebut, moisDebut, anneeDebut] =
-              contrat['Date de début de CT\nJJ/MM/AAAA'].split('/');
+              contrat['Date de début de CT JJ/MM/AAAA'].split('/');
             const dateDebutObject = new Date(
               anneeDebut,
               moisDebut - 1,
@@ -112,7 +112,7 @@ execute(__filename, async ({ app, logger, exit }) => {
             }
 
             const [jourFin, moisFin, anneeFin] =
-              contrat['Date de fin de CT\nJJ/MM/AAAA'].split('/');
+              contrat['Date de fin de CT JJ/MM/AAAA'].split('/');
             const dateFinObject = new Date(
               anneeFin,
               moisFin - 1,

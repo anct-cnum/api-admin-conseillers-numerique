@@ -7,7 +7,7 @@ type Roles =
   | 'conseiller'
   | 'prefet'
   | 'grandReseau'
-  | 'hub_coop'
+  | 'hub'
   | 'coordinateur';
 
 const mapReseau = GrandsReseaux.map((reseau: any) => reseau.valeur);

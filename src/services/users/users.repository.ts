@@ -21,7 +21,7 @@ const filterRole = (role: string) => {
             'admin',
             'grandReseau',
             'prefet',
-            'hub_coop',
+            'hub',
             'coordinateur',
             'structure',
           ],
