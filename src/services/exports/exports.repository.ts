@@ -58,18 +58,24 @@ const formatDateWithoutGetTime = (date: Date) => {
 const checkIfCcp1 = (statut) =>
   statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
 
-const generateCsvCandidat = async (misesEnRelations, res: Response) => {
-  res.write(
-    'Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;Compte activé;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire\n',
-  );
+const generateCsvCandidat = async (misesEnRelations, response: Response) => {
+  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;Compte activé;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire'];
+
+  const formatterDate = (date: Date): string => {
+    if (date !== undefined && date !== null) {
+      return date.toLocaleDateString('fr-FR');
+    }
+    return 'non renseignée';
+  }
+
   try {
     for (const miseEnrelation of misesEnRelations) {
       const coselec = getCoselec(miseEnrelation.structure);
 
-      res.write(
-        `${formatDate(miseEnrelation.conseiller?.createdAt)
-        };${formatDate(miseEnrelation?.dateDebutDeContrat)
-        };${formatDate(miseEnrelation?.dateFinDeContrat)
+      csv.push(
+        `${formatterDate(miseEnrelation.conseiller?.createdAt)
+        };${formatterDate(miseEnrelation?.dateDebutDeContrat)
+        };${formatterDate(miseEnrelation?.dateFinDeContrat)
         };${miseEnrelation?.typeDeContrat ?? 'Non renseigné'
         };${miseEnrelation?.salaire ?? 'Non renseigné'
         };${miseEnrelation.conseiller?.prenom
@@ -108,19 +114,20 @@ const generateCsvCandidat = async (misesEnRelations, res: Response) => {
         };${miseEnrelation.conseiller?._id
         };${coselec?.numero ? coselec.numero : ''
         };${coselec?.nombreConseillersCoselec ? coselec.nombreConseillersCoselec : 0
-        };${formatDate(miseEnrelation.conseiller?.datePrisePoste)
-        };${formatDate(miseEnrelation.conseiller?.dateFinFormation)
+        };${formatterDate(miseEnrelation.conseiller?.datePrisePoste)
+        };${formatterDate(miseEnrelation.conseiller?.dateFinFormation)
         };${miseEnrelation.conseiller?.mattermost?.id &&
           miseEnrelation.conseiller?.emailCN?.address
           ? miseEnrelation.conseiller?.emailCN?.address
           : ''
         };${miseEnrelation.conseiller?.emailPro ?? ''
-        }\n`,
+        }`
       );
     }
-    res.end();
+    response.write(csv.join('\n'));
+    response.end();
   } catch (error) {
-    res.status(500).json({
+    response.status(500).json({
       message: "Une erreur s'est produite au niveau de la création du csv",
     });
     throw new Error(error);
