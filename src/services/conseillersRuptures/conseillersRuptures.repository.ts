@@ -2,6 +2,7 @@
 import dayjs from 'dayjs';
 import { Response } from 'express';
 import { formatDateGMT } from '../../utils';
+import { AffichagePhaseConventionnement } from '../../ts/enum';
 
 const formatDate = (date: Date) => {
   if (date !== undefined && date !== null) {
@@ -27,6 +28,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
     'Date de rupture',
     'Motif de rupture',
     'Commentaire',
+    'Conventionnement',
   ];
   try {
     res.write(
@@ -48,6 +50,9 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
             rupture.conseillerSupprime?.conseiller?.idPG
               ? "Ce conseiller s'est désinscrit totalement du dispositif"
               : '',
+            rupture?.miseEnRelation?.phaseConventionnement
+              ? AffichagePhaseConventionnement.PHASE_2
+              : AffichagePhaseConventionnement.PHASE_1
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
