@@ -106,14 +106,14 @@ const getStatsGlobales = async (
       conseillers,
     };
 
-    const totalParticipants = await getStatsTotalParticipants(donneesStats);
+    const totalParticipants = getStatsTotalParticipants(donneesStats);
     const [
       nbUsagersBeneficiantSuivi,
       statsLieuxPourcentage,
       statsTempsAccompagnementPourcentage,
       statsAgesPourcentage,
       statsUsagersPourcentage,
-    ] = await Promise.all([
+    ] = [
       getNbUsagersBeneficiantSuivi(donneesStats),
       conversionPourcentage(
         donneesStats.statsLieux,
@@ -127,12 +127,9 @@ const getStatsGlobales = async (
       ),
       conversionPourcentage(donneesStats.statsAges, totalParticipants),
       conversionPourcentage(donneesStats.statsUsagers, totalParticipants),
-    ]);
+    ];
     donneesStats.tauxTotalUsagersAccompagnes = Math.round(
-      await getStatsTauxAccompagnements(
-        nbUsagersBeneficiantSuivi,
-        totalParticipants,
-      ),
+      getStatsTauxAccompagnements(nbUsagersBeneficiantSuivi, totalParticipants),
     );
     donneesStats.nbUsagersBeneficiantSuivi = nbUsagersBeneficiantSuivi;
     // Conversion en %
