@@ -11,6 +11,18 @@ import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 import { validStatCsv } from '../../../schemas/stats.schemas';
 import { formatDateGMT } from '../../../utils';
 
+const labelsCorrespondance = require('../../../../datas/themesCorrespondances.json');
+
+const sortByName = (a, b) => {
+  if (a.nom < b.nom) {
+    return -1;
+  }
+  if (a.nom > b.nom) {
+    return 1;
+  }
+  return 0;
+};
+
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     let { idType, nom, idStructure, idConseiller } = req.query;
@@ -72,6 +84,18 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          // @ts-expect-error
+          statistiques.statsThemes = statistiques.statsThemes
+            .map((stats) => {
+              return {
+                nom: labelsCorrespondance.find(
+                  (label) => label.nom === stats.nom,
+                ).correspondance,
+                percent: stats.percent,
+                valeur: stats.valeur,
+              };
+            })
+            .sort(sortByName);
           break;
         case 'structure':
           idStructure = new ObjectId(String(idType));
