@@ -191,13 +191,13 @@ execute(
                     {
                       $or: [
                         {
-                          'conventionnement.dossierConventionnement.dateDernierModification':
+                          'conventionnement.dossierConventionnement.dateDerniereModification':
                             {
                               $gt: new Date(dossier.dateDerniereModification),
                             },
                         },
                         {
-                          'conventionnement.dossierConventionnement.dateDernierModification':
+                          'conventionnement.dossierConventionnement.dateDerniereModification':
                             {
                               $exists: false,
                             },
@@ -241,13 +241,13 @@ execute(
                     {
                       $or: [
                         {
-                          'structureObj.conventionnement.dossierConventionnement.dateDernierModification':
+                          'structureObj.conventionnement.dossierConventionnement.dateDerniereModification':
                             {
                               $gt: new Date(dossier.dateDerniereModification),
                             },
                         },
                         {
-                          'structureObj.conventionnement.dossierConventionnement.dateDernierModification':
+                          'structureObj.conventionnement.dossierConventionnement.dateDerniereModification':
                             {
                               $exists: false,
                             },

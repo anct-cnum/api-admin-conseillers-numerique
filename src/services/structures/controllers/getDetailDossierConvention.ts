@@ -65,6 +65,20 @@ const getDetailStructureWithConseillers =
         },
       },
       {
+        $lookup: {
+          from: 'structures',
+          localField: 'demandesCoselec.prefet.idStructureTransfert',
+          foreignField: '_id',
+          as: 'structureTransfert',
+        },
+      },
+      {
+        $unwind: {
+          path: '$structureTransfert',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
           idPG: 1,
           nom: 1,
@@ -76,8 +90,10 @@ const getDetailStructureWithConseillers =
           nombreConseillersSouhaites: 1,
           insee: 1,
           conseillers: '$conseillers',
-          prefet: { $arrayElemAt: ['$prefet', -1] },
           createdAt: 1,
+          'structureTransfert.idPG': 1,
+          'structureTransfert.nom': 1,
+          prefet: { $arrayElemAt: ['$prefet', -1] },
         },
       },
     ]);
@@ -94,6 +110,9 @@ const miseEnRelationConseillerStructure =
         },
       },
       {
+        $sort: { dateDebutDeContrat: -1 },
+      },
+      {
         $project: {
           dateRecrutement: 1,
           statut: 1,
@@ -107,6 +126,8 @@ const miseEnRelationConseillerStructure =
           dateFinDeContrat: 1,
           dateDebutDeContrat: 1,
           typeDeContrat: 1,
+          miseEnRelationConventionnement: 1,
+          miseEnRelationReconventionnement: 1,
         },
       },
     ]);
@@ -193,12 +214,19 @@ const getDetailDossierConvention =
                   conseiller.statut === 'nouvelle_rupture' ||
                   conseiller.statut === 'terminee'),
             );
-          structure[0].conseillersRenouveller =
-            structure[0]?.conseillers?.filter(
+          structure[0].conseillersRenouveller = structure[0]?.conseillers
+            ?.filter(
               (conseiller) =>
-                conseiller.reconventionnement === true &&
-                conseiller.statutMiseEnrelation !== 'terminee' &&
-                conseiller.statutMiseEnrelation !== 'renouvellement_initiee',
+                conseiller.reconventionnement === true ||
+                conseiller.miseEnRelationConventionnement ||
+                conseiller.miseEnRelationReconventionnement,
+            )
+            .filter(
+              (conseiller, index, conseillers) =>
+                index ===
+                conseillers.findIndex(
+                  (element) => element.idPG === conseiller.idPG,
+                ),
             );
         } else if (
           structure[0]?.conventionnement?.dossierConventionnement?.numero

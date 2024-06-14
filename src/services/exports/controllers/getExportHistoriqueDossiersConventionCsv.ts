@@ -75,6 +75,7 @@ const getExportHistoriqueDossiersConventionCsv =
           {
             $project: {
               _id: 1,
+              nom: 1,
               siret: 1,
               idPG: 1,
               type: 1,
@@ -86,6 +87,64 @@ const getExportHistoriqueDossiersConventionCsv =
               coselec: 1,
               demandesCoselec: 1,
               codeCom: 1,
+              prefet: { $arrayElemAt: ['$prefet', -1] },
+              structureID: {
+                $arrayElemAt: ['$prefet.idStructureTransfert', -1],
+              },
+              structureTransfertAvenantIDs: {
+                $map: {
+                  input: '$demandesCoselec',
+                  as: 'demande',
+                  in: '$$demande.prefet.idStructureTransfert',
+                },
+              },
+            },
+          },
+          {
+            $addFields: {
+              structureID: { $toObjectId: '$structureID' },
+            },
+          },
+          {
+            $lookup: {
+              from: 'structures',
+              localField: 'structureID',
+              foreignField: '_id',
+              as: 'transfertStructure',
+            },
+          },
+          {
+            $unwind: {
+              path: '$transfertStructure',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'structures',
+              localField: 'structureTransfertAvenantIDs',
+              foreignField: '_id',
+              as: 'structureTransfertAvenantDetails',
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              nom: 1,
+              siret: 1,
+              idPG: 1,
+              type: 1,
+              createdAt: 1,
+              codeRegion: 1,
+              codeDepartement: 1,
+              statut: 1,
+              conventionnement: 1,
+              coselec: 1,
+              demandesCoselec: 1,
+              codeCom: 1,
+              'transfertStructure.idPG': 1,
+              'structureTransfertAvenantDetails.idPG': 1,
+              'structureTransfertAvenantDetails._id': 1,
             },
           },
         ]);

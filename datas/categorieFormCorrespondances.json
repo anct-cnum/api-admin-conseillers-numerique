@@ -18,7 +18,8 @@
       "Groupement de coopération sanitaire à gestion privée",
       "Autre groupement de droit privé non doté de la personnalité morale",
       "Groupement d'employeurs",
-      "Entrepreneur individuel"
+      "Entrepreneur individuel",
+      "Autre personne de droit privé inscrite au registre du commerce et des sociétés"
     ]
   },
   {
@@ -61,7 +62,8 @@
       "Établissement public national à caractère administratif",
       "Régie d'une collectivité locale à caractère industriel ou commercial",
       "Autre personne morale de droit administratif",
-      "Établissement public national à caractère industriel ou commercial doté d'un comptable public"
+      "Établissement public national à caractère industriel ou commercial doté d'un comptable public",
+      "Autre personne morale de droit privé"
     ]
   }
 ]

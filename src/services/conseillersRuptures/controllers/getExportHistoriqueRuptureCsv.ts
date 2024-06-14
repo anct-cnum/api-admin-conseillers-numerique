@@ -107,6 +107,7 @@ const getExportHistoriqueRuptureCsv =
               'conseiller.email': 1,
               'structure.idPG': 1,
               'structure.nom': 1,
+              'miseEnRelation.phaseConventionnement': 1,
               'miseEnRelation.dateDebutDeContrat': 1,
               'miseEnRelation.dateFinDeContrat': 1,
               'miseEnRelation.typeDeContrat': 1,

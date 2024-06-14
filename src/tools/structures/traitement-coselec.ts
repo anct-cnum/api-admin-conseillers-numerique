@@ -151,9 +151,19 @@ execute(__filename, async ({ app, logger, exit }) => {
       .service(service.users)
       .Model.find({
         'entity.$id': structure._id,
-        $and: [
-          { roles: { $elemMatch: { $eq: 'structure' } } },
-          { roles: { $elemMatch: { $eq: 'grandReseau' } } },
+        $or: [
+          {
+            $and: [
+              { roles: { $elemMatch: { $eq: 'structure' } } },
+              { roles: { $elemMatch: { $eq: 'grandReseau' } } },
+            ],
+          },
+          {
+            $and: [
+              { roles: { $elemMatch: { $eq: 'structure' } } },
+              { roles: { $elemMatch: { $eq: 'hub' } } },
+            ],
+          },
         ],
       })
       .select({ _id: 1 });

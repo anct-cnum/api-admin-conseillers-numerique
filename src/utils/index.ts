@@ -100,6 +100,10 @@ const getCoselec = (structure) => {
   return getLastCoselec(structure);
 };
 
+const getCoselecLabel = (structure) => {
+  return structure?.numero || 'Non rensigné';
+};
+
 const getCoselecConventionnement = (structure) => {
   if (structure.statut === 'VALIDATION_COSELEC') {
     return getCoselecPositifConventionnement(structure);
@@ -115,6 +119,16 @@ const deleteUser = async (app: Application, req: IRequest, email: string) => {
     .service(service.users)
     .Model.accessibleBy(req.ability, action.delete)
     .deleteOne({ name: email.toLowerCase() });
+};
+const pullRoleHubUser = async (
+  app: Application,
+  req: IRequest,
+  email: string,
+) => {
+  await app
+    .service(service.users)
+    .Model.accessibleBy(req.ability, action.update)
+    .updateOne({ name: email.toLowerCase() }, { $pull: { roles: 'hub' } });
 };
 
 const deleteRoleUser = async (
@@ -150,7 +164,9 @@ export {
   getCoselecPositifConventionnementInitial,
   getCoselecPositifAvantAbandon,
   deleteUser,
+  pullRoleHubUser,
   deleteRoleUser,
   formatDateGMT,
   getTimestampByDate,
+  getCoselecLabel,
 };
