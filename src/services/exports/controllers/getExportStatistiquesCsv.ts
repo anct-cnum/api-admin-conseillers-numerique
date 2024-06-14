@@ -11,6 +11,27 @@ import { getStatsNationalesGrandReseau } from '../../stats/controllers';
 import { validStatCsv } from '../../../schemas/stats.schemas';
 import { formatDateGMT } from '../../../utils';
 
+const labelsCorrespondance = require('../../../../datas/themesCorrespondances.json');
+
+const sortByName = (a, b) => {
+  if (a.nom < b.nom) {
+    return -1;
+  }
+  if (a.nom > b.nom) {
+    return 1;
+  }
+  return 0;
+};
+
+function matchCorrespondance(stats) {
+  return {
+    nom: labelsCorrespondance.find((label) => label.nom === stats.nom)
+      .correspondance,
+    percent: stats.percent,
+    valeur: stats.valeur,
+  };
+}
+
 const getExportStatistiquesCsv =
   (app: Application) => async (req: IRequest, res: Response) => {
     let { idType, nom, idStructure, idConseiller } = req.query;
@@ -94,6 +115,10 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          // @ts-expect-error
+          statistiques.statsThemes = statistiques.statsThemes
+            .map(matchCorrespondance)
+            .sort(sortByName);
           // eslint-disable-next-line no-case-declarations
           const structure = await app
             .service(service.structures)
@@ -125,6 +150,10 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          // @ts-expect-error
+          statistiques.statsThemes = statistiques.statsThemes
+            .map(matchCorrespondance)
+            .sort(sortByName);
           idType = undefined;
           break;
         case 'codeDepartement':
@@ -148,6 +177,10 @@ const getExportStatistiquesCsv =
             action.read,
             app,
           );
+          // @ts-expect-error
+          statistiques.statsThemes = statistiques.statsThemes
+            .map(matchCorrespondance)
+            .sort(sortByName);
           break;
         case 'grandReseau':
           req.query = {

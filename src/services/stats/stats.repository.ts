@@ -276,17 +276,17 @@ const getStatsActivites = async (query, ability, read, app) => {
     },
   ]);
 };
-const getNbUsagersBeneficiantSuivi = async (stats) =>
+const getNbUsagersBeneficiantSuivi = (stats) =>
   stats.nbUsagersAccompagnementIndividuel +
   stats.nbUsagersAtelierCollectif +
   stats.nbReconduction;
 
-const getStatsTotalParticipants = async (stats) =>
+const getStatsTotalParticipants = (stats) =>
   stats.nbTotalParticipant +
   stats.nbAccompagnementPerso +
   stats.nbDemandePonctuel;
 
-const getStatsTauxAccompagnements = async (
+const getStatsTauxAccompagnements = (
   nbUsagersBeneficiantSuivi,
   totalParticipants,
 ) =>
