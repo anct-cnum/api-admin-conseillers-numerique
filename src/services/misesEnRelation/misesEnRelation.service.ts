@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import MisesEnRelation from './misesEnRelation.class';
 import createModel from '../../models/misesEnRelation.model';
@@ -8,7 +7,7 @@ import hooks from './misesEnRelation.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    misesEnRelation: MisesEnRelation & ServiceAddons<any>;
+    misesEnRelation: MisesEnRelation;
   }
 }
 

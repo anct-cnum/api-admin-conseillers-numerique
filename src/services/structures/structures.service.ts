@@ -1,5 +1,4 @@
 // Initializes the `structures` service on path `/structures`
-import { ServiceAddons } from '@feathersjs/feathers';
 import createModel from '../../models/structures.model';
 import { Application } from '../../declarations';
 import Structures from './structures.class';
@@ -8,7 +7,7 @@ import hooks from './structures.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    structures: Structures & ServiceAddons<any>;
+    structures: Structures;
   }
 }
 

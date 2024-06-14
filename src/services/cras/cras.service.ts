@@ -1,5 +1,4 @@
 // Initializes the `cras` service on path `/cras`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import Cras from './cras.class';
 import createModel from '../../models/cras.model';
@@ -8,7 +7,7 @@ import hooks from './cras.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    cras: Cras & ServiceAddons<any>;
+    cras: Cras;
   }
 }
 

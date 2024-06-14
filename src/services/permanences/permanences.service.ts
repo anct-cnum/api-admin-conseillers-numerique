@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import createModel from '../../models/permanences.model';
 import hooks from './permanences.hook';
@@ -8,7 +7,7 @@ import Permanences from './permanences.class';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    permanences: Permanences & ServiceAddons<any>;
+    permanences: Permanences;
   }
 }
 

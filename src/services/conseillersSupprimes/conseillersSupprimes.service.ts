@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import createModel from '../../models/conseillersSupprimes.model';
 import hooks from './conseillersSupprimes.hook';
@@ -8,7 +7,7 @@ import ConseillersSupprimes from './conseillersSupprimes.class';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    conseillersSupprimes: ConseillersSupprimes & ServiceAddons<any>;
+    conseillersSupprimes: ConseillersSupprimes;
   }
 }
 

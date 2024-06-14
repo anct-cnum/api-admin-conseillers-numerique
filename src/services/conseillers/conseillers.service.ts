@@ -1,5 +1,4 @@
 // Initializes the `Conseillers` service on path `/Conseillers`
-import { ServiceAddons } from '@feathersjs/feathers';
 import createModel from '../../models/conseillers.model';
 import { Application } from '../../declarations';
 import Conseillers from './conseillers.class';
@@ -8,7 +7,7 @@ import hooks from './conseillers.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    conseillers: Conseillers & ServiceAddons<any>;
+    conseillers: Conseillers;
   }
 }
 

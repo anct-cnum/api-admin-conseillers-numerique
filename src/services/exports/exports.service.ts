@@ -1,5 +1,4 @@
 // Initializes the `exports` service on path `/exports`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { Exports } from './exports.class';
 import hooks from './exports.hooks';
@@ -7,7 +6,7 @@ import hooks from './exports.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    exports: Exports & ServiceAddons<any>;
+    exports: Exports;
   }
 }
 

@@ -1,4 +1,4 @@
-import feathers from '@feathersjs/feathers';
+import { feathers } from '@feathersjs/feathers';
 import configuration from '@feathersjs/configuration';
 import express from '@feathersjs/express';
 import * as Sentry from '@sentry/node';
@@ -30,15 +30,15 @@ app.hooks(appHooks);
 let transaction: any = null;
 
 const execute = async (name: string, job: any) => {
-  if (config().sentry.enabled === 'true') {
+  if (app.get('sentry.enabled') === 'true') {
     Sentry.init({
-      dsn: config().sentry.dsn,
-      environment: config().sentry.environment,
+      dsn: app.get('sentry.dsn'),
+      environment: app.get('sentry.environment'),
 
       // Set tracesSampleRate to 1.0 to capture 100%
       // of transactions for performance monitoring.
       // We recommend adjusting this value in production
-      tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
+      tracesSampleRate: parseFloat(app.get('sentry.traceSampleRate')),
     });
     transaction = Sentry.startTransaction({
       op: 'Lancement de script',

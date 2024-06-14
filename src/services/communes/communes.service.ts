@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import createModel from '../../models/communes.model';
 import Communes from './communes.class';
@@ -8,7 +7,7 @@ import hooks from './communes.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    communes: Communes & ServiceAddons<any>;
+    communes: Communes;
   }
 }
 

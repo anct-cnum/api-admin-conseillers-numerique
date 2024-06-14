@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import createModel from '../../models/qpv.model';
 import Qpv from './qpv.class';
@@ -8,7 +7,7 @@ import hooks from './qpv.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    qpv: Qpv & ServiceAddons<any>;
+    qpv: Qpv;
   }
 }
 

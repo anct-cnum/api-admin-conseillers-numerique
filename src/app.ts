@@ -2,9 +2,16 @@ import path from 'path';
 import compress from 'compression';
 import helmet from 'helmet';
 import cors from 'cors';
-import feathers from '@feathersjs/feathers';
+import { feathers } from '@feathersjs/feathers';
 import configuration from '@feathersjs/configuration';
-import express from '@feathersjs/express';
+import express, {
+  json,
+  urlencoded,
+  static as staticFiles,
+  rest,
+  notFound,
+  errorHandler,
+} from '@feathersjs/express';
 import socketio from '@feathersjs/socketio';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
@@ -17,14 +24,13 @@ import channels from './channels';
 import authentication from './authentication';
 import mongoose from './mongoose';
 
-const app = express(feathers());
+const app = express(feathers().configure(configuration()));
 
 // Init Sentry
-const config = configuration();
-if (config().sentry.enabled === 'true') {
+if (app.get('sentry.enabled') === 'true') {
   Sentry.init({
-    dsn: config().sentry.dsn,
-    environment: config().sentry.environment,
+    dsn: app.get('sentry.dsn'),
+    environment: app.get('sentry.environment'),
     integrations: [
       // enable HTTP calls tracing
       new Sentry.Integrations.Http({ tracing: true }),
@@ -34,7 +40,7 @@ if (config().sentry.enabled === 'true') {
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
+    tracesSampleRate: parseFloat(app.get('sentry.traceSampleRate')),
     // Ne doit partir en erreur si le client ferme le navigateur avant la fin de la requête
     ignoreErrors: [/request aborted/i],
   });
@@ -56,17 +62,17 @@ app.use(
 );
 app.use(compress());
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(favicon(path.join(__dirname, 'favicon.ico')));
 } else {
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(staticFiles(path.join(__dirname, 'public')));
 }
 
 // Set up Plugins and providers
-app.configure(express.rest());
+app.configure(rest());
 app.configure(socketio());
 
 app.use((req, res, next) => {
@@ -75,7 +81,7 @@ app.use((req, res, next) => {
 });
 
 app.configure(mongoose);
-app.use(cors({ origin: config().dashboard_hostname, credentials: true }));
+app.use(cors({ origin: app.get('dashboard_hostname'), credentials: true }));
 
 app.configure(authentication);
 // Set up our services (see `services/index.js`)
@@ -84,9 +90,9 @@ app.configure(services);
 app.configure(channels);
 
 // Configure a middleware for 404s and the error handler
-app.use(express.notFound());
+app.use(notFound());
 
-if (config().sentry.enabled === 'true') {
+if (app.get('sentry.enabled') === 'true') {
   // The error handler must be before any other error middleware and after all controllers
   app.use(
     Sentry.Handlers.errorHandler({
@@ -100,7 +106,7 @@ if (config().sentry.enabled === 'true') {
     }),
   );
 }
-app.use(express.errorHandler({ logger }));
+app.use(errorHandler({ logger }));
 
 app.hooks(appHooks);
 

@@ -1,5 +1,4 @@
 // Initializes the `users` service on path `/users`
-import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import createModel from '../../models/accessLogs.model';
 import hooks from './accessLogs.hook';
@@ -8,7 +7,7 @@ import AccessLogs from './accessLogs.class';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    accessLogs: AccessLogs & ServiceAddons<any>;
+    accessLogs: AccessLogs;
   }
 }
 

@@ -1,6 +1,5 @@
 import '@feathersjs/transport-commons';
-import { HookContext } from '@feathersjs/feathers';
-import { Application } from './declarations';
+import { HookContext, Application } from './declarations';
 
 export default function (app: Application): void {
   if (typeof app.channel !== 'function') {
