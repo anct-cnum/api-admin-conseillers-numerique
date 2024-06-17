@@ -1,45 +1,41 @@
-# api-admin-conseillers-numerique
+# API du tableau de pilotage
 
-Serveur d'api de gestion du tableau de bord
+API fournissant le dépôt [tableau de pilotage](https://github.com/anct-cnum/dashboard).
 
-## About
+## Prérequis
 
-This project uses [Feathers](http://feathersjs.com). An open source web framework for building modern real-time applications.
+- [Node.js LTS via NVM](https://nodejs.org/fr/download/package-manager) ;
+- [Docker](https://get.docker.com/).
 
-## Getting Started
-
-Getting up and running is as easy as 1, 2, 3.
-
-1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
-2. Install your dependencies
-
-    ```bash
-    cd path/to/api-admin-conseiller-numerique
-    npm install
-    ```
-
-3. Start your app
-
-    ```bash
-    npm start
-    ```
-
-## Testing
-
-Simply run `npm test` and all your tests in the `test/` directory will be run.
-
-## Scaffolding
-
-Feathers has a powerful command line interface. Here are a few things it can do:
+## Installation du projet
 
 ```bash
-npm install -g @feathersjs/cli          # Install Feathers CLI
-
-feathers generate service               # Generate a new Service
-feathers generate hook                  # Generate a new Hook
-feathers help                           # Show all commands
+npm install
+cp config/default.json config/local.json
 ```
 
-## Help
+## Installation des données dans MongoDB
 
-For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
+```bash
+npm run db:start
+```
+
+> ⚠ Attention si vous prenez les données de production, elles ne seront pas anonymisées donc à prendre avec précaution !
+
+- Télécharger l'export sur Clever Cloud (prod ou recette) dans l'onglet `backups` ;
+- Créer `datas/exports`, puis le copier dans ce dernier et renommer en `archive.gz` ;
+- Se connecter sur le conteneur Docker MongoDB créé (via VSCode ou [Lazydocker](https://github.com/jesseduffield/lazydocker#binary-release-linuxosxwindows)) puis lancer la commande suivante `mongorestore --host=localhost --port=27017 --username=admin --password=admin --archive=/home --gzip --drop --noIndexRestore --nsFrom="[REMPLACER_PAR_LE_NOM_DE_LA_BASE_DE_DONNEES].*" --nsTo="test.*"` ;
+- L'import ci-dessus exclue la création d'index (car ça ne fonctionne pas) donc il faut les importer dans un second temps avec `node api-conseiller-numerique/src/tools/indexes/index.js` via le dépôt `api-conseiller-numerique` ;
+- Si vous avez pris la base de production alors le compte admin n'existe pas donc il faut le copier de recette vers votre base locale.
+
+## Lancer l'application
+
+```bash
+npm run dev:local
+```
+
+## Lancer le linter
+
+```bash
+npm run lint
+```

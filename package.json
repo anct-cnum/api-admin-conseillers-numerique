@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "license": "AGPL-3.0",
   "scripts": {
-		"build": "shx rm -rf dist && tsc && npm run copy-files",
+    "build": "shx rm -rf dist && tsc && npm run copy-files",
     "copy-files": "copyfiles -u 1 src/**/*.mjml.ejs public/favicon.ico dist/",
-		"db:start": "docker compose down && docker compose up -d",
+    "db:start": "docker compose down && docker compose up -d",
     "dev": "NODE_ENV=development nodemon src/index.ts",
     "husky:init": "husky add .husky/pre-commit 'npx --no-install git-precommit-checks'",
     "husky:install": "husky install",
