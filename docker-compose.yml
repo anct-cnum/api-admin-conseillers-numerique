@@ -1,0 +1,35 @@
+services:
+  mongodb_dev:
+    image: mongo:4.0.3
+    container_name: admin_conseiller_numerique_dev
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - target: 27017
+        published: 27017
+    volumes:
+      - type: volume
+        source: mongodb_data_dev
+        target: /data/db
+      - type: bind
+        source: datas/exports
+        target: /home
+
+  mongodb_test:
+    image: mongo:4.0.3
+    container_name: admin_conseiller_numerique_test
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - target: 27017
+        published: 27018
+    volumes:
+      - type: volume
+        source: mongodb_data_test
+        target: /data/db
+
+volumes:
+  mongodb_data_dev:
+  mongodb_data_test:
