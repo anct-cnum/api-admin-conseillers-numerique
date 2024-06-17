@@ -11,7 +11,7 @@ const authenticateMode =
     try {
       if (process.env.NODE_ENV === 'development') {
         authenticate('jwt')(req, res, () => {
-          const { user } = req;
+          const { user } = req.feathers;
           req.user = user;
           next();
         });
