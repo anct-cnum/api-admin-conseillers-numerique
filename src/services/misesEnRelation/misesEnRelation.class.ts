@@ -10,6 +10,7 @@ import {
   updateContratRecrutementStructure,
   updateContratRecrutementAdmin,
   updateContrat,
+  extendContrat,
   getMiseEnRelation,
   getMiseEnRelationConseiller,
   getMisesEnRelationStructure,
@@ -76,6 +77,12 @@ export default class MisesEnRelation extends Service {
       authenticateMode(app),
       createAbilities(app),
       updateContrat(app),
+    );
+    app.patch(
+      '/prolongation-contrat/:id',
+      authenticateMode(app),
+      createAbilities(app),
+      extendContrat(app),
     );
     app.get(
       '/misesEnRelation/:id',
