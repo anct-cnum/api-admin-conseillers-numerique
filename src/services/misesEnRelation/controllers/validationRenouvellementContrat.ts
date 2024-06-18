@@ -14,6 +14,36 @@ const validationRenouvellementContrat =
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .findOne({ _id: new ObjectId(idMiseEnRelation) });
+      if (!miseEnRelationVerif) {
+        res.status(404).json({ message: 'Contrat non trouvé' });
+        return;
+      }
+      if (miseEnRelationVerif.nouvelleDateFinDeContrat) {
+        const miseEnRelationUpdated = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            {
+              _id: new ObjectId(idMiseEnRelation),
+            },
+            {
+              dateFinDeContrat: new Date(
+                miseEnRelationVerif.nouvelleDateFinDeContrat.dateSouhaitee,
+              ),
+              $unset: { nouvelleDateFinDeContrat: '' },
+            },
+            { returnOriginal: false, includeResultMetadata: true },
+          );
+        if (miseEnRelationUpdated.lastErrorObject.n === 0) {
+          res.status(404).json({
+            message: "Une erreur s'est produite lors de la validation",
+          });
+          return;
+        }
+        res
+          .status(200)
+          .json({ miseEnRelationUpdated: miseEnRelationUpdated.value });
+      }
       if (
         miseEnRelationVerif?.statut !== 'renouvellement_initiee' &&
         !miseEnRelationVerif?.miseEnRelationConventionnement

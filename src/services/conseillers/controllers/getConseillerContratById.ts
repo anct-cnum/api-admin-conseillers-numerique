@@ -77,6 +77,7 @@ const getConseillerContratById =
                     dateRupture: 1,
                     dateFinDeContrat: 1,
                     dateDebutDeContrat: 1,
+                    nouvelleDateFinDeContrat: 1,
                     typeDeContrat: 1,
                     motifRupture: 1,
                     contratCoordinateur: 1,
