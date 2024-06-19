@@ -34,13 +34,13 @@ execute(__filename, async ({ app, mailer, logger, exit }) => {
     return;
   }
 
-  // 'hub_coop' en standbye
   const allowedRoles = [
     'admin',
     'grandReseau',
     'structure',
     'prefet',
     'coordinateur',
+    'hub',
   ];
 
   if (allowedRoles.includes(options.role) === false) {
