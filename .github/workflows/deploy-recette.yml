@@ -1,7 +1,6 @@
 name: Déploiement en recette
 
 on:
-  workflow_dispatch:
   push:
     branches: [recette]
 
