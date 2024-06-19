@@ -22,7 +22,7 @@
   },
   "scripts": {
     "test": "npm run jest",
-    "lint": "tsc --project tsconfig.json --noEmit && eslint src/. --ignore-path .gitignore",
+    "lint": "tsc --noEmit && eslint src --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
     "dev:ic": "nodemon src/index.ts",
     "dev:local": "NODE_ENV=development nodemon src/index.ts",
     "start": "npm run build && npm run copy-files && node dist/",

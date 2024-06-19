@@ -1,9 +1,8 @@
 name: Mise à jour de la branche staging
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [recette]
+# on:
+#   push:
+#     branches: [recette]
 
 jobs:
   build:
