@@ -42,7 +42,7 @@ const getConseillers = async (
         break;
       case 'codeCommune':
         listStructures = await app
-          .service(service.conseillers)
+          .service(service.structures)
           .Model.find({
             statut: 'VALIDATION_COSELEC',
             codeCommune: { $in: conseiller.listeSubordonnes.liste },
@@ -65,6 +65,7 @@ const getConseillers = async (
             $and: [
               {
                 ...query,
+                statut: 'RECRUTE',
               },
               {
                 _id: { $ne: userId },
