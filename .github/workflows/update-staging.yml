@@ -3,18 +3,13 @@ name: Mise à jour de la branche staging
 on:
   workflow_dispatch:
   push:
-    branches: [ recette ]
+    branches: [recette]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.9.0]
-
     steps:
     - uses: actions/checkout@v4
-
     - name: Merge recette -> staging
       uses: devmasx/merge-branch@master
       with:

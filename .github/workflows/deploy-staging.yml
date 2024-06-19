@@ -6,23 +6,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.9.0]
-
     steps:
     - uses: actions/checkout@v4
-    - run: git fetch --prune --unshallow
-
-    - uses: 47ng/actions-clever-cloud@v1.2.0
+      with:
+        fetch-depth: 0
+    - uses: 47ng/actions-clever-cloud@v2.0.0
       with:
         appID: ${{ secrets.CLEVER_APP_ADMIN_API_STAGING_ID }}
-        timeout: 300 #5 minutes before move on (in case of never exit even though a deployment is successful)
+        force: true
       env:
         CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
         CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-
-    - uses: actions/checkout@v4
     - name: Create Sentry release
       uses: getsentry/action-release@v1
       env:
