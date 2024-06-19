@@ -2,21 +2,20 @@ name: ESLint
 
 on:
   push:
-    branches: [ main, recette ]
+    branches: [main, recette]
   pull_request:
-    branches: [ main, recette ]
+    branches: [main, recette]
 
 jobs:
   eslint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20]
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run lint
+        cache: npm
+        node-version-file: package.json
+    - name: Install modules
+      run: npm i
+    - name: Lint
+      run: npm run lint
