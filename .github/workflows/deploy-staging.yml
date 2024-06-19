@@ -1,4 +1,4 @@
-name: Déploiement manuel app staging clever
+name: Déploiement manuel en staging
 
 on:
   workflow_dispatch:

@@ -1,7 +1,6 @@
 name: Déploiement en production
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
 
