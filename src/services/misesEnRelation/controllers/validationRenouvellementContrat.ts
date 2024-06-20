@@ -18,7 +18,7 @@ const validationRenouvellementContrat =
         res.status(404).json({ message: 'Contrat non trouvé' });
         return;
       }
-      if (miseEnRelationVerif.nouvelleDateFinDeContrat) {
+      if (miseEnRelationVerif?.nouvelleDateFinDeContrat) {
         const miseEnRelationUpdated = await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
