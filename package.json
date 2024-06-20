@@ -1,34 +1,16 @@
 {
   "name": "api-admin-conseiller-numerique-v-2",
+  "version": "1.0.0",
   "license": "AGPL-3.0",
-  "description": "",
-  "version": "0.0.0",
-  "homepage": "",
-  "private": true,
-  "main": "src",
-  "keywords": [
-    "feathers"
-  ],
-  "author": {
-    "name": "dienamo",
-    "email": "46058257+dienamo@users.noreply.github.com"
-  },
-  "contributors": [],
-  "bugs": {},
-  "directories": {
-    "lib": "src",
-    "config": "config/"
-  },
   "scripts": {
-    "lint": "tsc --noEmit && eslint src --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
-    "dev:ic": "nodemon src/index.ts",
-    "dev:local": "NODE_ENV=development nodemon src/index.ts",
-    "start": "npm run build && npm run copy-files && node dist/",
+    "build": "shx rm -rf dist && tsc && npm run copy-files",
     "copy-files": "copyfiles -u 1 src/**/*.mjml.ejs public/favicon.ico dist/",
-    "build": "shx rm -rf dist/ && tsc && npm run copy-files",
-    "husky:install": "husky install",
+    "dev": "NODE_ENV=development nodemon src/index.ts",
     "husky:init": "husky add .husky/pre-commit 'npx --no-install git-precommit-checks'",
-    "husky:uninstall": "git config --unset core.hooksPath"
+    "husky:install": "husky install",
+    "husky:uninstall": "git config --unset core.hooksPath",
+    "lint": "tsc --noEmit && eslint src --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
+    "start": "npm run build && npm run copy-files && node dist"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
