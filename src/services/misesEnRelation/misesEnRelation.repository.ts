@@ -140,10 +140,8 @@ const filterStatutContrat = (statut: string) => {
         $or: [
           { statut: 'renouvellement_initiee' },
           {
-            $and: [
-              { statut: { $eq: 'finalisee' } },
-              { nouvelleDateFinDeContrat: { $exists: true } },
-            ],
+            statut: { $eq: 'finalisee' },
+            nouvelleDateFinDeContrat: { $exists: true },
           },
         ],
       };
@@ -153,10 +151,8 @@ const filterStatutContrat = (statut: string) => {
   return {
     $or: [
       {
-        $and: [
-          { statut: { $eq: 'finalisee' } },
-          { nouvelleDateFinDeContrat: { $exists: true } },
-        ],
+        statut: { $eq: 'finalisee' },
+        nouvelleDateFinDeContrat: { $exists: true },
       },
       {
         statut: {
@@ -269,10 +265,8 @@ const totalContrat = async (app: Application, checkAccess) => {
           {
             $or: [
               {
-                $and: [
-                  { statut: { $eq: 'finalisee' } },
-                  { nouvelleDateFinDeContrat: { $exists: true } },
-                ],
+                statut: { $eq: 'finalisee' },
+                nouvelleDateFinDeContrat: { $exists: true },
               },
               {
                 statut: {
