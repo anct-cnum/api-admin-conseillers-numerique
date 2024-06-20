@@ -4,6 +4,7 @@ import {
   IUser,
   IConseillers,
   isArrayConseillers,
+  IStructures,
 } from '../../../ts/interfaces/db.interfaces';
 import service from '../../services';
 
@@ -13,6 +14,7 @@ const getConseillers = async (
 ): Promise<IConseillers[] | Error> => {
   let conseiller: IConseillers;
   let conseillers: IConseillers[];
+  let listStructures: IStructures[];
   let query;
   try {
     conseiller = await app
@@ -38,6 +40,18 @@ const getConseillers = async (
           codeRegionStructure: { $in: conseiller.listeSubordonnes.liste },
         };
         break;
+      case 'codeCommune':
+        listStructures = await app
+          .service(service.structures)
+          .Model.find({
+            statut: 'VALIDATION_COSELEC',
+            codeCommune: { $in: conseiller.listeSubordonnes.liste },
+          })
+          .distinct('_id');
+        query = {
+          structureId: { $in: listStructures },
+        };
+        break;
       default:
         query = {
           _id: { $eq: null },
@@ -51,6 +65,7 @@ const getConseillers = async (
             $and: [
               {
                 ...query,
+                statut: 'RECRUTE',
               },
               {
                 _id: { $ne: userId },
