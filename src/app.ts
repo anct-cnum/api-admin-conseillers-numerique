@@ -24,7 +24,7 @@ import channels from './channels';
 import authentication from './authentication';
 import mongoose from './mongoose';
 
-const app = express(feathers().configure(configuration()));
+const app = express(feathers());
 
 // Init Sentry
 if (app.get('sentry.enabled') === 'true') {
