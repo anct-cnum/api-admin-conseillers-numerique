@@ -71,7 +71,7 @@ const updateDemandeConseillerAvisPrefet =
               coordinateurCandidature: false,
               statut: { $in: ['CREEE', 'EXAMEN_COMPLEMENTAIRE_COSELEC'] },
               prefet: {
-                $in: [structure[0].lastPrefet],
+                $elemMatch: structure[0].lastPrefet,
               },
             },
             {
