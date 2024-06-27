@@ -135,12 +135,31 @@ const filterStatut = (statut: string) => {
 
 const filterStatutContrat = (statut: string) => {
   if (statut !== 'toutes') {
+    if (statut === 'renouvellement_initiee') {
+      return {
+        $or: [
+          { statut: 'renouvellement_initiee' },
+          {
+            statut: { $eq: 'finalisee' },
+            nouvelleDateFinDeContrat: { $exists: true },
+          },
+        ],
+      };
+    }
     return { statut: { $eq: statut } };
   }
   return {
-    statut: {
-      $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
-    },
+    $or: [
+      {
+        statut: { $eq: 'finalisee' },
+        nouvelleDateFinDeContrat: { $exists: true },
+      },
+      {
+        statut: {
+          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
+        },
+      },
+    ],
   };
 };
 
@@ -241,10 +260,26 @@ const totalContrat = async (app: Application, checkAccess) => {
   const contrat = await app.service(service.misesEnRelation).Model.aggregate([
     {
       $match: {
-        $and: [checkAccess],
-        statut: {
-          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
-        },
+        $and: [
+          checkAccess,
+          {
+            $or: [
+              {
+                statut: { $eq: 'finalisee' },
+                nouvelleDateFinDeContrat: { $exists: true },
+              },
+              {
+                statut: {
+                  $in: [
+                    'recrutee',
+                    'nouvelle_rupture',
+                    'renouvellement_initiee',
+                  ],
+                },
+              },
+            ],
+          },
+        ],
       },
     },
     {
