@@ -141,6 +141,17 @@ const getMisesEnRelations =
                   },
                   then: '$createdAt',
                 },
+                {
+                  case: {
+                    $and: [
+                      { $eq: ['$statut', 'finalisee'] },
+                      {
+                        $ifNull: ['$nouvelleDateFinDeContrat', false],
+                      },
+                    ],
+                  },
+                  then: '$nouvelleDateFinDeContrat.dateDeLaDemande',
+                },
               ],
               default: null,
             },
