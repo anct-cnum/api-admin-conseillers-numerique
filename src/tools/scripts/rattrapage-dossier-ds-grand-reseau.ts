@@ -112,8 +112,11 @@ execute(
               break;
             case 'structure_publique':
               dossierReconventionnement.nbPostesAttribuees = parseInt(
-                champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyMw==')
-                  ?.integerNumber,
+                champs.find((champ: any) => champ.id === 'Q2hhbXAtMjkxNDE1NA==')
+                  ?.integerNumber ??
+                  champs.find(
+                    (champ: any) => champ.id === 'Q2hhbXAtMjkwMjkyMw==',
+                  )?.integerNumber,
                 10,
               );
               if (dossierReconventionnement.nbPostesAttribuees > 1) {
@@ -133,8 +136,11 @@ execute(
               break;
             case 'association':
               dossierReconventionnement.nbPostesAttribuees = parseInt(
-                champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg3MzQ4Mw==')
-                  ?.integerNumber,
+                champs.find((champ: any) => champ.id === 'Q2hhbXAtMjg3NDE0OA==')
+                  ?.integerNumber ??
+                  champs.find(
+                    (champ: any) => champ.id === 'Q2hhbXAtMjg3MzQ4Mw==',
+                  )?.integerNumber,
                 10,
               );
               if (dossierReconventionnement.nbPostesAttribuees > 1) {
