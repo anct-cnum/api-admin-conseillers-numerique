@@ -31,6 +31,9 @@ const validationRenouvellementContrat =
                 miseEnRelationVerif.nouvelleDateFinDeContrat.dateSouhaitee,
               ),
               $unset: { nouvelleDateFinDeContrat: '' },
+              $set: {
+                prolongationDeContrat: new Date(),
+              },
             },
             { returnOriginal: false, includeResultMetadata: true },
           );

@@ -179,8 +179,17 @@ const filtrePiecesManquantes = (piecesManquantes: string) => {
 const filterStatutContratHistorique = (statut: string) => {
   if (statut === 'renouvelee') {
     return {
-      statut: 'finalisee',
-      miseEnRelationConventionnement: { $exists: true },
+      $or: [
+        {
+          statut: 'finalisee',
+          miseEnRelationConventionnement: { $exists: true },
+        },
+
+        {
+          statut: { $eq: 'finalisee' },
+          prolongationDeContrat: { $exists: true },
+        },
+      ],
     };
   }
   if (statut === 'finalisee') {
