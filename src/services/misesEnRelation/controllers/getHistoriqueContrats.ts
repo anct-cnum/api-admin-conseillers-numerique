@@ -196,6 +196,7 @@ const getMisesEnRelations =
           dateFinDeContrat: 1,
           miseEnRelationConventionnement: 1,
           statut: 1,
+          prolongationDeContrat: 1,
         },
       },
       { $sort: { dateSorted: Number(ordre) } },
@@ -284,6 +285,9 @@ const getHistoriqueContrats =
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalHistoriqueContrat(app, checkAccess);
+      const totalProlongation = contrats.filter(
+        (contrat) => contrat?.prolongationDeContrat,
+      ).length;
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,
@@ -292,9 +296,9 @@ const getHistoriqueContrats =
             (totalParStatut) => totalParStatut.statut === 'finalisee',
           )?.count ?? 0,
         renouvellementDeContrat:
-          totalConvention.contrat.find(
+          (totalConvention.contrat.find(
             (totalParStatut) => totalParStatut.statut === 'renouvelee',
-          )?.count ?? 0,
+          )?.count ?? 0) + totalProlongation ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
             (totalParStatut) => totalParStatut.statut === 'finalisee_rupture',
