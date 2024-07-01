@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     coverage: {
-      include: ['src/services/conseillers/controllers/getConseillerDeLaCoopMediation.ts'],
+      include: ['src/services/conseillers/controllers/getConseillersPourLaCoopMediation.ts'],
       provider: 'istanbul',
       skipFull: true,
       watermarks: {

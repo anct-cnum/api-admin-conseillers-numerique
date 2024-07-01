@@ -16,6 +16,10 @@ import getCandidatsStructure from './controllers/getCandidatsStructure';
 import getConseillerContratById from './controllers/getConseillerContratById';
 import getCandidatContratById from './controllers/getCandidatContratById';
 import getConseillersCoordonnes from './controllers/getConseillersCoordonnes';
+import {
+  getConseillersPourLaCoopMediation,
+  validerConseillersPourLaCoopMediation,
+} from './controllers/getConseillersPourLaCoopMediation';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -103,6 +107,13 @@ export default class Conseillers extends Service {
       authenticateMode(app),
       createAbilities(app),
       getCandidatCV(app),
+    );
+    app.get(
+      '/coop-mediation/conseillers',
+      authenticateMode(app),
+      createAbilities(app),
+      validerConseillersPourLaCoopMediation(app),
+      getConseillersPourLaCoopMediation(app),
     );
   }
 }
