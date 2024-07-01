@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "vitest.config.ts"

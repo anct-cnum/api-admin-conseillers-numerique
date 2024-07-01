@@ -194,7 +194,7 @@ export default function (app: Application): Model<any> {
         default: undefined,
       },
     },
-    { strict: false },
+    { strict: false, versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

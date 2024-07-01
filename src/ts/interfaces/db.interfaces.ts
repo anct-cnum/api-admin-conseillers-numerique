@@ -583,7 +583,7 @@ export interface IPermanences {
   conseillersItinerants: ObjectId[];
   structure: typeof DBRef;
   updatedAt: Date;
-  updatedBy: Date;
+  updatedBy: ObjectId;
 }
 
 export interface ICras {

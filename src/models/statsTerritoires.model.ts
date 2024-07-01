@@ -34,7 +34,7 @@ export default function (app: Application): Model<any> {
 
       tauxActivation: { type: Number },
     },
-    { strict: false, collection: 'stats_Territoires' },
+    { strict: false, collection: 'stats_Territoires', versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

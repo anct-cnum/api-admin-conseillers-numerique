@@ -9,7 +9,10 @@ const authenticateMode =
   (app: Application) =>
   async (req: IRequest, res: Response, next: NextFunction) => {
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (
+        process.env.NODE_ENV === 'development' ||
+        process.env.NODE_ENV === 'test'
+      ) {
         authenticate('jwt')(req, res, () => {
           const { user } = req;
           req.user = user;
