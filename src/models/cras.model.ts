@@ -71,7 +71,7 @@ export default function (app: Application): Model<any> {
 
       createdAt: { type: Date },
     },
-    { strict: false, collection: 'cras' },
+    { strict: false, collection: 'cras', versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

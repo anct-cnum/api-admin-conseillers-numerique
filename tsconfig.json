@@ -5,8 +5,12 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "exclude": [
-    "test"
-  ]
+    "vitest.config.ts"
+  ],
+  "types": [
+    "vitest/globals"
+  ],
 }

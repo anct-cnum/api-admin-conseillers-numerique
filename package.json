@@ -11,7 +11,9 @@
     "husky:install": "husky install",
     "husky:uninstall": "git config --unset core.hooksPath",
     "lint": "tsc --noEmit && eslint src --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
-    "start": "npm run build && npm run copy-files && node dist"
+    "start": "npm run build && npm run copy-files && node dist",
+    "test": "NODE_ENV=test vitest --run",
+    "test:coverage": "npm run test -- --coverage"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
@@ -72,6 +74,7 @@
     "@types/mongodb": "^4.0.7",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
+    "@vitest/coverage-istanbul": "^1.6.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -84,7 +87,9 @@
     "husky": "^9.0.11",
     "nodemon": "^3.0.3",
     "prettier": "3.2.5",
-    "typescript": "^5.3.3"
+    "supertest": "^7.0.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.0"
   },
   "engines": {
     "node": "20.12.2"

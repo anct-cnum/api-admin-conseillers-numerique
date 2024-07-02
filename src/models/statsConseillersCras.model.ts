@@ -23,7 +23,7 @@ export default function (app: Application): Model<any> {
       2023: { type: [anneeSchema], default: undefined },
       2024: { type: [anneeSchema], default: undefined },
     },
-    { strict: false, collection: 'stats_conseillers_cras' },
+    { strict: false, collection: 'stats_conseillers_cras', versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

@@ -43,9 +43,9 @@ export default function (app: Application): Model<any> {
 
       updatedAt: { type: Date },
 
-      updatedBy: { type: Date },
+      updatedBy: { type: 'ObjectId' },
     },
-    { strict: false },
+    { strict: false, versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

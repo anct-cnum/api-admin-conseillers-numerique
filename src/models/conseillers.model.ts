@@ -226,7 +226,7 @@ export default function (app: Application): Model<any> {
       inactivite: { type: Boolean },
     },
 
-    { strict: false },
+    { strict: false, versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {

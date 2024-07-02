@@ -36,7 +36,7 @@ export default function (app: Application): Model<any> {
 
       properties: { type: propertiesSchema },
     },
-    { strict: false, collection: 'qpv' },
+    { strict: false, collection: 'qpv', versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {
