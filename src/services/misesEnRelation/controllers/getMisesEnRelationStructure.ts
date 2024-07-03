@@ -75,7 +75,6 @@ const getMisesEnRelationStructure =
               reconventionnement: 1,
               dateDebutDeContrat: 1,
               dateFinDeContrat: 1,
-              nouvelleDateFinDeContrat: 1,
               typeDeContrat: 1,
               salaire: 1,
               originalMiseEnRelation: 1,
