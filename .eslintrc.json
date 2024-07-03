@@ -20,6 +20,7 @@
       "LabeledStatement",
       "WithStatement"
     ],
-    "func-names": "off"
+    "func-names": "off",
+    "@typescript-eslint/no-use-before-define": "off"
   }
 }
