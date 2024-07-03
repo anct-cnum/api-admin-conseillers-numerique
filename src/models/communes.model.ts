@@ -34,7 +34,7 @@ export default function (app: Application): Model<any> {
 
       properties: { type: propertiesSchema },
     },
-    { strict: false, collection: 'communes' },
+    { strict: false, collection: 'communes', versionKey: false },
   );
 
   if (mongooseClient.modelNames().includes(modelName)) {
