@@ -141,17 +141,6 @@ const getMisesEnRelations =
                   },
                   then: '$createdAt',
                 },
-                {
-                  case: {
-                    $and: [
-                      { $eq: ['$statut', 'finalisee'] },
-                      {
-                        $ifNull: ['$nouvelleDateFinDeContrat', false],
-                      },
-                    ],
-                  },
-                  then: '$nouvelleDateFinDeContrat.dateDeLaDemande',
-                },
               ],
               default: null,
             },
@@ -165,7 +154,6 @@ const getMisesEnRelations =
           dossierIncompletRupture: 1,
           contratCoordinateur: 1,
           statut: 1,
-          nouvelleDateFinDeContrat: 1,
         },
       },
       { $sort: { dateSorted: Number(ordre) } },
@@ -253,13 +241,10 @@ const getContrats =
             (totalParStatut) => totalParStatut.statut === 'recrutee',
           )?.count ?? 0,
         renouvellementDeContrat:
-          (totalConvention.contrat.find(
+          totalConvention.contrat.find(
             (totalParStatut) =>
               totalParStatut.statut === 'renouvellement_initiee',
-          )?.count ?? 0) +
-          (totalConvention.contrat.find(
-            (totalParStatut) => totalParStatut.statut === 'finalisee',
-          )?.count ?? 0),
+          )?.count ?? 0,
         ruptureDeContrat:
           totalConvention.contrat.find(
             (totalParStatut) => totalParStatut.statut === 'nouvelle_rupture',
