@@ -1,9 +1,10 @@
-/* eslint-disable no-console */
 import logger from './logger';
 import app from './app';
 
 const port = app.get('port');
 const server = app.listen(port);
+
+process.on('unhandledRejection', (error) => logger.error('%s', error));
 
 server.on('listening', () =>
   logger.info(
