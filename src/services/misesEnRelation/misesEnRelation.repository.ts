@@ -134,6 +134,9 @@ const filterStatut = (statut: string) => {
 };
 
 const filterStatutContrat = (statut: string) => {
+  if (statut === 'prolongation_initiee') {
+    return { statut: 'finalisee', 'demandesDeProlongation.statut': 'initiee' };
+  }
   if (statut !== 'toutes') {
     return { statut: { $eq: statut } };
   }
@@ -158,6 +161,9 @@ const filtrePiecesManquantes = (piecesManquantes: string) => {
 };
 
 const filterStatutContratHistorique = (statut: string) => {
+  if (statut === 'prolongation_initiee') {
+    return { statut: 'finalisee', 'demandesDeProlongation.statut': 'validee' };
+  }
   if (statut === 'renouvelee') {
     return {
       statut: 'finalisee',
@@ -242,9 +248,78 @@ const totalContrat = async (app: Application, checkAccess) => {
     {
       $match: {
         $and: [checkAccess],
-        statut: {
-          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
-        },
+        $or: [
+          {
+            statut: {
+              $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: '$statut',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        statut: '$_id',
+        count: 1,
+      },
+    },
+  ]);
+  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
+
+  return {
+    contrat,
+    total,
+  };
+};
+
+const totalProlongationContrat = async (app: Application, checkAccess) => {
+  const contrat = await app.service(service.misesEnRelation).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+        statut: 'finalisee',
+        'demandesDeProlongation.statut': 'initiee',
+      },
+    },
+    {
+      $group: {
+        _id: '$statut',
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        statut: '$_id',
+        count: 1,
+      },
+    },
+  ]);
+  const total = contrat.reduce((acc, curr) => acc + curr.count, 0);
+
+  return {
+    contrat,
+    total,
+  };
+};
+
+const totalHistoriqueProlongationContrat = async (
+  app: Application,
+  checkAccess,
+) => {
+  const contrat = await app.service(service.misesEnRelation).Model.aggregate([
+    {
+      $match: {
+        $and: [checkAccess],
+        statut: 'finalisee',
+        'demandesDeProlongation.statut': 'validee',
       },
     },
     {
@@ -315,6 +390,8 @@ export {
   filterStatutContratHistorique,
   totalHistoriqueContrat,
   totalContrat,
+  totalProlongationContrat,
+  totalHistoriqueProlongationContrat,
   countConseillersRecrutees,
   countCoordinateurRecrutees,
   filtrePiecesManquantes,

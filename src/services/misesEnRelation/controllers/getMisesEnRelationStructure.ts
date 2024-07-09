@@ -84,6 +84,7 @@ const getMisesEnRelationStructure =
               createdAt: 1,
               phaseConventionnement: 1,
               banniereRefusRecrutement: 1,
+              demandesDeProlongation: 1,
             },
           },
           {

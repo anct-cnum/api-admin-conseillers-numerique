@@ -9,6 +9,7 @@ import {
   filterRegion,
   filterStatutContratHistorique,
   totalHistoriqueContrat,
+  totalHistoriqueProlongationContrat,
 } from '../misesEnRelation.repository';
 import { validHistoriqueContrat } from '../../../schemas/contrat.schemas';
 
@@ -195,8 +196,8 @@ const getMisesEnRelations =
           dateDebutDeContrat: 1,
           dateFinDeContrat: 1,
           miseEnRelationConventionnement: 1,
+          demandesDeProlongation: 1,
           statut: 1,
-          prolongationDeContrat: 1,
         },
       },
       { $sort: { dateSorted: Number(ordre) } },
@@ -238,6 +239,7 @@ const getHistoriqueContrats =
         totalParContrat: {
           recrutement: number;
           renouvellementDeContrat: number;
+          prolongationDeContrat: number;
           ruptureDeContrat: number;
           total: number;
         };
@@ -249,6 +251,7 @@ const getHistoriqueContrats =
         totalParContrat: {
           recrutement: 0,
           renouvellementDeContrat: 0,
+          prolongationDeContrat: 0,
           ruptureDeContrat: 0,
           total: 0,
         },
@@ -285,9 +288,10 @@ const getHistoriqueContrats =
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalHistoriqueContrat(app, checkAccess);
-      const totalProlongation = contrats.filter(
-        (contrat) => contrat?.prolongationDeContrat,
-      ).length;
+      const totalProlongation = await totalHistoriqueProlongationContrat(
+        app,
+        checkAccess,
+      );
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,
@@ -296,9 +300,10 @@ const getHistoriqueContrats =
             (totalParStatut) => totalParStatut.statut === 'finalisee',
           )?.count ?? 0,
         renouvellementDeContrat:
-          (totalConvention.contrat.find(
+          totalConvention.contrat.find(
             (totalParStatut) => totalParStatut.statut === 'renouvelee',
-          )?.count ?? 0) + totalProlongation ?? 0,
+          )?.count ?? 0,
+        prolongationDeContrat: totalProlongation.total,
         ruptureDeContrat:
           totalConvention.contrat.find(
             (totalParStatut) => totalParStatut.statut === 'finalisee_rupture',
