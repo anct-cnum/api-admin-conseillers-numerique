@@ -351,7 +351,7 @@ const generateCsvStructure = async (
         ) {
           label = 'non';
         }
-        if ([`${StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ}`, `${StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2}`].includes(structure?.conventionnement?.statut)) {
+        if ([StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ, StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2].includes(structure?.conventionnement?.statut as StatutConventionnement)) {
           phaseConventionnementStructure = AffichagePhaseConventionnement.PHASE_2;
         } 
         let adresse = `${structure?.insee?.adresse?.numero_voie ?? ''}
