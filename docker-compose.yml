@@ -12,6 +12,9 @@ services:
       - type: volume
         source: mongodb_data_dev
         target: /data/db
+      - type: volume
+        source: mongodb_data_config_dev
+        target: /data/configdb
       - type: bind
         source: datas/exports
         target: /home
@@ -29,7 +32,12 @@ services:
       - type: volume
         source: mongodb_data_test
         target: /data/db
+      - type: volume
+        source: mongodb_data_config_test
+        target: /data/configdb
 
 volumes:
   mongodb_data_dev:
+  mongodb_data_config_dev:
   mongodb_data_test:
+  mongodb_data_config_test:
