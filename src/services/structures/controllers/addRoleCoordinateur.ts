@@ -242,7 +242,12 @@ const addRoleCoordinateur =
           {
             _id: miseEnRelation._id,
           },
-          { $set: { banniereAjoutRoleCoordinateur: true } },
+          {
+            $set: {
+              banniereAjoutRoleCoordinateur: true,
+              contratCoordinateur: true,
+            },
+          },
         );
 
       res.status(200).json(conseillerId);
