@@ -26,7 +26,7 @@
     "from": "SMTP_FROM",
     "replyTo": "SMTP_REPLYTO"
   },
-	"mongodb": "MONGODB_ADDON_URI",
+  "mongodb": "MONGODB_ADDON_URI",
   "sentry": {
     "enabled": "SENTRY_ENABLED",
     "environment": "SENTRY_ENVIRONMENT",
@@ -86,5 +86,6 @@
     "type": "GANDI_TYPE"
   },
   "sib_api_key": "SIB_API_KEY",
-  "contrat_smic": "CONTRAT_SMIC"
+  "contrat_smic": "CONTRAT_SMIC",
+  "api_authorization_secret": "API_AUTHORIZATION_SECRET"
 }
