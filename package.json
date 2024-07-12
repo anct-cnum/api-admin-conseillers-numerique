@@ -28,7 +28,7 @@
     "@feathersjs/feathers": "^4.5.15",
     "@feathersjs/socketio": "^4.5.15",
     "@feathersjs/transport-commons": "^4.5.15",
-    "@sentry/node": "^7.101.1",
+    "@sentry/node": "^8.17.0",
     "@sentry/tracing": "^7.101.1",
     "@turf/circle": "^6.5.0",
     "@types/bcrypt": "^5.0.2",
