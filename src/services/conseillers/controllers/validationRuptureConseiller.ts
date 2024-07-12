@@ -10,7 +10,7 @@ import {
   IUser,
 } from '../../../ts/interfaces/db.interfaces';
 import service from '../../../helpers/services';
-import { action, ressource } from '../../../helpers/accessControl/accessList';
+import { action } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
 import { deleteMailbox } from '../../../utils/gandi';
 import deleteAccount from '../../../utils/mattermost';
@@ -18,6 +18,7 @@ import {
   conseillerRupturePix,
   conseillerRuptureStructure,
 } from '../../../emails';
+import canValidateTermination from '../../../helpers/accessControl/canValidateTermination';
 
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
@@ -79,7 +80,7 @@ const conseillerRecruteReinscription =
   };
 
 const updateCoordinateurRupture =
-  (app: Application, req: IRequest) =>
+  (app: Application) =>
   async (
     conseillerId: ObjectId,
     structureId: ObjectId,
@@ -88,7 +89,6 @@ const updateCoordinateurRupture =
     try {
       const conseillers: IConseillers[] = await app
         .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.read)
         .find({
           coordinateurs: {
             $elemMatch: {
@@ -104,55 +104,43 @@ const updateCoordinateurRupture =
           const p = new Promise<void>(async (resolve, reject) => {
             try {
               if (conseillerCoordonnee.coordinateurs.length === 1) {
-                await app
-                  .service(service.conseillers)
-                  .Model.accessibleBy(req.ability, action.update)
-                  .updateOne(
-                    { _id: conseillerCoordonnee._id },
-                    {
-                      $unset: {
-                        coordinateurs: '',
-                      },
+                await app.service(service.conseillers).updateOne(
+                  { _id: conseillerCoordonnee._id },
+                  {
+                    $unset: {
+                      coordinateurs: '',
                     },
-                  );
-                await app
-                  .service(service.misesEnRelation)
-                  .Model.accessibleBy(req.ability, action.update)
-                  .updateMany(
-                    { 'conseiller.$id': conseillerCoordonnee._id },
-                    {
-                      $unset: {
-                        'conseillerObj.coordinateurs': '',
-                      },
+                  },
+                );
+                await app.service(service.misesEnRelation).updateMany(
+                  { 'conseiller.$id': conseillerCoordonnee._id },
+                  {
+                    $unset: {
+                      'conseillerObj.coordinateurs': '',
                     },
-                  );
+                  },
+                );
               } else {
-                await app
-                  .service(service.conseillers)
-                  .Model.accessibleBy(req.ability, action.update)
-                  .updateOne(
-                    { _id: conseillerCoordonnee._id },
-                    {
-                      $pull: {
-                        coordinateurs: {
-                          id: conseillerId,
-                        },
+                await app.service(service.conseillers).updateOne(
+                  { _id: conseillerCoordonnee._id },
+                  {
+                    $pull: {
+                      coordinateurs: {
+                        id: conseillerId,
                       },
                     },
-                  );
-                await app
-                  .service(service.misesEnRelation)
-                  .Model.accessibleBy(req.ability, action.update)
-                  .updateMany(
-                    { 'conseiller.$id': conseillerCoordonnee._id },
-                    {
-                      $pull: {
-                        'conseillerObj.coordinateurs': {
-                          id: conseillerId,
-                        },
+                  },
+                );
+                await app.service(service.misesEnRelation).updateMany(
+                  { 'conseiller.$id': conseillerCoordonnee._id },
+                  {
+                    $pull: {
+                      'conseillerObj.coordinateurs': {
+                        id: conseillerId,
                       },
                     },
-                  );
+                  },
+                );
               }
               resolve(p);
             } catch (e) {
@@ -163,44 +151,38 @@ const updateCoordinateurRupture =
         });
         await Promise.allSettled(promises);
       }
-      await app
-        .service(service.structures)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          {
-            _id: structureId,
-            demandesCoordinateur: {
-              $elemMatch: {
-                statut: 'validee',
-                miseEnRelationId,
-              },
+      await app.service(service.structures).updateOne(
+        {
+          _id: structureId,
+          demandesCoordinateur: {
+            $elemMatch: {
+              statut: 'validee',
+              miseEnRelationId,
             },
           },
-          {
-            $unset: {
-              'demandesCoordinateur.$.miseEnRelationId': '',
+        },
+        {
+          $unset: {
+            'demandesCoordinateur.$.miseEnRelationId': '',
+          },
+        },
+      );
+      await app.service(service.misesEnRelation).updateMany(
+        {
+          'structure.$id': structureId,
+          'structureObj.demandesCoordinateur': {
+            $elemMatch: {
+              statut: 'validee',
+              miseEnRelationId,
             },
           },
-        );
-      await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            'structure.$id': structureId,
-            'structureObj.demandesCoordinateur': {
-              $elemMatch: {
-                statut: 'validee',
-                miseEnRelationId,
-              },
-            },
+        },
+        {
+          $unset: {
+            'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
           },
-          {
-            $unset: {
-              'structureObj.demandesCoordinateur.$.miseEnRelationId': '',
-            },
-          },
-        );
+        },
+      );
     } catch (error) {
       throw new Error(error);
     }
@@ -226,7 +208,6 @@ const updateConseillerRupture =
 
       const conseillerUpdated = await app
         .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           { _id: conseiller._id },
           {
@@ -263,64 +244,54 @@ const updateConseillerRupture =
           { returnOriginal: false },
         );
 
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            estCoordinateur: true,
-            'listeSubordonnes.type': 'conseillers',
-            'listeSubordonnes.liste': {
-              $elemMatch: { $eq: conseiller._id },
-            },
+      await app.service(service.conseillers).updateMany(
+        {
+          estCoordinateur: true,
+          'listeSubordonnes.type': 'conseillers',
+          'listeSubordonnes.liste': {
+            $elemMatch: { $eq: conseiller._id },
           },
-          {
-            $pull: {
-              'listeSubordonnes.liste': conseiller._id,
-            },
+        },
+        {
+          $pull: {
+            'listeSubordonnes.liste': conseiller._id,
           },
-        );
+        },
+      );
 
-      await app
-        .service(service.permanences)
-        .Model.accessibleBy(req.ability, action.delete)
-        .deleteMany({
-          conseillers: {
-            $eq: [conseiller._id],
-          },
-        });
+      await app.service(service.permanences).deleteMany({
+        conseillers: {
+          $eq: [conseiller._id],
+        },
+      });
 
-      await app
-        .service(service.permanences)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            $or: [
-              { conseillers: { $elemMatch: { $eq: conseiller._id } } },
-              {
-                conseillersItinerants: {
-                  $elemMatch: { $eq: conseiller._id },
-                },
+      await app.service(service.permanences).updateMany(
+        {
+          $or: [
+            { conseillers: { $elemMatch: { $eq: conseiller._id } } },
+            {
+              conseillersItinerants: {
+                $elemMatch: { $eq: conseiller._id },
               },
-              {
-                lieuPrincipalPour: {
-                  $elemMatch: { $eq: conseiller._id },
-                },
-              },
-            ],
-          },
-          {
-            $pull: {
-              conseillers: conseiller._id,
-              lieuPrincipalPour: conseiller._id,
-              conseillersItinerants: conseiller._id,
             },
+            {
+              lieuPrincipalPour: {
+                $elemMatch: { $eq: conseiller._id },
+              },
+            },
+          ],
+        },
+        {
+          $pull: {
+            conseillers: conseiller._id,
+            lieuPrincipalPour: conseiller._id,
+            conseillersItinerants: conseiller._id,
           },
-        );
+        },
+      );
 
       await app
         .service(service.cras)
-        .Model.accessibleBy(req.ability, action.update)
         .updateMany(
           { 'conseiller.$id': conseiller._id },
           { $unset: { permanence: '' } },
@@ -328,7 +299,6 @@ const updateConseillerRupture =
 
       const miseEnRelationUpdated: IMisesEnRelation = await app
         .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
         .findOneAndUpdate(
           {
             'conseiller.$id': conseiller._id,
@@ -350,27 +320,24 @@ const updateConseillerRupture =
         );
 
       // Modification des doublons potentiels
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateMany(
-          {
-            _id: { $ne: conseiller._id },
-            email: conseiller.email,
+      await app.service(service.conseillers).updateMany(
+        {
+          _id: { $ne: conseiller._id },
+          email: conseiller.email,
+        },
+        {
+          $set: {
+            disponible: true,
+            updatedAt,
           },
-          {
-            $set: {
-              disponible: true,
-              updatedAt,
-            },
-          },
-        );
+        },
+      );
       return miseEnRelationUpdated;
     } catch (error) {
       throw new Error(error);
     }
   };
-
+// Vérification  informations necessairesdes pour valider la rupture d'un conseiller
 const validationRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
@@ -405,6 +372,39 @@ const validationRuptureConseiller =
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
+      }
+      // Si CDISation passer la mise en relation en nouvelle_rupture et motifRupture cdisation
+      if (
+        req.user.roles.includes('structure') &&
+        req.user.entity?.$id === structure._id.toString()
+      ) {
+        const initialisationDeLaRupture = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            {
+              'conseiller.$id': conseiller._id,
+              'structure.$id': structure._id,
+              statut: { $eq: 'finalisee' },
+            },
+            {
+              $set: {
+                statut: 'nouvelle_rupture',
+                motifRupture: 'CDISation',
+                emetteurRupture: {
+                  email: req.user.name,
+                  date: new Date(),
+                },
+              },
+            },
+            { returnOriginal: false },
+          );
+        if (!initialisationDeLaRupture) {
+          res.status(404).json({
+            message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
+          });
+          return;
+        }
       }
       const miseEnRelation: IMisesEnRelation = await app
         .service(service.misesEnRelation)
@@ -464,27 +464,30 @@ const validationRuptureConseiller =
         0,
         conseiller.emailCN?.address?.lastIndexOf('@'),
       );
-      const canCreate = req.ability.can(
-        action.create,
-        ressource.conseillersRuptures,
-      );
-      if (!canCreate) {
+
+      const ability = canValidateTermination(req.user, miseEnRelation);
+
+      if (ability.can('validate', 'termination')) {
         res.status(403).json({
           message: `Accès refusé, vous n'êtes pas autorisé à valider la rupture d'un conseiller`,
         });
-        return;
       }
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
+      // Mise à jour de la disponibilité du conseiller dans la base de données Postgres
       await updateConseillersPG(pool)(conseiller.email, true, datePG);
+      // Création du conseillers dans la table conseillers_ruptures et mise à jour du conseiller en statut RUPTURE dans la collection conseillers
+      // Suppression des permanences du conseiller dans la collection permanences et dans les CRAs
+      // Passage du statut de la mise en relation de nouvelle_rupture en finalisée_rupture
       const miseEnRelationUpdated = await updateConseillerRupture(app, req)(
         conseiller,
         miseEnRelation,
         dateFinDeContrat,
         updatedAt,
       );
+      // Si le conseiller est coordinateur, on supprime les liens avec les conseillers subordonnés
       if (conseiller?.estCoordinateur) {
-        await updateCoordinateurRupture(app, req)(
+        await updateCoordinateurRupture(app)(
           conseiller._id,
           structure._id,
           miseEnRelation._id,
@@ -493,11 +496,11 @@ const validationRuptureConseiller =
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
         .service(service.users)
-        .Model.accessibleBy(req.ability, action.read)
         .findOne({
           roles: { $in: ['candidat'] },
           name: conseiller.email,
         });
+      // Si le conseiller est recruté et qu'il s'est réinscrit, on le réinscrit en tant que candidat
       if (userCandidatAlreadyPresent !== null) {
         await conseillerRecruteReinscription(app, req)(
           userCoop._id,
@@ -524,33 +527,27 @@ const validationRuptureConseiller =
       if (userCoop !== null && userCandidatAlreadyPresent === null) {
         // Maj name si le compte coop a été activé
         if (conseiller.email !== userCoop.name) {
-          await app
-            .service(service.users)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateOne(
-              { _id: userCoop._id },
-              {
-                $set: { ...userToUpdate },
-                $unset: {
-                  resetPasswordCnil: '',
-                },
+          await app.service(service.users).updateOne(
+            { _id: userCoop._id },
+            {
+              $set: { ...userToUpdate },
+              $unset: {
+                resetPasswordCnil: '',
               },
-            );
+            },
+          );
         } else {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           const { name: _, ...userWithoutName } = userToUpdate; // nécessaire pour ne pas avoir d'erreur de duplicate key
-          await app
-            .service(service.users)
-            .Model.accessibleBy(req.ability, action.update)
-            .updateOne(
-              { _id: userCoop._id },
-              {
-                $set: { ...userWithoutName },
-                $unset: {
-                  resetPasswordCnil: '',
-                },
+          await app.service(service.users).updateOne(
+            { _id: userCoop._id },
+            {
+              $set: { ...userWithoutName },
+              $unset: {
+                resetPasswordCnil: '',
               },
-            );
+            },
+          );
         }
       }
       const mailerInstance = mailer(app);
@@ -586,15 +583,12 @@ const validationRuptureConseiller =
         res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      await app
-        .service(service.conseillers)
-        .Model.accessibleBy(req.ability, action.update)
-        .updateOne(
-          { _id: idConseiller },
-          {
-            $set: { ruptureError: true },
-          },
-        );
+      await app.service(service.conseillers).updateOne(
+        { _id: idConseiller },
+        {
+          $set: { ruptureError: true },
+        },
+      );
       res.status(500).json({ message: error.message });
       throw new Error(error);
     }
