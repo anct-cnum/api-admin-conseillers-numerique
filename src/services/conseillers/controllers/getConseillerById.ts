@@ -94,6 +94,7 @@ const getConseillerById =
                     'structureObj.idPG': 1,
                     'structureObj.nom': 1,
                     'structureObj._id': 1,
+                    'conseillerObj._id': 1,
                   },
                 },
               ],
