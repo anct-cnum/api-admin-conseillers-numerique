@@ -20,6 +20,7 @@ import {
   getConseillersPourLaCoopMediation,
   validerConseillersPourLaCoopMediation,
 } from './controllers/getConseillersPourLaCoopMediation';
+import apiAuthorization from '../../middleware/apiAuthorization';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -110,8 +111,7 @@ export default class Conseillers extends Service {
     );
     app.get(
       '/coop-mediation/conseillers',
-      authenticateMode(app),
-      createAbilities(app),
+      apiAuthorization(app),
       validerConseillersPourLaCoopMediation(app),
       getConseillersPourLaCoopMediation(app),
     );
