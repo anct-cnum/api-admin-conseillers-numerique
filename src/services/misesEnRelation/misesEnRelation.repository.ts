@@ -255,6 +255,9 @@ const totalContrat = async (app: Application, checkAccess) => {
             },
           },
         ],
+        statut: {
+          $in: ['recrutee', 'nouvelle_rupture', 'renouvellement_initiee'],
+        },
       },
     },
     {
