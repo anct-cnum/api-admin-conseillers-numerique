@@ -97,5 +97,6 @@
     "type": "GANDI_TYPE"
   },
   "sib_api_key": "SIB_API_KEY",
-  "contrat_smic": "CONTRAT_SMIC"
+  "contrat_smic": "CONTRAT_SMIC",
+  "api_authorization_secret": "API_AUTHORIZATION_SECRET"
 }
