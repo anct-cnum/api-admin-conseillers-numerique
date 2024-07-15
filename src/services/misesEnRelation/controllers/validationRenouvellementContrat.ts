@@ -5,6 +5,12 @@ import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 
+interface IDemandeDeProlongation {
+  dateSouhaitee: string;
+  dateDeLaDemande: string;
+  statut: string;
+}
+
 const validationRenouvellementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idMiseEnRelation = req.params.id;
@@ -18,34 +24,32 @@ const validationRenouvellementContrat =
         res.status(404).json({ message: 'Contrat non trouvé' });
         return;
       }
-      if (miseEnRelationVerif?.nouvelleDateFinDeContrat) {
+      const dateDeFinSouhaitee =
+        miseEnRelationVerif.demandesDeProlongation.find(
+          (demande: IDemandeDeProlongation) => demande.statut === 'initiee',
+        )?.dateDeFinSouhaitee;
+      if (dateDeFinSouhaitee) {
         const miseEnRelationUpdated = await app
           .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
+          .Model.findOneAndUpdate(
             {
               _id: new ObjectId(idMiseEnRelation),
+              'demandesDeProlongation.statut': 'initiee',
             },
             {
-              dateFinDeContrat: new Date(
-                miseEnRelationVerif.nouvelleDateFinDeContrat.dateSouhaitee,
-              ),
-              $unset: { nouvelleDateFinDeContrat: '' },
-              $set: {
-                prolongationDeContrat: new Date(),
-              },
+              dateFinDeContrat: new Date(dateDeFinSouhaitee),
+              $set: { 'demandesDeProlongation.$.statut': 'validee' },
             },
-            { returnOriginal: false, includeResultMetadata: true },
+            { returnOriginal: false, new: true },
           );
-        if (miseEnRelationUpdated.lastErrorObject.n === 0) {
+        if (miseEnRelationUpdated.modifiedCount === 0) {
           res.status(404).json({
             message: "Une erreur s'est produite lors de la validation",
           });
           return;
         }
-        res
-          .status(200)
-          .json({ miseEnRelationUpdated: miseEnRelationUpdated.value });
+        res.status(200).json({ miseEnRelationUpdated });
+        return;
       }
       if (
         miseEnRelationVerif?.statut !== 'renouvellement_initiee' &&

@@ -10,6 +10,7 @@ import {
   filterStatutContrat,
   filtrePiecesManquantes,
   totalContrat,
+  totalProlongationContrat,
 } from '../misesEnRelation.repository';
 import { validContrat } from '../../../schemas/contrat.schemas';
 
@@ -102,6 +103,7 @@ const getMisesEnRelations =
           createdAt: 1,
           emetteurRenouvellement: 1,
           emetteurRecrutement: 1,
+          demandesDeProlongation: 1,
           dateSorted: {
             $switch: {
               branches: [
@@ -140,6 +142,10 @@ const getMisesEnRelations =
                     ],
                   },
                   then: '$createdAt',
+                },
+                {
+                  case: { $eq: ['$statut', 'finalisee'] },
+                  then: '$demandesDeProlongation.dateDeLaDemande',
                 },
               ],
               default: null,
@@ -196,6 +202,7 @@ const getContrats =
         totalParContrat: {
           recrutement: number;
           renouvellementDeContrat: number;
+          prolongationDeContrat: number;
           ruptureDeContrat: number;
           total: number;
         };
@@ -207,6 +214,7 @@ const getContrats =
         totalParContrat: {
           recrutement: 0,
           renouvellementDeContrat: 0,
+          prolongationDeContrat: 0,
           ruptureDeContrat: 0,
           total: 0,
         },
@@ -233,6 +241,10 @@ const getContrats =
       );
       items.total = totalContrats[0]?.count_contrats ?? 0;
       const totalConvention = await totalContrat(app, checkAccess);
+      const totalProlongation = await totalProlongationContrat(
+        app,
+        checkAccess,
+      );
       items.totalParContrat = {
         ...items.totalParContrat,
         total: totalConvention.total,
@@ -245,6 +257,7 @@ const getContrats =
             (totalParStatut) =>
               totalParStatut.statut === 'renouvellement_initiee',
           )?.count ?? 0,
+        prolongationDeContrat: totalProlongation.total,
         ruptureDeContrat:
           totalConvention.contrat.find(
             (totalParStatut) => totalParStatut.statut === 'nouvelle_rupture',

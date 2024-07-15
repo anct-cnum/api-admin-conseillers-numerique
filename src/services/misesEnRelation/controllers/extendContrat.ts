@@ -6,6 +6,13 @@ import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { validCreationContrat } from '../../../schemas/contrat.schemas';
 
+interface IExtensionRequest {
+  dateDeFinActuelle: Date;
+  dateDeFinSouhaitee: Date;
+  dateDeLaDemande: Date;
+  statut: string;
+}
+
 const extendContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
@@ -30,32 +37,72 @@ const extendContrat =
       }
       const miseEnRelation = await app
         .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.update)
-        .findOneAndUpdate(
-          {
-            _id: id,
-            statut: 'finalisee',
-          },
-          {
-            $set: {
-              nouvelleDateFinDeContrat: {
-                dateSouhaitee: new Date(dateFinDeContrat),
-                dateDeLaDemande: new Date(),
-              },
-            },
-          },
-          {
-            new: true,
-            includeResultMetadata: true,
-          },
-        );
-      if (miseEnRelation.lastErrorObject.n === 0) {
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          _id: id,
+          statut: 'finalisee',
+        });
+
+      if (!miseEnRelation) {
         res.status(404).json({
-          message: "Une erreur s'est produite lors de la demande",
+          message: 'Contrat non trouvé ou statut non valide',
         });
         return;
       }
-      res.status(200).json(miseEnRelation.value);
+      const existingRequest = miseEnRelation.demandesDeProlongation?.find(
+        (request: IExtensionRequest) => request.statut === 'initiee',
+      );
+      let updateResult;
+      if (existingRequest) {
+        updateResult = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            {
+              _id: id,
+              'demandesDeProlongation.statut': 'initiee',
+            },
+            {
+              $set: {
+                'demandesDeProlongation.$.dateDeFinSouhaitee': new Date(
+                  dateFinDeContrat,
+                ),
+              },
+            },
+            {
+              new: true,
+            },
+          );
+      } else {
+        updateResult = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.update)
+          .findOneAndUpdate(
+            {
+              _id: id,
+            },
+            {
+              $push: {
+                demandesDeProlongation: {
+                  dateDeFinActuelle: miseEnRelation.dateFinDeContrat,
+                  dateDeFinSouhaitee: new Date(dateFinDeContrat),
+                  dateDeLaDemande: new Date(),
+                  statut: 'initiee',
+                },
+              },
+            },
+            {
+              new: true,
+            },
+          );
+      }
+      if (updateResult.modifiedCount === 0) {
+        res.status(404).json({
+          message: "Une erreur s'est produite lors de la validation",
+        });
+        return;
+      }
+      res.status(200).json(updateResult);
     } catch (error) {
       res.status(500).json({ message: error.message });
       throw new Error(error);
