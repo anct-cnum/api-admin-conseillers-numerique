@@ -89,7 +89,7 @@ const updateCoordinateurRupture =
     try {
       const conseillers: IConseillers[] = await app
         .service(service.conseillers)
-        .find({
+        .Model.find({
           coordinateurs: {
             $elemMatch: {
               id: conseillerId,
@@ -104,7 +104,7 @@ const updateCoordinateurRupture =
           const p = new Promise<void>(async (resolve, reject) => {
             try {
               if (conseillerCoordonnee.coordinateurs.length === 1) {
-                await app.service(service.conseillers).updateOne(
+                await app.service(service.conseillers).Model.updateOne(
                   { _id: conseillerCoordonnee._id },
                   {
                     $unset: {
@@ -112,7 +112,7 @@ const updateCoordinateurRupture =
                     },
                   },
                 );
-                await app.service(service.misesEnRelation).updateMany(
+                await app.service(service.misesEnRelation).Model.updateMany(
                   { 'conseiller.$id': conseillerCoordonnee._id },
                   {
                     $unset: {
@@ -121,7 +121,7 @@ const updateCoordinateurRupture =
                   },
                 );
               } else {
-                await app.service(service.conseillers).updateOne(
+                await app.service(service.conseillers).Model.updateOne(
                   { _id: conseillerCoordonnee._id },
                   {
                     $pull: {
@@ -131,7 +131,7 @@ const updateCoordinateurRupture =
                     },
                   },
                 );
-                await app.service(service.misesEnRelation).updateMany(
+                await app.service(service.misesEnRelation).Model.updateMany(
                   { 'conseiller.$id': conseillerCoordonnee._id },
                   {
                     $pull: {
@@ -151,7 +151,7 @@ const updateCoordinateurRupture =
         });
         await Promise.allSettled(promises);
       }
-      await app.service(service.structures).updateOne(
+      await app.service(service.structures).Model.updateOne(
         {
           _id: structureId,
           demandesCoordinateur: {
@@ -167,7 +167,7 @@ const updateCoordinateurRupture =
           },
         },
       );
-      await app.service(service.misesEnRelation).updateMany(
+      await app.service(service.misesEnRelation).Model.updateMany(
         {
           'structure.$id': structureId,
           'structureObj.demandesCoordinateur': {
@@ -204,11 +204,11 @@ const updateConseillerRupture =
         motifRupture: miseEnRelation.motifRupture,
       };
 
-      await app.service(service.conseillersRuptures).create(objAnonyme);
+      await app.service(service.conseillersRuptures).Model.create(objAnonyme);
 
       const conseillerUpdated = await app
         .service(service.conseillers)
-        .findOneAndUpdate(
+        .Model.findOneAndUpdate(
           { _id: conseiller._id },
           {
             $set: {
@@ -244,7 +244,7 @@ const updateConseillerRupture =
           { returnOriginal: false },
         );
 
-      await app.service(service.conseillers).updateMany(
+      await app.service(service.conseillers).Model.updateMany(
         {
           estCoordinateur: true,
           'listeSubordonnes.type': 'conseillers',
@@ -259,13 +259,13 @@ const updateConseillerRupture =
         },
       );
 
-      await app.service(service.permanences).deleteMany({
+      await app.service(service.permanences).Model.deleteMany({
         conseillers: {
           $eq: [conseiller._id],
         },
       });
 
-      await app.service(service.permanences).updateMany(
+      await app.service(service.permanences).Model.updateMany(
         {
           $or: [
             { conseillers: { $elemMatch: { $eq: conseiller._id } } },
@@ -292,14 +292,14 @@ const updateConseillerRupture =
 
       await app
         .service(service.cras)
-        .updateMany(
+        .Model.updateMany(
           { 'conseiller.$id': conseiller._id },
           { $unset: { permanence: '' } },
         );
 
       const miseEnRelationUpdated: IMisesEnRelation = await app
         .service(service.misesEnRelation)
-        .findOneAndUpdate(
+        .Model.findOneAndUpdate(
           {
             'conseiller.$id': conseiller._id,
             'structure.$id': conseiller.structureId,
@@ -320,7 +320,7 @@ const updateConseillerRupture =
         );
 
       // Modification des doublons potentiels
-      await app.service(service.conseillers).updateMany(
+      await app.service(service.conseillers).Model.updateMany(
         {
           _id: { $ne: conseiller._id },
           email: conseiller.email,
@@ -341,7 +341,7 @@ const updateConseillerRupture =
 const validationRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    const { dateFinDeContrat } = req.body;
+    const { dateFinDeContrat, motifRupture } = req.body.payload;
     const pool = new Pool();
     try {
       if (!dateFinDeContrat) {
@@ -374,11 +374,12 @@ const validationRuptureConseiller =
         return;
       }
       // Si CDISation passer la mise en relation en nouvelle_rupture et motifRupture cdisation
+      let miseEnRelation = null;
       if (
-        req.user.roles.includes('structure') &&
-        req.user.entity?.$id === structure._id.toString()
+        motifRupture === 'CDISation' &&
+        req.user.entity?.oid.toString() === structure._id.toString()
       ) {
-        const initialisationDeLaRupture = await app
+        miseEnRelation = await app
           .service(service.misesEnRelation)
           .Model.accessibleBy(req.ability, action.update)
           .findOneAndUpdate(
@@ -399,27 +400,30 @@ const validationRuptureConseiller =
             },
             { returnOriginal: false },
           );
-        if (!initialisationDeLaRupture) {
+        // Si il y a une erreure lors de l'initialisation de la rupture on ne continue pas on renvoie une erreur
+        if (!miseEnRelation) {
+          res.status(409).json({
+            message:
+              'Une erreur est survenue lors de l initialisation de la rupture',
+          });
+        }
+      } else {
+        miseEnRelation = await app
+          .service(service.misesEnRelation)
+          .Model.accessibleBy(req.ability, action.read)
+          .findOne({
+            'conseiller.$id': conseiller._id,
+            'structure.$id': structure._id,
+            statut: { $eq: 'nouvelle_rupture' },
+          });
+        if (!miseEnRelation) {
           res.status(404).json({
             message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
           });
           return;
         }
       }
-      const miseEnRelation: IMisesEnRelation = await app
-        .service(service.misesEnRelation)
-        .Model.accessibleBy(req.ability, action.read)
-        .findOne({
-          'conseiller.$id': conseiller._id,
-          'structure.$id': structure._id,
-          statut: { $eq: 'nouvelle_rupture' },
-        });
-      if (!miseEnRelation) {
-        res.status(404).json({
-          message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
-        });
-        return;
-      }
+
       const miseEnRelationRenouvellementEnCours: IMisesEnRelation = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
@@ -465,13 +469,13 @@ const validationRuptureConseiller =
         conseiller.emailCN?.address?.lastIndexOf('@'),
       );
 
-      const ability = canValidateTermination(req.user, miseEnRelation);
-
-      if (ability.can('validate', 'termination')) {
+      if (!canValidateTermination(req.user, miseEnRelation)) {
         res.status(403).json({
           message: `Accès refusé, vous n'êtes pas autorisé à valider la rupture d'un conseiller`,
         });
+        return;
       }
+
       const updatedAt = new Date();
       const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
       // Mise à jour de la disponibilité du conseiller dans la base de données Postgres
@@ -496,7 +500,7 @@ const validationRuptureConseiller =
       // Cas spécifique : conseiller recruté s'est réinscrit sur le formulaire d'inscription => compte coop + compte candidat
       const userCandidatAlreadyPresent = await app
         .service(service.users)
-        .findOne({
+        .Model.findOne({
           roles: { $in: ['candidat'] },
           name: conseiller.email,
         });
@@ -527,7 +531,7 @@ const validationRuptureConseiller =
       if (userCoop !== null && userCandidatAlreadyPresent === null) {
         // Maj name si le compte coop a été activé
         if (conseiller.email !== userCoop.name) {
-          await app.service(service.users).updateOne(
+          await app.service(service.users).Model.updateOne(
             { _id: userCoop._id },
             {
               $set: { ...userToUpdate },
@@ -539,7 +543,7 @@ const validationRuptureConseiller =
         } else {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           const { name: _, ...userWithoutName } = userToUpdate; // nécessaire pour ne pas avoir d'erreur de duplicate key
-          await app.service(service.users).updateOne(
+          await app.service(service.users).Model.updateOne(
             { _id: userCoop._id },
             {
               $set: { ...userWithoutName },
@@ -583,7 +587,7 @@ const validationRuptureConseiller =
         res.status(403).json({ message: 'Accès refusé' });
         return;
       }
-      await app.service(service.conseillers).updateOne(
+      await app.service(service.conseillers).Model.updateOne(
         { _id: idConseiller },
         {
           $set: { ruptureError: true },
