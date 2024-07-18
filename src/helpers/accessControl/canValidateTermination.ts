@@ -7,7 +7,7 @@ function canValidateTermination(
   return (
     (user.roles.includes('structure') &&
       miseEnRelation &&
-      miseEnRelation.motifRupture === 'CDISation') ||
+      miseEnRelation.motifRupture === 'CDIsation') ||
     user.roles.includes('admin')
   );
 }

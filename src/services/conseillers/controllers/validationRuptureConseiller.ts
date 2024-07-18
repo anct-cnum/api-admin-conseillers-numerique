@@ -373,10 +373,10 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      // Si CDISation passer la mise en relation en nouvelle_rupture et motifRupture cdisation
+      // Si CDIsation passer la mise en relation en nouvelle_rupture et motifRupture CDIsation
       let miseEnRelation = null;
       if (
-        motifRupture === 'CDISation' &&
+        motifRupture === 'CDIsation' &&
         req.user.entity?.oid.toString() === structure._id.toString()
       ) {
         miseEnRelation = await app
@@ -391,7 +391,7 @@ const validationRuptureConseiller =
             {
               $set: {
                 statut: 'nouvelle_rupture',
-                motifRupture: 'CDISation',
+                motifRupture: 'CDIsation',
                 emetteurRupture: {
                   email: req.user.name,
                   date: new Date(),
