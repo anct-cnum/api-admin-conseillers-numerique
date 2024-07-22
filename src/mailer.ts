@@ -4,7 +4,7 @@ import { Application } from './declarations';
 
 const path = require('path');
 const { promisify } = require('util');
-const lodash = require('lodash');
+const merge = require('lodash.merge');
 const { htmlToText } = require('nodemailer-html-to-text');
 const nodemailer = require('nodemailer');
 const mjml = require('mjml');
@@ -110,7 +110,7 @@ export default function (app: Application) {
           );
           const { subject, body } = schema.validate(message).value;
           return transporter.sendMail(
-            lodash.merge(
+            merge(
               {},
               {
                 to: emailAddress,
