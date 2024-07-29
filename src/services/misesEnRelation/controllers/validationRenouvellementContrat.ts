@@ -25,7 +25,7 @@ const validationRenouvellementContrat =
         return;
       }
       const dateDeFinSouhaitee =
-        miseEnRelationVerif.demandesDeProlongation.find(
+        miseEnRelationVerif.demandesDeProlongation?.find(
           (demande: IDemandeDeProlongation) => demande.statut === 'initiee',
         )?.dateDeFinSouhaitee;
       if (dateDeFinSouhaitee) {
