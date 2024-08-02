@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { DBRef, ObjectId } from 'mongodb';
 import { describe, expect, it } from 'vitest';
+import viderLesCollections from '../../../../tests/utils';
 
 import app from '../../../app';
 import {
@@ -14,11 +15,10 @@ import { ConseillerPourLaCoopMediation } from './getConseillersPourLaCoopMediati
 
 describe('retourner un ou des conseillers pour la coop médiation avec le rôle admin', () => {
   const host = 'http://localhost:8181';
-  app.listen(app.get('port'));
 
   it('étant donné une limite incorrecte quand j’apelle l’API conseiller alors j’ai un message d’erreur', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const limiteIncorrecte = 'limiteIncorrecte';
 
     // WHEN
@@ -40,7 +40,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('étant donné une pagination incorrecte quand j’apelle l’API conseiller alors j’ai un message d’erreur', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const paginationIncorrecte = 'pageIncorrecte';
 
     // WHEN
@@ -62,7 +62,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('étant donné un id incorrect quand j’apelle l’API conseiller alors j’ai un message d’erreur', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const idIncorrect = 999;
 
     // WHEN
@@ -84,7 +84,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('étant donné un e-mail incorrect quand j’apelle l’API conseiller alors j’ai un message d’erreur', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const emailIncorrect = 'email.incorrect@example.com';
 
     // WHEN
@@ -106,7 +106,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('étant donné un id correct quand j’apelle l’API conseiller alors j’ai le conseiller recruté correspondant', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const id = new ObjectId('62ff549045f8484ff010002f');
     const idPgCorrect = 123;
     await app.service('conseillers').create(
@@ -289,7 +289,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('étant donné un e-mail correct quand j’apelle l’API conseiller alors j’ai le conseiller recruté correspondant', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const emailCorrect = 'email.correct@example.com';
     const idConseiller = new ObjectId('62ff549045f8484ff010002f');
     await app.service('conseillers').create(
@@ -472,7 +472,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('n’ayant aucun filtre quand j’apelle l’API conseiller alors j’ai la première page de tous les conseillers recrutés dans l’ordre croissant', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const conseillerEnRupture = new ObjectId('11ff549045f8484ff0100012');
     const conseillerRecruteHorsPagination = new ObjectId(
       '99ff549045f8484ff0100099',
@@ -590,7 +590,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
 
   it('n’ayant aucun filtre quand j’apelle l’API conseiller page 2 alors j’ai la deuxième page de tous les conseillers recrutés dans l’ordre croissant', async () => {
     // GIVEN
-    await viderLesCollections();
+    await viderLesCollections(app);
     const conseillerEnRupture = new ObjectId('11ff549045f8484ff0100012');
     const conseillerRecruteHorsPagination = new ObjectId(
       '99ff549045f8484ff0100099',
@@ -703,14 +703,6 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
     expect(response.data[0].idPG).toBe(678);
   });
 });
-
-async function viderLesCollections(): Promise<void> {
-  await app.service('conseillers').Model.deleteMany({});
-  await app.service('permanences').Model.deleteMany({});
-  await app.service('structures').Model.deleteMany({});
-  await app.service('misesEnRelation').Model.deleteMany({});
-  await app.service('conseillersSupprimes').Model.deleteMany({});
-}
 
 function conseillerModelFactory(
   override: Partial<IConseillers> = {},
