@@ -106,10 +106,54 @@ const validCandidatsStructure = Joi.object({
   diplome: Joi.string().error(new Error('Le filtre diplôme est invalide')),
 });
 
+const validCandidatureConseiller = Joi.object({
+  prenom: Joi.string().required().error(new Error('Le prénom est requis')),
+  nom: Joi.string().required().error(new Error('Le nom est requis')),
+  email: Joi.string()
+    .required()
+    .error(new Error('L’adresse e-mail est requis')),
+  telephone: Joi.string(),
+  nomCommune: Joi.string().required().error(new Error('La ville est requise')),
+  codePostal: Joi.string()
+    .required()
+    .min(5)
+    .max(5)
+    .error(new Error('Le code postal est invalide')),
+  codeCommune: Joi.string()
+    .required()
+    .min(4)
+    .max(5)
+    .error(new Error('Le code commune est invalide')),
+  location: Joi.object()
+    .required()
+    .error(new Error('La localisation est requise')),
+  codeDepartement: Joi.string(),
+  codeRegion: Joi.string(),
+  codeCom: Joi.string(),
+  // TODO : ajouter une validation pour qu'au moins un des champs soient à true
+  estDemandeurEmploi: Joi.boolean(),
+  estEnEmploi: Joi.boolean(),
+  estEnFormation: Joi.boolean(),
+  estDiplomeMedNum: Joi.boolean(),
+  nomDiplomeMedNum: Joi.string(),
+  aUneExperienceMedNum: Joi.boolean()
+    .required()
+    .error(new Error('L’experience médiateur numérique est requise')),
+  dateDisponibilite: Joi.date().required(),
+  distanceMax: Joi.number()
+    .required()
+    .allow(5, 10, 15, 20, 40, 100, 2000)
+    .error(new Error('La distance est invalide')),
+  motivation: Joi.string()
+    .required()
+    .error(new Error('La motivation est requise')),
+});
+
 export {
   validConseillers,
   validExportConseillers,
   validCandidats,
   validCandidatsStructure,
   validConseillersCoordonnes,
+  validCandidatureConseiller,
 };
