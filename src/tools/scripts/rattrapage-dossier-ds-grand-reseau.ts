@@ -26,7 +26,6 @@ program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
-  // eslint-disable-next-line new-cap
   const structures = await CSVToJSON({ delimiter: 'auto' }).fromFile(filePath); // CSV en entrée avec la colonne ID & DS2
   return structures;
 };

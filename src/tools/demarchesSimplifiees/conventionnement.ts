@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/demarchesSimplifiees/conventionnement.ts
 
@@ -35,6 +34,7 @@ execute(
 
     do {
       if (arrayHasNextPage[0] === true) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_structure_publique_conventionnement,
@@ -50,6 +50,7 @@ execute(
           demarcheStructurePublique.demarche.dossiers.pageInfo.hasNextPage;
       }
       if (arrayHasNextPage[1] === true) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_association_conventionnement,
@@ -65,6 +66,7 @@ execute(
           demarcheAssociation.demarche.dossiers.pageInfo.hasNextPage;
       }
       if (arrayHasNextPage[2] === true) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_entreprise_conventionnement,

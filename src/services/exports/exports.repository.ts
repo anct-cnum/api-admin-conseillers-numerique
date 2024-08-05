@@ -5,7 +5,12 @@ import utc from 'dayjs/plugin/utc';
 import { Response } from 'express';
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
-import { formatDateGMT, getCoselec, getCoselecLabel, getCoselecPositifAvantAbandon } from '../../utils';
+import {
+  formatDateGMT,
+  getCoselec,
+  getCoselecLabel,
+  getCoselecPositifAvantAbandon,
+} from '../../utils';
 import service from '../../helpers/services';
 import {
   IMisesEnRelation,
@@ -251,7 +256,7 @@ const generateCsvConseillersWithoutCRA = async (
 ) => {
   try {
     const fileHeaders = [
-      "id Conum",
+      'id Conum',
       'Nom',
       'Prénom',
       'Email @conseiller-numerique.fr',
@@ -260,7 +265,7 @@ const generateCsvConseillersWithoutCRA = async (
       'Numéro de téléphone du conseiller',
       "Date d'envoi du mail M+1",
       "Date d'envoi du mail M+1.5",
-      "Groupe CRA",
+      'Groupe CRA',
       'Id de la structure',
       'Siret de la structure',
       'Nom de la structure',
@@ -353,7 +358,7 @@ const generateCsvStructure = async (
         }
         if ([StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ, StatutConventionnement.CONVENTIONNEMENT_VALIDÉ_PHASE_2].includes(structure?.conventionnement?.statut as StatutConventionnement)) {
           phaseConventionnementStructure = AffichagePhaseConventionnement.PHASE_2;
-        } 
+        }
         let adresse = `${structure?.insee?.adresse?.numero_voie ?? ''}
         ${structure?.insee?.adresse?.type_voie ?? ''}
         ${structure?.insee?.adresse?.libelle_voie ?? ''}\n${structure?.insee?.adresse?.complement_adresse

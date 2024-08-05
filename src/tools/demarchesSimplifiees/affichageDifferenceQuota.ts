@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/demarchesSimplifiees/affichageDifferenceQuota.ts
 
@@ -34,6 +33,7 @@ execute(
 
     do {
       if (arrayHasNextPage[0]) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_structure_publique_reconventionnement,
@@ -49,6 +49,7 @@ execute(
           demarcheStructurePublique.demarche.dossiers.pageInfo.hasNextPage;
       }
       if (arrayHasNextPage[1]) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheAssociation = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_association_reconventionnement,
@@ -64,6 +65,7 @@ execute(
           demarcheAssociation.demarche.dossiers.pageInfo.hasNextPage;
       }
       if (arrayHasNextPage[2]) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheEntrepriseEss = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           demarcheSimplifiee.numero_demarche_entreprise_reconventionnement,

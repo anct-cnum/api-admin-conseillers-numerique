@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/default-param-last */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Id,
   NullableId,
@@ -27,6 +23,7 @@ import {
 interface Data {}
 
 interface ServiceOptions {}
+// eslint-disable-next-line import/prefer-default-export
 export class Stats implements ServiceMethods<Data> {
   app: Application;
 
@@ -94,11 +91,13 @@ export class Stats implements ServiceMethods<Data> {
   }
 
   // fonctions par default créées par feathers à la génération d'un service custom (non relié à une collection) ne pas prendre en compte
-  async find(_params?: Params): Promise<Data[] | Paginated<Data>> {
+  // eslint-disable-next-line class-methods-use-this
+  async find(): Promise<Data[] | Paginated<Data>> {
     return [];
   }
 
-  async get(id: Id, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async get(id: Id): Promise<Data> {
     return {
       id,
       text: `A new message with ID: ${id}!`,
@@ -113,15 +112,18 @@ export class Stats implements ServiceMethods<Data> {
     return data;
   }
 
-  async update(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async update(_id: NullableId, data: Data): Promise<Data> {
     return data;
   }
 
-  async patch(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async patch(_id: NullableId, data: Data): Promise<Data> {
     return data;
   }
 
-  async remove(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async remove(_id: NullableId, data: Data): Promise<Data> {
     return data;
   }
 }

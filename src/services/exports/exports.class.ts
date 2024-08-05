@@ -155,20 +155,19 @@ export class Exports implements ServiceMethods<Data> {
 
   // fonctions par default créées par feathers à la génération d'un service custom (non relié à une collection) ne pas prendre en compte
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async find(_params?: Params): Promise<Data[] | Paginated<Data>> {
+  // eslint-disable-next-line class-methods-use-this
+  async find(): Promise<Data[] | Paginated<Data>> {
     return [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async get(id: Id, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async get(id: Id): Promise<Data> {
     return {
       id,
       text: `A new message with ID: ${id}!`,
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create(data: Data, params?: Params): Promise<Data> {
     if (Array.isArray(data)) {
       return Promise.all(data.map((current) => this.create(current, params)));
@@ -177,17 +176,17 @@ export class Exports implements ServiceMethods<Data> {
     return data;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async update(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async update(_id: NullableId, data: Data): Promise<Data> {
     return data;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-  async patch(_id: NullableId, data: Data, _params?: Params): Promise<Data> {
+  // eslint-disable-next-line class-methods-use-this
+  async patch(_id: NullableId, data: Data): Promise<Data> {
     return data;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+  // eslint-disable-next-line class-methods-use-this
   async remove(_id: NullableId, data: Data): Promise<Data> {
     return data;
   }

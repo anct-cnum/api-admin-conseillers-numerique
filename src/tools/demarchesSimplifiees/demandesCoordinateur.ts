@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/demarchesSimplifiees/demandesCoordinateur.ts
 
@@ -38,6 +37,7 @@ execute(
     let dossiersStructurePubliqueBrut = [];
     do {
       if (arrayHasNextPage === true) {
+        // eslint-disable-next-line no-await-in-loop
         const demarcheStructurePublique = await requestGraphQLForGetDemarcheDS(
           graphQLClient,
           arrayCursor,
