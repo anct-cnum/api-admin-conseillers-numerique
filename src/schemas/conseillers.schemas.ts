@@ -115,7 +115,7 @@ const validCandidatureConseiller = Joi.object({
     .error(new Error('L’adresse e-mail est invalide')),
   telephone: Joi.string()
     .optional()
-    // .allow('', null)
+    .allow('', null)
     .pattern(/^(?:(?:\+)(33|590|596|594|262|269))(?:[\s.-]*\d{3}){3,4}$/)
     .error(new Error('Le numéro de téléphone est invalide')),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
