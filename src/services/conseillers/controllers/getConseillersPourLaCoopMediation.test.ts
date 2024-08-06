@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DBRef, ObjectId } from 'mongodb';
 import { describe, expect, it } from 'vitest';
-import viderLesCollections from '../../../../tests/utils';
+import { viderLesCollections, host } from '../../../tests/utils';
 
 import app from '../../../app';
 import {
@@ -14,8 +14,6 @@ import {
 import { ConseillerPourLaCoopMediation } from './getConseillersPourLaCoopMediation';
 
 describe('retourner un ou des conseillers pour la coop médiation avec le rôle admin', () => {
-  const host = 'http://localhost:8181';
-
   it('étant donné une limite incorrecte quand j’apelle l’API conseiller alors j’ai un message d’erreur', async () => {
     // GIVEN
     await viderLesCollections(app);
