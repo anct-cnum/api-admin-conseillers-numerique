@@ -20,7 +20,9 @@ import {
   getConseillersPourLaCoopMediation,
   validerConseillersPourLaCoopMediation,
 } from './controllers/getConseillersPourLaCoopMediation';
-import creerCandidatureConseiller from './controllers/creerCandidatureConseiller';
+import creerCandidatureConseiller, {
+  validerCandidatureConsiller,
+} from './controllers/creerCandidatureConseiller';
 import apiAuthorization from '../../middleware/apiAuthorization';
 
 export default class Conseillers extends Service {
@@ -119,6 +121,7 @@ export default class Conseillers extends Service {
     app.post(
       '/candidature-conseiller',
       apiAuthorization(app),
+      validerCandidatureConsiller(),
       creerCandidatureConseiller(app),
     );
   }
