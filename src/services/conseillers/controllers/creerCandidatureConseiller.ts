@@ -5,22 +5,22 @@ import service from '../../../helpers/services';
 
 type CandidatureConseiller = {};
 
-const creerCandidatureConseiller =
-  (app: Application) =>
-  async (request: Request, res: Response, next: NextFunction) => {
+export const validerCandidatureConsiller =
+  () => async (request: Request, response: Response, next: NextFunction) => {
     try {
-      await validerParametres(request);
-      const candidatureConseiller = construireRequete(request);
-      await stockerCandidatureConseiller(candidatureConseiller, app);
+      await validCandidatureConseiller.validateAsync(request.body);
       return next();
     } catch (error) {
-      return res.status(400).json({ message: error.message }).end();
+      return response.status(400).json({ message: error.message }).end();
     }
   };
 
-const validerParametres = async (request: Request): Promise<void> => {
-  await validCandidatureConseiller.validateAsync(request.body);
-};
+const creerCandidatureConseiller =
+  (app: Application) => async (request: Request, response: Response) => {
+    const candidatureConseiller = construireRequete(request);
+    await stockerCandidatureConseiller(candidatureConseiller, app);
+    return response.status(200).json({}).end();
+  };
 
 const construireRequete = (request: Request): CandidatureConseiller => {
   return request.body;
