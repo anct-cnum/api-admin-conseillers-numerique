@@ -50,7 +50,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     await viderLesCollections(app);
     const envoiUtilisateur = {
       ...champsObligatoires,
-      telephone: "0123456789",
+      telephone: "+33123456789",
       codeDepartement: "75",
       codeRegion: "75",
       codeCom: "75",
