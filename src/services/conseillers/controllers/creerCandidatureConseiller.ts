@@ -1,23 +1,36 @@
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
+import service from '../../../helpers/services';
+
+type CandidatureConseiller = {};
 
 const creerCandidatureConseiller =
   (app: Application) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    // 1 validation des paramètres
-    // 2 rajouter des données (ex : statut créé)
-    // 3 écrire sur Mongo
+  async (request: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('REQ BODY', req.body);
-      await validCandidatureConseiller.validateAsync(req.body);
-      console.log('2');
-      // res.status(200).json({ text: 'Hello world' });
+      await validerParametres(request);
+      const candidatureConseiller = construireRequete(request);
+      await stockerCandidatureConseiller(candidatureConseiller, app);
       return next();
     } catch (error) {
-      console.log(error.message);
       return res.status(400).json({ message: error.message }).end();
     }
   };
+
+const validerParametres = async (request: Request): Promise<void> => {
+  await validCandidatureConseiller.validateAsync(request.body);
+};
+
+const construireRequete = (request: Request): CandidatureConseiller => {
+  return request.body;
+};
+
+const stockerCandidatureConseiller = async (
+  candidatureConseiller: CandidatureConseiller,
+  app: Application,
+): Promise<void> => {
+  return app.service(service.conseillers).Model.countDocuments();
+};
 
 export default creerCandidatureConseiller;

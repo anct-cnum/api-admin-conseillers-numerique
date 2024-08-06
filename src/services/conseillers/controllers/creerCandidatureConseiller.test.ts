@@ -1,12 +1,10 @@
 import axios from 'axios';
 import { describe, expect, it } from 'vitest';
-import viderLesCollections from '../../../../tests/utils';
+import { viderLesCollections, host } from '../../../tests/utils';
 
 import app from '../../../app';
 
 describe('recevoir et valider une candidature conseiller', () => {
-  const host = 'http://localhost:8181';
-
   it('si j’envoie un formulaire sans prénom alors j’ai une erreur de validation', async () => {
     // GIVEN
     await viderLesCollections(app);
