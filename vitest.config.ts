@@ -15,7 +15,7 @@ export default defineConfig({
       },
     },
     globals: true,
-    sequence: { shuffle: true },
+    //sequence: { shuffle: true },
     globalSetup: ['src/tests/setup.ts'],
     unstubEnvs: true,
     unstubGlobals: true,

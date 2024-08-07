@@ -132,8 +132,12 @@ const validCandidatureConseiller = Joi.object({
   location: Joi.object()
     .required()
     .error(new Error('La localisation est requise')),
-  codeDepartement: Joi.string(),
-  codeRegion: Joi.string(),
+  codeDepartement: Joi.string()
+    .required()
+    .error(new Error('Le code département est requis')),
+  codeRegion: Joi.string()
+    .required()
+    .error(new Error('Le code région est requis')),
   codeCom: Joi.string(),
   // TODO : ajouter une validation pour qu'au moins un des champs soient à true
   estDemandeurEmploi: Joi.boolean(),
@@ -147,7 +151,7 @@ const validCandidatureConseiller = Joi.object({
   dateDisponibilite: Joi.date().required(),
   distanceMax: Joi.number()
     .required()
-    .allow(5, 10, 15, 20, 40, 100, 2000)
+    .valid(5, 10, 15, 20, 40, 100, 2000)
     .error(new Error('La distance est invalide')),
   motivation: Joi.string()
     .required()
