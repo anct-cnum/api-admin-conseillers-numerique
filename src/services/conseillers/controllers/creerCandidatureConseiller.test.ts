@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { viderLesCollections, host } from '../../../tests/utils';
 
 import app from '../../../app';
@@ -11,6 +11,8 @@ const champsObligatoires = {
   nomCommune: "Paris",
   codePostal: "75001",
   codeCommune: "75000",
+  codeDepartement: "75",
+  codeRegion: "75",
   location: {
     type: "Point",
     coordinates: [0, 0],
@@ -22,9 +24,12 @@ const champsObligatoires = {
 }
 
 describe('recevoir et valider une candidature conseiller', () => {
+  beforeEach(async () => {
+    await viderLesCollections(app);
+  })
+
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
-    await viderLesCollections(app);
     const envoiUtilisateur = {
       ...champsObligatoires,
     }
@@ -47,12 +52,9 @@ describe('recevoir et valider une candidature conseiller', () => {
 
   it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
     // GIVEN
-    await viderLesCollections(app);
     const envoiUtilisateur = {
       ...champsObligatoires,
       telephone: "+33123456789",
-      codeDepartement: "75",
-      codeRegion: "75",
       codeCom: "75",
       estDemandeurEmploi: true,
       estEnEmploi: true,
@@ -79,7 +81,6 @@ describe('recevoir et valider une candidature conseiller', () => {
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
-    await viderLesCollections(app);
     const envoiUtilisateur = {
       ...champsObligatoires,
       email: "abc"
@@ -105,7 +106,6 @@ describe('recevoir et valider une candidature conseiller', () => {
 
   it('si j’envoie un formulaire avec un numéro de téléphone invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
-    await viderLesCollections(app);
     const envoiUtilisateur = {
       ...champsObligatoires,
       telephone: "abc"
@@ -126,6 +126,132 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.status).toBe(400);
     expect(response.data).toStrictEqual({
       message: 'Le numéro de téléphone est invalide',
+    });
+  });
+
+  it('si j’envoie un formulaire avec un code postal invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      codePostal: "123"
+    }
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le code postal est invalide',
+    });
+  });
+
+  it('si j’envoie un formulaire avec un code commune invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      codeCommune: "123"
+    }
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le code commune est invalide',
+    });
+  });
+
+  // TODO
+  it.todo('si j’envoie un formulaire avec un localisation invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      location: "//TODO"
+    }
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le code postal est invalide',
+    });
+  });
+
+  // TODO
+  it.todo('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+    }
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le code postal est invalide',
+    });
+  });
+
+  it('si j’envoie un formulaire avec une distance max invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      distanceMax: 3
+    }
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'La distance est invalide',
     });
   });
 });
