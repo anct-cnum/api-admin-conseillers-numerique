@@ -17,38 +17,35 @@ export const validerCandidatureConsiller =
 
 const creerCandidatureConseiller =
   (app: Application) => async (request: Request, response: Response) => {
-    console.log('<<>############>>>');
     const candidatureConseiller = await construireRequete(app, request);
-    // await stockerCandidatureConseiller(candidatureConseiller, app);
-    return response.status(200).json({}).end();
+    await stockerCandidatureConseiller(candidatureConseiller, app);
+    return response.status(200).json(candidatureConseiller).end();
   };
 
 const getDernierIdPG = async (app: Application): Promise<number> => {
   const dernierConseiller = await app
     .service(service.conseillers)
     .Model.findOne({}, { idPG: -1 });
-  console.log('<<>>>>>>>>>>>>>>', dernierConseiller);
-  return dernierConseiller?.idPG;
+  return dernierConseiller?.idPG || 0;
 };
 
 const construireRequete = async (
   app: Application,
   request: Request,
 ): Promise<CandidatureConseiller> => {
-  const requeteEnrichie = {
+  return {
     ...request.body,
     idPG: (await getDernierIdPG(app)) + 1,
     importedAt: new Date(),
     userCreated: false,
   };
-  return requeteEnrichie;
 };
 
-// const stockerCandidatureConseiller = async (
-//   candidatureConseiller: CandidatureConseiller,
-//   app: Application,
-// ): Promise<void> => {
-//   return app.service(service.conseillers).Model.countDocuments();
-// };
+const stockerCandidatureConseiller = async (
+  candidatureConseiller: CandidatureConseiller,
+  app: Application,
+): Promise<void> => {
+  return app.service(service.conseillers).Model.countDocuments();
+};
 
 export default creerCandidatureConseiller;
