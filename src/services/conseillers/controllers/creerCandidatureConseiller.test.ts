@@ -206,10 +206,16 @@ describe('recevoir et valider une candidature conseiller', () => {
   });
 
   // TODO
-  it.todo('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
+      estDemandeurEmploi: false,
+      estEnEmploi: false,
+      estEnFormation: false,
+      estDiplomeMedNum: false,
+      nomDiplomeMedNum: '',
+      aUneExperienceMedNum: false
     }
 
     // WHEN
@@ -226,10 +232,39 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(400);
     expect(response.data).toStrictEqual({
-      message: 'Le code postal est invalide',
+      message: 'L’experience médiateur numérique est requise',
     });
   });
 
+  it('si j’envoie un formulaire avec une expérience renseignée Mednum et que je nai pas de nom renseigné alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      estDemandeurEmploi: false,
+      estEnEmploi: false,
+      estEnFormation: false,
+      estDiplomeMedNum: true,
+      nomDiplomeMedNum: '',
+      aUneExperienceMedNum: false
+    }
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le nom du diplôme est requis',
+    });
+  });
   it('si j’envoie un formulaire avec une distance max invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {

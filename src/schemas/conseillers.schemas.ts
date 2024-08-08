@@ -139,15 +139,18 @@ const validCandidatureConseiller = Joi.object({
     .required()
     .error(new Error('Le code région est requis')),
   codeCom: Joi.string(),
-  // TODO : ajouter une validation pour qu'au moins un des champs soient à true
   estDemandeurEmploi: Joi.boolean(),
   estEnEmploi: Joi.boolean(),
   estEnFormation: Joi.boolean(),
   estDiplomeMedNum: Joi.boolean(),
-  nomDiplomeMedNum: Joi.string(),
-  aUneExperienceMedNum: Joi.boolean()
-    .required()
-    .error(new Error('L’experience médiateur numérique est requise')),
+  nomDiplomeMedNum: Joi.string()
+    .when('estDiplomeMedNum', {
+      is: Joi.boolean().valid(true),
+      then: Joi.invalid('', null),
+      otherwise: Joi.valid('', null),
+    })
+    .error(new Error('Le nom du diplôme est requis')),
+  aUneExperienceMedNum: Joi.boolean(),
   dateDisponibilite: Joi.date().required(),
   distanceMax: Joi.number()
     .required()
@@ -156,7 +159,22 @@ const validCandidatureConseiller = Joi.object({
   motivation: Joi.string()
     .required()
     .error(new Error('La motivation est requise')),
-});
+}).when(
+  Joi.object({
+    estDemandeurEmploi: Joi.valid(false),
+    estEnEmploi: Joi.valid(false),
+    estEnFormation: Joi.valid(false),
+    estDiplomeMedNum: Joi.valid(false),
+    aUneExperienceMedNum: Joi.valid(false),
+  }).unknown(),
+  {
+    then: Joi.object({
+      estDemandeurEmploi: Joi.invalid(false).error(
+        new Error('L’experience médiateur numérique est requise'),
+      ),
+    }),
+  },
+);
 
 export {
   validConseillers,
