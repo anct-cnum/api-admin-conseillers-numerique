@@ -95,7 +95,7 @@ export default function (app: Application): Model<any> {
 
   const schema = new Schema<IConseillers>(
     {
-      idPG: { type: Number, required: true },
+      idPG: { type: Number, required: true, unique: true },
 
       password: { type: String },
 

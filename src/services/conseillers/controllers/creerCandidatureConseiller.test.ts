@@ -184,7 +184,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      location: "//TODO"
+      location: 1
     }
 
     // WHEN
