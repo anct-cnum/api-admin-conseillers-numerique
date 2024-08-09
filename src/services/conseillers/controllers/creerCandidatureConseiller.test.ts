@@ -65,6 +65,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.nomCommune).toBe("Paris");
     expect(response.data.prenom).toBe("Jean");
     expect(response.data.userCreated).toBe(false);
+    expect(response.data.disponible).toBe(true);
   });
 
   it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
@@ -118,6 +119,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.estEnFormation).toBe(true);
     expect(response.data.estDiplomeMedNum).toBe(true);
     expect(response.data.nomDiplomeMedNum).toBe("Diplome");
+    expect(response.data.disponible).toBe(true);
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
@@ -327,6 +329,36 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.status).toBe(400);
     expect(response.data).toStrictEqual({
       message: 'La distance est invalide',
+    });
+  });
+
+  it('si j’envoie un formulaire avec un email déjà existant alors j’ai une erreur', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+    }
+    await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'L’email est déjà utilisé',
     });
   });
 });
