@@ -129,9 +129,12 @@ const validCandidatureConseiller = Joi.object({
     .min(4)
     .max(5)
     .error(new Error('Le code commune est invalide')),
-  location: Joi.object()
+  location: Joi.object({
+    coordinates: Joi.array().items(Joi.number(), Joi.number()),
+    type: Joi.string().optional(),
+  })
     .required()
-    .error(new Error('La localisation est requise')),
+    .error(new Error('La localisation est invalide')),
   codeDepartement: Joi.string()
     .required()
     .error(new Error('Le code département est requis')),
