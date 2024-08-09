@@ -16,6 +16,8 @@ export default defineConfig({
     },
     globals: true,
     sequence: { shuffle: true },
+    globalSetup: ['src/tests/setup.ts'],
+    fileParallelism: false,
     unstubEnvs: true,
     unstubGlobals: true,
   },
