@@ -17,7 +17,7 @@ export const validerCandidatureConsiller =
 
 const creerCandidatureConseiller =
   (app: Application) => async (request: Request, response: Response) => {
-    const candidatureConseiller = await construireRequete(app, request);
+    const candidatureConseiller = await construireRequete(app, request.body);
     await stockerCandidatureConseiller(candidatureConseiller, app);
     return response.status(200).json(candidatureConseiller).end();
   };
@@ -31,10 +31,10 @@ const getDernierIdPG = async (app: Application): Promise<number> => {
 
 const construireRequete = async (
   app: Application,
-  request: Request,
+  body: Request,
 ): Promise<CandidatureConseiller> => {
   return {
-    ...request.body,
+    ...body,
     idPG: (await getDernierIdPG(app)) + 1,
     importedAt: new Date(),
     userCreated: false,

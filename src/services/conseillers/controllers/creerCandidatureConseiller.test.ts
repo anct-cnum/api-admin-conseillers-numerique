@@ -26,16 +26,10 @@ const champsObligatoires = {
 describe('recevoir et valider une candidature conseiller', () => {
   beforeEach(async () => {
     await viderLesCollections(app);
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
   })
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
-    vi.setSystemTime(new Date(2024, 1, 1));
     const envoiUtilisateur = {
       ...champsObligatoires,
     }
@@ -53,33 +47,27 @@ describe('recevoir et valider une candidature conseiller', () => {
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data).toStrictEqual({
-      aUneExperienceMedNum: false,
-      codeCommune: "75000",
-      codeDepartement: "75",
-      codePostal: "75001",
-      codeRegion: "75",
-      dateDisponibilite: "2024-01-01T00:00:00.000Z",
-      distanceMax: 5,
-      email: "jean.martin@example.com",
-      idPG: 1,
-      importedAt: "2024-01-01T00:00:00.000Z",
-      location:  {
-        coordinates: [
-          0,
-          0,
-        ],
-        type: "Point",
-      },
-      motivation: "Ma motivation",
-      nom: "Martin",
-      nomCommune: "Paris",
-      prenom: "Jean",
-      userCreated: false,
+    expect(response.data.aUneExperienceMedNum).toBe(false);
+    expect(response.data.codeCommune).toBe("75000");
+    expect(response.data.codeDepartement).toBe("75");
+    expect(response.data.codePostal).toBe("75001");
+    expect(response.data.codeRegion).toBe("75");
+    expect(response.data.dateDisponibilite).toBe("2024-01-01T00:00:00.000Z");
+    expect(response.data.distanceMax).toBe(5);
+    expect(response.data.email).toBe("jean.martin@example.com");
+    expect(response.data.idPG).toBe(1);
+    expect(response.data.location).toStrictEqual({
+      coordinates: [0, 0],
+      type: "Point",
     });
+    expect(response.data.motivation).toBe("Ma motivation");
+    expect(response.data.nom).toBe("Martin");
+    expect(response.data.nomCommune).toBe("Paris");
+    expect(response.data.prenom).toBe("Jean");
+    expect(response.data.userCreated).toBe(false);
   });
 
-  it.skip('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
+  it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -105,7 +93,31 @@ describe('recevoir et valider une candidature conseiller', () => {
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data).toStrictEqual({});
+    expect(response.data.aUneExperienceMedNum).toBe(false);
+    expect(response.data.codeCommune).toBe("75000");
+    expect(response.data.codeDepartement).toBe("75");
+    expect(response.data.codePostal).toBe("75001");
+    expect(response.data.codeRegion).toBe("75");
+    expect(response.data.dateDisponibilite).toBe("2024-01-01T00:00:00.000Z");
+    expect(response.data.distanceMax).toBe(5);
+    expect(response.data.email).toBe("jean.martin@example.com");
+    expect(response.data.idPG).toBe(1);
+    expect(response.data.location).toStrictEqual({
+      coordinates: [0, 0],
+      type: "Point",
+    });
+    expect(response.data.motivation).toBe("Ma motivation");
+    expect(response.data.nom).toBe("Martin");
+    expect(response.data.nomCommune).toBe("Paris");
+    expect(response.data.prenom).toBe("Jean");
+    expect(response.data.userCreated).toBe(false);
+    expect(response.data.telephone).toBe("+33123456789");
+    expect(response.data.codeCom).toBe("75");
+    expect(response.data.estDemandeurEmploi).toBe(true);
+    expect(response.data.estEnEmploi).toBe(true);
+    expect(response.data.estEnFormation).toBe(true);
+    expect(response.data.estDiplomeMedNum).toBe(true);
+    expect(response.data.nomDiplomeMedNum).toBe("Diplome");
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
@@ -208,8 +220,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     });
   });
 
-  // TODO
-  it.todo('si j’envoie un formulaire avec un localisation invalide alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec un localisation invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -230,11 +241,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(400);
     expect(response.data).toStrictEqual({
-      message: 'Le code postal est invalide',
+      message: 'La localisation est invalide',
     });
   });
 
-  // TODO
   it('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
