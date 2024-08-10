@@ -11,7 +11,6 @@ API fournissant le dépôt [tableau de pilotage](https://github.com/anct-cnum/da
 
 ```bash
 npm install
-cp config/default.json config/local.json
 ```
 
 ## Installation des données dans MongoDB
@@ -31,11 +30,23 @@ npm run db:start
 ## Lancer l'application
 
 ```bash
-npm run dev:local
+npm run dev
 ```
 
 ## Lancer le linter
 
 ```bash
 npm run lint
+```
+
+## Lancer les tests
+
+```bash
+npm run test
+```
+
+## Lancer le coverage des tests
+
+```bash
+npm run test:coverage
 ```

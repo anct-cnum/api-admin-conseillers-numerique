@@ -8,6 +8,7 @@
     "db:start": "docker compose down && docker compose up -d",
     "dev": "NODE_ENV=development nodemon src/index.ts",
     "lint": "tsc --noEmit && eslint src --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
+    "postinstall": "./post-install.sh",
     "start": "npm run build && node dist",
     "test": "NODE_ENV=test vitest --run",
     "test:coverage": "npm run test -- --coverage"
