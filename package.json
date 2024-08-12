@@ -5,6 +5,7 @@
   "scripts": {
     "build": "shx rm -rf dist && tsc && npm run copy-files",
     "copy-files": "copyfiles -u 1 src/**/*.mjml.ejs public/favicon.ico dist/",
+    "data:import": "./import-data-mongo.sh",
     "db:start": "docker compose down && docker compose up -d",
     "dev": "NODE_ENV=development nodemon src/index.ts",
     "lint": "tsc --noEmit && eslint src --max-warnings=0 --cache --cache-location node_modules/.cache/eslint",
