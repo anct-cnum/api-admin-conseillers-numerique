@@ -150,6 +150,79 @@ const commentaireConseillerAvisPrefet = Joi.object({
     .required()
     .error(new Error('Le commentaire est invalide')),
 });
+
+const validCandidatureStructure = Joi.object({
+  type: Joi.string()
+    .required()
+    .valid(
+      'COLLECTIVITE',
+      'COMMUNE',
+      'DEPARTEMENT',
+      'EPCI',
+      'GIP',
+      'PRIVATE',
+      'REGION',
+    )
+    .error(new Error('Le type est requis')),
+  nom: Joi.string().required().error(new Error('Le nom est requis')),
+  siret: Joi.string().required().error(new Error('Le siret est requis')),
+  aIdentifieCandidat: Joi.boolean()
+    .required()
+    .error(new Error('L’identification du candidat est requis')),
+  dateDebutMission: Joi.date()
+    .required()
+    .error(new Error('Le date de début mission est invalide')),
+  contact: Joi.object({
+    prenom: Joi.string().required().error(new Error('Le prénom est requis')),
+    nom: Joi.string().required().error(new Error('Le nom est requis')),
+    fonction: Joi.string()
+      .required()
+      .error(new Error('La fonction est requis')),
+    email: Joi.string()
+      .email()
+      .required()
+      .error(new Error('L’adresse e-mail est invalide')),
+    telephone: Joi.string()
+      .optional()
+      .allow('', null)
+      .pattern(/^(?:(?:\+)(33|590|596|594|262|269))(?:[\s.-]*\d{3}){3,4}$/)
+      .error(new Error('Le numéro de téléphone est invalide')),
+  })
+    .required()
+    .error(new Error('Le contact est invalide')),
+  nomCommune: Joi.string().required().error(new Error('La ville est requise')),
+  codePostal: Joi.string()
+    .required()
+    .min(5)
+    .max(5)
+    .error(new Error('Le code postal est invalide')),
+  codeCommune: Joi.string()
+    .required()
+    .min(4)
+    .max(5)
+    .error(new Error('Le code commune est invalide')),
+  codeDepartement: Joi.string()
+    .required()
+    .error(new Error('Le code département est requis')),
+  codeRegion: Joi.string()
+    .required()
+    .error(new Error('Le code région est requis')),
+  codeCom: Joi.string()
+    .required()
+    .allow('', null)
+    .error(new Error('Le codeCom est invalide')),
+  location: Joi.object({
+    coordinates: Joi.array().items(Joi.number(), Joi.number()),
+    type: Joi.string(),
+  })
+    .required()
+    .error(new Error('La localisation est invalide')),
+  nombreConseillersSouhaites: Joi.number()
+    .min(1)
+    .required()
+    .error(new Error('La nombre de conseillers souhaités est invalide')),
+});
+
 export {
   validStructures,
   validExportStructures,
@@ -162,4 +235,5 @@ export {
   validDemandesConseiller,
   demandeConseillerAvisPrefet,
   commentaireConseillerAvisPrefet,
+  validCandidatureStructure,
 };
