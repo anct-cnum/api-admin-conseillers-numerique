@@ -155,17 +155,27 @@ const validCandidatureStructure = Joi.object({
   type: Joi.string()
     .required()
     .valid(
-      'COLLECTIVITE',
       'COMMUNE',
       'DEPARTEMENT',
+      'REGION',
       'EPCI',
+      'COLLECTIVITE',
       'GIP',
       'PRIVATE',
-      'REGION',
     )
-    .error(new Error('Le type est requis')),
+    .error(new Error('Le type est invalide')),
   nom: Joi.string().required().error(new Error('Le nom est requis')),
-  siret: Joi.string().required().error(new Error('Le siret est requis')),
+  siret: Joi.string()
+    .allow(null)
+    .required()
+    .error(new Error('Le siret est requis')),
+  ridet: Joi.string()
+    .when('siret', {
+      is: Joi.valid(null),
+      then: Joi.invalid('', null).required(),
+      otherwise: Joi.valid(null),
+    })
+    .error(new Error('Le siret ou le ridet est requis')),
   aIdentifieCandidat: Joi.boolean()
     .required()
     .error(new Error('L’identification du candidat est requis')),
@@ -221,6 +231,14 @@ const validCandidatureStructure = Joi.object({
     .min(1)
     .required()
     .error(new Error('La nombre de conseillers souhaités est invalide')),
+  motivation: Joi.string()
+    .invalid('', null)
+    .required()
+    .error(new Error('La motivation est requise')),
+  confirmationEngagement: Joi.boolean()
+    .valid(true)
+    .required()
+    .error(new Error('La confirmation d’engagement est requis')),
 });
 
 export {

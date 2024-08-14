@@ -7,6 +7,7 @@ type CandidatureStructureInput = {
   type: string;
   nom: string;
   siret: string;
+  ridet: string; // voir impact du ridet ..
   aIdentifieCandidat: string;
   dateDebutMission: Date;
   contact: {
@@ -27,8 +28,8 @@ type CandidatureStructureInput = {
     coordinates: [number, number];
   };
   nombreStructuresSouhaites: number;
-  // TODO a ajouter les nouveau Tag pour les nouvelles input du formulaire
-  // Motivation etc...
+  motivation: string;
+  confirmationEngagement: boolean; // Faut il ajouter une key pour la confirmation d'engagement ?
 };
 
 type Structure = CandidatureStructureInput & {
@@ -76,7 +77,20 @@ const stockerCandidatureStructure = async (
   candidatureStructure: Structure,
   app: Application,
 ): Promise<void> => {
-  // TODO : ajout de condition doublon
+  const siretOuRidetExists =
+    (await app.service(service.structures).Model.countDocuments({
+      $or: [
+        {
+          siret: candidatureStructure.siret,
+        },
+        {
+          ridet: candidatureStructure.ridet,
+        },
+      ],
+    })) !== 0;
+  if (siretOuRidetExists) {
+    throw new Error('Vous êtes déjà inscrite'); // revoir le message ..
+  }
   const result = await app
     .service(service.structures)
     .create(candidatureStructure);
