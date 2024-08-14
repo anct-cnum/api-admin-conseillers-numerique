@@ -18,7 +18,7 @@ const champsObligatoires = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite: "2024-01-01T00:00:00.000Z",
+  dateDisponibilite: "2025-01-01T00:00:00.000Z",
   distanceMax: 5,
   motivation: "Ma motivation",
 }
@@ -52,7 +52,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.codeDepartement).toBe("75");
     expect(response.data.codePostal).toBe("75001");
     expect(response.data.codeRegion).toBe("75");
-    expect(response.data.dateDisponibilite).toBe("2024-01-01T00:00:00.000Z");
+    expect(response.data.dateDisponibilite).toBe("2025-01-01T00:00:00.000Z");
     expect(response.data.distanceMax).toBe(5);
     expect(response.data.email).toBe("jean.martin@example.com");
     expect(response.data.idPG).toBe(1);
@@ -99,7 +99,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.codeDepartement).toBe("75");
     expect(response.data.codePostal).toBe("75001");
     expect(response.data.codeRegion).toBe("75");
-    expect(response.data.dateDisponibilite).toBe("2024-01-01T00:00:00.000Z");
+    expect(response.data.dateDisponibilite).toBe("2025-01-01T00:00:00.000Z");
     expect(response.data.distanceMax).toBe(5);
     expect(response.data.email).toBe("jean.martin@example.com");
     expect(response.data.idPG).toBe(1);
@@ -246,7 +246,30 @@ describe('recevoir et valider une candidature conseiller', () => {
       message: 'La localisation est invalide',
     });
   });
+  it('si j’envoie un formulaire avec une date disponibilité inférieur à la date du jour alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      dateDisponibilite: "2024-01-01T00:00:00.000Z",
+    }
 
+    // WHEN
+    const response = await axios({
+      method: "POST",
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'La date doit être supérieur à la date du jour',
+    });
+  });
   it('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
