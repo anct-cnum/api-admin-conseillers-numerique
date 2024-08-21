@@ -27,7 +27,7 @@ type CandidatureStructureInput = {
     type: string;
     coordinates: [number, number];
   };
-  nombreStructuresSouhaites: number;
+  nombreConseillersSouhaites: number;
   motivation: string;
   confirmationEngagement: boolean; // Faut il ajouter une key pour la confirmation d'engagement ?
 };

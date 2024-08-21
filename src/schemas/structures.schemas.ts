@@ -199,7 +199,9 @@ const validCandidatureStructure = Joi.object({
       .error(new Error('Le numéro de téléphone est invalide')),
   })
     .required()
-    .error(new Error('Le contact est invalide')),
+    .messages({
+      'any.required': 'Le contact est requis',
+    }),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
   codePostal: Joi.string()
     .required()
@@ -222,15 +224,20 @@ const validCandidatureStructure = Joi.object({
     .allow('', null)
     .error(new Error('Le codeCom est invalide')),
   location: Joi.object({
-    coordinates: Joi.array().items(Joi.number(), Joi.number()),
-    type: Joi.string(),
+    coordinates: Joi.array()
+      .required()
+      .items(Joi.number(), Joi.number())
+      .error(new Error('Les coordonées sont invalide')),
+    type: Joi.string().required().error(new Error('Le type est invalide')),
   })
     .required()
-    .error(new Error('La localisation est invalide')),
+    .messages({
+      'any.required': 'La location est requis',
+    }),
   nombreConseillersSouhaites: Joi.number()
     .min(1)
     .required()
-    .error(new Error('La nombre de conseillers souhaités est invalide')),
+    .error(new Error('Le nombre de conseillers souhaités est invalide')),
   motivation: Joi.string()
     .invalid('', null)
     .required()

@@ -223,7 +223,7 @@ describe('recevoir et valider une candidature structure', () => {
       );
             expect(response.status).toBe(400);
       expect(response.data).toStrictEqual({
-        message: 'La nombre de conseillers souhaités est invalide',
+        message: 'Le nombre de conseillers souhaités est invalide',
       });
   });
   it('si j’envoie un formulaire avec une motivation vide "" alors j’ai une erreur de validation', async () => {
@@ -302,5 +302,147 @@ describe('recevoir et valider une candidature structure', () => {
    expect(response.data).toStrictEqual({
      message: 'Vous êtes déjà inscrite',
    });
+});
+it.each([
+  {
+    testKey: 'type',
+    key: {type: undefined},
+    error: 'Le type est invalide',
+    ignored: true
+  },
+  {
+    testKey: 'nom',
+    key: {nom: undefined},
+    error: 'Le nom est requis'
+  },
+  {
+    testKey: 'aIdentifieCandidat',
+    key: {aIdentifieCandidat: undefined},
+    error: 'L’identification du candidat est requis'
+  },
+  {
+    testKey: 'dateDebutMission',
+    key: {dateDebutMission: undefined},
+    error: 'Le date de début mission est invalide'
+  },
+  {
+    testKey: 'contact',
+    key: {contact:  undefined},
+    error: 'Le contact est requis'
+  },
+  {
+    testKey: 'contact.prenom',
+    key: {contact: { ...champsObligatoires.contact, prenom: undefined}},
+    error: 'Le prénom est requis'
+  },
+  {
+    testKey: 'contact.nom',
+    key: {contact: { ...champsObligatoires.contact, nom: undefined}},
+    error: 'Le nom est requis'
+  },
+  {
+    testKey: 'contact.fonction',
+    key: {contact: { ...champsObligatoires.contact, fonction: undefined}},
+    error: 'La fonction est requis'
+  },
+  {
+    testKey: 'contact.email',
+    key: {contact: { ...champsObligatoires.contact, email: undefined}},
+    error: 'L’adresse e-mail est invalide'
+  },
+  {
+    testKey: 'nomCommune',
+    key: {nomCommune: undefined },
+    error: 'La ville est requise'
+  },
+  {
+    testKey: 'codePostal',
+    key: {codePostal: undefined },
+    error: 'Le code postal est invalide'
+  },
+  {
+    testKey: 'codeCommune',
+    key: {codeCommune: undefined },
+    error: 'Le code commune est invalide'
+  },
+  {
+    testKey: 'codeDepartement',
+    key: {codeDepartement: undefined },
+    error: 'Le code département est requis'
+  },
+  {
+    testKey: 'codeRegion',
+    key: {codeRegion: undefined },
+    error: 'Le code région est requis'
+  },
+  {
+    testKey: 'codeCom',
+    key: { codeCom: undefined },
+    error: 'Le codeCom est invalide'
+  },
+  {
+    testKey: 'location',
+    key: { location: undefined },
+    error: 'La location est requis'
+  },
+  {
+    testKey: 'location.type',
+    key: {
+      location: {...champsObligatoires.location, type: undefined }
+    },
+    error: 'Le type est invalide',
+    ignored: true
+  },
+  {
+    testKey: 'location.coordinates',
+    key: {
+      location: {...champsObligatoires.location, coordinates: undefined }
+    },
+    error: 'Les coordonées sont invalide'
+  },
+  {
+    testKey: 'nombreConseillersSouhaites',
+    key: {
+      nombreConseillersSouhaites: undefined
+    },
+    error: 'Le nombre de conseillers souhaités est invalide'
+  },
+  {
+    testKey: 'motivation',
+    key: {
+      motivation: undefined
+    },
+    error: 'La motivation est requise'
+  },
+  {
+    testKey: 'confirmationEngagement',
+    key: {
+      confirmationEngagement: undefined
+    },
+    error: 'La confirmation d’engagement est requis'
+  },
+])('si j’envoie un formulaire avec la clé $testKey égale à undefined alors j’ai une erreur', async ({ key, error}) => {
+  // GIVEN
+  const envoiUtilisateur = {
+    ...champsObligatoires,
+    ...key
+  }
+
+ // WHEN
+ const response = await axios({
+   method: "POST",
+   url: `${host}/candidature-structure`,
+   data: envoiUtilisateur,
+   validateStatus: (status) => status < 500,
+ });
+
+ // THEN
+ expect(response.headers['content-type']).toBe(
+     'application/json; charset=utf-8',
+ );
+       expect(response.status).toBe(400);
+ expect(response.data).toStrictEqual({
+   message: error,
+ });
 });
 });
