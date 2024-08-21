@@ -8,12 +8,4 @@ const viderLesCollections = async (app): Promise<void> => {
 
 const host = 'http://localhost:8181';
 
-const convertionDateIsoHoraire = (date) => {
-  const dateOriginale = new Date(date);
-  const dateMaintenant = new Date();
-  const dateChanger = dateMaintenant.setTime(dateOriginale.getTime());
-  const formatDate = new Date(dateChanger).toISOString();
-  return formatDate.toString();
-};
-
-export { viderLesCollections, host, convertionDateIsoHoraire };
+export { viderLesCollections, host };

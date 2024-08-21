@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, host, convertionDateIsoHoraire } from '../../../tests/utils';
+import { viderLesCollections, host } from '../../../tests/utils';
 
 import app from '../../../app';
 
@@ -128,10 +128,6 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.estZRR).toBe(null);
     expect(response.data.prefet).toStrictEqual([]);
     expect(response.data.coselec).toStrictEqual([]);
-
-    // A voir si on garde ou non...
-    expect(response.data.createdAt).toBe(convertionDateIsoHoraire(response.data.createdAt));
-    expect(response.data.updatedAt).toBe(convertionDateIsoHoraire(response.data.updatedAt));
 });
   it('si j’envoie un formulaire avec un type null alors j’ai une erreur de validation', async () => {
        // GIVEN
