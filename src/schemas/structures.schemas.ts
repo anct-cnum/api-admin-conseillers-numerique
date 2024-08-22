@@ -200,6 +200,7 @@ const validCandidatureStructure = Joi.object({
   })
     .required()
     .messages({
+      'object.base': 'Le contact doit etre de type object',
       'any.required': 'Le contact est requis',
     }),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
@@ -232,6 +233,7 @@ const validCandidatureStructure = Joi.object({
   })
     .required()
     .messages({
+      'object.base': 'La location doit etre de type object',
       'any.required': 'La location est requis',
     }),
   nombreConseillersSouhaites: Joi.number()

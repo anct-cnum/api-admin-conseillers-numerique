@@ -42,6 +42,8 @@ type Structure = CandidatureStructureInput & {
   estZRR: boolean;
   prefet: Array<string>;
   coselec: Array<string>;
+  coordinateurCandidature: boolean;
+  coordinateurTypeContrat: string;
 };
 
 export const validerCandidatureStructure =
@@ -70,6 +72,8 @@ const construireStructure = async (
     estZRR: null,
     prefet: [],
     coselec: [],
+    coordinateurCandidature: false,
+    coordinateurTypeContrat: null,
   };
 };
 
