@@ -129,55 +129,6 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.prefet).toStrictEqual([]);
     expect(response.data.coselec).toStrictEqual([]);
   });
-  it('si j’envoie un formulaire avec un type null alors j’ai une erreur de validation', async () => {
-    // GIVEN
-    const envoiUtilisateur = {
-      ...champsObligatoires,
-      type: null,
-    };
-
-    // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
-    // THEN
-    expect(response.headers['content-type']).toBe(
-      'application/json; charset=utf-8',
-    );
-    expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
-      message: 'Le type est invalide',
-    });
-  });
-  it('si j’envoie un formulaire sans siret et ni ridet alors j’ai une erreur de validation', async () => {
-    // GIVEN
-    const envoiUtilisateur = {
-      ...champsObligatoires,
-      siret: null,
-      ridet: null,
-    };
-
-    // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
-    // THEN
-    expect(response.headers['content-type']).toBe(
-      'application/json; charset=utf-8',
-    );
-    expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
-      message: 'Le siret ou le ridet est requis',
-    });
-  });
   it('si j’envoie un formulaire sans siret mais avec un ridet alors j’ai pas d’erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -250,7 +201,7 @@ describe('recevoir et valider une candidature structure', () => {
       message: 'La motivation est requise',
     });
   });
-  it('si j’envoie un formulaire sans confirmation des engagements alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec confirmation des engagements à false alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -314,6 +265,16 @@ describe('recevoir et valider une candidature structure', () => {
       testKey: 'nom',
       key: { nom: undefined },
       error: 'Le nom est requis',
+    },
+    {
+      testKey: 'siret',
+      key: { siret: undefined },
+      error: 'Le siret est requis',
+    },
+    {
+      testKey: 'ridet',
+      key: { siret: null, ridet: undefined },
+      error: 'Le siret ou le ridet est requis',
     },
     {
       testKey: 'aIdentifieCandidat',
