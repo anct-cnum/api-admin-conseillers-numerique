@@ -5,38 +5,45 @@ import { viderLesCollections, host } from '../../../tests/utils';
 import app from '../../../app';
 
 const champsObligatoires = {
-  prenom: "Jean",
-  nom: "Martin",
-  email: "jean.martin@example.com",
-  nomCommune: "Paris",
-  codePostal: "75001",
-  codeCommune: "75000",
-  codeDepartement: "75",
-  codeRegion: "75",
+  prenom: 'Jean',
+  nom: 'Martin',
+  email: 'jean.martin@example.com',
+  nomCommune: 'Paris',
+  codePostal: '75001',
+  codeCommune: '75000',
+  codeDepartement: '75',
+  codeRegion: '75',
+  codeCom: null,
   location: {
-    type: "Point",
+    type: 'Point',
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite: "2025-01-01T00:00:00.000Z",
+  dateDisponibilite: '2025-01-01T00:00:00.000Z',
   distanceMax: 5,
-  motivation: "Ma motivation",
-}
+  motivation: 'Ma motivation',
+  telephone: '',
+  estDemandeurEmploi: true,
+  estEnEmploi: false,
+  estEnFormation: false,
+  estDiplomeMedNum: false,
+  nomDiplomeMedNum: '',
+};
 
 describe('recevoir et valider une candidature conseiller', () => {
   beforeEach(async () => {
     await viderLesCollections(app);
-  })
+  });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-    }
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -48,42 +55,47 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(200);
     expect(response.data.aUneExperienceMedNum).toBe(false);
-    expect(response.data.codeCommune).toBe("75000");
-    expect(response.data.codeDepartement).toBe("75");
-    expect(response.data.codePostal).toBe("75001");
-    expect(response.data.codeRegion).toBe("75");
-    expect(response.data.dateDisponibilite).toBe("2025-01-01T00:00:00.000Z");
+    expect(response.data.codeCommune).toBe('75000');
+    expect(response.data.codeDepartement).toBe('75');
+    expect(response.data.codePostal).toBe('75001');
+    expect(response.data.codeRegion).toBe('75');
+    expect(response.data.codeCom).toBe(null);
+    expect(response.data.dateDisponibilite).toBe('2025-01-01T00:00:00.000Z');
     expect(response.data.distanceMax).toBe(5);
-    expect(response.data.email).toBe("jean.martin@example.com");
+    expect(response.data.email).toBe('jean.martin@example.com');
     expect(response.data.idPG).toBe(1);
     expect(response.data.location).toStrictEqual({
       coordinates: [0, 0],
-      type: "Point",
+      type: 'Point',
     });
-    expect(response.data.motivation).toBe("Ma motivation");
-    expect(response.data.nom).toBe("Martin");
-    expect(response.data.nomCommune).toBe("Paris");
-    expect(response.data.prenom).toBe("Jean");
+    expect(response.data.motivation).toBe('Ma motivation');
+    expect(response.data.nom).toBe('Martin');
+    expect(response.data.nomCommune).toBe('Paris');
+    expect(response.data.prenom).toBe('Jean');
     expect(response.data.userCreated).toBe(false);
-    expect(response.data.disponible).toBe(true);
+    expect(response.data.estDemandeurEmploi).toBe(true);
+    expect(response.data.estEnEmploi).toBe(false);
+    expect(response.data.estEnFormation).toBe(false);
+    expect(response.data.estDiplomeMedNum).toBe(false);
+    expect(response.data.nomDiplomeMedNum).toBe('');
   });
 
   it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      telephone: "+33123456789",
-      codeCom: "75",
+      telephone: '+33123456789',
+      codeCom: '75',
       estDemandeurEmploi: true,
       estEnEmploi: true,
       estEnFormation: true,
       estDiplomeMedNum: true,
-      nomDiplomeMedNum: "Diplome",
-    }
+      nomDiplomeMedNum: 'Diplome',
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -95,30 +107,30 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(200);
     expect(response.data.aUneExperienceMedNum).toBe(false);
-    expect(response.data.codeCommune).toBe("75000");
-    expect(response.data.codeDepartement).toBe("75");
-    expect(response.data.codePostal).toBe("75001");
-    expect(response.data.codeRegion).toBe("75");
-    expect(response.data.dateDisponibilite).toBe("2025-01-01T00:00:00.000Z");
+    expect(response.data.codeCommune).toBe('75000');
+    expect(response.data.codeDepartement).toBe('75');
+    expect(response.data.codePostal).toBe('75001');
+    expect(response.data.codeRegion).toBe('75');
+    expect(response.data.dateDisponibilite).toBe('2025-01-01T00:00:00.000Z');
     expect(response.data.distanceMax).toBe(5);
-    expect(response.data.email).toBe("jean.martin@example.com");
+    expect(response.data.email).toBe('jean.martin@example.com');
     expect(response.data.idPG).toBe(1);
     expect(response.data.location).toStrictEqual({
       coordinates: [0, 0],
-      type: "Point",
+      type: 'Point',
     });
-    expect(response.data.motivation).toBe("Ma motivation");
-    expect(response.data.nom).toBe("Martin");
-    expect(response.data.nomCommune).toBe("Paris");
-    expect(response.data.prenom).toBe("Jean");
+    expect(response.data.motivation).toBe('Ma motivation');
+    expect(response.data.nom).toBe('Martin');
+    expect(response.data.nomCommune).toBe('Paris');
+    expect(response.data.prenom).toBe('Jean');
     expect(response.data.userCreated).toBe(false);
-    expect(response.data.telephone).toBe("+33123456789");
-    expect(response.data.codeCom).toBe("75");
+    expect(response.data.telephone).toBe('+33123456789');
+    expect(response.data.codeCom).toBe('75');
     expect(response.data.estDemandeurEmploi).toBe(true);
     expect(response.data.estEnEmploi).toBe(true);
     expect(response.data.estEnFormation).toBe(true);
     expect(response.data.estDiplomeMedNum).toBe(true);
-    expect(response.data.nomDiplomeMedNum).toBe("Diplome");
+    expect(response.data.nomDiplomeMedNum).toBe('Diplome');
     expect(response.data.disponible).toBe(true);
   });
 
@@ -126,12 +138,12 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      email: "abc"
-    }
+      email: 'abc',
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -151,12 +163,12 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      telephone: "abc"
-    }
+      telephone: 'abc',
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -176,12 +188,12 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      codePostal: "123"
-    }
+      codePostal: '123',
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -201,12 +213,12 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      codeCommune: "123"
-    }
+      codeCommune: '123',
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -221,41 +233,16 @@ describe('recevoir et valider une candidature conseiller', () => {
       message: 'Le code commune est invalide',
     });
   });
-
-  it('si j’envoie un formulaire avec un localisation invalide alors j’ai une erreur de validation', async () => {
-    // GIVEN
-    const envoiUtilisateur = {
-      ...champsObligatoires,
-      location: 1
-    }
-
-    // WHEN
-    const response = await axios({
-      method: "POST",
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
-    // THEN
-    expect(response.headers['content-type']).toBe(
-      'application/json; charset=utf-8',
-    );
-    expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
-      message: 'La localisation est invalide',
-    });
-  });
   it('si j’envoie un formulaire avec une date disponibilité inférieur à la date du jour alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      dateDisponibilite: "2024-01-01T00:00:00.000Z",
-    }
+      dateDisponibilite: '2024-01-01T00:00:00.000Z',
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -279,12 +266,12 @@ describe('recevoir et valider une candidature conseiller', () => {
       estEnFormation: false,
       estDiplomeMedNum: false,
       nomDiplomeMedNum: '',
-      aUneExperienceMedNum: false
-    }
+      aUneExperienceMedNum: false,
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -309,12 +296,12 @@ describe('recevoir et valider une candidature conseiller', () => {
       estEnFormation: false,
       estDiplomeMedNum: true,
       nomDiplomeMedNum: '',
-      aUneExperienceMedNum: false
-    }
+      aUneExperienceMedNum: false,
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -334,12 +321,12 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      distanceMax: 3
-    }
+      distanceMax: 3,
+    };
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -359,9 +346,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-    }
+    };
     await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -369,7 +356,7 @@ describe('recevoir et valider une candidature conseiller', () => {
 
     // WHEN
     const response = await axios({
-      method: "POST",
+      method: 'POST',
       url: `${host}/candidature-conseiller`,
       data: envoiUtilisateur,
       validateStatus: (status) => status < 500,
@@ -384,4 +371,173 @@ describe('recevoir et valider une candidature conseiller', () => {
       message: 'L’email est déjà utilisé',
     });
   });
+  it.each([
+    {
+      testKey: 'prenom',
+      key: { prenom: undefined },
+      error: 'Le prénom est requis',
+    },
+    {
+      testKey: 'nom',
+      key: { nom: undefined },
+      error: 'Le nom est requis',
+    },
+    {
+      testKey: 'email',
+      key: { email: undefined },
+      error: 'L’adresse e-mail est invalide',
+    },
+    {
+      testKey: 'nomCommune',
+      key: { nomCommune: undefined },
+      error: 'La ville est requise',
+    },
+    {
+      testKey: 'codePostal',
+      key: { codePostal: undefined },
+      error: 'Le code postal est invalide',
+    },
+    {
+      testKey: 'codeCommune',
+      key: { codeCommune: undefined },
+      error: 'Le code commune est invalide',
+    },
+    {
+      testKey: 'codeDepartement',
+      key: { codeDepartement: undefined },
+      error: 'Le code département est requis',
+    },
+    {
+      testKey: 'codeRegion',
+      key: { codeRegion: undefined },
+      error: 'Le code région est requis',
+    },
+    {
+      testKey: 'location.type',
+      key: {
+        location: { ...champsObligatoires.location, type: undefined },
+      },
+      error: 'Le type est invalide',
+    },
+    {
+      testKey: 'location.coordinates',
+      key: {
+        location: { ...champsObligatoires.location, coordinates: undefined },
+      },
+      error: 'Les coordonées sont invalide',
+    },
+    {
+      testKey: 'estDemandeurEmploi',
+      key: { estDemandeurEmploi: undefined },
+      error: 'L’experience médiateur numérique est requise',
+    },
+    {
+      testKey: 'estEnEmploi',
+      key: { estEnEmploi: undefined },
+      error: 'L’experience médiateur numérique est requise',
+    },
+    {
+      testKey: 'estEnFormation',
+      key: { estEnFormation: undefined },
+      error: 'L’experience médiateur numérique est requise',
+    },
+    {
+      testKey: 'estDiplomeMedNum',
+      key: { estDiplomeMedNum: undefined },
+      error: 'L’experience médiateur numérique est requise',
+    },
+    {
+      testKey: 'nomDiplomeMedNum',
+      key: { estDiplomeMedNum: true, nomDiplomeMedNum: undefined },
+      error: 'Le nom du diplôme est requis',
+    },
+    {
+      testKey: 'aUneExperienceMedNum',
+      key: { aUneExperienceMedNum: undefined },
+      error: 'L’experience médiateur numérique est requise',
+    },
+    {
+      testKey: 'dateDisponibilite',
+      key: { dateDisponibilite: undefined },
+      error: 'La date est requise',
+    },
+    {
+      testKey: 'distanceMax',
+      key: { distanceMax: undefined },
+      error: 'La distance est invalide',
+    },
+    {
+      testKey: 'dateDisponibilite',
+      key: { dateDisponibilite: undefined },
+      error: 'La date est requise',
+    },
+    {
+      testKey: 'motivation',
+      key: { motivation: undefined },
+      error: 'La motivation est requise',
+    },
+  ])(
+    'si j’envoie un formulaire avec la clé $testKey égale à undefined alors j’ai une erreur',
+    async ({ key, error }) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        ...key,
+      };
+
+      // WHEN
+      const response = await axios({
+        method: 'POST',
+        url: `${host}/candidature-conseiller`,
+        data: envoiUtilisateur,
+        validateStatus: (status) => status < 500,
+      });
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(400);
+      expect(response.data).toStrictEqual({
+        message: error,
+      });
+    },
+  );
+
+  it.each([
+    {
+      testKey: 'contact.telephone',
+      key: { telephone: '' },
+      result: '',
+    },
+    {
+      testKey: 'contact.telephone',
+      key: { telephone: null },
+      result: null,
+    },
+  ])(
+    'si j’envoie un formulaire avec la clé optionnel $testKey égale à $result alors j’ai pas d’erreur de validation',
+    async ({ key, result }) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        ...key,
+      };
+
+      // WHEN
+      const response = await axios({
+        method: 'POST',
+        url: `${host}/candidature-conseiller`,
+        data: envoiUtilisateur,
+        validateStatus: (status) => status < 500,
+      });
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.telephone).toBe(result);
+    },
+  );
 });
