@@ -195,7 +195,7 @@ const validCandidatureStructure = Joi.object({
     telephone: Joi.string()
       .optional()
       .allow('', null)
-      .pattern(/^(?:(?:\+)(33|590|596|594|262|269))(?:[\s.-]*\d{3}){3,4}$/)
+      .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
       .error(new Error('Le numéro de téléphone est invalide')),
   })
     .required()

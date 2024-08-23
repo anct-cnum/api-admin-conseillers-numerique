@@ -270,6 +270,35 @@ describe('recevoir et valider une candidature structure', () => {
     });
   });
 
+  it.each([33, 590, 596, 594, 262, 269, 687])(
+    'si j’envoie un formulaire avec un numéro de téléphone qui commence par +%d alors il est validé',
+    async (debutTelephone) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        contact: {
+          ...champsObligatoires.contact,
+          telephone: '+' + debutTelephone + '611223344',
+        }
+      };
+
+      // WHEN
+      const response = await axios({
+        method: 'POST',
+        url: `${host}/candidature-structure`,
+        data: envoiUtilisateur,
+        validateStatus: (status) => status < 500,
+      });
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.contact.telephone).toBe('+' + debutTelephone + '611223344');
+    },
+  );
+
   it.each([
     {
       testKey: 'type',
