@@ -193,8 +193,7 @@ const validCandidatureStructure = Joi.object({
       .required()
       .error(new Error('L’adresse e-mail est invalide')),
     telephone: Joi.string()
-      .optional()
-      .allow('', null)
+      .required()
       .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
       .error(new Error('Le numéro de téléphone est invalide')),
   })

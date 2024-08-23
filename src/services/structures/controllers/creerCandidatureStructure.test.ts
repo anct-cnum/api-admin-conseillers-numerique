@@ -455,43 +455,6 @@ describe('recevoir et valider une candidature structure', () => {
     },
   );
 
-  it.each([
-    {
-      testKey: 'contact.telephone',
-      key: { contact: { ...champsObligatoires.contact, telephone: '' } },
-      result: '',
-    },
-    {
-      testKey: 'contact.telephone',
-      key: { contact: { ...champsObligatoires.contact, telephone: null } },
-      result: null,
-    },
-  ])(
-    'si j’envoie un formulaire avec la clé optionnel $testKey égale à $result alors j’ai pas d’erreur de validation',
-    async ({ key, result }) => {
-      // GIVEN
-      const envoiUtilisateur = {
-        ...champsObligatoires,
-        ...key,
-      };
-
-      // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
-
-      // THEN
-      expect(response.headers['content-type']).toBe(
-        'application/json; charset=utf-8',
-      );
-      expect(response.status).toBe(200);
-      expect(response.data.contact.telephone).toBe(result);
-    },
-  );
-
   it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
