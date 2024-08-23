@@ -233,6 +233,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       message: 'Le code commune est invalide',
     });
   });
+
   it('si j’envoie un formulaire avec une date disponibilité inférieur à la date du jour alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -257,6 +258,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       message: 'La date doit être supérieur à la date du jour',
     });
   });
+
   it('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -371,6 +373,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       message: 'L’email est déjà utilisé',
     });
   });
+
   it.each([
     {
       testKey: 'prenom',
@@ -540,4 +543,55 @@ describe('recevoir et valider une candidature conseiller', () => {
       expect(response.data.telephone).toBe(result);
     },
   );
+
+  it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const lettreA = 'a';
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      motivation: lettreA.repeat(2501),
+    };
+
+    // WHEN
+    const response = await axios({
+      method: 'POST',
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'La motivation ne doit pas dépasser 2500 caractères',
+    });
+  });
+
+  it('si j’envoie un formulaire avec une motivation strictement égale à 2500 caractères alors alors il est validé', async () => {
+    // GIVEN
+    const lettreA = 'a';
+    const motivation = lettreA.repeat(2500);
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      motivation,
+    };
+
+    // WHEN
+    const response = await axios({
+      method: 'POST',
+      url: `${host}/candidature-conseiller`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.data.motivation).toBe(motivation);
+  });
 });

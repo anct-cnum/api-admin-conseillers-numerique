@@ -186,9 +186,10 @@ const validCandidatureConseiller = Joi.object({
     .required()
     .valid(5, 10, 15, 20, 40, 100, 2000)
     .error(new Error('La distance est invalide')),
-  motivation: Joi.string()
-    .required()
-    .error(new Error('La motivation est requise')),
+  motivation: Joi.string().max(2500).required().messages({
+    'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
+    'any.required': 'La motivation est requise',
+  }),
 }).when(
   Joi.object({
     estDemandeurEmploi: Joi.valid(false),
