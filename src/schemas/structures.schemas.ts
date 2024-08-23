@@ -240,10 +240,10 @@ const validCandidatureStructure = Joi.object({
     .min(1)
     .required()
     .error(new Error('Le nombre de conseillers souhaités est invalide')),
-  motivation: Joi.string()
-    .invalid('', null)
-    .required()
-    .error(new Error('La motivation est requise')),
+  motivation: Joi.string().max(2500).required().messages({
+    'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
+    'any.required': 'La motivation est requise',
+  }),
   confirmationEngagement: Joi.boolean()
     .valid(true)
     .required()

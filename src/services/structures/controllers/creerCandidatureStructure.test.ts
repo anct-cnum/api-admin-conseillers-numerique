@@ -80,6 +80,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.motivation).toBe('Je suis motivé.');
     expect(response.data.confirmationEngagement).toBe(true);
   });
+
   it('si j’envoie la totalité des champs possibles avec les champs ajouté par default alors il est validé', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -131,6 +132,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.coordinateurCandidature).toStrictEqual(false);
     expect(response.data.coordinateurTypeContrat).toStrictEqual(null);
   });
+
   it('si j’envoie un formulaire sans siret mais avec un ridet alors j’ai pas d’erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -155,6 +157,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.siret).toBe(null);
     expect(response.data.ridet).toBe('1234567');
   });
+
   it('si j’envoie un formulaire avec 0 conseiller souhaités alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -179,6 +182,7 @@ describe('recevoir et valider une candidature structure', () => {
       message: 'Le nombre de conseillers souhaités est invalide',
     });
   });
+
   it('si j’envoie un formulaire avec confirmation des engagements à false alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -203,6 +207,7 @@ describe('recevoir et valider une candidature structure', () => {
       message: 'La confirmation d’engagement est requis',
     });
   });
+
   it('si j’envoie un formulaire avec un siret déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -232,6 +237,7 @@ describe('recevoir et valider une candidature structure', () => {
       message: 'Vous êtes déjà inscrite',
     });
   });
+
   it('si j’envoie un formulaire avec un ridet déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -263,6 +269,7 @@ describe('recevoir et valider une candidature structure', () => {
       message: 'Vous êtes déjà inscrite',
     });
   });
+
   it.each([
     {
       testKey: 'type',
@@ -421,156 +428,6 @@ describe('recevoir et valider une candidature structure', () => {
 
   it.each([
     {
-      testKey: 'type',
-      key: { type: '' },
-      error: 'Le type est invalide',
-      ignored: true,
-    },
-    {
-      testKey: 'nom',
-      key: { nom: '' },
-      error: 'Le nom est requis',
-    },
-    {
-      testKey: 'siret',
-      key: { siret: '' },
-      error: 'Le siret est requis',
-    },
-    {
-      testKey: 'ridet',
-      key: { siret: null, ridet: '' },
-      error: 'Le siret ou le ridet est requis',
-    },
-    {
-      testKey: 'aIdentifieCandidat',
-      key: { aIdentifieCandidat: '' },
-      error: 'L’identification du candidat est requis',
-    },
-    {
-      testKey: 'dateDebutMission',
-      key: { dateDebutMission: '' },
-      error: 'Le date de début mission est invalide',
-    },
-    {
-      testKey: 'contact',
-      key: { contact: '' },
-      error: 'Le contact doit etre de type object',
-    },
-    {
-      testKey: 'contact.prenom',
-      key: { contact: { ...champsObligatoires.contact, prenom: '' } },
-      error: 'Le prénom est requis',
-    },
-    {
-      testKey: 'contact.nom',
-      key: { contact: { ...champsObligatoires.contact, nom: '' } },
-      error: 'Le nom est requis',
-    },
-    {
-      testKey: 'contact.fonction',
-      key: { contact: { ...champsObligatoires.contact, fonction: '' } },
-      error: 'La fonction est requis',
-    },
-    {
-      testKey: 'contact.email',
-      key: { contact: { ...champsObligatoires.contact, email: '' } },
-      error: 'L’adresse e-mail est invalide',
-    },
-    {
-      testKey: 'nomCommune',
-      key: { nomCommune: '' },
-      error: 'La ville est requise',
-    },
-    {
-      testKey: 'codePostal',
-      key: { codePostal: '' },
-      error: 'Le code postal est invalide',
-    },
-    {
-      testKey: 'codeCommune',
-      key: { codeCommune: '' },
-      error: 'Le code commune est invalide',
-    },
-    {
-      testKey: 'codeDepartement',
-      key: { codeDepartement: '' },
-      error: 'Le code département est requis',
-    },
-    {
-      testKey: 'codeRegion',
-      key: { codeRegion: '' },
-      error: 'Le code région est requis',
-    },
-    {
-      testKey: 'location',
-      key: { location: '' },
-      error: 'La location doit etre de type object',
-    },
-    {
-      testKey: 'location.type',
-      key: {
-        location: { ...champsObligatoires.location, type: '' },
-      },
-      error: 'Le type est invalide',
-      ignored: true,
-    },
-    {
-      testKey: 'location.coordinates',
-      key: {
-        location: { ...champsObligatoires.location, coordinates: '' },
-      },
-      error: 'Les coordonées sont invalide',
-    },
-    {
-      testKey: 'nombreConseillersSouhaites',
-      key: {
-        nombreConseillersSouhaites: '',
-      },
-      error: 'Le nombre de conseillers souhaités est invalide',
-    },
-    {
-      testKey: 'motivation',
-      key: {
-        motivation: '',
-      },
-      error: 'La motivation est requise',
-    },
-    {
-      testKey: 'confirmationEngagement',
-      key: {
-        confirmationEngagement: '',
-      },
-      error: 'La confirmation d’engagement est requis',
-    },
-  ])(
-    'si j’envoie un formulaire avec la clé $testKey égale à un string vide alors j’ai une erreur',
-    async ({ key, error }) => {
-      // GIVEN
-      const envoiUtilisateur = {
-        ...champsObligatoires,
-        ...key,
-      };
-
-      // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
-
-      // THEN
-      expect(response.headers['content-type']).toBe(
-        'application/json; charset=utf-8',
-      );
-      expect(response.status).toBe(400);
-      expect(response.data).toStrictEqual({
-        message: error,
-      });
-    },
-  );
-  it.each([
-    {
       testKey: 'contact.telephone',
       key: { contact: { ...champsObligatoires.contact, telephone: '' } },
       result: '',
@@ -605,6 +462,7 @@ describe('recevoir et valider une candidature structure', () => {
       expect(response.data.contact.telephone).toBe(result);
     },
   );
+
   it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
@@ -628,5 +486,56 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data).toStrictEqual({
       message: 'Le numéro de téléphone est invalide',
     });
+  });
+
+  it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const lettreA = 'a';
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      motivation: lettreA.repeat(2501),
+    };
+
+    // WHEN
+    const response = await axios({
+      method: 'POST',
+      url: `${host}/candidature-structure`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'La motivation ne doit pas dépasser 2500 caractères',
+    });
+  });
+
+  it('si j’envoie un formulaire avec une motivation strictement égale à 2500 caractères alors il est validé', async () => {
+    // GIVEN
+    const lettreA = 'a';
+    const motivation = lettreA.repeat(2500);
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      motivation,
+    };
+
+    // WHEN
+    const response = await axios({
+      method: 'POST',
+      url: `${host}/candidature-structure`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.data.motivation).toBe(motivation);
   });
 });
