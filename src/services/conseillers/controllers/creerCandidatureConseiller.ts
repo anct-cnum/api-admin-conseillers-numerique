@@ -51,11 +51,14 @@ const creerCandidatureConseiller =
   (app: Application) => async (request: Request, response: Response) => {
     const candidatureConseiller = await construireConseiller(app, request.body);
     try {
-      await stockerCandidatureConseiller(candidatureConseiller, app);
+      const result = await stockerCandidatureConseiller(
+        candidatureConseiller,
+        app,
+      );
+      return response.status(200).json(result).end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
     }
-    return response.status(200).json(candidatureConseiller).end();
   };
 
 const getDernierIdPG = async (app: Application): Promise<number> => {

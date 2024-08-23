@@ -116,7 +116,7 @@ const validCandidatureConseiller = Joi.object({
   telephone: Joi.string()
     .optional()
     .allow('', null)
-    .pattern(/^(?:(?:\+)(33|590|596|594|262|269))(?:[\s.-]*\d{3}){3,4}$/)
+    .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
     .error(new Error('Le numéro de téléphone est invalide')),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
   codePostal: Joi.string()
@@ -130,38 +130,66 @@ const validCandidatureConseiller = Joi.object({
     .max(5)
     .error(new Error('Le code commune est invalide')),
   location: Joi.object({
-    coordinates: Joi.array().items(Joi.number(), Joi.number()),
-    type: Joi.string(),
+    coordinates: Joi.array()
+      .required()
+      .items(Joi.number(), Joi.number())
+      .error(new Error('Les coordonées sont invalide')),
+    type: Joi.string().required().error(new Error('Le type est invalide')),
   })
     .required()
-    .error(new Error('La localisation est invalide')),
+    .messages({
+      'object.base': 'La location doit etre de type object',
+      'any.required': 'La location est requis',
+    }),
   codeDepartement: Joi.string()
     .required()
     .error(new Error('Le code département est requis')),
   codeRegion: Joi.string()
     .required()
     .error(new Error('Le code région est requis')),
-  codeCom: Joi.string(),
-  estDemandeurEmploi: Joi.boolean(),
-  estEnEmploi: Joi.boolean(),
-  estEnFormation: Joi.boolean(),
-  estDiplomeMedNum: Joi.boolean(),
+  codeCom: Joi.string()
+    .required()
+    .allow('', null)
+    .error(new Error('Le codeCom est invalide')),
+  estDemandeurEmploi: Joi.boolean()
+    .required()
+    .error(new Error('L’experience médiateur numérique est requise')),
+  estEnEmploi: Joi.boolean()
+    .required()
+    .error(new Error('L’experience médiateur numérique est requise')),
+  estEnFormation: Joi.boolean()
+    .required()
+    .error(new Error('L’experience médiateur numérique est requise')),
+  estDiplomeMedNum: Joi.boolean()
+    .required()
+    .error(new Error('L’experience médiateur numérique est requise')),
   nomDiplomeMedNum: Joi.string()
     .when('estDiplomeMedNum', {
       is: Joi.boolean().valid(true),
-      then: Joi.invalid('', null),
+      then: Joi.string().required(),
       otherwise: Joi.valid('', null),
     })
     .error(new Error('Le nom du diplôme est requis')),
-  aUneExperienceMedNum: Joi.boolean(),
-  dateDisponibilite: Joi.date().required(),
+  aUneExperienceMedNum: Joi.boolean()
+    .required()
+    .error(new Error('L’experience médiateur numérique est requise')),
+  dateDisponibilite: Joi.date()
+    .min('now')
+    .required()
+    .messages({
+      'date.base': 'La date de disponibilité doit être de type date',
+      'date.min': 'La date doit être supérieur à la date du jour',
+      'any.required': 'La date est requise',
+    })
+    .error((err) => new Error(err)),
   distanceMax: Joi.number()
     .required()
     .valid(5, 10, 15, 20, 40, 100, 2000)
     .error(new Error('La distance est invalide')),
-  motivation: Joi.string()
-    .required()
-    .error(new Error('La motivation est requise')),
+  motivation: Joi.string().max(2500).required().messages({
+    'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
+    'any.required': 'La motivation est requise',
+  }),
 }).when(
   Joi.object({
     estDemandeurEmploi: Joi.valid(false),
@@ -172,9 +200,9 @@ const validCandidatureConseiller = Joi.object({
   }).unknown(),
   {
     then: Joi.object({
-      estDemandeurEmploi: Joi.invalid(false).error(
-        new Error('L’experience médiateur numérique est requise'),
-      ),
+      estDemandeurEmploi: Joi.boolean()
+        .invalid(false)
+        .error(new Error('L’experience médiateur numérique est requise')),
     }),
   },
 );
