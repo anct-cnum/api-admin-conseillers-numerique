@@ -249,6 +249,111 @@ const validCandidatureStructure = Joi.object({
     .error(new Error('La confirmation d’engagement est requis')),
 });
 
+const validCandidatureStructureCoordinateur = Joi.object({
+  type: Joi.string()
+    .required()
+    .valid(
+      'COMMUNE',
+      'DEPARTEMENT',
+      'REGION',
+      'EPCI',
+      'COLLECTIVITE',
+      'GIP',
+      'PRIVATE',
+    )
+    .error(new Error('Le type est invalide')),
+  nom: Joi.string().required().error(new Error('Le nom est requis')),
+  siret: Joi.string()
+    .allow(null)
+    .required()
+    .error(new Error('Le siret est requis')),
+  ridet: Joi.string()
+    .when('siret', {
+      is: Joi.valid(null),
+      then: Joi.invalid('', null).required(),
+      otherwise: Joi.valid(null),
+    })
+    .error(new Error('Le siret ou le ridet est requis')),
+  aIdentifieCandidat: Joi.boolean() // A voir si obligatoire ???
+    .required()
+    .error(new Error('L’identification du candidat est requis')),
+  dateDebutMission: Joi.date().min('now').required().messages({
+    'date.base': 'La date de disponibilité doit être de type date',
+    'date.min': 'La date doit être supérieur à la date du jour',
+    'any.required': 'La date de début mission est requise',
+  }),
+  contact: Joi.object({
+    prenom: Joi.string().required().error(new Error('Le prénom est requis')),
+    nom: Joi.string().required().error(new Error('Le nom est requis')),
+    fonction: Joi.string()
+      .required()
+      .error(new Error('La fonction est requis')),
+    email: Joi.string()
+      .email()
+      .required()
+      .error(new Error('L’adresse e-mail est invalide')),
+    telephone: Joi.string()
+      .required()
+      .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
+      .error(new Error('Le numéro de téléphone est invalide')),
+  })
+    .required()
+    .messages({
+      'object.base': 'Le contact doit etre de type object',
+      'any.required': 'Le contact est requis',
+    }),
+  nomCommune: Joi.string().required().error(new Error('La ville est requise')),
+  codePostal: Joi.string()
+    .required()
+    .min(5)
+    .max(5)
+    .error(new Error('Le code postal est invalide')),
+  codeCommune: Joi.string()
+    .required()
+    .min(4)
+    .max(5)
+    .error(new Error('Le code commune est invalide')),
+  codeDepartement: Joi.string()
+    .required()
+    .error(new Error('Le code département est requis')),
+  codeRegion: Joi.string()
+    .required()
+    .error(new Error('Le code région est requis')),
+  codeCom: Joi.string()
+    .required()
+    .allow('', null)
+    .error(new Error('Le codeCom est invalide')),
+  location: Joi.object({
+    coordinates: Joi.array()
+      .required()
+      .items(Joi.number(), Joi.number())
+      .error(new Error('Les coordonées sont invalide')),
+    type: Joi.string().required().error(new Error('Le type est invalide')),
+  })
+    .required()
+    .messages({
+      'object.base': 'La location doit etre de type object',
+      'any.required': 'La location est requis',
+    }),
+  missionCoordinateur: Joi.string()
+    .required()
+    .valid('COORDINATEUR', 'CONSEILLER_COORDINATEUR')
+    .error(
+      new Error('L’identification de la mission du coordinateur est requis'),
+    ),
+  aIdentifieCoordinateur: Joi.boolean()
+    .required()
+    .error(new Error('L’identification du coordinateur est requis')),
+  motivation: Joi.string().max(2500).required().messages({
+    'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
+    'any.required': 'La motivation est requise',
+  }),
+  confirmationEngagement: Joi.boolean()
+    .valid(true)
+    .required()
+    .error(new Error('La confirmation d’engagement est requis')),
+});
+
 export {
   validStructures,
   validExportStructures,
@@ -262,4 +367,5 @@ export {
   demandeConseillerAvisPrefet,
   commentaireConseillerAvisPrefet,
   validCandidatureStructure,
+  validCandidatureStructureCoordinateur,
 };

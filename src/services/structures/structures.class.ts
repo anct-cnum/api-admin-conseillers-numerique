@@ -42,6 +42,9 @@ import createAbilities from '../../middleware/createAbilities';
 import creerCandidatureStructure, {
   validerCandidatureStructure,
 } from './controllers/creerCandidatureStructure';
+import creerCandidatureStructureCoordinateur, {
+  validerCandidatureStructureCoordinateur,
+} from './controllers/creerCandidatureStructureCoordinateur';
 
 export default class Structures extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -260,6 +263,11 @@ export default class Structures extends Service {
       '/candidature-structure',
       validerCandidatureStructure(),
       creerCandidatureStructure(app),
+    );
+    app.post(
+      '/candidature-structure-coordinateur',
+      validerCandidatureStructureCoordinateur(),
+      creerCandidatureStructureCoordinateur(app),
     );
   }
 }
