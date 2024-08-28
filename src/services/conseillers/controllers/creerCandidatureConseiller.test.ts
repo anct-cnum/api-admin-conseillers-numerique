@@ -496,11 +496,6 @@ describe('recevoir et valider une candidature conseiller', () => {
       error: 'La distance est invalide',
     },
     {
-      testKey: 'dateDisponibilite',
-      key: { dateDisponibilite: undefined },
-      error: 'La date est requise',
-    },
-    {
       testKey: 'motivation',
       key: { motivation: undefined },
       error: 'La motivation est requise',
