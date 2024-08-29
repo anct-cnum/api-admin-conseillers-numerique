@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import { Application } from '@feathersjs/express';
 import { action } from '../helpers/accessControl/accessList';
 import service from '../helpers/services';

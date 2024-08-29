@@ -5,8 +5,7 @@ import { IConseillersRuptures } from '../ts/interfaces/db.interfaces';
 const mongoose = require('mongoose');
 const dbref = require('mongoose-dbref');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const loaded = dbref.install(mongoose);
+dbref.install(mongoose);
 
 export default function (app: Application): Model<any> {
   const modelName = 'conseillersRuptures';

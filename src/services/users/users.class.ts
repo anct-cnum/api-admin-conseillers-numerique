@@ -115,7 +115,6 @@ export default class Users extends Service {
     });
 
     // Monitoring clever
-    // eslint-disable @typescript-eslint/no-unused-vars
     app.get('/', (req, res) => {
       res.sendStatus(200);
     });

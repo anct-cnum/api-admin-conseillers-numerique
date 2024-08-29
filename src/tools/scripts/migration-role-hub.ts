@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 import execute from '../utils';
 import service from '../../helpers/services';
 
@@ -20,6 +19,7 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       const activeUser = user.passwordCreated;
       if (activeUser) {
         try {
+          // eslint-disable-next-line no-await-in-loop
           await app.service(service.users).Model.updateOne(
             { _id: user._id },
             {

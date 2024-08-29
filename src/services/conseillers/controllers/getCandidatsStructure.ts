@@ -169,7 +169,7 @@ const getCandidatsStructure =
         .Model.accessibleBy(req.ability, action.read)
         .find({
           statut: {
-            $nin: ['finalisee_rupture', 'terminee_naturelle'],
+            $nin: ['finalisee_rupture', 'terminee_naturelle', 'terminee'],
           },
         })
         .select({ 'conseillerObj._id': 1, _id: 0 });

@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
 import { action, functionnality, ressource } from '../accessList';
@@ -58,41 +57,44 @@ const getStructureAndConseillerByDepartementHubAntillesGuyane = async (
   departementsHub: Array<string>,
 ) => {
   try {
-    let structureAndConseillers: IStructuresConseillers[];
-    structureAndConseillers = app.service(service.structures).Model.aggregate([
-      {
-        $match: {
-          $or: [
-            { codeDepartement: { $in: departementsHub } },
-            {
-              $and: [
-                { codeCom: { $eq: '978' } },
-                { codeDepartement: { $eq: '00' } },
-              ],
-            },
-          ],
-        },
-      },
-      {
-        $lookup: {
-          from: 'conseillers',
-          let: { idStructure: '$_id' },
-          as: 'conseiller',
-          pipeline: [
-            {
-              $match: {
+    const structureAndConseillers: IStructuresConseillers[] = app
+      .service(service.structures)
+      .Model.aggregate([
+        {
+          $match: {
+            $or: [
+              { codeDepartement: { $in: departementsHub } },
+              {
                 $and: [
-                  { $expr: { $eq: ['$$idStructure', '$structureId'] } },
-                  { $expr: { $eq: ['$statut', 'RECRUTE'] } },
+                  { codeCom: { $eq: '978' } },
+                  { codeDepartement: { $eq: '00' } },
                 ],
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-      { $group: { _id: '$_id', conseiller: { $addToSet: '$conseiller._id' } } },
-      { $unwind: '$conseiller' },
-    ]);
+        {
+          $lookup: {
+            from: 'conseillers',
+            let: { idStructure: '$_id' },
+            as: 'conseiller',
+            pipeline: [
+              {
+                $match: {
+                  $and: [
+                    { $expr: { $eq: ['$$idStructure', '$structureId'] } },
+                    { $expr: { $eq: ['$statut', 'RECRUTE'] } },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+        {
+          $group: { _id: '$_id', conseiller: { $addToSet: '$conseiller._id' } },
+        },
+        { $unwind: '$conseiller' },
+      ]);
     return structureAndConseillers;
   } catch (error) {
     throw new Error(error);
@@ -107,8 +109,6 @@ export default async function hubRules(
   const hub: IHub = findDepartementOrRegion(user?.hub);
 
   let conseillersAndStructures: IStructuresConseillers[];
-  let conseillersIds: ObjectId[];
-  let structuresIds: ObjectId[];
 
   if (hub?.region_names) {
     const departementsList = findNumDepartementsByRegion(hub.region_names);
@@ -128,12 +128,14 @@ export default async function hubRules(
       hub.departements,
     );
   }
-  conseillersIds = conseillersAndStructures
+  const conseillersIds: ObjectId[] = conseillersAndStructures
     .filter((el) => el.conseiller.length > 0)
     .map((structure) => structure.conseiller)
     .flat();
 
-  structuresIds = conseillersAndStructures.map((structure) => structure._id);
+  const structuresIds: ObjectId[] = conseillersAndStructures.map(
+    (structure) => structure._id,
+  );
 
   can(action.read, functionnality.exportHub);
   can([action.read], ressource.statsTerritoires);

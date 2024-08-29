@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/populate/populate-dossier-conventionnement.ts -c <path file>
 
@@ -23,6 +22,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
   const options = program.opts();
   const structures = await readCSV(options.csv);
   for (const structure of structures) {
+    // eslint-disable-next-line no-await-in-loop
     const dossier: any | Error = await graphQLClient
       .request(queryGetDossierDemarcheSimplifiee(), {
         dossierNumber: parseInt(structure.NUMERO, 10),
@@ -30,12 +30,14 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
       .catch(() => {
         return new Error("Le dossier n'existe pas");
       });
+    // eslint-disable-next-line no-await-in-loop
     const match = await app
       .service(service.structures)
       .Model.findOne({ idPG: structure.ID });
     if (dossier instanceof Error || match === null) {
       logger.warn(`Structure [${structure.ID}], ${dossier.message}`);
     } else {
+      // eslint-disable-next-line no-await-in-loop
       const structureUpdated = await app
         .service(service.structures)
         .Model.updateOne(
@@ -64,6 +66,7 @@ execute(__filename, async ({ app, logger, exit, graphQLClient }) => {
           },
         );
       if (structureUpdated.modifiedCount === 1) {
+        // eslint-disable-next-line no-await-in-loop
         await app.service(service.misesEnRelation).Model.updateMany(
           {
             'structure.$id': match._id,

@@ -15,7 +15,6 @@ const codesRegions = require('../../../../datas/imports/code_region.json');
 
 const getStatsNationalesGrandReseau =
   (app: Application, exportStats = false) =>
-  // eslint-disable-next-line consistent-return
   async (req: IRequest, res: Response) => {
     try {
       const dateDebut = new Date(req.query.dateDebut);

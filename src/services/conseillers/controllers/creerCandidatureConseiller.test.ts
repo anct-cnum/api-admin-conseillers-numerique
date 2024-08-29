@@ -4,6 +4,13 @@ import { viderLesCollections, host } from '../../../tests/utils';
 
 import app from '../../../app';
 
+
+const dateDuJourPlus4Mois = () => {
+  const date = new Date();
+  return new Date(date.getFullYear(), date.getMonth() + 4, date.getDate()).toISOString();
+};
+
+
 const champsObligatoires = {
   prenom: 'Jean',
   nom: 'Martin',
@@ -19,7 +26,7 @@ const champsObligatoires = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite: '2025-01-01T00:00:00.000Z',
+  dateDisponibilite : dateDuJourPlus4Mois(),
   distanceMax: 5,
   motivation: 'Ma motivation',
   telephone: '',
@@ -60,7 +67,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.codePostal).toBe('75001');
     expect(response.data.codeRegion).toBe('75');
     expect(response.data.codeCom).toBe(null);
-    expect(response.data.dateDisponibilite).toBe('2025-01-01T00:00:00.000Z');
+    expect(response.data.dateDisponibilite).toBe(dateDuJourPlus4Mois());
     expect(response.data.distanceMax).toBe(5);
     expect(response.data.email).toBe('jean.martin@example.com');
     expect(response.data.idPG).toBe(1);
@@ -111,7 +118,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.codeDepartement).toBe('75');
     expect(response.data.codePostal).toBe('75001');
     expect(response.data.codeRegion).toBe('75');
-    expect(response.data.dateDisponibilite).toBe('2025-01-01T00:00:00.000Z');
+    expect(response.data.dateDisponibilite).toBe(dateDuJourPlus4Mois());
     expect(response.data.distanceMax).toBe(5);
     expect(response.data.email).toBe('jean.martin@example.com');
     expect(response.data.idPG).toBe(1);
@@ -260,7 +267,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     });
   });
 
-  it('si j’envoie un formulaire avec une date disponibilité inférieur à la date du jour alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une date disponibilité inférieure à la date du jour alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -281,7 +288,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(400);
     expect(response.data).toStrictEqual({
-      message: 'La date doit être supérieur à la date du jour',
+      message: 'La date doit être supérieure à la date du jour',
     });
   });
 
@@ -442,6 +449,13 @@ describe('recevoir et valider une candidature conseiller', () => {
       error: 'Le code région est requis',
     },
     {
+      testKey: 'location',
+      key: {
+        location: undefined,
+      },
+      error: 'La localisation est requise',
+    },
+    {
       testKey: 'location.type',
       key: {
         location: { ...champsObligatoires.location, type: undefined },
@@ -453,7 +467,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       key: {
         location: { ...champsObligatoires.location, coordinates: undefined },
       },
-      error: 'Les coordonées sont invalide',
+      error: 'Les coordonées sont invalides',
     },
     {
       testKey: 'estDemandeurEmploi',
@@ -494,11 +508,6 @@ describe('recevoir et valider une candidature conseiller', () => {
       testKey: 'distanceMax',
       key: { distanceMax: undefined },
       error: 'La distance est invalide',
-    },
-    {
-      testKey: 'dateDisponibilite',
-      key: { dateDisponibilite: undefined },
-      error: 'La date est requise',
     },
     {
       testKey: 'motivation',
