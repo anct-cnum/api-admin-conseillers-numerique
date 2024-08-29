@@ -39,6 +39,9 @@ import {
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
 import createAbilities from '../../middleware/createAbilities';
+import creerCandidatureStructure, {
+  validerCandidatureStructure,
+} from './controllers/creerCandidatureStructure';
 
 export default class Structures extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -252,6 +255,11 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       addRoleCoordinateur(app),
+    );
+    app.post(
+      '/candidature-structure',
+      validerCandidatureStructure(),
+      creerCandidatureStructure(app),
     );
   }
 }

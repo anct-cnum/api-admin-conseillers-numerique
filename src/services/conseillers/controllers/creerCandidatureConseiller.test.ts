@@ -4,6 +4,7 @@ import { viderLesCollections, host } from '../../../tests/utils';
 
 import app from '../../../app';
 
+
 const dateDuJourPlus4Mois = () => {
   const date = new Date();
   return new Date(date.getFullYear(), date.getMonth() + 4, date.getDate()).toISOString();
@@ -447,6 +448,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       error: 'Le code région est requis',
     },
     {
+
       testKey: 'location',
       key: {
         location: undefined,

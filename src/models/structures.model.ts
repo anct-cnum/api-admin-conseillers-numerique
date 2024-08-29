@@ -114,7 +114,7 @@ export default function (app: Application): Model<any> {
 
   const schema = new Schema<IStructures>(
     {
-      idPG: { type: Number },
+      idPG: { type: Number, required: true, unique: true },
 
       type: { type: String },
 
