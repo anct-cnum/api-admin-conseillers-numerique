@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable prettier/prettier */
 
 // Lancement de ce script : ts-node src/tools/populate/populate-avis-prefet-poste-conseiller.ts -c <file>
 
@@ -13,7 +12,6 @@ program.option('-c, --csv <path>', 'CSV file path');
 program.parse(process.argv);
 
 const readCSV = async (filePath: any) => {
-  // eslint-disable-next-line new-cap
   const structures = await CSVToJSON({ delimiter: 'auto' }).fromFile(filePath); // CSV en entrée avec colonnes ID, COMMENTAIRE, ID_TRANSFERT & AVIS_PREFET
   return structures;
 };

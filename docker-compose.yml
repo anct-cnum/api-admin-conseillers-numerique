@@ -15,9 +15,6 @@ services:
       - type: volume
         source: mongodb_data_config_dev
         target: /data/configdb
-      - type: bind
-        source: datas/exports
-        target: /home
 
   mongodb_test:
     image: mongo:4.0.3

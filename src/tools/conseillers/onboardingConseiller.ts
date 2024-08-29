@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/conseillers/onboardingConseiller.ts
 
@@ -21,6 +20,7 @@ execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
     return;
   }
   for (const conseiller of conseillers) {
+    // eslint-disable-next-line no-await-in-loop
     const user = await app.service(service.users).Model.findOne({
       'entity.$id': conseiller._id,
       roles: { $in: ['conseiller'] },
@@ -36,8 +36,10 @@ execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
         lower: true,
         strict: true,
       });
+      // eslint-disable-next-line no-await-in-loop
       const login = await fixHomonymesCreateMailbox(app)(nom, prenom);
       const password = `${uuidv4()}AZEdsf;+:!`; // Sera choisi par le conseiller via invitation
+      // eslint-disable-next-line no-await-in-loop
       const errorMailBoxCreate = await createMailbox(app)({
         conseillerId: conseiller._id,
         login,
@@ -46,8 +48,10 @@ execute(__filename, async ({ app, logger, exit, mailer, delay, Sentry }) => {
       if (errorMailBoxCreate instanceof Error) {
         logger.error(errorMailBoxCreate);
       } else {
+        // eslint-disable-next-line no-await-in-loop
         await delay(30000);
         const message = creationCompteConseiller(app, mailer);
+        // eslint-disable-next-line no-await-in-loop
         const errorSmtpMail = await message
           .send(user)
           .catch((errSmtp: Error) => {

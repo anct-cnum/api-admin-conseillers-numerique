@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/structures/onboardingStructure.ts
 

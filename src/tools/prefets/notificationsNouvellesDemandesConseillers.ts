@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/prefets/notificationsNouvellesDemandesConseillers.ts
 
@@ -52,6 +51,7 @@ execute(__filename, async ({ app, mailer, logger, exit, delay }) => {
   let count = 0;
   for (const prefetWithStructure of prefetsWithStructure) {
     const errorSmtpMailCandidaturePosteConseiller =
+      // eslint-disable-next-line no-await-in-loop
       await messageAvisCandidaturePosteConseiller
         .send(prefetWithStructure)
         .catch((errSmtp: Error) => {
@@ -64,6 +64,7 @@ execute(__filename, async ({ app, mailer, logger, exit, delay }) => {
     } else {
       count += 1;
     }
+    // eslint-disable-next-line no-await-in-loop
     await delay(2000);
   }
   logger.info(

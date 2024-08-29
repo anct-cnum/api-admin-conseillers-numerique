@@ -1,4 +1,3 @@
-/* eslint-disable prefer-template */
 import { Application } from '@feathersjs/express';
 import { ObjectId } from 'mongodb';
 import { action } from '../../../helpers/accessControl/accessList';

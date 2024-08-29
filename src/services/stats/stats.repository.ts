@@ -643,7 +643,7 @@ const getStatsReorientations = async (query, ability, read, app) => {
   // Conversion en % total
   if (reorientations.length > 0) {
     return reorientations.map((lieu) => {
-      // eslint-disable-next-line
+      // eslint-disable-next-line no-param-reassign
       lieu.valeur =
         totalReorientations > 0
           ? Math.round((lieu.valeur / totalReorientations) * 100)

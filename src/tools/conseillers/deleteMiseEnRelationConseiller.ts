@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-await-in-loop */
 
 // Lancement de ce script : ts-node src/tools/conseillers/deleteMiseEnRelationConseiller.ts
 
@@ -24,6 +23,7 @@ execute(__filename, async ({ app, logger, exit }) => {
   let countDeleteMiseEnRelation = 0;
   let countDeleteDoublonConseillers = 0;
   for (const conseiller of conseillers) {
+    // eslint-disable-next-line no-await-in-loop
     const deleteMiseEnRelation = await app
       .service(service.misesEnRelation)
       .Model.deleteMany({
@@ -33,6 +33,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         },
       });
     countDeleteMiseEnRelation += deleteMiseEnRelation.deletedCount;
+    // eslint-disable-next-line no-await-in-loop
     const deleteDoublon = await app
       .service(service.misesEnRelation)
       .Model.deleteMany({

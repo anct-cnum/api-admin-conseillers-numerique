@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import dayjs from 'dayjs';
 import { Response } from 'express';
 import { formatDateGMT } from '../../utils';
@@ -52,7 +51,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
               : '',
             rupture?.miseEnRelation?.phaseConventionnement
               ? AffichagePhaseConventionnement.PHASE_2
-              : AffichagePhaseConventionnement.PHASE_1
+              : AffichagePhaseConventionnement.PHASE_1,
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),
