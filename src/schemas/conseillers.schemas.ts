@@ -133,13 +133,12 @@ const validCandidatureConseiller = Joi.object({
     coordinates: Joi.array()
       .required()
       .items(Joi.number(), Joi.number())
-      .error(new Error('Les coordonées sont invalide')),
+      .error(new Error('Les coordonées sont invalides')),
     type: Joi.string().required().error(new Error('Le type est invalide')),
   })
     .required()
     .messages({
-      'object.base': 'La location doit etre de type object',
-      'any.required': 'La location est requis',
+      'any.required': 'La localisation est requise',
     }),
   codeDepartement: Joi.string()
     .required()
@@ -178,7 +177,7 @@ const validCandidatureConseiller = Joi.object({
     .required()
     .messages({
       'date.base': 'La date de disponibilité doit être de type date',
-      'date.min': 'La date doit être supérieur à la date du jour',
+      'date.min': 'La date doit être supérieure à la date du jour',
       'any.required': 'La date est requise',
     })
     .error((err) => new Error(err)),
