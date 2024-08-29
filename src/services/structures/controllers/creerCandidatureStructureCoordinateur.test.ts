@@ -329,7 +329,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     {
       testKey: 'contact.fonction',
       key: { contact: { ...champsObligatoires.contact, fonction: undefined } },
-      error: 'La fonction est requis',
+      error: 'La fonction est requise',
     },
     {
       testKey: 'contact.email',
@@ -369,7 +369,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     {
       testKey: 'location',
       key: { location: undefined },
-      error: 'La location est requis',
+      error: 'La localisation est requise',
     },
     {
       testKey: 'location.type',

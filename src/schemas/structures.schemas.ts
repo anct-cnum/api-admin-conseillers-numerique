@@ -287,7 +287,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
     nom: Joi.string().required().error(new Error('Le nom est requis')),
     fonction: Joi.string()
       .required()
-      .error(new Error('La fonction est requis')),
+      .error(new Error('La fonction est requise')),
     email: Joi.string()
       .email()
       .required()
@@ -332,8 +332,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
   })
     .required()
     .messages({
-      'object.base': 'La location doit etre de type object',
-      'any.required': 'La location est requis',
+      'any.required': 'La localisation est requise',
     }),
   missionCoordinateur: Joi.string()
     .required()
