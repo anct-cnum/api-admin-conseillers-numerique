@@ -168,26 +168,26 @@ const validCandidatureStructure = Joi.object({
   siret: Joi.string()
     .allow(null)
     .required()
-    .error(new Error('Le siret est requis')),
+    .error(new Error('Le SIRET est requis')),
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
       then: Joi.invalid('', null).required(),
       otherwise: Joi.valid(null),
     })
-    .error(new Error('Le siret ou le ridet est requis')),
+    .error(new Error('Le SIRET ou le RIDET est requis')),
   aIdentifieCandidat: Joi.boolean()
     .required()
-    .error(new Error('L’identification du candidat est requis')),
+    .error(new Error('L’identification du candidat est requise')),
   dateDebutMission: Joi.date()
     .required()
-    .error(new Error('Le date de début mission est invalide')),
+    .error(new Error('La date de début de mission est invalide')),
   contact: Joi.object({
     prenom: Joi.string().required().error(new Error('Le prénom est requis')),
     nom: Joi.string().required().error(new Error('Le nom est requis')),
     fonction: Joi.string()
       .required()
-      .error(new Error('La fonction est requis')),
+      .error(new Error('La fonction est requise')),
     email: Joi.string()
       .email()
       .required()

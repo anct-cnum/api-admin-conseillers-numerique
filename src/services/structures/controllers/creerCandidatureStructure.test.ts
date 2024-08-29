@@ -133,7 +133,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.coordinateurTypeContrat).toStrictEqual(null);
   });
 
-  it('si j’envoie un formulaire sans siret mais avec un ridet alors j’ai pas d’erreur de validation', async () => {
+  it('si j’envoie un formulaire sans SIRET mais avec un RIDET alors il n’y a pas d’erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -158,7 +158,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.ridet).toBe('1234567');
   });
 
-  it('si j’envoie un formulaire avec 0 conseiller souhaités alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec 0 conseiller souhaité alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -208,7 +208,7 @@ describe('recevoir et valider une candidature structure', () => {
     });
   });
 
-  it('si j’envoie un formulaire avec un siret déjà existant alors j’ai une erreur', async () => {
+  it('si j’envoie un formulaire avec un SIRET déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -238,7 +238,7 @@ describe('recevoir et valider une candidature structure', () => {
     });
   });
 
-  it('si j’envoie un formulaire avec un ridet déjà existant alors j’ai une erreur', async () => {
+  it('si j’envoie un formulaire avec un RIDET déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -314,22 +314,22 @@ describe('recevoir et valider une candidature structure', () => {
     {
       testKey: 'siret',
       key: { siret: undefined },
-      error: 'Le siret est requis',
+      error: 'Le SIRET est requis',
     },
     {
       testKey: 'ridet',
       key: { siret: null, ridet: undefined },
-      error: 'Le siret ou le ridet est requis',
+      error: 'Le SIRET ou le RIDET est requis',
     },
     {
       testKey: 'aIdentifieCandidat',
       key: { aIdentifieCandidat: undefined },
-      error: 'L’identification du candidat est requis',
+      error: 'L’identification du candidat est requise',
     },
     {
       testKey: 'dateDebutMission',
       key: { dateDebutMission: undefined },
-      error: 'Le date de début mission est invalide',
+      error: 'La date de début de mission est invalide',
     },
     {
       testKey: 'contact',
@@ -349,7 +349,7 @@ describe('recevoir et valider une candidature structure', () => {
     {
       testKey: 'contact.fonction',
       key: { contact: { ...champsObligatoires.contact, fonction: undefined } },
-      error: 'La fonction est requis',
+      error: 'La fonction est requise'
     },
     {
       testKey: 'contact.email',
@@ -455,7 +455,7 @@ describe('recevoir et valider une candidature structure', () => {
     },
   );
 
-  it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec un numéro téléphone incorrect alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
