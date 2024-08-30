@@ -268,15 +268,11 @@ const validCandidatureStructureCoordinateur = Joi.object({
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
-      then: Joi.invalid('', null).required(),
+      then: Joi.string().required(),
       otherwise: Joi.valid(null),
     })
     .error(new Error('Le siret ou le ridet est requis')),
-  aIdentifieCandidat: Joi.boolean() // A voir si obligatoire ???
-    .required()
-    .error(new Error('L’identification du candidat est requis')),
   dateDebutMission: Joi.date().min('now').required().messages({
-    'date.base': 'La date de disponibilité doit être de type date',
     'date.min': 'La date doit être supérieur à la date du jour',
     'any.required': 'La date de début mission est requise',
   }),
@@ -297,7 +293,6 @@ const validCandidatureStructureCoordinateur = Joi.object({
   })
     .required()
     .messages({
-      'object.base': 'Le contact doit etre de type object',
       'any.required': 'Le contact est requis',
     }),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
@@ -334,7 +329,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
     }),
   missionCoordinateur: Joi.string()
     .required()
-    .valid('COORDINATEUR', 'CONSEILLER_COORDINATEUR')
+    .valid('COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR')
     .error(
       new Error('L’identification de la mission du coordinateur est requis'),
     ),

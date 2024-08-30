@@ -7,8 +7,8 @@ type CandidatureStructureInput = {
   type: string;
   nom: string;
   siret: string;
-  ridet: string; // voir impact du ridet ..
-  aIdentifieCandidat: string;
+  ridet: string;
+  aIdentifieCandidat: boolean;
   dateDebutMission: Date;
   contact: {
     prenom: string;
@@ -29,7 +29,7 @@ type CandidatureStructureInput = {
   };
   nombreConseillersSouhaites: number;
   motivation: string;
-  confirmationEngagement: boolean; // Faut il ajouter une key pour la confirmation d'engagement ?
+  confirmationEngagement: boolean;
 };
 
 type Structure = CandidatureStructureInput & {

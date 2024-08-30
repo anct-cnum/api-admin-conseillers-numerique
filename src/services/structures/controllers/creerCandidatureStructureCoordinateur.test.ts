@@ -25,10 +25,9 @@ const champsObligatoires = {
     type: 'Point',
     coordinates: [0, 0],
   },
-  aIdentifieCandidat: false,
   dateDebutMission: '2025-12-01T00:00:00.000Z',
   aIdentifieCoordinateur: true,
-  missionCoordinateur: 'COORDINATEUR', // COORDINATEUR || CONSEILLER_COORDINATEUR // A en discuter
+  missionCoordinateur: 'COORDINATEUR',
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
 };
@@ -60,7 +59,6 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.data.nom).toBe('MAIRIE');
     expect(response.data.siret).toBe('12345678910');
     expect(response.data.ridet).toBe(null);
-    expect(response.data.aIdentifieCandidat).toBe(false);
     expect(response.data.dateDebutMission).toBe('2025-12-01T00:00:00.000Z');
     expect(response.data.contact.prenom).toBe('camélien');
     expect(response.data.contact.nom).toBe('rousseau');
@@ -104,7 +102,6 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.data.nom).toBe('MAIRIE');
     expect(response.data.siret).toBe('12345678910');
     expect(response.data.ridet).toBe(null);
-    expect(response.data.aIdentifieCandidat).toBe(false);
     expect(response.data.dateDebutMission).toBe('2025-12-01T00:00:00.000Z');
     expect(response.data.contact.prenom).toBe('camélien');
     expect(response.data.contact.nom).toBe('rousseau');
@@ -134,6 +131,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.data.coordinateurCandidature).toStrictEqual(false);
     expect(response.data.coordinateurTypeContrat).toStrictEqual(null);
     expect(response.data.nombreConseillersSouhaites).toBe(1);
+    expect(response.data.aIdentifieCandidat).toBe(false);
   });
 
   it('si j’envoie un formulaire sans siret mais avec un ridet alors j’ai pas d’erreur de validation', async () => {
@@ -300,11 +298,6 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       testKey: 'ridet',
       key: { siret: null, ridet: undefined },
       error: 'Le siret ou le ridet est requis',
-    },
-    {
-      testKey: 'aIdentifieCandidat',
-      key: { aIdentifieCandidat: undefined },
-      error: 'L’identification du candidat est requis',
     },
     {
       testKey: 'dateDebutMission',
