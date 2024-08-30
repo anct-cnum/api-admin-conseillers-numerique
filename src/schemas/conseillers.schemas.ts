@@ -148,39 +148,24 @@ const validCandidatureConseiller = Joi.object({
     .error(new Error('Le code région est requis')),
   codeCom: Joi.string()
     .required()
-    .allow('', null)
+    .allow(null)
     .error(new Error('Le codeCom est invalide')),
-  estDemandeurEmploi: Joi.boolean()
-    .required()
-    .error(new Error('L’experience médiateur numérique est requise')),
-  estEnEmploi: Joi.boolean()
-    .required()
-    .error(new Error('L’experience médiateur numérique est requise')),
-  estEnFormation: Joi.boolean()
-    .required()
-    .error(new Error('L’experience médiateur numérique est requise')),
-  estDiplomeMedNum: Joi.boolean()
-    .required()
-    .error(new Error('L’experience médiateur numérique est requise')),
+  estDemandeurEmploi: Joi.boolean().required(),
+  estEnEmploi: Joi.boolean().required(),
+  estEnFormation: Joi.boolean().required(),
+  estDiplomeMedNum: Joi.boolean().required(),
   nomDiplomeMedNum: Joi.string()
     .when('estDiplomeMedNum', {
       is: Joi.boolean().valid(true),
       then: Joi.string().required(),
-      otherwise: Joi.valid('', null),
+      otherwise: Joi.valid(''),
     })
     .error(new Error('Le nom du diplôme est requis')),
-  aUneExperienceMedNum: Joi.boolean()
-    .required()
-    .error(new Error('L’experience médiateur numérique est requise')),
-  dateDisponibilite: Joi.date()
-    .min('now')
-    .required()
-    .messages({
-      'date.base': 'La date de disponibilité doit être de type date',
-      'date.min': 'La date doit être supérieure à la date du jour',
-      'any.required': 'La date est requise',
-    })
-    .error((err) => new Error(err)),
+  aUneExperienceMedNum: Joi.boolean().required(),
+  dateDisponibilite: Joi.date().min('now').required().messages({
+    'date.min': 'La date doit être supérieure à la date du jour',
+    'any.required': 'La date est requise',
+  }),
   distanceMax: Joi.number()
     .required()
     .valid(5, 10, 15, 20, 40, 100, 2000)

@@ -476,17 +476,17 @@ describe('recevoir et valider une candidature conseiller', () => {
     {
       testKey: 'estEnEmploi',
       key: { estEnEmploi: undefined },
-      error: 'L’experience médiateur numérique est requise',
+      error: '"estEnEmploi" is required',
     },
     {
       testKey: 'estEnFormation',
       key: { estEnFormation: undefined },
-      error: 'L’experience médiateur numérique est requise',
+      error: '"estEnFormation" is required',
     },
     {
       testKey: 'estDiplomeMedNum',
       key: { estDiplomeMedNum: undefined },
-      error: 'L’experience médiateur numérique est requise',
+      error: '"estDiplomeMedNum" is required',
     },
     {
       testKey: 'nomDiplomeMedNum',
@@ -496,7 +496,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     {
       testKey: 'aUneExperienceMedNum',
       key: { aUneExperienceMedNum: undefined },
-      error: 'L’experience médiateur numérique est requise',
+      error: '"aUneExperienceMedNum" is required',
     },
     {
       testKey: 'dateDisponibilite',

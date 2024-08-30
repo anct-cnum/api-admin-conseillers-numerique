@@ -8,7 +8,6 @@ type CandidatureStructureCoordinateurInput = {
   nom: string;
   siret: string;
   ridet: string;
-  aIdentifieCandidat: string;
   contact: {
     prenom: string;
     nom: string;
@@ -46,6 +45,7 @@ type Structure = CandidatureStructureCoordinateurInput & {
   coordinateurCandidature: boolean;
   coordinateurTypeContrat: string;
   nombreConseillersSouhaites: number;
+  aIdentifieCandidat: boolean;
 };
 const getDernierIdPG = async (app: Application): Promise<number> => {
   const derniereStructure = await app
@@ -73,6 +73,7 @@ const construireStructureCoordinateur = async (
     coordinateurCandidature: false,
     coordinateurTypeContrat: null,
     nombreConseillersSouhaites: 1,
+    aIdentifieCandidat: false,
   };
 };
 
