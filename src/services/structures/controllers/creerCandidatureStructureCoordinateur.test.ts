@@ -600,12 +600,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure-coordinateur`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -624,12 +622,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -659,12 +655,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure-coordinateur`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -683,12 +677,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
