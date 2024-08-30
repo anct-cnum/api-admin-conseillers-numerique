@@ -10,7 +10,6 @@ const dateDuJourPlus4Mois = () => {
   return new Date(date.getFullYear(), date.getMonth() + 4, date.getDate()).toISOString();
 };
 
-
 const champsObligatoires = {
   prenom: 'Jean',
   nom: 'Martin',

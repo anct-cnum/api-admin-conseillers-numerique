@@ -353,7 +353,6 @@ const validCandidatureStructureCoordinateur = Joi.object({
     .error(new Error('La confirmation d’engagement est requis')),
 });
 
-
 export {
   validStructures,
   validExportStructures,
@@ -368,5 +367,4 @@ export {
   commentaireConseillerAvisPrefet,
   validCandidatureStructure,
   validCandidatureStructureCoordinateur,
-
 };

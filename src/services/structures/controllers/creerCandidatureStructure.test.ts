@@ -208,7 +208,6 @@ describe('recevoir et valider une candidature structure', () => {
     });
   });
 
-
   it('si j’envoie un formulaire avec un SIRET déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
