@@ -165,53 +165,57 @@ describe('recevoir et valider une candidature structure', () => {
     'EPCI',
     'COLLECTIVITE',
     'GIP',
-    'PRIVATE',])('si j’envoie un formulaire avec une structure de type égale à %s alors il est validé', async (type) => {
-  // GIVEN
-  const envoiUtilisateur = {
-    ...champsObligatoires,
-    type,
-  };
+    'PRIVATE',
+  ])(
+    'si j’envoie un formulaire avec une structure de type égale à %s alors il est validé',
+    async (type) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        type,
+      };
 
-  // WHEN
-  const response = await axios({
-    method: 'POST',
-    url: `${host}/candidature-structure`,
-    data: envoiUtilisateur,
-    validateStatus: (status) => status < 500,
-  });
+      // WHEN
+      const response = await axios({
+        method: 'POST',
+        url: `${host}/candidature-structure`,
+        data: envoiUtilisateur,
+        validateStatus: (status) => status < 500,
+      });
 
-  // THEN
-  expect(response.headers['content-type']).toBe(
-    'application/json; charset=utf-8',
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.type).toBe(type);
+    },
   );
-  expect(response.status).toBe(200);
-  expect(response.data.type).toBe(type);
-});
 
-it('si j’envoie un formulaire avec une structure de type invalide alors j’ai une erreur de validation', async () => {
-  // GIVEN
-  const envoiUtilisateur = {
-    ...champsObligatoires,
-    type: 'TEST',
-  };
+  it('si j’envoie un formulaire avec une structure de type invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      type: 'TEST',
+    };
 
-  // WHEN
-  const response = await axios({
-    method: 'POST',
-    url: `${host}/candidature-structure`,
-    data: envoiUtilisateur,
-    validateStatus: (status) => status < 500,
+    // WHEN
+    const response = await axios({
+      method: 'POST',
+      url: `${host}/candidature-structure`,
+      data: envoiUtilisateur,
+      validateStatus: (status) => status < 500,
+    });
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le type est invalide',
+    });
   });
-
-  // THEN
-  expect(response.headers['content-type']).toBe(
-    'application/json; charset=utf-8',
-  );
-  expect(response.status).toBe(400);
-  expect(response.data).toStrictEqual({
-    message: 'Le type est invalide',
-  });
-});
 
   it('si j’envoie un formulaire avec 0 conseiller souhaité alors j’ai une erreur de validation', async () => {
     // GIVEN
@@ -334,7 +338,7 @@ it('si j’envoie un formulaire avec une structure de type invalide alors j’ai
         contact: {
           ...champsObligatoires.contact,
           telephone: '+' + debutTelephone + '611223344',
-        }
+        },
       };
 
       // WHEN
@@ -350,7 +354,9 @@ it('si j’envoie un formulaire avec une structure de type invalide alors j’ai
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.contact.telephone).toBe('+' + debutTelephone + '611223344');
+      expect(response.data.contact.telephone).toBe(
+        '+' + debutTelephone + '611223344',
+      );
     },
   );
 
@@ -404,7 +410,7 @@ it('si j’envoie un formulaire avec une structure de type invalide alors j’ai
     {
       testKey: 'contact.fonction',
       key: { contact: { ...champsObligatoires.contact, fonction: undefined } },
-      error: 'La fonction est requise'
+      error: 'La fonction est requise',
     },
     {
       testKey: 'contact.email',

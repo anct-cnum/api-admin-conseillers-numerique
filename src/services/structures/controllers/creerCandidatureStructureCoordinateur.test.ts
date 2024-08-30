@@ -535,28 +535,31 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it.each(['COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR'])('si j’envoie un formulaire avec une missionCoordinateur égale à +%d alors il est validé', async (missionCoordinateur) => {
-    // GIVEN
-    const envoiUtilisateur = {
-      ...champsObligatoires,
-      missionCoordinateur,
-    };
+  it.each(['COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR'])(
+    'si j’envoie un formulaire avec une missionCoordinateur égale à +%d alors il est validé',
+    async (missionCoordinateur) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        missionCoordinateur,
+      };
 
-    // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+      // WHEN
+      const response = await axios({
+        method: 'POST',
+        url: `${host}/candidature-structure-coordinateur`,
+        data: envoiUtilisateur,
+        validateStatus: (status) => status < 500,
+      });
 
-    // THEN
-    expect(response.headers['content-type']).toBe(
-      'application/json; charset=utf-8',
-    );
-    expect(response.status).toBe(200);
-    expect(response.data.missionCoordinateur).toBe(missionCoordinateur);
-  });
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.missionCoordinateur).toBe(missionCoordinateur);
+    },
+  );
 
   it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors j’ai une erreur de validation', async () => {
     // GIVEN
@@ -584,34 +587,38 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
   });
 
   it.each([
-      'COMMUNE',
-      'DEPARTEMENT',
-      'REGION',
-      'EPCI',
-      'COLLECTIVITE',
-      'GIP',
-      'PRIVATE',])('si j’envoie un formulaire avec une structure de type égale à +%d alors il est validé', async (type) => {
-    // GIVEN
-    const envoiUtilisateur = {
-      ...champsObligatoires,
-      type,
-    };
+    'COMMUNE',
+    'DEPARTEMENT',
+    'REGION',
+    'EPCI',
+    'COLLECTIVITE',
+    'GIP',
+    'PRIVATE',
+  ])(
+    'si j’envoie un formulaire avec une structure de type égale à +%d alors il est validé',
+    async (type) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        type,
+      };
 
-    // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+      // WHEN
+      const response = await axios({
+        method: 'POST',
+        url: `${host}/candidature-structure-coordinateur`,
+        data: envoiUtilisateur,
+        validateStatus: (status) => status < 500,
+      });
 
-    // THEN
-    expect(response.headers['content-type']).toBe(
-      'application/json; charset=utf-8',
-    );
-    expect(response.status).toBe(200);
-    expect(response.data.type).toBe(type);
-  });
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.type).toBe(type);
+    },
+  );
 
   it('si j’envoie un formulaire avec une structure de type invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
