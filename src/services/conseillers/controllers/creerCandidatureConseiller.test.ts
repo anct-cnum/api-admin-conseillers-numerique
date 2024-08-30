@@ -448,7 +448,6 @@ describe('recevoir et valider une candidature conseiller', () => {
       error: 'Le code région est requis',
     },
     {
-
       testKey: 'location',
       key: {
         location: undefined,
