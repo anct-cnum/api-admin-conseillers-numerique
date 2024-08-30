@@ -196,7 +196,7 @@ describe('recevoir et valider une candidature structure', () => {
       '/candidature-structure',
       envoiUtilisateur,
     );
-
+   
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
