@@ -172,7 +172,7 @@ const validCandidatureStructure = Joi.object({
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
-      then: Joi.invalid('', null).required(),
+      then: Joi.string().required(),
       otherwise: Joi.valid(null),
     })
     .error(new Error('Le SIRET ou le RIDET est requis')),
@@ -199,7 +199,6 @@ const validCandidatureStructure = Joi.object({
   })
     .required()
     .messages({
-      'object.base': 'Le contact doit etre de type object',
       'any.required': 'Le contact est requis',
     }),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
@@ -232,7 +231,6 @@ const validCandidatureStructure = Joi.object({
   })
     .required()
     .messages({
-      'object.base': 'La location doit etre de type object',
       'any.required': 'La location est requis',
     }),
   nombreConseillersSouhaites: Joi.number()
