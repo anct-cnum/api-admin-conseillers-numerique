@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, host } from '../../../tests/utils';
+import { viderLesCollections, requetePost } from '../../../tests/utils';
 
 import app from '../../../app';
 
@@ -45,12 +45,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -88,12 +86,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -142,12 +138,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -176,12 +170,10 @@ describe('recevoir et valider une candidature structure', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -200,12 +192,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -225,12 +215,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -250,12 +238,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -272,20 +258,13 @@ describe('recevoir et valider une candidature structure', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    await requetePost('/candidature-structure', envoiUtilisateur);
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -304,20 +283,13 @@ describe('recevoir et valider une candidature structure', () => {
       siret: null,
       ridet: '123',
     };
-    await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    await requetePost('/candidature-structure', envoiUtilisateur);
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -342,12 +314,10 @@ describe('recevoir et valider une candidature structure', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -498,12 +468,10 @@ describe('recevoir et valider une candidature structure', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -524,12 +492,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -550,12 +516,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -577,12 +541,10 @@ describe('recevoir et valider une candidature structure', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
