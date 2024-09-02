@@ -1,13 +1,15 @@
-import axios from 'axios';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, host } from '../../../tests/utils';
+import { viderLesCollections, requetePost } from '../../../tests/utils';
 
 import app from '../../../app';
 
-
 const dateDuJourPlus4Mois = () => {
   const date = new Date();
-  return new Date(date.getFullYear(), date.getMonth() + 4, date.getDate()).toISOString();
+  return new Date(
+    date.getFullYear(),
+    date.getMonth() + 4,
+    date.getDate(),
+  ).toISOString();
 };
 
 const champsObligatoires = {
@@ -25,7 +27,7 @@ const champsObligatoires = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite : dateDuJourPlus4Mois(),
+  dateDisponibilite: dateDuJourPlus4Mois(),
   distanceMax: 5,
   motivation: 'Ma motivation',
   telephone: '',
@@ -48,12 +50,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -100,12 +100,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -148,12 +146,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -173,12 +169,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -200,12 +194,10 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-conseiller`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-conseiller',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -224,12 +216,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -249,12 +239,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -274,12 +262,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -304,12 +290,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -334,12 +318,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -359,12 +341,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -381,20 +361,13 @@ describe('recevoir et valider une candidature conseiller', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    await requetePost('/candidature-conseiller', envoiUtilisateur);
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -523,12 +496,10 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-conseiller`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-conseiller',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -562,12 +533,10 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-conseiller`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-conseiller',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -587,12 +556,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -614,12 +581,10 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-conseiller`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(

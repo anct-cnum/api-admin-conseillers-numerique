@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, host } from '../../../tests/utils';
+import { viderLesCollections, requetePost } from '../../../tests/utils';
 
 import app from '../../../app';
 const champsObligatoires = {
@@ -44,13 +44,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -87,13 +84,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -143,13 +137,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -167,13 +158,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -189,21 +177,12 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    await requetePost('/candidature-structure-coordinateur', envoiUtilisateur);
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -221,21 +200,13 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       siret: null,
       ridet: '123',
     };
-    await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    await requetePost('/candidature-structure-coordinateur', envoiUtilisateur);
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -259,12 +230,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure-coordinateur`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -417,12 +386,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure-coordinateur`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -442,13 +409,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -468,13 +432,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -495,13 +456,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -518,13 +476,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
-
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
@@ -545,12 +500,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure-coordinateur`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -569,12 +522,110 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'L’identification de la mission du coordinateur est requis',
     });
+  });
+
+  it.each([
+    'COMMUNE',
+    'DEPARTEMENT',
+    'REGION',
+    'EPCI',
+    'COLLECTIVITE',
+    'GIP',
+    'PRIVATE',
+  ])(
+    'si j’envoie un formulaire avec une structure de type égale à +%d alors il est validé',
+    async (type) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        type,
+      };
+
+      // WHEN
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.type).toBe(type);
+    },
+  );
+
+  it('si j’envoie un formulaire avec une structure de type invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      type: 'TEST',
+    };
+
+    // WHEN
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual({
+      message: 'Le type est invalide',
+    });
+  });
+
+  it.each(['COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR'])(
+    'si j’envoie un formulaire avec une missionCoordinateur égale à +%d alors il est validé',
+    async (missionCoordinateur) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        missionCoordinateur,
+      };
+
+      // WHEN
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.data.missionCoordinateur).toBe(missionCoordinateur);
+    },
+  );
+
+  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      missionCoordinateur: 'TEST',
+    };
+
+    // WHEN
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -604,12 +655,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await axios({
-        method: 'POST',
-        url: `${host}/candidature-structure-coordinateur`,
-        data: envoiUtilisateur,
-        validateStatus: (status) => status < 500,
-      });
+      const response = await requetePost(
+        '/candidature-structure-coordinateur',
+        envoiUtilisateur,
+      );
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -628,12 +677,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await axios({
-      method: 'POST',
-      url: `${host}/candidature-structure-coordinateur`,
-      data: envoiUtilisateur,
-      validateStatus: (status) => status < 500,
-    });
+    const response = await requetePost(
+      '/candidature-structure-coordinateur',
+      envoiUtilisateur,
+    );
 
     // THEN
     expect(response.headers['content-type']).toBe(
