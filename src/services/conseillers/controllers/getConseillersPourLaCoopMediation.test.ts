@@ -130,6 +130,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
     await app.service('structures').create(
       structureModelFactory({
         _id: new ObjectId('11ff549045f8484ff0100011'),
+        idPG: 4455,
         nom: 'CCAS des HERBIERS',
       }),
     );
@@ -269,6 +270,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
         structure: {
           _id: '11ff549045f8484ff0100011',
           coselec: [],
+          idPG: 4455,
           nom: 'CCAS des HERBIERS',
           qpvListe: [],
         },
@@ -312,6 +314,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
     await app.service('structures').create(
       structureModelFactory({
         _id: new ObjectId('11ff549045f8484ff0100011'),
+        idPG: 4455,
         nom: 'CCAS des HERBIERS',
       }),
     );
@@ -451,6 +454,7 @@ describe('retourner un ou des conseillers pour la coop médiation avec le rôle 
         structure: {
           _id: '11ff549045f8484ff0100011',
           coselec: [],
+          idPG: 4455,
           nom: 'CCAS des HERBIERS',
           qpvListe: [],
         },
