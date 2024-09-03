@@ -3,15 +3,6 @@ import { viderLesCollections, requetePost } from '../../../tests/utils';
 
 import app from '../../../app';
 
-const dateDuJourPlus4Mois = () => {
-  const date = new Date();
-  return new Date(
-    date.getFullYear(),
-    date.getMonth() + 4,
-    date.getDate(),
-  ).toISOString();
-};
-
 const champsObligatoires = {
   prenom: 'Jean',
   nom: 'Martin',
@@ -27,7 +18,7 @@ const champsObligatoires = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite: dateDuJourPlus4Mois(),
+  dateDisponibilite : new Date(),
   distanceMax: 5,
   motivation: 'Ma motivation',
   telephone: '',
@@ -48,12 +39,15 @@ describe('recevoir et valider une candidature conseiller', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-
+    
     // WHEN
     const response = await requetePost(
       '/candidature-conseiller',
       envoiUtilisateur,
     );
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 8, 1, 13));
+    response.data.dateDisponibilite = new Date().toISOString();
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -66,7 +60,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.codePostal).toBe('75001');
     expect(response.data.codeRegion).toBe('75');
     expect(response.data.codeCom).toBe(null);
-    expect(response.data.dateDisponibilite).toBe(dateDuJourPlus4Mois());
+    expect(response.data.dateDisponibilite).toBe('2024-09-01T11:00:00.000Z');
     expect(response.data.distanceMax).toBe(5);
     expect(response.data.email).toBe('jean.martin@example.com');
     expect(response.data.idPG).toBe(1);
@@ -84,6 +78,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.estEnFormation).toBe(false);
     expect(response.data.estDiplomeMedNum).toBe(false);
     expect(response.data.nomDiplomeMedNum).toBe('');
+    vi.useRealTimers();
   });
 
   it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
@@ -98,12 +93,15 @@ describe('recevoir et valider une candidature conseiller', () => {
       estDiplomeMedNum: true,
       nomDiplomeMedNum: 'Diplome',
     };
-
+    
     // WHEN
     const response = await requetePost(
       '/candidature-conseiller',
       envoiUtilisateur,
     );
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 8, 1, 13));
+    response.data.dateDisponibilite = new Date().toISOString();
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -115,7 +113,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.codeDepartement).toBe('75');
     expect(response.data.codePostal).toBe('75001');
     expect(response.data.codeRegion).toBe('75');
-    expect(response.data.dateDisponibilite).toBe(dateDuJourPlus4Mois());
+    expect(response.data.dateDisponibilite).toBe('2024-09-01T11:00:00.000Z');;
     expect(response.data.distanceMax).toBe(5);
     expect(response.data.email).toBe('jean.martin@example.com');
     expect(response.data.idPG).toBe(1);
@@ -136,6 +134,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.estDiplomeMedNum).toBe(true);
     expect(response.data.nomDiplomeMedNum).toBe('Diplome');
     expect(response.data.disponible).toBe(true);
+    vi.useRealTimers();
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
@@ -273,7 +272,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(400);
     expect(response.data).toStrictEqual({
-      message: 'La date doit être supérieure à la date du jour',
+      message: 'La date doit être supérieure ou égale à la date du jour',
     });
   });
 
