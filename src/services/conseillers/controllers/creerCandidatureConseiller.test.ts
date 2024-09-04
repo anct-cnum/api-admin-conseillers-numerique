@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, requetePost } from '../../../tests/utils';
+import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
 
 import app from '../../../app';
 
@@ -36,6 +36,7 @@ describe('recevoir et valider une candidature conseiller', () => {
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
+    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
@@ -45,8 +46,6 @@ describe('recevoir et valider une candidature conseiller', () => {
       '/candidature-conseiller',
       envoiUtilisateur,
     );
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(2024, 8, 1, 13));
     response.data.dateDisponibilite = new Date().toISOString();
 
     // THEN
@@ -78,11 +77,11 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.estEnFormation).toBe(false);
     expect(response.data.estDiplomeMedNum).toBe(false);
     expect(response.data.nomDiplomeMedNum).toBe('');
-    vi.useRealTimers();
   });
 
   it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
     // GIVEN
+    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
       telephone: '+33123456789',
@@ -99,8 +98,6 @@ describe('recevoir et valider une candidature conseiller', () => {
       '/candidature-conseiller',
       envoiUtilisateur,
     );
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(2024, 8, 1, 13));
     response.data.dateDisponibilite = new Date().toISOString();
 
     // THEN
@@ -134,7 +131,6 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.estDiplomeMedNum).toBe(true);
     expect(response.data.nomDiplomeMedNum).toBe('Diplome');
     expect(response.data.disponible).toBe(true);
-    vi.useRealTimers();
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
