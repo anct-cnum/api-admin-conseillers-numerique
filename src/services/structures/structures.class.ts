@@ -35,6 +35,7 @@ import {
   updateAvenantAvisPrefetPosteSupplementaire,
   updateCommentaireAvisPrefet,
   updateCommentaireAvenantAvisPrefet,
+  verifySiretOrRidetStructure,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
@@ -264,11 +265,14 @@ export default class Structures extends Service {
       validerCandidatureStructure(),
       creerCandidatureStructure(app),
     );
-
     app.post(
       '/candidature-structure-coordinateur',
       validerCandidatureStructureCoordinateur(app),
       creerCandidatureStructureCoordinateur(app),
+    );
+    app.get(
+      '/structure/verify-siret-or-ridet/:siretOrRidet',
+      verifySiretOrRidetStructure(app),
     );
   }
 }
