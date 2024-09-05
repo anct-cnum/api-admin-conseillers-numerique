@@ -180,8 +180,12 @@ const validCandidatureStructure = Joi.object({
     .required()
     .error(new Error('L’identification du candidat est requise')),
   dateDebutMission: Joi.date()
+    .min(new Date().toISOString().slice(0, 10))
     .required()
-    .error(new Error('La date de début de mission est invalide')),
+    .messages({
+      'date.min': 'La date doit être supérieure ou égale à la date du jour',
+      'any.required': 'La date de début de mission est invalide',
+    }),
   contact: Joi.object({
     prenom: Joi.string().required().error(new Error('Le prénom est requis')),
     nom: Joi.string().required().error(new Error('Le nom est requis')),
@@ -272,10 +276,13 @@ const validCandidatureStructureCoordinateur = Joi.object({
       otherwise: Joi.valid(null),
     })
     .error(new Error('Le siret ou le ridet est requis')),
-  dateDebutMission: Joi.date().min('now').required().messages({
-    'date.min': 'La date doit être supérieur à la date du jour',
-    'any.required': 'La date de début mission est requise',
-  }),
+  dateDebutMission: Joi.date()
+    .min(new Date().toISOString().slice(0, 10))
+    .required()
+    .messages({
+      'date.min': 'La date doit être supérieur à la date du jour',
+      'any.required': 'La date de début mission est requise',
+    }),
   contact: Joi.object({
     prenom: Joi.string().required().error(new Error('Le prénom est requis')),
     nom: Joi.string().required().error(new Error('Le nom est requis')),

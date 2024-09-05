@@ -40,7 +40,6 @@ describe('recevoir et valider une candidature conseiller', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    
     // WHEN
     const response = await requetePost(
       '/candidature-conseiller',
