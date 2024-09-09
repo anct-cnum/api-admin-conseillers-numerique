@@ -38,14 +38,13 @@ describe('recevoir et valider une candidature structure', () => {
     await viderLesCollections(app);
   });
 
-  it.only('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
+  it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
     vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
 
-      console.log('Structure:', envoiUtilisateur.dateDebutMission);
     // WHEN
     const response = await requetePost(
       '/candidature-structure',

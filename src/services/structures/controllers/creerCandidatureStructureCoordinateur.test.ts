@@ -37,7 +37,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     await viderLesCollections(app);
   });
 
-  it.only('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
+  it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
     vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
