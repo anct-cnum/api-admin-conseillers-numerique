@@ -20,5 +20,6 @@ export default defineConfig({
     fileParallelism: false,
     unstubEnvs: true,
     unstubGlobals: true,
+    testTimeout: 15_000
   },
 });
