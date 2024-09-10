@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
-
+import { mailConfirmationAdresseMail, construireConseiller } from './creerCandidatureConseiller';
 import app from '../../../app';
 
 const champsObligatoires = {
@@ -130,6 +130,23 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.data.estDiplomeMedNum).toBe(true);
     expect(response.data.nomDiplomeMedNum).toBe('Diplome');
     expect(response.data.disponible).toBe(true);
+    expect(response.data.emailConfirmedAt).toBe(null);
+    expect(response.data.emailConfirmationKey).toBe(undefined);
+  });
+
+  it('si jenvoie un formulaire alors je reçoie un mail de confirmation', async () => {
+    // GIVEN
+    const createUtilisateur = await construireConseiller(app, champsObligatoires);
+    
+    // WHEN
+    const result = await app
+    .service('conseillers')
+    .create(createUtilisateur);
+    const envoiMail = await mailConfirmationAdresseMail(app, result.email, result.prenom, result.emailConfirmationKey);
+
+    // THEN
+    expect(envoiMail.response).toBe('250 2.0.0 Ok: queued');
+    expect(envoiMail.accepted[0]).toBe('jean.martin@example.com');
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {

@@ -2,6 +2,10 @@ import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
+import mailer from '../../../mailer';
+
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 type CandidatureConseillerInput = {
   prenom: string;
@@ -14,14 +18,14 @@ type CandidatureConseillerInput = {
   codeRegion: string;
   location: {
     type: string;
-    coordinates: [number, number];
+    coordinates: number[];
   };
   aUneExperienceMedNum: boolean;
   dateDisponibilite: Date;
   distanceMax: number;
   motivation: string;
   telephone: string;
-  codeCom: string;
+  codeCom: null | string;
   estDemandeurEmploi: boolean;
   estEnEmploi: boolean;
   estEnFormation: boolean;
@@ -35,9 +39,11 @@ type Conseiller = CandidatureConseillerInput & {
   updatedAt: Date;
   userCreated: boolean;
   disponible: boolean;
+  emailConfirmedAt: Date;
+  emailConfirmationKey: string;
 };
 
-export const validerCandidatureConsiller =
+export const validerCandidatureConseiller =
   () => async (request: Request, response: Response, next: NextFunction) => {
     try {
       await validCandidatureConseiller.validateAsync(request.body);
@@ -68,7 +74,7 @@ const getDernierIdPG = async (app: Application): Promise<number> => {
   return dernierConseiller?.idPG || 0;
 };
 
-const construireConseiller = async (
+export const construireConseiller = async (
   app: Application,
   body: CandidatureConseillerInput,
 ): Promise<Conseiller> => {
@@ -80,24 +86,60 @@ const construireConseiller = async (
     updatedAt: newDate,
     userCreated: false,
     disponible: true,
+    emailConfirmedAt: null,
+    emailConfirmationKey: uuidv4(),
   };
+};
+
+export const mailConfirmationAdresseMail = async (
+  app: Application,
+  email: string,
+  prenom: string,
+  token: void,
+): Promise<any> => {
+  const body = await mailer(app).render(
+    path.join(__dirname, '../../../emails/confirmation-email-candidature'),
+    'confirmation-email-inscription',
+    {
+      link: mailer(app).utils.getPublicUrl(
+        `/confirmation-email-inscription/${token}`,
+      ),
+      prenom,
+    },
+  );
+  return mailer(app).createMailer().sendEmail(email, {
+    subject: 'Confirmation adresse mail',
+    body,
+  });
 };
 
 const stockerCandidatureConseiller = async (
   candidatureConseiller: Conseiller,
   app: Application,
 ): Promise<void> => {
-  const emailExists =
-    (await app
+  try {
+    const { email, prenom } = candidatureConseiller;
+    const emailExists =
+      (await app
+        .service(service.conseillers)
+        .Model.countDocuments({ email })) !== 0;
+    if (emailExists) {
+      throw new Error('L’email est déjà utilisé');
+    }
+    const result = await app
       .service(service.conseillers)
-      .Model.countDocuments({ email: candidatureConseiller.email })) !== 0;
-  if (emailExists) {
-    throw new Error('L’email est déjà utilisé');
+      .create(candidatureConseiller);
+    await mailConfirmationAdresseMail(
+      app,
+      email,
+      prenom,
+      result.emailConfirmationKey,
+    );
+    delete result.emailConfirmationKey;
+    return result;
+  } catch (error) {
+    throw new Error(error.message);
   }
-  const result = await app
-    .service(service.conseillers)
-    .create(candidatureConseiller);
-  return result;
 };
 
 export default creerCandidatureConseiller;
