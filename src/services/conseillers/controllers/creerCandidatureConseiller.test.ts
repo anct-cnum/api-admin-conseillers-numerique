@@ -27,6 +27,7 @@ const champsObligatoires = {
   estEnFormation: false,
   estDiplomeMedNum: false,
   nomDiplomeMedNum: '',
+  "h-captcha-response": "captcha"
 };
 
 describe('recevoir et valider une candidature conseiller', () => {
@@ -91,7 +92,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       estDiplomeMedNum: true,
       nomDiplomeMedNum: 'Diplome',
     };
-    
+
     // WHEN
     const response = await requetePost(
       '/candidature-conseiller',
@@ -586,5 +587,45 @@ describe('recevoir et valider une candidature conseiller', () => {
     );
     expect(response.status).toBe(200);
     expect(response.data.motivation).toBe(motivation);
+  });
+
+  it.todo('si j’envoie un formulaire valide avec un captcha correct alors il est validé', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      "h-captcha-response": "captcha-correct"
+    };
+
+    // WHEN
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+  });
+
+  it.todo('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      "h-captcha-response": "captcha-incorrect"
+    };
+
+    // WHEN
+    const response = await requetePost(
+      '/candidature-conseiller',
+      envoiUtilisateur,
+    );
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
   });
 });
