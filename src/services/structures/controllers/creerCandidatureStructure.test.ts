@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, requetePost } from '../../../tests/utils';
+import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
 
 import app from '../../../app';
 
@@ -10,7 +10,7 @@ const champsObligatoires = {
   siret: '12345678910',
   ridet: null,
   aIdentifieCandidat: false,
-  dateDebutMission: '2024-01-01T00:00:00.000Z',
+  dateDebutMission: new Date(),
   contact: {
     prenom: 'camélien',
     nom: 'rousseau',
@@ -40,6 +40,7 @@ describe('recevoir et valider une candidature structure', () => {
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
+    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
@@ -49,6 +50,7 @@ describe('recevoir et valider une candidature structure', () => {
       '/candidature-structure',
       envoiUtilisateur,
     );
+    response.data.dateDebutMission = new Date().toISOString();
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -59,7 +61,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.siret).toBe('12345678910');
     expect(response.data.ridet).toBe(null);
     expect(response.data.aIdentifieCandidat).toBe(false);
-    expect(response.data.dateDebutMission).toBe('2024-01-01T00:00:00.000Z');
+    expect(response.data.dateDebutMission).toBe('2024-09-01T11:00:00.000Z');
     expect(response.data.contact.prenom).toBe('camélien');
     expect(response.data.contact.nom).toBe('rousseau');
     expect(response.data.contact.fonction).toBe('PRESIDENTE');
@@ -81,6 +83,7 @@ describe('recevoir et valider une candidature structure', () => {
 
   it('si j’envoie la totalité des champs possibles avec les champs ajouté par default alors il est validé', async () => {
     // GIVEN
+    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
@@ -90,6 +93,7 @@ describe('recevoir et valider une candidature structure', () => {
       '/candidature-structure',
       envoiUtilisateur,
     );
+    response.data.dateDebutMission = new Date().toISOString();
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -100,7 +104,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.data.siret).toBe('12345678910');
     expect(response.data.ridet).toBe(null);
     expect(response.data.aIdentifieCandidat).toBe(false);
-    expect(response.data.dateDebutMission).toBe('2024-01-01T00:00:00.000Z');
+    expect(response.data.dateDebutMission).toBe('2024-09-01T11:00:00.000Z');
     expect(response.data.contact.prenom).toBe('camélien');
     expect(response.data.contact.nom).toBe('rousseau');
     expect(response.data.contact.fonction).toBe('PRESIDENTE');

@@ -162,10 +162,13 @@ const validCandidatureConseiller = Joi.object({
     })
     .error(new Error('Le nom du diplôme est requis')),
   aUneExperienceMedNum: Joi.boolean().required(),
-  dateDisponibilite: Joi.date().min('now').required().messages({
-    'date.min': 'La date doit être supérieure à la date du jour',
-    'any.required': 'La date est requise',
-  }),
+  dateDisponibilite: Joi.date()
+    .min(new Date().toISOString().slice(0, 10))
+    .required()
+    .messages({
+      'date.min': 'La date doit être supérieure ou égale à la date du jour',
+      'any.required': 'La date est requise',
+    }),
   distanceMax: Joi.number()
     .required()
     .valid(5, 10, 15, 20, 40, 100, 2000)

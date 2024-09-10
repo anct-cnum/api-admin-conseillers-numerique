@@ -18,4 +18,10 @@ const requetePost = async (url, data) =>
     validateStatus: (status) => status < 500,
   });
 
-export { viderLesCollections, host, requetePost };
+class InitialisationDate extends Date {
+  constructor() {
+    super('2024-09-01T11:00:00.000Z');
+  }
+}
+
+export { viderLesCollections, host, requetePost, InitialisationDate };
