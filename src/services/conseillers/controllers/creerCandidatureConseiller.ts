@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
+import axios from 'axios';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
 
@@ -37,10 +38,26 @@ type Conseiller = CandidatureConseillerInput & {
   disponible: boolean;
 };
 
+const verifyCaptcha = async (app, token) => {
+  const response = await axios.post(
+    'https://hcaptcha.com/siteverify',
+    new URLSearchParams({
+      secret: app.get('hcaptcha_secret'),
+      response: token,
+    }),
+  );
+
+  if (!response.data.success) {
+    throw new Error('Le captcha est invalide');
+  }
+};
+
 export const validerCandidatureConsiller =
-  () => async (request: Request, response: Response, next: NextFunction) => {
+  (app: Application) =>
+  async (request: Request, response: Response, next: NextFunction) => {
     try {
       await validCandidatureConseiller.validateAsync(request.body);
+      await verifyCaptcha(app, request.body['h-captcha-response']);
       return next();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
