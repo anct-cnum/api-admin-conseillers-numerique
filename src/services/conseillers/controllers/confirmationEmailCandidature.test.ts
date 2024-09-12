@@ -17,6 +17,7 @@ describe('Pouvoir confirmer mon adresse mail d’inscription', () => {
       );
 
       // THEN
+      expect(response.status).toBe(403);
       expect(response.data.message).toBe('Le lien est invalide.');
     },
   );
@@ -65,6 +66,7 @@ describe('Pouvoir confirmer mon adresse mail d’inscription', () => {
     );
 
       // THEN
+      expect(response.status).toBe(200);
       expect(response.data).toBe('E-mail confirmé.');
     },
   );

@@ -13,7 +13,7 @@ const confirmationEmailCandidature =
         );
       if (result.modifiedCount === 0) {
         return response
-          .status(404)
+          .status(403)
           .json({
             message: 'Le lien est invalide.',
           })
