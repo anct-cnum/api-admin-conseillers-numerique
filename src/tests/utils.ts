@@ -18,10 +18,23 @@ const requetePost = async (url, data) =>
     validateStatus: (status) => status < 500,
   });
 
+const requetePatch = async (url) =>
+  axios({
+    method: 'PATCH',
+    url: host + url,
+    validateStatus: (status) => status < 500,
+  });
+
 class InitialisationDate extends Date {
   constructor() {
     super('2024-09-01T11:00:00.000Z');
   }
 }
 
-export { viderLesCollections, host, requetePost, InitialisationDate };
+export {
+  viderLesCollections,
+  host,
+  requetePost,
+  requetePatch,
+  InitialisationDate,
+};
