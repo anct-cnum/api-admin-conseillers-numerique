@@ -4,7 +4,13 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     coverage: {
-      include: ['src/services/conseillers/controllers/getConseillersPourLaCoopMediation.ts'],
+      include: [
+        'src/services/conseillers/controllers/getConseillersPourLaCoopMediation.ts',
+        'src/services/conseillers/controllers/creerCandidatureConseiller.ts',
+        'src/services/structures/controllers/creerCandidatureStructure.ts',
+        'src/services/structures/controllers/creerCandidatureStructureCoordinateur.ts',
+        'src/services/conseillers/controllers/confirmationEmailCandidature.ts',
+      ],
       provider: 'istanbul',
       skipFull: true,
       watermarks: {
@@ -20,6 +26,6 @@ export default defineConfig({
     fileParallelism: false,
     unstubEnvs: true,
     unstubGlobals: true,
-    testTimeout: 15_000
+    testTimeout: 15_000,
   },
 });
