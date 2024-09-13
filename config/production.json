@@ -87,5 +87,6 @@
   },
   "sib_api_key": "SIB_API_KEY",
   "contrat_smic": "CONTRAT_SMIC",
-  "api_authorization_secret": "API_AUTHORIZATION_SECRET"
+  "api_authorization_secret": "API_AUTHORIZATION_SECRET",
+  "hcaptcha_secret": "HCAPTCHA_SECRET"
 }
