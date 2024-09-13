@@ -18,7 +18,7 @@ describe('Pouvoir confirmer mon adresse mail d’inscription', () => {
 
       // THEN
       expect(response.status).toBe(403);
-      expect(response.data.message).toBe('Le lien est invalide.');
+      expect(response.data.message).toBe('Impossible de valider l’email, le lien a expiré ou est invalide.');
     },
   );
 
@@ -67,19 +67,7 @@ describe('Pouvoir confirmer mon adresse mail d’inscription', () => {
 
       // THEN
       expect(response.status).toBe(200);
-      expect(response.data).toBe('E-mail confirmé.');
+      expect(response.data).toBe('Votre email a été confirmé et votre inscription est maintenant active. Vous serez contacté par mail ou par téléphone si une structure est intéressée par votre profil.');
     },
   );
-
-  it.todo('', () => {
-    //GIVEN
-    //WHEN
-    //THEN
-  });
-
-  it.todo('', () => {
-    //GIVEN
-    //WHEN
-    //THEN
-  });
 });

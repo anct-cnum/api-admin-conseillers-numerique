@@ -15,11 +15,17 @@ const confirmationEmailCandidature =
         return response
           .status(403)
           .json({
-            message: 'Le lien est invalide.',
+            message:
+              'Impossible de valider l’email, le lien a expiré ou est invalide.',
           })
           .end();
       }
-      return response.status(200).json('E-mail confirmé.').end();
+      return response
+        .status(200)
+        .json(
+          'Votre email a été confirmé et votre inscription est maintenant active. Vous serez contacté par mail ou par téléphone si une structure est intéressée par votre profil.',
+        )
+        .end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
     }
