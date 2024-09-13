@@ -1,5 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
+import request from "supertest";
+import axios from "axios"
 
 import app from '../../../app';
 
@@ -18,7 +20,7 @@ const champsObligatoires = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite : new Date(),
+  dateDisponibilite : new Date(3024, 8, 1, 13),
   distanceMax: 5,
   motivation: 'Ma motivation',
   telephone: '',
@@ -30,58 +32,58 @@ const champsObligatoires = {
   "h-captcha-response": "captcha"
 };
 
+vi.mock("axios")
+const mockedAxios = vi.mocked(axios, true);
+
 describe('recevoir et valider une candidature conseiller', () => {
   beforeEach(async () => {
     await viderLesCollections(app);
+    mockedAxios.post.mockResolvedValue({
+      data: { success: true },
+    })
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
-    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
-    response.data.dateDisponibilite = new Date().toISOString();
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.aUneExperienceMedNum).toBe(false);
-    expect(response.data.codeCommune).toBe('75000');
-    expect(response.data.codeDepartement).toBe('75');
-    expect(response.data.codePostal).toBe('75001');
-    expect(response.data.codeRegion).toBe('75');
-    expect(response.data.codeCom).toBe(null);
-    expect(response.data.dateDisponibilite).toBe('2024-09-01T11:00:00.000Z');
-    expect(response.data.distanceMax).toBe(5);
-    expect(response.data.email).toBe('jean.martin@example.com');
-    expect(response.data.idPG).toBe(1);
-    expect(response.data.location).toStrictEqual({
+    expect(response.body.aUneExperienceMedNum).toBe(false);
+    expect(response.body.codeCommune).toBe('75000');
+    expect(response.body.codeDepartement).toBe('75');
+    expect(response.body.codePostal).toBe('75001');
+    expect(response.body.codeRegion).toBe('75');
+    expect(response.body.codeCom).toBe(null);
+    expect(response.body.dateDisponibilite).toBe('3024-09-01T11:00:00.000Z');
+    expect(response.body.distanceMax).toBe(5);
+    expect(response.body.email).toBe('jean.martin@example.com');
+    expect(response.body.idPG).toBe(1);
+    expect(response.body.location).toStrictEqual({
       coordinates: [0, 0],
       type: 'Point',
     });
-    expect(response.data.motivation).toBe('Ma motivation');
-    expect(response.data.nom).toBe('Martin');
-    expect(response.data.nomCommune).toBe('Paris');
-    expect(response.data.prenom).toBe('Jean');
-    expect(response.data.userCreated).toBe(false);
-    expect(response.data.estDemandeurEmploi).toBe(true);
-    expect(response.data.estEnEmploi).toBe(false);
-    expect(response.data.estEnFormation).toBe(false);
-    expect(response.data.estDiplomeMedNum).toBe(false);
-    expect(response.data.nomDiplomeMedNum).toBe('');
+    expect(response.body.motivation).toBe('Ma motivation');
+    expect(response.body.nom).toBe('Martin');
+    expect(response.body.nomCommune).toBe('Paris');
+    expect(response.body.prenom).toBe('Jean');
+    expect(response.body.userCreated).toBe(false);
+    expect(response.body.estDemandeurEmploi).toBe(true);
+    expect(response.body.estEnEmploi).toBe(false);
+    expect(response.body.estEnFormation).toBe(false);
+    expect(response.body.estDiplomeMedNum).toBe(false);
+    expect(response.body.nomDiplomeMedNum).toBe('');
   });
 
   it('si j’envoie un formulaire avec tous les champs possibles alors il est validé', async () => {
     // GIVEN
-    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
       telephone: '+33123456789',
@@ -94,43 +96,39 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
-    response.data.dateDisponibilite = new Date().toISOString();
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.aUneExperienceMedNum).toBe(false);
-    expect(response.data.codeCommune).toBe('75000');
-    expect(response.data.codeDepartement).toBe('75');
-    expect(response.data.codePostal).toBe('75001');
-    expect(response.data.codeRegion).toBe('75');
-    expect(response.data.dateDisponibilite).toBe('2024-09-01T11:00:00.000Z');;
-    expect(response.data.distanceMax).toBe(5);
-    expect(response.data.email).toBe('jean.martin@example.com');
-    expect(response.data.idPG).toBe(1);
-    expect(response.data.location).toStrictEqual({
+    expect(response.body.aUneExperienceMedNum).toBe(false);
+    expect(response.body.codeCommune).toBe('75000');
+    expect(response.body.codeDepartement).toBe('75');
+    expect(response.body.codePostal).toBe('75001');
+    expect(response.body.codeRegion).toBe('75');
+    expect(response.body.dateDisponibilite).toBe('3024-09-01T11:00:00.000Z');;
+    expect(response.body.distanceMax).toBe(5);
+    expect(response.body.email).toBe('jean.martin@example.com');
+    expect(response.body.idPG).toBe(1);
+    expect(response.body.location).toStrictEqual({
       coordinates: [0, 0],
       type: 'Point',
     });
-    expect(response.data.motivation).toBe('Ma motivation');
-    expect(response.data.nom).toBe('Martin');
-    expect(response.data.nomCommune).toBe('Paris');
-    expect(response.data.prenom).toBe('Jean');
-    expect(response.data.userCreated).toBe(false);
-    expect(response.data.telephone).toBe('+33123456789');
-    expect(response.data.codeCom).toBe('75');
-    expect(response.data.estDemandeurEmploi).toBe(true);
-    expect(response.data.estEnEmploi).toBe(true);
-    expect(response.data.estEnFormation).toBe(true);
-    expect(response.data.estDiplomeMedNum).toBe(true);
-    expect(response.data.nomDiplomeMedNum).toBe('Diplome');
-    expect(response.data.disponible).toBe(true);
+    expect(response.body.motivation).toBe('Ma motivation');
+    expect(response.body.nom).toBe('Martin');
+    expect(response.body.nomCommune).toBe('Paris');
+    expect(response.body.prenom).toBe('Jean');
+    expect(response.body.userCreated).toBe(false);
+    expect(response.body.telephone).toBe('+33123456789');
+    expect(response.body.codeCom).toBe('75');
+    expect(response.body.estDemandeurEmploi).toBe(true);
+    expect(response.body.estEnEmploi).toBe(true);
+    expect(response.body.estEnFormation).toBe(true);
+    expect(response.body.estDiplomeMedNum).toBe(true);
+    expect(response.body.nomDiplomeMedNum).toBe('Diplome');
+    expect(response.body.disponible).toBe(true);
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
@@ -141,17 +139,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'L’adresse e-mail est invalide',
     });
   });
@@ -164,17 +159,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le numéro de téléphone est invalide',
     });
   });
@@ -189,17 +181,14 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-conseiller',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.telephone).toBe('+' + debutTelephone + '611223344');
+      expect(response.body.telephone).toBe('+' + debutTelephone + '611223344');
     },
   );
 
@@ -211,17 +200,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le code postal est invalide',
     });
   });
@@ -234,17 +220,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le code commune est invalide',
     });
   });
@@ -257,17 +240,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'La date doit être supérieure ou égale à la date du jour',
     });
   });
@@ -285,17 +265,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'L’experience médiateur numérique est requise',
     });
   });
@@ -313,17 +290,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le nom du diplôme est requis',
     });
   });
@@ -336,22 +310,19 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'La distance est invalide',
     });
   });
 
-  it('si j’envoie un formulaire avec un email déjà existant alors j’ai une erreur', async () => {
+  it('si j’envoie un formulaire avec un e-mail déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -359,17 +330,15 @@ describe('recevoir et valider une candidature conseiller', () => {
     await requetePost('/candidature-conseiller', envoiUtilisateur);
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'L’email est déjà utilisé',
     });
   });
@@ -481,6 +450,11 @@ describe('recevoir et valider une candidature conseiller', () => {
       key: { motivation: undefined },
       error: 'La motivation est requise',
     },
+    {
+      testKey: 'h-captcha-response',
+      key: { 'h-captcha-response': undefined },
+      error: 'Le captcha est obligatoire',
+    },
   ])(
     'si j’envoie un formulaire avec la clé $testKey égale à undefined alors j’ai une erreur',
     async ({ key, error }) => {
@@ -491,17 +465,14 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-conseiller',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(400);
-      expect(response.data).toStrictEqual({
+      expect(response.body).toStrictEqual({
         message: error,
       });
     },
@@ -528,17 +499,14 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-conseiller',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.telephone).toBe(result);
+      expect(response.body.telephone).toBe(result);
     },
   );
 
@@ -551,17 +519,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'La motivation ne doit pas dépasser 2500 caractères',
     });
   });
@@ -576,51 +541,28 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.motivation).toBe(motivation);
+    expect(response.body.motivation).toBe(motivation);
   });
 
-  it.todo('si j’envoie un formulaire valide avec un captcha correct alors il est validé', async () => {
+  it('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
     // GIVEN
-    const envoiUtilisateur = {
-      ...champsObligatoires,
-      "h-captcha-response": "captcha-correct"
-    };
-
-    // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
-
-    // THEN
-    expect(response.headers['content-type']).toBe(
-      'application/json; charset=utf-8',
-    );
-    expect(response.status).toBe(200);
-  });
-
-  it.todo('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
-    // GIVEN
+    mockedAxios.post.mockResolvedValue({
+      data: { success: false },
+    })
     const envoiUtilisateur = {
       ...champsObligatoires,
       "h-captcha-response": "captcha-incorrect"
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-conseiller',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
