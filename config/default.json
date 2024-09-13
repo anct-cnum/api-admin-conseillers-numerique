@@ -13,7 +13,10 @@
     "entity": "user",
     "service": "users",
     "secret": "hEUdtqlm9De4GJ8H9qJklmaxraY=",
-    "authStrategies": ["jwt", "local"],
+    "authStrategies": [
+      "jwt",
+      "local"
+    ],
     "jwtOptions": {
       "header": {
         "typ": "access"
@@ -98,5 +101,6 @@
   },
   "sib_api_key": "SIB_API_KEY",
   "contrat_smic": "CONTRAT_SMIC",
-  "api_authorization_secret": "API_AUTHORIZATION_SECRET"
+  "api_authorization_secret": "API_AUTHORIZATION_SECRET",
+  "hcaptcha_secret": "HCAPTCHA_SECRET"
 }
