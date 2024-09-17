@@ -1,11 +1,10 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections } from '../../../tests/utils';
 import request from 'supertest';
 import axios from 'axios';
 
 import app from '../../../app';
 import {
-  CandidatureConseillerInput,
   construireConseiller,
   envoyerConfirmationParMail,
 } from './creerCandidatureConseiller';
