@@ -29,7 +29,34 @@ class InitialisationDate extends Date {
   constructor() {
     super('2024-09-01T11:00:00.000Z');
   }
-}
+};
+
+const champsObligatoiresFormConseiller = {
+  prenom: 'Jean',
+  nom: 'Martin',
+  email: 'jean.martin@example.com',
+  nomCommune: 'Paris',
+  codePostal: '75001',
+  codeCommune: '75000',
+  codeDepartement: '75',
+  codeRegion: '75',
+  codeCom: null,
+  location: {
+    type: 'Point',
+    coordinates: [0, 0],
+  },
+  aUneExperienceMedNum: false,
+  dateDisponibilite: new Date(),
+  distanceMax: 5,
+  motivation: 'Ma motivation',
+  telephone: '',
+  estDemandeurEmploi: true,
+  estEnEmploi: false,
+  estEnFormation: false,
+  estDiplomeMedNum: false,
+  nomDiplomeMedNum: '',
+};
+
 
 export {
   viderLesCollections,
@@ -37,4 +64,5 @@ export {
   requetePost,
   requetePatch,
   InitialisationDate,
+  champsObligatoiresFormConseiller,
 };

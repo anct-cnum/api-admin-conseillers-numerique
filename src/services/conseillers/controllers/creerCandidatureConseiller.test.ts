@@ -1,33 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
+import { viderLesCollections, requetePost, InitialisationDate, champsObligatoiresFormConseiller } from '../../../tests/utils';
 import { mailConfirmationAdresseMail, construireConseiller } from './creerCandidatureConseiller';
 import app from '../../../app';
-
-const champsObligatoires = {
-  prenom: 'Jean',
-  nom: 'Martin',
-  email: 'jean.martin@example.com',
-  nomCommune: 'Paris',
-  codePostal: '75001',
-  codeCommune: '75000',
-  codeDepartement: '75',
-  codeRegion: '75',
-  codeCom: null,
-  location: {
-    type: 'Point',
-    coordinates: [0, 0],
-  },
-  aUneExperienceMedNum: false,
-  dateDisponibilite : new Date(),
-  distanceMax: 5,
-  motivation: 'Ma motivation',
-  telephone: '',
-  estDemandeurEmploi: true,
-  estEnEmploi: false,
-  estEnFormation: false,
-  estDiplomeMedNum: false,
-  nomDiplomeMedNum: '',
-};
 
 describe('recevoir et valider une candidature conseiller', () => {
   beforeEach(async () => {
@@ -38,7 +12,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
     };
     // WHEN
     const response = await requetePost(
@@ -82,7 +56,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       telephone: '+33123456789',
       codeCom: '75',
       estDemandeurEmploi: true,
@@ -136,7 +110,7 @@ describe('recevoir et valider une candidature conseiller', () => {
 
   it('si jenvoie un formulaire alors je reçoie un mail de confirmation', async () => {
     // GIVEN
-    const createUtilisateur = await construireConseiller(app, champsObligatoires);
+    const createUtilisateur = await construireConseiller(app, champsObligatoiresFormConseiller);
     
     // WHEN
     const result = await app
@@ -152,7 +126,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       email: 'abc',
     };
 
@@ -175,7 +149,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec un numéro de téléphone invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       telephone: 'abc',
     };
 
@@ -200,7 +174,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     async (debutTelephone) => {
       // GIVEN
       const envoiUtilisateur = {
-        ...champsObligatoires,
+        ...champsObligatoiresFormConseiller,
         telephone: '+' + debutTelephone + '611223344',
       };
 
@@ -222,7 +196,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec un code postal invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       codePostal: '123',
     };
 
@@ -245,7 +219,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec un code commune invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       codeCommune: '123',
     };
 
@@ -268,7 +242,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec une date disponibilité inférieure à la date du jour alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       dateDisponibilite: '2024-01-01T00:00:00.000Z',
     };
 
@@ -291,7 +265,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec aucune situation renseignée alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       estDemandeurEmploi: false,
       estEnEmploi: false,
       estEnFormation: false,
@@ -319,7 +293,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec une expérience renseignée Mednum et que je nai pas de nom renseigné alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       estDemandeurEmploi: false,
       estEnEmploi: false,
       estEnFormation: false,
@@ -347,7 +321,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec une distance max invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       distanceMax: 3,
     };
 
@@ -370,7 +344,7 @@ describe('recevoir et valider une candidature conseiller', () => {
   it('si j’envoie un formulaire avec un email déjà existant alors j’ai une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
     };
     await requetePost('/candidature-conseiller', envoiUtilisateur);
 
@@ -441,14 +415,14 @@ describe('recevoir et valider une candidature conseiller', () => {
     {
       testKey: 'location.type',
       key: {
-        location: { ...champsObligatoires.location, type: undefined },
+        location: { ...champsObligatoiresFormConseiller.location, type: undefined },
       },
       error: 'Le type est invalide',
     },
     {
       testKey: 'location.coordinates',
       key: {
-        location: { ...champsObligatoires.location, coordinates: undefined },
+        location: { ...champsObligatoiresFormConseiller.location, coordinates: undefined },
       },
       error: 'Les coordonées sont invalides',
     },
@@ -502,7 +476,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     async ({ key, error }) => {
       // GIVEN
       const envoiUtilisateur = {
-        ...champsObligatoires,
+        ...champsObligatoiresFormConseiller,
         ...key,
       };
 
@@ -539,7 +513,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     async ({ key, result }) => {
       // GIVEN
       const envoiUtilisateur = {
-        ...champsObligatoires,
+        ...champsObligatoiresFormConseiller,
         ...key,
       };
 
@@ -562,7 +536,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     const lettreA = 'a';
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       motivation: lettreA.repeat(2501),
     };
 
@@ -587,7 +561,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     const lettreA = 'a';
     const motivation = lettreA.repeat(2500);
     const envoiUtilisateur = {
-      ...champsObligatoires,
+      ...champsObligatoiresFormConseiller,
       motivation,
     };
 
