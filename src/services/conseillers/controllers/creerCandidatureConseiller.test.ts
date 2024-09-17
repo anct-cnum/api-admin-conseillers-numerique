@@ -1,10 +1,17 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
-import request from "supertest";
-import axios from "axios"
+import {
+  viderLesCollections,
+  requetePost,
+  InitialisationDate,
+} from '../../../tests/utils';
+import request from 'supertest';
+import axios from 'axios';
 
 import app from '../../../app';
-import { construireConseiller, envoyerConfirmationParMail } from './creerCandidatureConseiller';
+import {
+  construireConseiller,
+  envoyerConfirmationParMail,
+} from './creerCandidatureConseiller';
 
 const champsObligatoires = {
   prenom: 'Jean',
@@ -21,7 +28,7 @@ const champsObligatoires = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite : new Date(3024, 8, 1, 13),
+  dateDisponibilite: new Date(3024, 8, 1, 13),
   distanceMax: 5,
   motivation: 'Ma motivation',
   telephone: '',
@@ -30,10 +37,10 @@ const champsObligatoires = {
   estEnFormation: false,
   estDiplomeMedNum: false,
   nomDiplomeMedNum: '',
-  "h-captcha-response": "captcha"
+  'h-captcha-response': 'captcha',
 };
 
-vi.mock("axios")
+vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
 describe('recevoir et valider une candidature conseiller', () => {
@@ -41,7 +48,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     await viderLesCollections(app);
     mockedAxios.post.mockResolvedValue({
       data: { success: true },
-    })
+    });
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
@@ -50,7 +57,9 @@ describe('recevoir et valider une candidature conseiller', () => {
       ...champsObligatoires,
     };
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -97,7 +106,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -109,7 +120,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.body.codeDepartement).toBe('75');
     expect(response.body.codePostal).toBe('75001');
     expect(response.body.codeRegion).toBe('75');
-    expect(response.body.dateDisponibilite).toBe('3024-09-01T11:00:00.000Z');;
+    expect(response.body.dateDisponibilite).toBe('3024-09-01T11:00:00.000Z');
     expect(response.body.distanceMax).toBe(5);
     expect(response.body.email).toBe('jean.martin@example.com');
     expect(response.body.idPG).toBe(1);
@@ -136,13 +147,19 @@ describe('recevoir et valider une candidature conseiller', () => {
 
   it('si jenvoie un formulaire alors je reçois un mail de confirmation', async () => {
     // GIVEN
-    const createUtilisateur = await construireConseiller(app, champsObligatoires);
-    
+    const createUtilisateur = await construireConseiller(
+      app,
+      champsObligatoires,
+    );
+
     // WHEN
-    const result = await app
-    .service('conseillers')
-    .create(createUtilisateur);
-    const envoiMail = await envoyerConfirmationParMail(app, result.email, result.prenom, result.emailConfirmationKey);
+    const result = await app.service('conseillers').create(createUtilisateur);
+    const envoiMail = await envoyerConfirmationParMail(
+      app,
+      result.email,
+      result.prenom,
+      result.emailConfirmationKey,
+    );
 
     // THEN
     expect(envoiMail.response).toBe('250 2.0.0 Ok: queued');
@@ -157,7 +174,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -177,7 +196,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -199,7 +220,9 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-conseiller')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -218,7 +241,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -238,7 +263,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -258,7 +285,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -283,7 +312,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -308,7 +339,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -328,7 +361,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -349,7 +384,9 @@ describe('recevoir et valider une candidature conseiller', () => {
 
     // WHEN
     await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -483,7 +520,9 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-conseiller')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -517,7 +556,9 @@ describe('recevoir et valider une candidature conseiller', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-conseiller')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -537,7 +578,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -559,7 +602,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -573,14 +618,16 @@ describe('recevoir et valider une candidature conseiller', () => {
     // GIVEN
     mockedAxios.post.mockResolvedValue({
       data: { success: false },
-    })
+    });
     const envoiUtilisateur = {
       ...champsObligatoires,
-      "h-captcha-response": "captcha-incorrect"
+      'h-captcha-response': 'captcha-incorrect',
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
