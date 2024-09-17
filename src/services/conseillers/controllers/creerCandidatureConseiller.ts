@@ -58,6 +58,20 @@ const verifyCaptcha = async (app, token) => {
   }
 };
 
+const verifyCaptcha = async (app, token) => {
+  const response = await axios.post(
+    'https://hcaptcha.com/siteverify',
+    new URLSearchParams({
+      secret: app.get('hcaptcha_secret'),
+      response: token,
+    }),
+  );
+
+  if (!response.data.success) {
+    throw new Error('Le captcha est invalide');
+  }
+};
+
 export const validerCandidatureConseiller =
   (app: Application) =>
   async (request: Request, response: Response, next: NextFunction) => {
