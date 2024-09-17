@@ -3,6 +3,7 @@ import { Response, NextFunction, Request } from 'express';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
+import { envoiEmailInformationValidationCoselec } from '../../../utils/email';
 
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
@@ -61,6 +62,14 @@ const creerCandidatureConseiller =
         candidatureConseiller,
         app,
       );
+      const { email, prenom } = candidatureConseiller;
+      await envoyerConfirmationParMail(
+        app,
+        email,
+        prenom,
+        candidatureConseiller.emailConfirmationKey,
+      );
+      delete (result as unknown as Conseiller).emailConfirmationKey;
       return response.status(200).json(result).end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
@@ -91,24 +100,22 @@ export const construireConseiller = async (
   };
 };
 
-export const mailConfirmationAdresseMail = async (
+export const envoyerConfirmationParMail = async (
   app: Application,
   email: string,
   prenom: string,
-  token: void,
+  token: string,
 ): Promise<any> => {
   const body = await mailer(app).render(
     path.join(__dirname, '../../../emails/confirmation-email-candidature'),
     'confirmation-email-inscription',
     {
-      link: mailer(app).utils.getPublicUrl(
-        `/confirmation-email-inscription/${token}`,
-      ),
+      link: mailer(app).utils.getPublicUrl(`/candidature-confirmer/${token}`),
       prenom,
     },
   );
   return mailer(app).createMailer().sendEmail(email, {
-    subject: 'Confirmation adresse mail',
+    subject: 'Confirmation de votre adresse e-mail',
     body,
   });
 };
@@ -118,24 +125,16 @@ const stockerCandidatureConseiller = async (
   app: Application,
 ): Promise<void> => {
   try {
-    const { email, prenom } = candidatureConseiller;
     const emailExists =
-      (await app
-        .service(service.conseillers)
-        .Model.countDocuments({ email })) !== 0;
+      (await app.service(service.conseillers).Model.countDocuments({
+        email: candidatureConseiller.email,
+      })) !== 0;
     if (emailExists) {
       throw new Error('L’email est déjà utilisé');
     }
     const result = await app
       .service(service.conseillers)
       .create(candidatureConseiller);
-    await mailConfirmationAdresseMail(
-      app,
-      email,
-      prenom,
-      result.emailConfirmationKey,
-    );
-    delete result.emailConfirmationKey;
     return result;
   } catch (error) {
     throw new Error(error.message);
