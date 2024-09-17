@@ -1,14 +1,11 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import {
-  viderLesCollections,
-  requetePost,
-  InitialisationDate,
-} from '../../../tests/utils';
+import { viderLesCollections } from '../../../tests/utils';
 import request from 'supertest';
 import axios from 'axios';
 
 import app from '../../../app';
 import {
+  CandidatureConseillerInput,
   construireConseiller,
   envoyerConfirmationParMail,
 } from './creerCandidatureConseiller';
@@ -128,21 +125,21 @@ describe('recevoir et valider une candidature conseiller', () => {
       coordinates: [0, 0],
       type: 'Point',
     });
-    expect(response.data.motivation).toBe('Ma motivation');
-    expect(response.data.nom).toBe('Martin');
-    expect(response.data.nomCommune).toBe('Paris');
-    expect(response.data.prenom).toBe('Jean');
-    expect(response.data.userCreated).toBe(false);
-    expect(response.data.telephone).toBe('+33123456789');
-    expect(response.data.codeCom).toBe('75');
-    expect(response.data.estDemandeurEmploi).toBe(true);
-    expect(response.data.estEnEmploi).toBe(true);
-    expect(response.data.estEnFormation).toBe(true);
-    expect(response.data.estDiplomeMedNum).toBe(true);
-    expect(response.data.nomDiplomeMedNum).toBe('Diplome');
-    expect(response.data.disponible).toBe(true);
-    expect(response.data.emailConfirmedAt).toBe(null);
-    expect(response.data.emailConfirmationKey).toBe(undefined);
+    expect(response.body.motivation).toBe('Ma motivation');
+    expect(response.body.nom).toBe('Martin');
+    expect(response.body.nomCommune).toBe('Paris');
+    expect(response.body.prenom).toBe('Jean');
+    expect(response.body.userCreated).toBe(false);
+    expect(response.body.telephone).toBe('+33123456789');
+    expect(response.body.codeCom).toBe('75');
+    expect(response.body.estDemandeurEmploi).toBe(true);
+    expect(response.body.estEnEmploi).toBe(true);
+    expect(response.body.estEnFormation).toBe(true);
+    expect(response.body.estDiplomeMedNum).toBe(true);
+    expect(response.body.nomDiplomeMedNum).toBe('Diplome');
+    expect(response.body.disponible).toBe(true);
+    expect(response.body.emailConfirmedAt).toBe(null);
+    expect(response.body.emailConfirmationKey).toBe(undefined);
   });
 
   it('si jenvoie un formulaire alors je reçois un mail de confirmation', async () => {
@@ -214,22 +211,24 @@ describe('recevoir et valider une candidature conseiller', () => {
     'si j’envoie un formulaire avec un numéro de téléphone qui commence par +%d alors il est validé',
     async (debutTelephone) => {
       // GIVEN
+      const telephone = '+' + debutTelephone.toString() + '611223344'
       const envoiUtilisateur = {
         ...champsObligatoires,
-        telephone: '+' + debutTelephone + '611223344',
+        telephone,
       };
 
       // WHEN
       const response = await request(app)
-        .post('/candidature-conseiller')
-        .send(envoiUtilisateur);
-
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
+      console.log('response:', response);
+      
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.body.telephone).toBe('+' + debutTelephone + '611223344');
+      expect(response.body.telephone).toBe(telephone);
     },
   );
 
@@ -380,7 +379,6 @@ describe('recevoir et valider une candidature conseiller', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    await requetePost('/candidature-conseiller', envoiUtilisateur);
 
     // WHEN
     await request(app).post('/candidature-conseiller').send(envoiUtilisateur);

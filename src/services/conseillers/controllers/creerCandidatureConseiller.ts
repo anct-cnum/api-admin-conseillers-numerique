@@ -32,6 +32,7 @@ type CandidatureConseillerInput = {
   estEnFormation: boolean;
   estDiplomeMedNum: boolean;
   nomDiplomeMedNum: string;
+  'h-captcha-response': string;
 };
 
 type Conseiller = CandidatureConseillerInput & {
@@ -74,7 +75,7 @@ const creerCandidatureConseiller =
   (app: Application) => async (request: Request, response: Response) => {
     const candidatureConseiller = await construireConseiller(app, request.body);
     try {
-      const result = await stockerCandidatureConseiller(
+      const result: any = await stockerCandidatureConseiller(
         candidatureConseiller,
         app,
       );
@@ -85,7 +86,7 @@ const creerCandidatureConseiller =
         prenom,
         candidatureConseiller.emailConfirmationKey,
       );
-      delete (result as unknown as Conseiller).emailConfirmationKey;
+      delete result.emailConfirmationKey;
       return response.status(200).json(result).end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
