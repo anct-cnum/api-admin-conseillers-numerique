@@ -16,7 +16,7 @@ const confirmationEmailCandidature =
           .status(403)
           .json({
             message:
-              'Impossible de valider l’email, le lien a expiré ou est invalide.',
+              'Impossible de valider l’e-mail, le lien a expiré ou est invalide.',
           })
           .end();
       }
