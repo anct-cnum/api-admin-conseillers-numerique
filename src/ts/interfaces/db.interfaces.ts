@@ -160,7 +160,7 @@ export interface IConseillers {
 
   location: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
 
   nomCommune: string;
@@ -309,12 +309,12 @@ export interface IStructures {
 
   location: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
 
   coordonneesInsee: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
 
   adresseInsee2Ban: object;
@@ -573,7 +573,7 @@ export interface IPermanences {
   };
   location: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
   horaires: object[];
   typeAcces: string[];
@@ -685,7 +685,7 @@ export interface ICommunes {
   type: string;
   geometry: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
   properties: {
     code: string;
@@ -703,7 +703,7 @@ export interface IQpv {
   };
   geometry: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
 }
 

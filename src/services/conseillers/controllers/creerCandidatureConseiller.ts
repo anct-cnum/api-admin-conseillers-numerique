@@ -19,7 +19,7 @@ type CandidatureConseillerInput = {
   codeRegion: string;
   location: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
   aUneExperienceMedNum: boolean;
   dateDisponibilite: Date;
