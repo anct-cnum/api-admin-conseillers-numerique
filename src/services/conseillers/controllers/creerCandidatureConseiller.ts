@@ -1,8 +1,8 @@
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
-import axios from 'axios';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
+import verifyCaptcha from '../../../utils/verifyCaptcha';
 
 type CandidatureConseillerInput = {
   prenom: string;
@@ -36,20 +36,6 @@ type Conseiller = CandidatureConseillerInput & {
   updatedAt: Date;
   userCreated: boolean;
   disponible: boolean;
-};
-
-const verifyCaptcha = async (app, token) => {
-  const response = await axios.post(
-    'https://hcaptcha.com/siteverify',
-    new URLSearchParams({
-      secret: app.get('hcaptcha_secret'),
-      response: token,
-    }),
-  );
-
-  if (!response.data.success) {
-    throw new Error('Le captcha est invalide');
-  }
 };
 
 export const validerCandidatureConsiller =
