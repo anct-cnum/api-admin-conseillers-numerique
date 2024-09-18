@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CandidatureConseillerInput } from '../services/conseillers/controllers/creerCandidatureConseiller';
 
 const viderLesCollections = async (app): Promise<void> => {
   await app.service('conseillers').Model.deleteMany({});
@@ -25,13 +26,7 @@ const requetePatch = async (url) =>
     validateStatus: (status) => status < 500,
   });
 
-class InitialisationDate extends Date {
-  constructor() {
-    super('2024-09-01T11:00:00.000Z');
-  }
-};
-
-const champsObligatoiresFormConseiller = {
+const champsObligatoiresFormConseiller: CandidatureConseillerInput = {
   prenom: 'Jean',
   nom: 'Martin',
   email: 'jean.martin@example.com',
@@ -46,7 +41,7 @@ const champsObligatoiresFormConseiller = {
     coordinates: [0, 0],
   },
   aUneExperienceMedNum: false,
-  dateDisponibilite: new Date(),
+  dateDisponibilite: new Date(3024, 8, 1, 13),
   distanceMax: 5,
   motivation: 'Ma motivation',
   telephone: '',
@@ -55,14 +50,13 @@ const champsObligatoiresFormConseiller = {
   estEnFormation: false,
   estDiplomeMedNum: false,
   nomDiplomeMedNum: '',
+  'h-captcha-response': 'captcha',
 };
-
 
 export {
   viderLesCollections,
   host,
   requetePost,
   requetePatch,
-  InitialisationDate,
   champsObligatoiresFormConseiller,
 };
