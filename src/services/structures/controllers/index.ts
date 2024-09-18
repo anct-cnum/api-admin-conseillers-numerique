@@ -31,6 +31,7 @@ import closeBannerAvenantAvisPrefet from './closeBannerAvenantAvisPrefet';
 import updateAvenantAvisPrefetPosteSupplementaire from './updateAvenantAvisPrefetPosteSupplementaire';
 import updateCommentaireAvisPrefet from './updateCommentaireAvisPrefet';
 import updateCommentaireAvenantAvisPrefet from './updateCommentaireAvenantAvisPrefet';
+import verifySiretOrRidetStructure from './verifySiretOrRidetStructure';
 
 export {
   getStructures,
@@ -66,4 +67,5 @@ export {
   updateAvenantAvisPrefetPosteSupplementaire,
   updateCommentaireAvisPrefet,
   updateCommentaireAvenantAvisPrefet,
+  verifySiretOrRidetStructure,
 };

@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructureCoordinateur } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
+import verifyCaptcha from '../../../utils/verifyCaptcha';
 
 type CandidatureStructureCoordinateurInput = {
   type: string;
@@ -102,9 +103,10 @@ const stockerCandidatureStructureCoordinateur = async (
 };
 
 export const validerCandidatureStructureCoordinateur =
-  () => async (request: Request, response: Response, next: NextFunction) => {
+  (app) => async (request: Request, response: Response, next: NextFunction) => {
     try {
       await validCandidatureStructureCoordinateur.validateAsync(request.body);
+      await verifyCaptcha(app, request.body['h-captcha-response']);
       return next();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
