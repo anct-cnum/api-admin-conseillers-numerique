@@ -4,56 +4,21 @@ import {
   champsObligatoiresFormConseiller,
 } from '../../../tests/utils';
 import app from '../../../app';
-import {
-  construireConseiller,
-  envoyerConfirmationParMail,
-} from './creerCandidatureConseiller';
-
-// const nodemailer = require('nodemailer');
 import request from "supertest";
 import axios from "axios";
-import * as nodeMailer from 'nodemailer';
-import mailer from '../../../mailer';
-
+import nodemailer from 'nodemailer';
 
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
-// vi.mock('envoyerConfirmationParMail');
-// const mockedMailer = vi.mocked(envoyerConfirmationParMail, {
-//   createMailer: vi.fn(() => ({ response : '250 2.0.0 Ok: queued'}))
-// });
-// vi.mock('./creerCandidatureConseiller', () => ({
-//   envoyerConfirmationParMail: vi.fn(() => ({ response : '250 2.0.0 Ok: queued' })),
-// }));
-vi.mock('nodemailer', () => ({
-  createMailer: () => ({ sendMail: { response : '250 2.0.0 Ok: queued' }}),
-  createTransport: vi.fn(),
-}));
+const mockSendMail = vi.fn();
 
-vi.mock('../../../mailer', async (importOriginal: any) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    createMailer: () => ({ sendMail: () => ({ 'response' : '250 2.0.0 Ok: queued' })}),
-    createTransport: vi.fn(() => ({use: ''})),
-  }
-});
-
-// return mailer(app).createMailer().sendEmail(email, {
-//   subject: 'Confirmation de votre adresse e-mail',
-//   body,
-// });
 describe('recevoir et valider une candidature conseiller', () => {
   beforeEach(async () => {
     await viderLesCollections(app);
     mockedAxios.post.mockResolvedValue({
       data: { success: true },
     });
-    // const mockNodemailer = vi.fn().mockReturnValue(() => ({ response : '250 2.0.0 Ok: queued'}));
-    // vi.spyOn(nodemailer, 'sendMail').mockReturnValue(mockNodemailer);
-    // vi.spyOn(''envoyerConfirmationParMail);
-    //mailer, createMailer
-    // vi.spyOn(TestOK, 'envoyerConfirmationParMail').mockReturnValue({response : '250 2.0.0 Ok: queued' });
+    vi.spyOn(nodemailer, 'createTransport').mockReturnValue({ sendMail: mockSendMail, use: vi.fn() });
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
@@ -61,6 +26,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     const envoiUtilisateur = {
       ...champsObligatoiresFormConseiller,
     };
+
     // WHEN
     const response = await request(app)
       .post('/candidature-conseiller')
@@ -150,34 +116,25 @@ describe('recevoir et valider une candidature conseiller', () => {
     expect(response.body.emailConfirmationKey).toBe(undefined);
   });
 
-  it.only('si jenvoie un formulaire alors je reçois un mail de confirmation', async () => {
+  it('si j’envoie un formulaire alors je reçois un mail de confirmation', async () => {
     // GIVEN
-    // vi.spyOn(nodemailer, 'createMailer').mockReturnValue(() => );
-    // vi.spyOn(nodemailer, 'createTransport').mockImplementation(() => ({response : '250 2.0.0 Ok: queued' }));
-    const mockMail = vi.fn().mockReturnValue(() => ({ response : '250 2.0.0 Ok: queued' }));
-    vi.spyOn(nodeMailer, 'createMailer').mockReturnValue(mockMail);
-    // vi.spyOn(nodeMailer, 'createMailer');
-    // vi.spyOn(nodeMailer, 'createTransport').mockReturnValue(() => true);
-    const createUtilisateur = await construireConseiller(
-      app,
-      champsObligatoiresFormConseiller,
-    );
-    console.log('createUtilisateur:', createUtilisateur);
+    // const mockSendMail = vi.fn();
+    // vi.spyOn(nodemailer, 'createTransport').mockReturnValue({ sendMail: mockSendMail, use: vi.fn() });
 
     // WHEN
-    const result = await app.service('conseillers').create(createUtilisateur);
-    const envoiMail = await envoyerConfirmationParMail(
-      app,
-      result.email,
-      result.prenom,
-      result.emailConfirmationKey,
-    );
+    await request(app)
+      .post('/candidature-conseiller')
+      .send(champsObligatoiresFormConseiller);
 
     // THEN
-    console.log('envoiMail:', envoiMail);
-    expect(mockMail).toHaveBeenCalled();
-    expect(envoiMail.response).toBe('250 2.0.0 Ok: queued');
-    expect(envoiMail.accepted[0]).toBe('jean.martin@example.com');
+    expect(mockSendMail).toHaveBeenCalledWith({
+      from: expect.anything(),
+      html: expect.anything(),
+      list: expect.anything(),
+      replyTo: expect.anything(),
+      subject: "Confirmation de votre adresse e-mail",
+      to: "jean.martin@example.com"
+    });
   });
 
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
@@ -238,7 +195,6 @@ describe('recevoir et valider une candidature conseiller', () => {
       const response = await request(app)
         .post('/candidature-conseiller')
         .send(envoiUtilisateur);
-      console.log('response:', response);
 
       // THEN
       expect(response.headers['content-type']).toBe(

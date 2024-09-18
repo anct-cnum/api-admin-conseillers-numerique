@@ -11,6 +11,12 @@ const viderLesCollections = async (app): Promise<void> => {
 
 const host = 'http://localhost:8181';
 
+class InitialisationDate extends Date {
+  constructor() {
+    super('2024-09-01T11:00:00.000Z');
+  }
+}
+
 const requetePost = async (url, data) =>
   axios({
     method: 'POST',
@@ -59,4 +65,5 @@ export {
   requetePost,
   requetePatch,
   champsObligatoiresFormConseiller,
+  InitialisationDate,
 };
