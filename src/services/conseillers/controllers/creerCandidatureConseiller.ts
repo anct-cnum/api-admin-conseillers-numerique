@@ -8,7 +8,7 @@ import mailer from '../../../mailer';
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-type CandidatureConseillerInput = {
+export type CandidatureConseillerInput = {
   prenom: string;
   nom: string;
   email: string;
@@ -19,7 +19,7 @@ type CandidatureConseillerInput = {
   codeRegion: string;
   location: {
     type: string;
-    coordinates: number[];
+    coordinates: [number, number];
   };
   aUneExperienceMedNum: boolean;
   dateDisponibilite: Date;
@@ -116,7 +116,6 @@ export const construireConseiller = async (
     emailConfirmationKey: uuidv4(),
   };
 };
-
 
 export const envoyerConfirmationParMail = async (
   app: Application,
