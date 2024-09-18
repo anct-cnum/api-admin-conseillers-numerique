@@ -4,11 +4,10 @@ import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
 
-const { v4: uuidv4 } = require('uuid');
-const path = require('path');
-
 import verifyCaptcha from '../../../utils/verifyCaptcha';
 
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 type CandidatureConseillerInput = {
   prenom: string;
@@ -45,20 +44,6 @@ type Conseiller = CandidatureConseillerInput & {
   disponible: boolean;
   emailConfirmedAt: Date;
   emailConfirmationKey: string;
-};
-
-const verifyCaptcha = async (app, token) => {
-  const response = await axios.post(
-    'https://hcaptcha.com/siteverify',
-    new URLSearchParams({
-      secret: app.get('hcaptcha_secret'),
-      response: token,
-    }),
-  );
-
-  if (!response.data.success) {
-    throw new Error('Le captcha est invalide');
-  }
 };
 
 export const validerCandidatureConseiller =
