@@ -468,8 +468,8 @@ const getRidetData = async (ridet: string) => {
   try {
     const response = await axios.get(url);
     return response.data.results[0] ?? null;
-  } catch (e) {
-    throw new Error(`API Error : ${e} ${url}`);
+  } catch (error) {
+    throw new Error(`API Error : ${error} ${url}`);
   }
 };
 
