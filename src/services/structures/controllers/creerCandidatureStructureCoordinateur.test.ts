@@ -1,6 +1,7 @@
-import axios from 'axios';
+import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { viderLesCollections, requetePost, InitialisationDate } from '../../../tests/utils';
+import { viderLesCollections } from '../../../tests/utils';
+import axios from "axios"
 
 import app from '../../../app';
 const champsObligatoires = {
@@ -25,115 +26,112 @@ const champsObligatoires = {
     type: 'Point',
     coordinates: [0, 0],
   },
-  dateDebutMission: new Date(),
+  dateDebutMission: new Date(3024, 8, 1, 13),
   aIdentifieCoordinateur: true,
   missionCoordinateur: 'COORDINATEUR',
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
+  "h-captcha-response": "captcha"
 };
+
+vi.mock("axios")
+const mockedAxios = vi.mocked(axios, true);
 
 describe('recevoir et valider une candidature structure coordinateur', () => {
   beforeEach(async () => {
     await viderLesCollections(app);
+    mockedAxios.post.mockResolvedValue({
+      data: { success: true },
+    });
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
     // GIVEN
-    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
-    response.data.dateDebutMission = new Date().toISOString();
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.nom).toBe('MAIRIE');
-    expect(response.data.siret).toBe('12345678910');
-    expect(response.data.ridet).toBe(null);
-    expect(response.data.dateDebutMission).toBe('2024-09-01T11:00:00.000Z');
-    expect(response.data.contact.prenom).toBe('camélien');
-    expect(response.data.contact.nom).toBe('rousseau');
-    expect(response.data.contact.fonction).toBe('PRESIDENTE');
-    expect(response.data.contact.email).toBe('camlien_rousseau74@example.net');
-    expect(response.data.contact.telephone).toBe('+33751756469');
-    expect(response.data.codeCommune).toBe('75000');
-    expect(response.data.codeDepartement).toBe('75');
-    expect(response.data.codePostal).toBe('75001');
-    expect(response.data.codeRegion).toBe('75');
-    expect(response.data.codeCom).toBe('');
-    expect(response.data.location).toStrictEqual({
+    expect(response.body.nom).toBe('MAIRIE');
+    expect(response.body.siret).toBe('12345678910');
+    expect(response.body.ridet).toBe(null);
+    expect(response.body.dateDebutMission).toBe('3024-09-01T11:00:00.000Z');
+    expect(response.body.contact.prenom).toBe('camélien');
+    expect(response.body.contact.nom).toBe('rousseau');
+    expect(response.body.contact.fonction).toBe('PRESIDENTE');
+    expect(response.body.contact.email).toBe('camlien_rousseau74@example.net');
+    expect(response.body.contact.telephone).toBe('+33751756469');
+    expect(response.body.codeCommune).toBe('75000');
+    expect(response.body.codeDepartement).toBe('75');
+    expect(response.body.codePostal).toBe('75001');
+    expect(response.body.codeRegion).toBe('75');
+    expect(response.body.codeCom).toBe('');
+    expect(response.body.location).toStrictEqual({
       coordinates: [0, 0],
       type: 'Point',
     });
-    expect(response.data.aIdentifieCoordinateur).toBe(true);
-    expect(response.data.missionCoordinateur).toBe('COORDINATEUR');
-    expect(response.data.motivation).toBe('Je suis motivé.');
-    expect(response.data.confirmationEngagement).toBe(true);
+    expect(response.body.aIdentifieCoordinateur).toBe(true);
+    expect(response.body.missionCoordinateur).toBe('COORDINATEUR');
+    expect(response.body.motivation).toBe('Je suis motivé.');
+    expect(response.body.confirmationEngagement).toBe(true);
   });
 
   it('si j’envoie la totalité des champs possibles avec les champs ajouté par default alors il est validé', async () => {
     // GIVEN
-    vi.stubGlobal('Date', InitialisationDate);
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
-    response.data.dateDebutMission = new Date().toISOString();
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.nom).toBe('MAIRIE');
-    expect(response.data.siret).toBe('12345678910');
-    expect(response.data.ridet).toBe(null);
-    expect(response.data.dateDebutMission).toBe('2024-09-01T11:00:00.000Z');
-    expect(response.data.contact.prenom).toBe('camélien');
-    expect(response.data.contact.nom).toBe('rousseau');
-    expect(response.data.contact.fonction).toBe('PRESIDENTE');
-    expect(response.data.contact.email).toBe('camlien_rousseau74@example.net');
-    expect(response.data.contact.telephone).toBe('+33751756469');
-    expect(response.data.codeCommune).toBe('75000');
-    expect(response.data.codeDepartement).toBe('75');
-    expect(response.data.codePostal).toBe('75001');
-    expect(response.data.codeRegion).toBe('75');
-    expect(response.data.codeCom).toBe('');
-    expect(response.data.location).toStrictEqual({
+    expect(response.body.nom).toBe('MAIRIE');
+    expect(response.body.siret).toBe('12345678910');
+    expect(response.body.ridet).toBe(null);
+    expect(response.body.dateDebutMission).toBe('3024-09-01T11:00:00.000Z');
+    expect(response.body.contact.prenom).toBe('camélien');
+    expect(response.body.contact.nom).toBe('rousseau');
+    expect(response.body.contact.fonction).toBe('PRESIDENTE');
+    expect(response.body.contact.email).toBe('camlien_rousseau74@example.net');
+    expect(response.body.contact.telephone).toBe('+33751756469');
+    expect(response.body.codeCommune).toBe('75000');
+    expect(response.body.codeDepartement).toBe('75');
+    expect(response.body.codePostal).toBe('75001');
+    expect(response.body.codeRegion).toBe('75');
+    expect(response.body.codeCom).toBe('');
+    expect(response.body.location).toStrictEqual({
       coordinates: [0, 0],
       type: 'Point',
     });
-    expect(response.data.aIdentifieCoordinateur).toBe(true);
-    expect(response.data.missionCoordinateur).toBe('COORDINATEUR');
-    expect(response.data.motivation).toBe('Je suis motivé.');
-    expect(response.data.confirmationEngagement).toBe(true);
-    expect(response.data.idPG).toBe(1);
-    expect(response.data.userCreated).toBe(false);
-    expect(response.data.statut).toBe('CREEE');
-    expect(response.data.estLabelliseFranceServices).toBe('NON');
-    expect(response.data.estZRR).toBe(null);
-    expect(response.data.prefet).toStrictEqual([]);
-    expect(response.data.coselec).toStrictEqual([]);
-    expect(response.data.coordinateurCandidature).toStrictEqual(false);
-    expect(response.data.coordinateurTypeContrat).toStrictEqual(null);
-    expect(response.data.nombreConseillersSouhaites).toBe(1);
-    expect(response.data.aIdentifieCandidat).toBe(false);
+    expect(response.body.aIdentifieCoordinateur).toBe(true);
+    expect(response.body.missionCoordinateur).toBe('COORDINATEUR');
+    expect(response.body.motivation).toBe('Je suis motivé.');
+    expect(response.body.confirmationEngagement).toBe(true);
+    expect(response.body.idPG).toBe(1);
+    expect(response.body.userCreated).toBe(false);
+    expect(response.body.statut).toBe('CREEE');
+    expect(response.body.estLabelliseFranceServices).toBe('NON');
+    expect(response.body.estZRR).toBe(null);
+    expect(response.body.prefet).toStrictEqual([]);
+    expect(response.body.coselec).toStrictEqual([]);
+    expect(response.body.coordinateurCandidature).toStrictEqual(false);
+    expect(response.body.coordinateurTypeContrat).toStrictEqual(null);
+    expect(response.body.nombreConseillersSouhaites).toBe(1);
+    expect(response.body.aIdentifieCandidat).toBe(false);
   });
 
-  it('si j’envoie un formulaire sans siret mais avec un ridet alors j’ai pas d’erreur de validation', async () => {
+  it('si j’envoie un formulaire sans siret mais avec un ridet alors il n’y a pas d’erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -142,20 +140,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.siret).toBe(null);
-    expect(response.data.ridet).toBe('1234567');
+    expect(response.body.siret).toBe(null);
+    expect(response.body.ridet).toBe('1234567');
   });
 
-  it('si j’envoie un formulaire avec confirmation des engagements à false alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec confirmation des engagements à false alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -163,61 +159,56 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'La confirmation d’engagement est requis',
     });
   });
 
-  it('si j’envoie un formulaire avec un siret déjà existant alors j’ai une erreur', async () => {
+  it('si j’envoie un formulaire avec un siret déjà existant alors il y a une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    await requetePost('/candidature-structure-coordinateur', envoiUtilisateur);
+
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Vous êtes déjà inscrite',
     });
   });
 
-  it('si j’envoie un formulaire avec un ridet déjà existant alors j’ai une erreur', async () => {
+  it('si j’envoie un formulaire avec un ridet déjà existant alors il y a une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
       ridet: '123',
     };
-    await requetePost('/candidature-structure-coordinateur', envoiUtilisateur);
+    await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Vous êtes déjà inscrite',
     });
   });
@@ -235,17 +226,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-structure-coordinateur',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.contact.telephone).toBe(
+      expect(response.body.contact.telephone).toBe(
         '+' + debutTelephone + '611223344',
       );
     },
@@ -381,8 +369,15 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       },
       error: 'L’identification de la mission du coordinateur est requis',
     },
+    {
+      testKey: 'h-captcha-response',
+      key: {
+        'h-captcha-response': undefined
+      },
+      error: 'Le captcha est obligatoire',
+    },
   ])(
-    'si j’envoie un formulaire avec la clé $testKey égale à undefined alors j’ai une erreur',
+    'si j’envoie un formulaire avec la clé $testKey égale à undefined alors il y a une erreur',
     async ({ key, error }) => {
       // GIVEN
       const envoiUtilisateur = {
@@ -391,22 +386,19 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-structure-coordinateur',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(400);
-      expect(response.data).toStrictEqual({
+      expect(response.body).toStrictEqual({
         message: error,
       });
     },
   );
-  it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -414,21 +406,19 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le numéro de téléphone est invalide',
     });
   });
 
-  it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors il y a une erreur de validation', async () => {
     // GIVEN
     const lettreA = 'a';
     const envoiUtilisateur = {
@@ -437,16 +427,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'La motivation ne doit pas dépasser 2500 caractères',
     });
   });
@@ -461,19 +449,17 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(200);
-    expect(response.data.motivation).toBe(motivation);
+    expect(response.body.motivation).toBe(motivation);
   });
 
-  it('si j’envoie un formulaire avec une date disponibilité inférieur à la date du jour alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une date disponibilité inférieur à la date du jour alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -481,16 +467,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'La date doit être supérieur à la date du jour',
     });
   });
@@ -505,21 +489,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-structure-coordinateur',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.missionCoordinateur).toBe(missionCoordinateur);
+      expect(response.body.missionCoordinateur).toBe(missionCoordinateur);
     },
   );
 
-  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -527,16 +508,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'L’identification de la mission du coordinateur est requis',
     });
   });
@@ -559,21 +538,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-structure-coordinateur',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.type).toBe(type);
+      expect(response.body.type).toBe(type);
     },
   );
 
-  it('si j’envoie un formulaire avec une structure de type invalide alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une structure de type invalide alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -581,16 +557,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le type est invalide',
     });
   });
@@ -605,21 +579,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-structure-coordinateur',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.missionCoordinateur).toBe(missionCoordinateur);
+      expect(response.body.missionCoordinateur).toBe(missionCoordinateur);
     },
   );
 
-  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -627,17 +598,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'L’identification de la mission du coordinateur est requis',
     });
   });
@@ -660,21 +628,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await requetePost(
-        '/candidature-structure-coordinateur',
-        envoiUtilisateur,
-      );
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.data.type).toBe(type);
+      expect(response.body.type).toBe(type);
     },
   );
 
-  it('si j’envoie un formulaire avec une structure de type invalide alors j’ai une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une structure de type invalide alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -682,17 +647,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await requetePost(
-      '/candidature-structure-coordinateur',
-      envoiUtilisateur,
-    );
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
     expect(response.status).toBe(400);
-    expect(response.data).toStrictEqual({
+    expect(response.body).toStrictEqual({
       message: 'Le type est invalide',
     });
   });
