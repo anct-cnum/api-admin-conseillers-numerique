@@ -1,12 +1,14 @@
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
-import axios from 'axios';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
 
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+
+import verifyCaptcha from '../../../utils/verifyCaptcha';
+
 
 type CandidatureConseillerInput = {
   prenom: string;
