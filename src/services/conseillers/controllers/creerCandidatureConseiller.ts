@@ -9,7 +9,7 @@ import verifyCaptcha from '../../../utils/verifyCaptcha';
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-type CandidatureConseillerInput = {
+export type CandidatureConseillerInput = {
   prenom: string;
   nom: string;
   email: string;
@@ -87,7 +87,7 @@ const getDernierIdPG = async (app: Application): Promise<number> => {
   return dernierConseiller?.idPG || 0;
 };
 
-const construireConseiller = async (
+export const construireConseiller = async (
   app: Application,
   body: CandidatureConseillerInput,
 ): Promise<Conseiller> => {
