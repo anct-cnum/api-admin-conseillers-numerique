@@ -267,7 +267,7 @@ export default class Structures extends Service {
 
     app.post(
       '/candidature-structure-coordinateur',
-      validerCandidatureStructureCoordinateur(),
+      validerCandidatureStructureCoordinateur(app),
       creerCandidatureStructureCoordinateur(app),
     );
   }
