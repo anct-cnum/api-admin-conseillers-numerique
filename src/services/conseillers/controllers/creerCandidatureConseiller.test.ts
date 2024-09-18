@@ -117,10 +117,6 @@ describe('recevoir et valider une candidature conseiller', () => {
   });
 
   it('si j’envoie un formulaire alors je reçois un mail de confirmation', async () => {
-    // GIVEN
-    // const mockSendMail = vi.fn();
-    // vi.spyOn(nodemailer, 'createTransport').mockReturnValue({ sendMail: mockSendMail, use: vi.fn() });
-
     // WHEN
     await request(app)
       .post('/candidature-conseiller')

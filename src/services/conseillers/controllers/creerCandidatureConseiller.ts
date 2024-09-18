@@ -100,7 +100,7 @@ const getDernierIdPG = async (app: Application): Promise<number> => {
   return dernierConseiller?.idPG || 0;
 };
 
-export const construireConseiller = async (
+const construireConseiller = async (
   app: Application,
   body: CandidatureConseillerInput,
 ): Promise<Conseiller> => {
