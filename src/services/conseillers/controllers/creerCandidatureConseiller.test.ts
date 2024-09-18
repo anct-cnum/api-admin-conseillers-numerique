@@ -325,286 +325,285 @@ describe('recevoir et valider une candidature conseiller', () => {
     });
   });
 
-  // it('si j’envoie un formulaire avec une distance max invalide alors j’ai une erreur de validation', async () => {
-  //   // GIVEN
-  //   const envoiUtilisateur = {
-  //     ...champsObligatoiresFormConseiller,
-  //     distanceMax: 3,
-  //   };
+  it('si j’envoie un formulaire avec une distance max invalide alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoiresFormConseiller,
+      distanceMax: 3,
+    };
 
-  //   // WHEN
-  //   const response = await request(app)
-  //     .post('/candidature-conseiller')
-  //     .send(envoiUtilisateur);
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
-  //   // THEN
-  //   expect(response.headers['content-type']).toBe(
-  //     'application/json; charset=utf-8',
-  //   );
-  //   expect(response.status).toBe(400);
-  //   expect(response.body).toStrictEqual({
-  //     message: 'La distance est invalide',
-  //   });
-  // });
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      message: 'La distance est invalide',
+    });
+  });
 
-  // it('si j’envoie un formulaire avec un e-mail déjà existant alors j’ai une erreur', async () => {
-  //   // GIVEN
-  //   const envoiUtilisateur = {
-  //     ...champsObligatoiresFormConseiller,
-  //   };
+  it('si j’envoie un formulaire avec un e-mail déjà existant alors j’ai une erreur', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoiresFormConseiller,
+    };
 
-  //   // WHEN
-  //   await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
-  //   const response = await request(app)
-  //     .post('/candidature-conseiller')
-  //     .send(envoiUtilisateur);
+    // WHEN
+    await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
-  //   // THEN
-  //   expect(response.headers['content-type']).toBe(
-  //     'application/json; charset=utf-8',
-  //   );
-  //   expect(response.status).toBe(400);
-  //   expect(response.body).toStrictEqual({
-  //     message: 'L’email est déjà utilisé',
-  //   });
-  // });
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      message: 'L’email est déjà utilisé',
+    });
+  });
 
-  // it.each([
-  //   {
-  //     testKey: 'prenom',
-  //     key: { prenom: undefined },
-  //     error: 'Le prénom est requis',
-  //   },
-  //   {
-  //     testKey: 'nom',
-  //     key: { nom: undefined },
-  //     error: 'Le nom est requis',
-  //   },
-  //   {
-  //     testKey: 'email',
-  //     key: { email: undefined },
-  //     error: 'L’adresse e-mail est invalide',
-  //   },
-  //   {
-  //     testKey: 'nomCommune',
-  //     key: { nomCommune: undefined },
-  //     error: 'La ville est requise',
-  //   },
-  //   {
-  //     testKey: 'codePostal',
-  //     key: { codePostal: undefined },
-  //     error: 'Le code postal est invalide',
-  //   },
-  //   {
-  //     testKey: 'codeCommune',
-  //     key: { codeCommune: undefined },
-  //     error: 'Le code commune est invalide',
-  //   },
-  //   {
-  //     testKey: 'codeDepartement',
-  //     key: { codeDepartement: undefined },
-  //     error: 'Le code département est requis',
-  //   },
-  //   {
-  //     testKey: 'codeRegion',
-  //     key: { codeRegion: undefined },
-  //     error: 'Le code région est requis',
-  //   },
-  //   {
-  //     testKey: 'location',
-  //     key: {
-  //       location: undefined,
-  //     },
-  //     error: 'La localisation est requise',
-  //   },
-  //   {
-  //     testKey: 'location.type',
-  //     key: {
-  //       location: { ...champsObligatoiresFormConseiller.location, type: undefined },
-  //     },
-  //     error: 'Le type est invalide',
-  //   },
-  //   {
-  //     testKey: 'location.coordinates',
-  //     key: {
-  //       location: { ...champsObligatoiresFormConseiller.location, coordinates: undefined },
-  //     },
-  //     error: 'Les coordonées sont invalides',
-  //   },
-  //   {
-  //     testKey: 'estDemandeurEmploi',
-  //     key: { estDemandeurEmploi: undefined },
-  //     error: 'L’experience médiateur numérique est requise',
-  //   },
-  //   {
-  //     testKey: 'estEnEmploi',
-  //     key: { estEnEmploi: undefined },
-  //     error: '"estEnEmploi" is required',
-  //   },
-  //   {
-  //     testKey: 'estEnFormation',
-  //     key: { estEnFormation: undefined },
-  //     error: '"estEnFormation" is required',
-  //   },
-  //   {
-  //     testKey: 'estDiplomeMedNum',
-  //     key: { estDiplomeMedNum: undefined },
-  //     error: '"estDiplomeMedNum" is required',
-  //   },
-  //   {
-  //     testKey: 'nomDiplomeMedNum',
-  //     key: { estDiplomeMedNum: true, nomDiplomeMedNum: undefined },
-  //     error: 'Le nom du diplôme est requis',
-  //   },
-  //   {
-  //     testKey: 'aUneExperienceMedNum',
-  //     key: { aUneExperienceMedNum: undefined },
-  //     error: '"aUneExperienceMedNum" is required',
-  //   },
-  //   {
-  //     testKey: 'dateDisponibilite',
-  //     key: { dateDisponibilite: undefined },
-  //     error: 'La date est requise',
-  //   },
-  //   {
-  //     testKey: 'distanceMax',
-  //     key: { distanceMax: undefined },
-  //     error: 'La distance est invalide',
-  //   },
-  //   {
-  //     testKey: 'motivation',
-  //     key: { motivation: undefined },
-  //     error: 'La motivation est requise',
-  //   },
-  //   {
-  //     testKey: 'h-captcha-response',
-  //     key: { 'h-captcha-response': undefined },
-  //     error: 'Le captcha est obligatoire',
-  //   },
-  // ])(
-  //   'si j’envoie un formulaire avec la clé $testKey égale à undefined alors j’ai une erreur',
-  //   async ({ key, error }) => {
-  //     // GIVEN
-  //     const envoiUtilisateur = {
-  //       ...champsObligatoiresFormConseiller,
-  //       ...key,
-  //     };
+  it.each([
+    {
+      testKey: 'prenom',
+      key: { prenom: undefined },
+      error: 'Le prénom est requis',
+    },
+    {
+      testKey: 'nom',
+      key: { nom: undefined },
+      error: 'Le nom est requis',
+    },
+    {
+      testKey: 'email',
+      key: { email: undefined },
+      error: 'L’adresse e-mail est invalide',
+    },
+    {
+      testKey: 'nomCommune',
+      key: { nomCommune: undefined },
+      error: 'La ville est requise',
+    },
+    {
+      testKey: 'codePostal',
+      key: { codePostal: undefined },
+      error: 'Le code postal est invalide',
+    },
+    {
+      testKey: 'codeCommune',
+      key: { codeCommune: undefined },
+      error: 'Le code commune est invalide',
+    },
+    {
+      testKey: 'codeDepartement',
+      key: { codeDepartement: undefined },
+      error: 'Le code département est requis',
+    },
+    {
+      testKey: 'codeRegion',
+      key: { codeRegion: undefined },
+      error: 'Le code région est requis',
+    },
+    {
+      testKey: 'location',
+      key: {
+        location: undefined,
+      },
+      error: 'La localisation est requise',
+    },
+    {
+      testKey: 'location.type',
+      key: {
+        location: { ...champsObligatoiresFormConseiller.location, type: undefined },
+      },
+      error: 'Le type est invalide',
+    },
+    {
+      testKey: 'location.coordinates',
+      key: {
+        location: { ...champsObligatoiresFormConseiller.location, coordinates: undefined },
+      },
+      error: 'Les coordonées sont invalides',
+    },
+    {
+      testKey: 'estDemandeurEmploi',
+      key: { estDemandeurEmploi: undefined },
+      error: 'L’experience médiateur numérique est requise',
+    },
+    {
+      testKey: 'estEnEmploi',
+      key: { estEnEmploi: undefined },
+      error: '"estEnEmploi" is required',
+    },
+    {
+      testKey: 'estEnFormation',
+      key: { estEnFormation: undefined },
+      error: '"estEnFormation" is required',
+    },
+    {
+      testKey: 'estDiplomeMedNum',
+      key: { estDiplomeMedNum: undefined },
+      error: '"estDiplomeMedNum" is required',
+    },
+    {
+      testKey: 'nomDiplomeMedNum',
+      key: { estDiplomeMedNum: true, nomDiplomeMedNum: undefined },
+      error: 'Le nom du diplôme est requis',
+    },
+    {
+      testKey: 'aUneExperienceMedNum',
+      key: { aUneExperienceMedNum: undefined },
+      error: '"aUneExperienceMedNum" is required',
+    },
+    {
+      testKey: 'dateDisponibilite',
+      key: { dateDisponibilite: undefined },
+      error: 'La date est requise',
+    },
+    {
+      testKey: 'distanceMax',
+      key: { distanceMax: undefined },
+      error: 'La distance est invalide',
+    },
+    {
+      testKey: 'motivation',
+      key: { motivation: undefined },
+      error: 'La motivation est requise',
+    },
+    {
+      testKey: 'h-captcha-response',
+      key: { 'h-captcha-response': undefined },
+      error: 'Le captcha est obligatoire',
+    },
+  ])(
+    'si j’envoie un formulaire avec la clé $testKey égale à undefined alors j’ai une erreur',
+    async ({ key, error }) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoiresFormConseiller,
+        ...key,
+      };
 
-  //     // WHEN
-  //     const response = await request(app)
-  //       .post('/candidature-conseiller')
-  //       .send(envoiUtilisateur);
+      // WHEN
+      const response = await request(app)
+        .post('/candidature-conseiller')
+        .send(envoiUtilisateur);
 
-  //     // THEN
-  //     expect(response.headers['content-type']).toBe(
-  //       'application/json; charset=utf-8',
-  //     );
-  //     expect(response.status).toBe(400);
-  //     expect(response.body).toStrictEqual({
-  //       message: error,
-  //     });
-  //   },
-  // );
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: error,
+      });
+    },
+  );
 
-  // it.each([
-  //   {
-  //     testKey: 'contact.telephone',
-  //     key: { telephone: '' },
-  //     result: '',
-  //   },
-  //   {
-  //     testKey: 'contact.telephone',
-  //     key: { telephone: null },
-  //     result: null,
-  //   },
-  // ])(
-  //   'si j’envoie un formulaire avec la clé optionnel $testKey égale à $result alors j’ai pas d’erreur de validation',
-  //   async ({ key, result }) => {
-  //     // GIVEN
-  //     const envoiUtilisateur = {
-  //       ...champsObligatoiresFormConseiller,
-  //       ...key,
-  //     };
+  it.each([
+    {
+      testKey: 'contact.telephone',
+      key: { telephone: '' },
+      result: '',
+    },
+    {
+      testKey: 'contact.telephone',
+      key: { telephone: null },
+      result: null,
+    },
+  ])(
+    'si j’envoie un formulaire avec la clé optionnel $testKey égale à $result alors j’ai pas d’erreur de validation',
+    async ({ key, result }) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoiresFormConseiller,
+        ...key,
+      };
 
-  //     // WHEN
-  //     const response = await request(app)
-  //     .post('/candidature-conseiller')
-  //     .send(envoiUtilisateur);
-  //     console.log('response:', response);
+      // WHEN
+      const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
-  //     // THEN
-  //     expect(response.headers['content-type']).toBe(
-  //       'application/json; charset=utf-8',
-  //     );
-  //     expect(response.status).toBe(200);
-  //     expect(response.body.telephone).toBe(result);
-  //   },
-  // );
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.body.telephone).toBe(result);
+    },
+  );
 
-  // it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
-  //   // GIVEN
-  //   const lettreA = 'a';
-  //   const envoiUtilisateur = {
-  //     ...champsObligatoiresFormConseiller,
-  //     motivation: lettreA.repeat(2501),
-  //   };
+  it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
+    // GIVEN
+    const lettreA = 'a';
+    const envoiUtilisateur = {
+      ...champsObligatoiresFormConseiller,
+      motivation: lettreA.repeat(2501),
+    };
 
-  //   // WHEN
-  //   const response = await request(app)
-  //     .post('/candidature-conseiller')
-  //     .send(envoiUtilisateur);
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
-  //   // THEN
-  //   expect(response.headers['content-type']).toBe(
-  //     'application/json; charset=utf-8',
-  //   );
-  //   expect(response.status).toBe(400);
-  //   expect(response.body).toStrictEqual({
-  //     message: 'La motivation ne doit pas dépasser 2500 caractères',
-  //   });
-  // });
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+    expect(response.body).toStrictEqual({
+      message: 'La motivation ne doit pas dépasser 2500 caractères',
+    });
+  });
 
-  // it('si j’envoie un formulaire avec une motivation strictement égale à 2500 caractères alors alors il est validé', async () => {
-  //   // GIVEN
-  //   const lettreA = 'a';
-  //   const motivation = lettreA.repeat(2500);
-  //   const envoiUtilisateur = {
-  //     ...champsObligatoiresFormConseiller,
-  //     motivation,
-  //   };
+  it('si j’envoie un formulaire avec une motivation strictement égale à 2500 caractères alors alors il est validé', async () => {
+    // GIVEN
+    const lettreA = 'a';
+    const motivation = lettreA.repeat(2500);
+    const envoiUtilisateur = {
+      ...champsObligatoiresFormConseiller,
+      motivation,
+    };
 
-  //   // WHEN
-  //   const response = await request(app)
-  //     .post('/candidature-conseiller')
-  //     .send(envoiUtilisateur);
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
-  //   // THEN
-  //   expect(response.headers['content-type']).toBe(
-  //     'application/json; charset=utf-8',
-  //   );
-  //   expect(response.status).toBe(200);
-  //   expect(response.body.motivation).toBe(motivation);
-  // });
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.motivation).toBe(motivation);
+  });
 
-  // it('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
-  //   // GIVEN
-  //   mockedAxios.post.mockResolvedValue({
-  //     data: { success: false },
-  //   });
-  //   const envoiUtilisateur = {
-  //     ...champsObligatoiresFormConseiller,
-  //     'h-captcha-response': 'captcha-incorrect',
-  //   };
+  it('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
+    // GIVEN
+    mockedAxios.post.mockResolvedValue({
+      data: { success: false },
+    });
+    const envoiUtilisateur = {
+      ...champsObligatoiresFormConseiller,
+      'h-captcha-response': 'captcha-incorrect',
+    };
 
-  //   // WHEN
-  //   const response = await request(app)
-  //     .post('/candidature-conseiller')
-  //     .send(envoiUtilisateur);
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
 
-  //   // THEN
-  //   expect(response.headers['content-type']).toBe(
-  //     'application/json; charset=utf-8',
-  //   );
-  //   expect(response.status).toBe(400);
-  // });
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+  });
 });
