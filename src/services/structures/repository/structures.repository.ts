@@ -1,4 +1,5 @@
 import { Application } from '@feathersjs/express';
+import axios from 'axios';
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
@@ -457,8 +458,24 @@ const totalParDemandesConseiller = async (app: Application, req: IRequest) => {
   };
 };
 
+const getRidetData = async (ridet: string) => {
+  const params = new URLSearchParams({
+    where: `rid7='${ridet.padStart(7, '0')}'`,
+    select: 'denomination,libelle_commune,province,libelle_naf',
+    limit: '1',
+  });
+  const url = `https://data.gouv.nc/api/explore/v2.1/catalog/datasets/entreprises-actives-au-ridet/records?${params}`;
+  try {
+    const response = await axios.get(url);
+    return response.data.results[0] ?? null;
+  } catch (error) {
+    throw new Error(`API Error : ${error} ${url}`);
+  }
+};
+
 export {
   checkAccessReadRequestStructures,
+  getRidetData,
   filterDepartement,
   filterSearchBar,
   filterType,
