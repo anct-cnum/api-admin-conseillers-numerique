@@ -122,7 +122,7 @@ export default class Conseillers extends Service {
     app.post(
       '/candidature-conseiller',
       apiAuthorization(app),
-      validerCandidatureConseiller(),
+      validerCandidatureConseiller(app),
       creerCandidatureConseiller(app),
     );
     app.patch(

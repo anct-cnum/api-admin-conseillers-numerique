@@ -1,5 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
+import axios from 'axios';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
@@ -31,6 +32,7 @@ type CandidatureConseillerInput = {
   estEnFormation: boolean;
   estDiplomeMedNum: boolean;
   nomDiplomeMedNum: string;
+  'h-captcha-response': string;
 };
 
 type Conseiller = CandidatureConseillerInput & {
@@ -43,10 +45,26 @@ type Conseiller = CandidatureConseillerInput & {
   emailConfirmationKey: string;
 };
 
+const verifyCaptcha = async (app, token) => {
+  const response = await axios.post(
+    'https://hcaptcha.com/siteverify',
+    new URLSearchParams({
+      secret: app.get('hcaptcha_secret'),
+      response: token,
+    }),
+  );
+
+  if (!response.data.success) {
+    throw new Error('Le captcha est invalide');
+  }
+};
+
 export const validerCandidatureConseiller =
-  () => async (request: Request, response: Response, next: NextFunction) => {
+  (app: Application) =>
+  async (request: Request, response: Response, next: NextFunction) => {
     try {
       await validCandidatureConseiller.validateAsync(request.body);
+      await verifyCaptcha(app, request.body['h-captcha-response']);
       return next();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
@@ -57,10 +75,18 @@ const creerCandidatureConseiller =
   (app: Application) => async (request: Request, response: Response) => {
     const candidatureConseiller = await construireConseiller(app, request.body);
     try {
-      const result = await stockerCandidatureConseiller(
+      const result: any = await stockerCandidatureConseiller(
         candidatureConseiller,
         app,
       );
+      const { email, prenom } = candidatureConseiller;
+      await envoyerConfirmationParMail(
+        app,
+        email,
+        prenom,
+        candidatureConseiller.emailConfirmationKey,
+      );
+      delete result.emailConfirmationKey;
       return response.status(200).json(result).end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
@@ -91,11 +117,12 @@ export const construireConseiller = async (
   };
 };
 
-export const mailConfirmationAdresseMail = async (
+
+export const envoyerConfirmationParMail = async (
   app: Application,
   email: string,
   prenom: string,
-  token: void,
+  token: string,
 ): Promise<any> => {
   const body = await mailer(app).render(
     path.join(__dirname, '../../../emails/confirmation-email-candidature'),
@@ -108,7 +135,7 @@ export const mailConfirmationAdresseMail = async (
     },
   );
   return mailer(app).createMailer().sendEmail(email, {
-    subject: 'Confirmation adresse mail',
+    subject: 'Confirmation de votre adresse e-mail',
     body,
   });
 };
@@ -118,24 +145,16 @@ const stockerCandidatureConseiller = async (
   app: Application,
 ): Promise<void> => {
   try {
-    const { email, prenom } = candidatureConseiller;
     const emailExists =
-      (await app
-        .service(service.conseillers)
-        .Model.countDocuments({ email })) !== 0;
+      (await app.service(service.conseillers).Model.countDocuments({
+        email: candidatureConseiller.email,
+      })) !== 0;
     if (emailExists) {
       throw new Error('L’email est déjà utilisé');
     }
     const result = await app
       .service(service.conseillers)
       .create(candidatureConseiller);
-    await mailConfirmationAdresseMail(
-      app,
-      email,
-      prenom,
-      result.emailConfirmationKey,
-    );
-    delete result.emailConfirmationKey;
     return result;
   } catch (error) {
     throw new Error(error.message);
