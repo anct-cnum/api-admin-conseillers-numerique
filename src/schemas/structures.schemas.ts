@@ -249,6 +249,9 @@ const validCandidatureStructure = Joi.object({
     .valid(true)
     .required()
     .error(new Error('La confirmation d’engagement est requis')),
+  'h-captcha-response': Joi.string()
+    .required()
+    .error(new Error('Le captcha est obligatoire')),
 });
 
 const validCandidatureStructureCoordinateur = Joi.object({
