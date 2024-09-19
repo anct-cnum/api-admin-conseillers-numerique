@@ -62,8 +62,7 @@ const creerCandidatureConseiller =
   (app: Application) => async (request: Request, response: Response) => {
     const candidatureConseiller = await construireConseiller(app, request.body);
     try {
-      // TODO
-      const result: any = await stockerCandidatureConseiller(
+      const result = await stockerCandidatureConseiller(
         candidatureConseiller,
         app,
       );
@@ -130,7 +129,7 @@ export const envoyerConfirmationParMail = async (
 const stockerCandidatureConseiller = async (
   candidatureConseiller: Conseiller,
   app: Application,
-): Promise<void> => {
+): Promise<Conseiller> => {
   try {
     const emailExists =
       (await app.service(service.conseillers).Model.countDocuments({
