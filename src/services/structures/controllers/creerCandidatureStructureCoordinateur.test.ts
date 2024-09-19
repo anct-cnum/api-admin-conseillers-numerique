@@ -28,7 +28,7 @@ const champsObligatoires = {
   },
   dateDebutMission: new Date(3024, 8, 1, 13),
   aIdentifieCoordinateur: true,
-  missionCoordinateur: 'COORDINATEUR',
+  coordinateurTypeContrat: 'PT',
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
   "h-captcha-response": "captcha"
@@ -77,7 +77,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       type: 'Point',
     });
     expect(response.body.aIdentifieCoordinateur).toBe(true);
-    expect(response.body.missionCoordinateur).toBe('COORDINATEUR');
+    expect(response.body.coordinateurTypeContrat).toBe('PT');
     expect(response.body.motivation).toBe('Je suis motivé.');
     expect(response.body.confirmationEngagement).toBe(true);
   });
@@ -115,7 +115,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       type: 'Point',
     });
     expect(response.body.aIdentifieCoordinateur).toBe(true);
-    expect(response.body.missionCoordinateur).toBe('COORDINATEUR');
+    expect(response.body.coordinateurTypeContrat).toBe('PT');
     expect(response.body.motivation).toBe('Je suis motivé.');
     expect(response.body.confirmationEngagement).toBe(true);
     expect(response.body.idPG).toBe(1);
@@ -125,8 +125,8 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.body.estZRR).toBe(null);
     expect(response.body.prefet).toStrictEqual([]);
     expect(response.body.coselec).toStrictEqual([]);
-    expect(response.body.coordinateurCandidature).toStrictEqual(false);
-    expect(response.body.coordinateurTypeContrat).toStrictEqual(null);
+    expect(response.body.coordinateurCandidature).toStrictEqual(true);
+    expect(response.body.coordinateurTypeContrat).toStrictEqual('PT');
     expect(response.body.nombreConseillersSouhaites).toBe(1);
     expect(response.body.aIdentifieCandidat).toBe(false);
   });
@@ -363,9 +363,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       error: 'L’identification du coordinateur est requis',
     },
     {
-      testKey: 'missionCoordinateur',
+      testKey: 'coordinateurTypeContrat',
       key: {
-        missionCoordinateur: undefined,
+        coordinateurTypeContrat: undefined,
       },
       error: 'L’identification de la mission du coordinateur est requis',
     },
@@ -479,13 +479,13 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it.each(['COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR'])(
-    'si j’envoie un formulaire avec une missionCoordinateur égale à +%d alors il est validé',
-    async (missionCoordinateur) => {
+  it.each(['PT', 'FT'])(
+    'si j’envoie un formulaire avec une coordinateurTypeContrat égale à +%d alors il est validé',
+    async (coordinateurTypeContrat) => {
       // GIVEN
       const envoiUtilisateur = {
         ...champsObligatoires,
-        missionCoordinateur,
+        coordinateurTypeContrat,
       };
 
       // WHEN
@@ -496,15 +496,15 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.body.missionCoordinateur).toBe(missionCoordinateur);
+      expect(response.body.coordinateurTypeContrat).toBe(coordinateurTypeContrat);
     },
   );
 
-  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors il y a une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une coordinateurTypeContrat incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      missionCoordinateur: 'TEST',
+      coordinateurTypeContrat: 'TEST',
     };
 
     // WHEN
@@ -569,13 +569,13 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it.each(['COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR'])(
-    'si j’envoie un formulaire avec une missionCoordinateur égale à +%d alors il est validé',
-    async (missionCoordinateur) => {
+  it.each(['PT', 'FT'])(
+    'si j’envoie un formulaire avec une coordinateurTypeContrat égale à +%d alors il est validé',
+    async (coordinateurTypeContrat) => {
       // GIVEN
       const envoiUtilisateur = {
         ...champsObligatoires,
-        missionCoordinateur,
+        coordinateurTypeContrat,
       };
 
       // WHEN
@@ -586,15 +586,15 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.body.missionCoordinateur).toBe(missionCoordinateur);
+      expect(response.body.coordinateurTypeContrat).toBe(coordinateurTypeContrat);
     },
   );
 
-  it('si j’envoie un formulaire avec une missionCoordinateur incorrecte alors il y a une erreur de validation', async () => {
+  it('si j’envoie un formulaire avec une coordinateurTypeContrat incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      missionCoordinateur: 'TEST',
+      coordinateurTypeContrat: 'TEST',
     };
 
     // WHEN

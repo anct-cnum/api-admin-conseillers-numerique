@@ -28,7 +28,7 @@ type CandidatureStructureCoordinateurInput = {
   };
   dateDebutMission: Date;
   aIdentifieCoordinateur: boolean;
-  missionCoordinateur: string;
+  coordinateurTypeContrat: string;
   motivation: string;
   confirmationEngagement: boolean;
 };
@@ -43,9 +43,8 @@ type Structure = CandidatureStructureCoordinateurInput & {
   estZRR: boolean;
   prefet: Array<string>;
   coselec: Array<string>;
-  coordinateurCandidature: boolean;
-  coordinateurTypeContrat: string;
   nombreConseillersSouhaites: number;
+  coordinateurCandidature: boolean;
   aIdentifieCandidat: boolean;
 };
 const getDernierIdPG = async (app: Application): Promise<number> => {
@@ -71,9 +70,8 @@ const construireStructureCoordinateur = async (
     estZRR: null,
     prefet: [],
     coselec: [],
-    coordinateurCandidature: false,
-    coordinateurTypeContrat: null,
     nombreConseillersSouhaites: 1,
+    coordinateurCandidature: true,
     aIdentifieCandidat: false,
   };
 };
