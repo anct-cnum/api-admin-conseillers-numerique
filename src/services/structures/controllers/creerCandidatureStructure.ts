@@ -2,6 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructure } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
+import verifyCaptcha from '../../../utils/verifyCaptcha';
 
 type CandidatureStructureInput = {
   type: string;
@@ -30,6 +31,7 @@ type CandidatureStructureInput = {
   nombreConseillersSouhaites: number;
   motivation: string;
   confirmationEngagement: boolean;
+  'h-captcha-response': string;
 };
 
 type Structure = CandidatureStructureInput & {
@@ -47,9 +49,11 @@ type Structure = CandidatureStructureInput & {
 };
 
 export const validerCandidatureStructure =
-  () => async (request: Request, response: Response, next: NextFunction) => {
+  (app: Application) =>
+  async (request: Request, response: Response, next: NextFunction) => {
     try {
       await validCandidatureStructure.validateAsync(request.body);
+      await verifyCaptcha(app, request.body['h-captcha-response']);
       return next();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
@@ -99,7 +103,7 @@ const stockerCandidatureStructure = async (
       ],
     })) !== 0;
   if (siretOuRidetExists) {
-    throw new Error('Vous êtes déjà inscrite');
+    throw new Error('Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé');
   }
   const result = await app
     .service(service.structures)
