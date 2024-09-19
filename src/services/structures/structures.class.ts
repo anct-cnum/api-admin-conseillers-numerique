@@ -46,6 +46,7 @@ import creerCandidatureStructure, {
 import creerCandidatureStructureCoordinateur, {
   validerCandidatureStructureCoordinateur,
 } from './controllers/creerCandidatureStructureCoordinateur';
+import confirmationEmailCandidatureStructure from './controllers/confirmationEmailCandidatureStructure';
 
 export default class Structures extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -269,6 +270,10 @@ export default class Structures extends Service {
       '/candidature-structure-coordinateur',
       validerCandidatureStructureCoordinateur(app),
       creerCandidatureStructureCoordinateur(app),
+    );
+    app.patch(
+      '/confirmation-email-inscription-structure/:id',
+      confirmationEmailCandidatureStructure(app),
     );
     app.get(
       '/structure/verify-siret-or-ridet/:siretOrRidet',

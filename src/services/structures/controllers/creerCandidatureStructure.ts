@@ -56,7 +56,7 @@ export const validerCandidatureStructure =
     }
   };
 
-const construireStructure = async (
+export const construireStructure = async (
   app: Application,
   body: CandidatureStructureInput,
 ): Promise<Structure> => {
