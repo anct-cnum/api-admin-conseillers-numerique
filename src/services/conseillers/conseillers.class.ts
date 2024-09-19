@@ -24,6 +24,7 @@ import creerCandidatureConseiller, {
   validerCandidatureConseiller,
 } from './controllers/creerCandidatureConseiller';
 import apiAuthorization from '../../middleware/apiAuthorization';
+import confirmationEmailCandidature from './controllers/confirmationEmailCandidature';
 
 export default class Conseillers extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -123,6 +124,10 @@ export default class Conseillers extends Service {
       apiAuthorization(app),
       validerCandidatureConseiller(app),
       creerCandidatureConseiller(app),
+    );
+    app.patch(
+      '/confirmation-email-inscription/:id',
+      confirmationEmailCandidature(app),
     );
   }
 }

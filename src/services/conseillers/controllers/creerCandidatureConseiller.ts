@@ -9,7 +9,7 @@ import verifyCaptcha from '../../../utils/verifyCaptcha';
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-type CandidatureConseillerInput = {
+export type CandidatureConseillerInput = {
   prenom: string;
   nom: string;
   email: string;
@@ -115,7 +115,9 @@ export const envoyerConfirmationParMail = async (
     path.join(__dirname, '../../../emails/confirmation-email-candidature'),
     'confirmation-email-inscription',
     {
-      link: mailer(app).utils.getPublicUrl(`/candidature-confirmer/${token}`),
+      link: mailer(app).utils.getPublicUrl(
+        `/confirmation-email-inscription/${token}`,
+      ),
       prenom,
     },
   );
