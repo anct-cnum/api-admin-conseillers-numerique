@@ -3,7 +3,7 @@ import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructure } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
 
-type CandidatureStructureInput = {
+export type CandidatureStructureInput = {
   type: string;
   nom: string;
   siret: string;
