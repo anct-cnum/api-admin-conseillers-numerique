@@ -112,7 +112,7 @@ export const envoyerConfirmationParMail = async (
 ): Promise<any> => {
   const body = await mailer(app).render(
     path.join(__dirname, '../../../emails/confirmation-email-candidature'),
-    'confirmation-email-inscription',
+    'confirmation-email-inscription-conseiller',
     {
       link: mailer(app).utils.getPublicUrl(
         `/confirmation-email-inscription/${token}`,
