@@ -51,6 +51,8 @@ export default function (app: Application) {
     `${app.get('espace_coop_hostname')}${pathUrl}`;
 
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
+  const getDemarcheSimplifierUrl = (id: string) =>
+    `${app.get('demarche_simplifier_coordinateur-hostname')}${id}`;
 
   const initSentry = () => {
     if (config().sentry.enabled === 'true') {
@@ -79,6 +81,7 @@ export default function (app: Application) {
     getPixSupportMail,
     getEspaceCandidatUrl,
     getEspaceCoopUrl,
+    getDemarcheSimplifierUrl,
   };
   return {
     utils,

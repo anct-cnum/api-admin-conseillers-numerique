@@ -2,6 +2,7 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections } from '../../../tests/utils';
 import axios from "axios"
+import nodemailer from 'nodemailer';
 
 import app from '../../../app';
 const champsObligatoires = {
@@ -36,6 +37,7 @@ const champsObligatoires = {
 
 vi.mock("axios")
 const mockedAxios = vi.mocked(axios, true);
+const mockSendMail = vi.fn();
 
 describe('recevoir et valider une candidature structure coordinateur', () => {
   beforeEach(async () => {
@@ -43,6 +45,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     mockedAxios.post.mockResolvedValue({
       data: { success: true },
     });
+    vi.spyOn(nodemailer, 'createTransport').mockReturnValue({ sendMail: mockSendMail, use: vi.fn() });
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
@@ -129,6 +132,29 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.body.coordinateurTypeContrat).toStrictEqual(null);
     expect(response.body.nombreConseillersSouhaites).toBe(1);
     expect(response.body.aIdentifieCandidat).toBe(false);
+    expect(response.body.emailConfirmationKey).toBe(undefined);
+  });
+
+  it('si j’envoie un formulaire alors je reçois un mail de confirmation en tant que structure coordinateur', async () => {
+    //GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+    };
+    
+    // WHEN
+    await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
+
+    // THEN
+    expect(mockSendMail).toHaveBeenCalledWith({
+      from: expect.anything(),
+      html: expect.anything(),
+      list: expect.anything(),
+      replyTo: expect.anything(),
+      subject: "Formulaire de motivation et confirmation de votre adresse e-mail",
+      to: "camlien_rousseau74@example.net"
+    });
   });
 
   it('si j’envoie un formulaire sans siret mais avec un ridet alors il n’y a pas d’erreur de validation', async () => {
