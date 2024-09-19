@@ -109,7 +109,7 @@ export type ConseillerPourLaCoopMediation = Readonly<{
     };
     location: {
       type: string;
-      coordinates: number[];
+      coordinates: [number, number];
     };
     horaires: Object[];
     typeAcces: string[];
