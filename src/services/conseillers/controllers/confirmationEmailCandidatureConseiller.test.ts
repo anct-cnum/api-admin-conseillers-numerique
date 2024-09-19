@@ -9,7 +9,7 @@ describe('Pouvoir confirmer mon adresse mail d’inscription', () => {
   it('Quand je valide mon e-mail d’inscription mais que le lien est invalide alors j’ai une erreur', async () => {
     //GIVEN
     const tokenInvalide = '1';
-    const urlConfirmationEmail = '/confirmation-email-inscription';
+    const urlConfirmationEmail = '/confirmation-email-inscription-conseiller';
 
     // WHEN
     const response = await requetePatch(
@@ -31,7 +31,7 @@ describe('Pouvoir confirmer mon adresse mail d’inscription', () => {
       champsObligatoiresFormConseiller,
     );
     const result = await app.service('conseillers').create(createUtilisateur);
-    const urlConfirmationEmail = '/confirmation-email-inscription';
+    const urlConfirmationEmail = '/confirmation-email-inscription-conseiller';
     const tokenValide = result.emailConfirmationKey;
 
     // WHEN
