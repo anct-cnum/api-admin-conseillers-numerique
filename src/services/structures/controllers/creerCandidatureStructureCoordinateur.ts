@@ -145,7 +145,7 @@ const envoyerConfirmationParMail = async (
     },
   );
   return mailer(app).createMailer().sendEmail(email, {
-    subject: 'Formulaire de motivation et confirmation de votre adresse e-mail',
+    subject: 'Candidature pour un poste de coordinateur',
     body,
   });
 };
