@@ -3,6 +3,10 @@ import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructureCoordinateur } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
 import verifyCaptcha from '../../../utils/verifyCaptcha';
+import mailer from '../../../mailer';
+
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 type CandidatureStructureCoordinateurInput = {
   type: string;
@@ -31,6 +35,7 @@ type CandidatureStructureCoordinateurInput = {
   coordinateurTypeContrat: string;
   motivation: string;
   confirmationEngagement: boolean;
+  'h-captcha-response': string;
 };
 
 type Structure = CandidatureStructureCoordinateurInput & {
@@ -46,6 +51,8 @@ type Structure = CandidatureStructureCoordinateurInput & {
   nombreConseillersSouhaites: number;
   coordinateurCandidature: boolean;
   aIdentifieCandidat: boolean;
+  emailConfirmedAt: Date;
+  emailConfirmationKey: string;
 };
 const getDernierIdPG = async (app: Application): Promise<number> => {
   const derniereStructure = await app
@@ -73,6 +80,8 @@ const construireStructureCoordinateur = async (
     nombreConseillersSouhaites: 1,
     coordinateurCandidature: true,
     aIdentifieCandidat: false,
+    emailConfirmedAt: null,
+    emailConfirmationKey: uuidv4(),
   };
 };
 
@@ -116,16 +125,56 @@ export const validerCandidatureStructureCoordinateur =
       return response.status(400).json({ message: error.message }).end();
     }
   };
+const envoyerConfirmationParMail = async (
+  app: Application,
+  email: string,
+  prenom: string,
+  nom: string,
+  token: string,
+  idPG: number,
+): Promise<any> => {
+  const body = await mailer(app).render(
+    path.join(__dirname, '../../../emails/confirmation-email-candidature'),
+    'confirmation-email-inscription-structure-coordinateur',
+    {
+      link: mailer(app).utils.getPublicUrl(
+        `/confirmation-email-inscription/${token}`,
+      ),
+      linkDemarcheSimplifier: mailer(app).utils.getDemarcheSimplifierUrl(
+        `${idPG}`,
+      ),
+      emailContact: 'conseiller-numerique@anct.gouv.fr',
+      prenom,
+      nom,
+    },
+  );
+  return mailer(app).createMailer().sendEmail(email, {
+    subject: 'Candidature pour un poste de coordinateur',
+    body,
+  });
+};
 
 const creerCandidatureStructureCoordinateur =
   (app: Application) => async (request: Request, response: Response) => {
     const candidatureStructureCoordinateur =
       await construireStructureCoordinateur(app, request.body);
     try {
-      const result = await stockerCandidatureStructureCoordinateur(
+      const { idPG, contact, emailConfirmationKey } =
+        candidatureStructureCoordinateur;
+      const { email, prenom, nom } = contact;
+      const result: any = await stockerCandidatureStructureCoordinateur(
         candidatureStructureCoordinateur,
         app,
       );
+      await envoyerConfirmationParMail(
+        app,
+        email,
+        prenom,
+        nom,
+        emailConfirmationKey,
+        idPG,
+      );
+      delete result.emailConfirmationKey;
       return response.status(200).json(result).end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
