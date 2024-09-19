@@ -3,6 +3,7 @@ import {
   viderLesCollections,
   champsObligatoiresFormConseiller,
 } from '../../../tests/utils';
+
 import app from '../../../app';
 import request from "supertest";
 import axios from "axios";
@@ -348,9 +349,9 @@ describe('recevoir et valider une candidature conseiller', () => {
     const envoiUtilisateur = {
       ...champsObligatoiresFormConseiller,
     };
+    await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // WHEN
-    await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
     const response = await request(app)
       .post('/candidature-conseiller')
       .send(envoiUtilisateur);
