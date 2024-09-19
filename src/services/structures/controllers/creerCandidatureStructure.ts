@@ -31,6 +31,7 @@ type CandidatureStructureInput = {
   nombreConseillersSouhaites: number;
   motivation: string;
   confirmationEngagement: boolean;
+  'h-captcha-response': string;
 };
 
 type Structure = CandidatureStructureInput & {

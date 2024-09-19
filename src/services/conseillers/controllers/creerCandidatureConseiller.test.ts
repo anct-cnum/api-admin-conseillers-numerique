@@ -352,7 +352,6 @@ describe('recevoir et valider une candidature conseiller', () => {
     await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
 
     // WHEN
-    await request(app).post('/candidature-conseiller').send(envoiUtilisateur);
     const response = await request(app)
       .post('/candidature-conseiller')
       .send(envoiUtilisateur);
