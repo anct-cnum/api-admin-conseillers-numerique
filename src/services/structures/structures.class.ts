@@ -262,7 +262,7 @@ export default class Structures extends Service {
     );
     app.post(
       '/candidature-structure',
-      validerCandidatureStructure(),
+      validerCandidatureStructure(app),
       creerCandidatureStructure(app),
     );
     app.post(
