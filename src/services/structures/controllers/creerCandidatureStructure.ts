@@ -2,6 +2,10 @@ import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructure } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
+import mailer from '../../../mailer';
+
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 type CandidatureStructureInput = {
   type: string;
@@ -44,6 +48,8 @@ type Structure = CandidatureStructureInput & {
   coselec: Array<string>;
   coordinateurCandidature: boolean;
   coordinateurTypeContrat: string;
+  emailConfirmedAt: Date;
+  emailConfirmationKey: string;
 };
 
 export const validerCandidatureStructure =
@@ -74,13 +80,15 @@ const construireStructure = async (
     coselec: [],
     coordinateurCandidature: false,
     coordinateurTypeContrat: null,
+    emailConfirmedAt: null,
+    emailConfirmationKey: uuidv4(),
   };
 };
 
 const stockerCandidatureStructure = async (
   candidatureStructure: Structure,
   app: Application,
-): Promise<void> => {
+): Promise<Structure> => {
   const siretOuRidetExists =
     (await app.service(service.structures).Model.countDocuments({
       $or: [
@@ -113,14 +121,49 @@ const getDernierIdPG = async (app: Application): Promise<number> => {
   return derniereStructure?.idPG || 0;
 };
 
+const envoyerConfirmationParMail = async (
+  app: Application,
+  email: string,
+  prenom: string,
+  nom: string,
+  token: string,
+): Promise<any> => {
+  const body = await mailer(app).render(
+    path.join(__dirname, '../../../emails/confirmation-email-candidature'),
+    'confirmation-email-inscription-structure',
+    {
+      link: mailer(app).utils.getPublicUrl(
+        `/confirmation-email-inscription/${token}`,
+      ),
+      emailContact: 'conseiller-numerique@anct.gouv.fr',
+      prenom,
+      nom,
+    },
+  );
+  return mailer(app).createMailer().sendEmail(email, {
+    subject: 'Confirmation de l’enregistrement de votre candidature',
+    body,
+  });
+};
+
 const creerCandidatureStructure =
   (app: Application) => async (request: Request, response: Response) => {
     const candidatureStructure = await construireStructure(app, request.body);
     try {
+      const { contact, emailConfirmationKey } = candidatureStructure;
+      const { email, prenom, nom } = contact;
       const result = await stockerCandidatureStructure(
         candidatureStructure,
         app,
       );
+      await envoyerConfirmationParMail(
+        app,
+        email,
+        prenom,
+        nom,
+        emailConfirmationKey,
+      );
+      delete result.emailConfirmationKey;
       return response.status(200).json(result).end();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
