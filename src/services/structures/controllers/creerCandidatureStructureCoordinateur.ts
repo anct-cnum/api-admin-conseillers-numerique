@@ -86,10 +86,16 @@ const stockerCandidatureStructureCoordinateur = async (
     (await app.service(service.structures).Model.countDocuments({
       $or: [
         {
-          siret: candidatureStructure.siret,
+          $and: [
+            { siret: { $ne: null } },
+            { siret: candidatureStructure.siret },
+          ],
         },
         {
-          ridet: candidatureStructure.ridet,
+          $and: [
+            { ridet: { $ne: null } },
+            { ridet: candidatureStructure.ridet },
+          ],
         },
       ],
     })) !== 0;
