@@ -334,9 +334,9 @@ const validCandidatureStructureCoordinateur = Joi.object({
     .messages({
       'any.required': 'La localisation est requise',
     }),
-  missionCoordinateur: Joi.string()
+  coordinateurTypeContrat: Joi.string()
     .required()
-    .valid('COORDINATEUR', 'CONSEILLER_ET_COORDINATEUR')
+    .valid('PT', 'FT')
     .error(
       new Error('L’identification de la mission du coordinateur est requis'),
     ),

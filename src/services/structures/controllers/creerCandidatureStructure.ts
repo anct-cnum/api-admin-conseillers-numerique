@@ -85,15 +85,21 @@ const stockerCandidatureStructure = async (
     (await app.service(service.structures).Model.countDocuments({
       $or: [
         {
-          siret: candidatureStructure.siret,
+          $and: [
+            { siret: { $ne: null } },
+            { siret: candidatureStructure.siret },
+          ],
         },
         {
-          ridet: candidatureStructure.ridet,
+          $and: [
+            { ridet: { $ne: null } },
+            { ridet: candidatureStructure.ridet },
+          ],
         },
       ],
     })) !== 0;
   if (siretOuRidetExists) {
-    throw new Error('Vous êtes déjà inscrite'); // revoir le message ..
+    throw new Error('Vous êtes déjà inscrite');
   }
   const result = await app
     .service(service.structures)
