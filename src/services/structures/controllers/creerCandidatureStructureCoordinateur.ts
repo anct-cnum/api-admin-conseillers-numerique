@@ -98,7 +98,7 @@ const stockerCandidatureStructureCoordinateur = async (
       ],
     })) !== 0;
   if (siretOuRidetExists) {
-    throw new Error('Vous êtes déjà inscrite');
+    throw new Error('Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé');
   }
   const result = await app
     .service(service.structures)

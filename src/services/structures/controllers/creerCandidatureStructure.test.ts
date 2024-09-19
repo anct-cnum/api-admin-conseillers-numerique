@@ -236,7 +236,7 @@ describe('recevoir et valider une candidature structure', () => {
     );
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      message: 'La confirmation d’engagement est requis',
+      message: 'La confirmation d’engagement est requise',
     });
   });
 
@@ -256,7 +256,7 @@ describe('recevoir et valider une candidature structure', () => {
     );
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      message: 'Vous êtes déjà inscrite',
+      message: 'Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé',
     });
   });
 
@@ -278,7 +278,7 @@ describe('recevoir et valider une candidature structure', () => {
     );
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      message: 'Vous êtes déjà inscrite',
+      message: 'Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé',
     });
   });
 
@@ -434,7 +434,7 @@ describe('recevoir et valider une candidature structure', () => {
       key: {
         confirmationEngagement: undefined,
       },
-      error: 'La confirmation d’engagement est requis',
+      error: 'La confirmation d’engagement est requise',
     },
     {
       testKey: 'h-captcha-response',
