@@ -138,7 +138,7 @@ const envoyerConfirmationParMail = async (
     'confirmation-email-inscription-structure-coordinateur',
     {
       link: mailer(app).utils.getPublicUrl(
-        `/confirmation-email-inscription/${token}`,
+        `/candidature-confirmer-structure/${token}`,
       ),
       linkDemarcheSimplifier: mailer(app).utils.getDemarcheSimplifierUrl(
         `${idPG}`,
