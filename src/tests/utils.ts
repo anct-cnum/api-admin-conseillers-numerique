@@ -27,13 +27,6 @@ const requetePost = async (url, data) =>
     validateStatus: (status) => status < 500,
   });
 
-const requetePatch = async (url) =>
-  axios({
-    method: 'PATCH',
-    url: host + url,
-    validateStatus: (status) => status < 500,
-  });
-
 const champsObligatoiresFormConseiller: CandidatureConseillerInput = {
   prenom: 'Jean',
   nom: 'Martin',
@@ -88,6 +81,7 @@ const champsObligatoireStructure: CandidatureStructureInput = {
   nombreConseillersSouhaites: 1,
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
+  'h-captcha-response': 'captcha',
 };
 
 const champsObligatoireStructureCoordinateur: CandidatureStructureCoordinateurInput =
@@ -125,7 +119,6 @@ export {
   viderLesCollections,
   host,
   requetePost,
-  requetePatch,
   champsObligatoiresFormConseiller,
   InitialisationDate,
   champsObligatoireStructure,

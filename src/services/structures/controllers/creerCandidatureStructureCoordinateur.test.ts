@@ -136,7 +136,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
   });
 
   it('si j’envoie un formulaire alors je reçois un mail de confirmation en tant que structure coordinateur', async () => {
-    //GIVEN
+    // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
