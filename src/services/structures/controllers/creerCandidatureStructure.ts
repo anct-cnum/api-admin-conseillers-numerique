@@ -133,7 +133,7 @@ const envoyerConfirmationParMail = async (
     'confirmation-email-inscription-structure',
     {
       link: mailer(app).utils.getPublicUrl(
-        `/confirmation-email-inscription/${token}`,
+        `/candidature-confirmer-structure/${token}`,
       ),
       emailContact: 'conseiller-numerique@anct.gouv.fr',
       prenom,
