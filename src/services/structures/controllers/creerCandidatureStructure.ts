@@ -131,7 +131,7 @@ const envoyerConfirmationParMail = async (
   prenom: string,
   nom: string,
   token: string,
-): Promise<any> => {
+): Promise<object> => {
   const body = await mailer(app).render(
     path.join(__dirname, '../../../emails/confirmation-email-candidature'),
     'confirmation-email-inscription-structure',

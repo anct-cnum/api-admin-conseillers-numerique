@@ -134,7 +134,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.body.coordinateurTypeContrat).toStrictEqual(null);
     expect(response.body.emailConfirmationKey).toBe(undefined);
      });
-  it.skip('si j’envoie un formulaire alors je reçois un mail de confirmation en tant que structure coordinateur', async () => {
+  it('si j’envoie un formulaire alors je reçois un mail de confirmation en tant que structure coordinateur', async () => {
     //GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
