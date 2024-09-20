@@ -8,7 +8,7 @@ import mailer from '../../../mailer';
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-type CandidatureStructureCoordinateurInput = {
+export type CandidatureStructureCoordinateurInput = {
   type: string;
   nom: string;
   siret: string;
@@ -61,7 +61,7 @@ const getDernierIdPG = async (app: Application): Promise<number> => {
   return derniereStructure?.idPG || 0;
 };
 
-const construireStructureCoordinateur = async (
+export const construireStructureCoordinateur = async (
   app: Application,
   body: CandidatureStructureCoordinateurInput,
 ): Promise<Structure> => {
@@ -88,7 +88,7 @@ const construireStructureCoordinateur = async (
 const stockerCandidatureStructureCoordinateur = async (
   candidatureStructure: Structure,
   app: Application,
-): Promise<void> => {
+): Promise<Structure> => {
   const siretOuRidetExists =
     (await app.service(service.structures).Model.countDocuments({
       $or: [
@@ -138,7 +138,7 @@ const envoyerConfirmationParMail = async (
     'confirmation-email-inscription-structure-coordinateur',
     {
       link: mailer(app).utils.getPublicUrl(
-        `/confirmation-email-inscription/${token}`,
+        `/candidature-confirmer-structure/${token}`,
       ),
       linkDemarcheSimplifier: mailer(app).utils.getDemarcheSimplifierUrl(
         `${idPG}`,
@@ -162,7 +162,7 @@ const creerCandidatureStructureCoordinateur =
       const { idPG, contact, emailConfirmationKey } =
         candidatureStructureCoordinateur;
       const { email, prenom, nom } = contact;
-      const result: any = await stockerCandidatureStructureCoordinateur(
+      const result = await stockerCandidatureStructureCoordinateur(
         candidatureStructureCoordinateur,
         app,
       );

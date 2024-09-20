@@ -8,7 +8,7 @@ import mailer from '../../../mailer';
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
-type CandidatureStructureInput = {
+export type CandidatureStructureInput = {
   type: string;
   nom: string;
   siret: string;
@@ -66,7 +66,7 @@ export const validerCandidatureStructure =
     }
   };
 
-const construireStructure = async (
+export const construireStructure = async (
   app: Application,
   body: CandidatureStructureInput,
 ): Promise<Structure> => {

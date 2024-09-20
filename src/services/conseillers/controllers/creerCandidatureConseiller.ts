@@ -115,7 +115,7 @@ export const envoyerConfirmationParMail = async (
     'confirmation-email-inscription-conseiller',
     {
       link: mailer(app).utils.getPublicUrl(
-        `/confirmation-email-inscription/${token}`,
+        `/candidature-confirmer-conseiller/${token}`,
       ),
       prenom,
     },

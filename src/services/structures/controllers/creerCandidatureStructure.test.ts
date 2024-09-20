@@ -134,6 +134,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.body.coordinateurTypeContrat).toStrictEqual(null);
     expect(response.body.emailConfirmationKey).toBe(undefined);
      });
+
   it('si j’envoie un formulaire alors je reçois un mail de confirmation en tant que structure coordinateur', async () => {
     //GIVEN
     const envoiUtilisateur = {
@@ -152,6 +153,7 @@ describe('recevoir et valider une candidature structure', () => {
       subject: "Confirmation de l’enregistrement de votre candidature",
       to: "camlien_rousseau74@example.net"
     });
+
   });
 
   it('si j’envoie un formulaire sans SIRET mais avec un RIDET alors il n’y a pas d’erreur de validation', async () => {
