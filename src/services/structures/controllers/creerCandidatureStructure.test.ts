@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections } from '../../../tests/utils';
 import request from "supertest";
 import axios from "axios";
+import nodemailer from 'nodemailer';
 
 import app from '../../../app';
 
@@ -37,6 +38,7 @@ const champsObligatoires = {
 
 vi.mock("axios")
 const mockedAxios = vi.mocked(axios, true);
+const mockSendMail = vi.fn();
 
 describe('recevoir et valider une candidature structure', () => {
   beforeEach(async () => {
@@ -44,6 +46,7 @@ describe('recevoir et valider une candidature structure', () => {
     mockedAxios.post.mockResolvedValue({
       data: { success: true },
     });
+    vi.spyOn(nodemailer, 'createTransport').mockReturnValue({ sendMail: mockSendMail, use: vi.fn() });
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
@@ -129,6 +132,26 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.body.coselec).toStrictEqual([]);
     expect(response.body.coordinateurCandidature).toStrictEqual(false);
     expect(response.body.coordinateurTypeContrat).toStrictEqual(null);
+    expect(response.body.emailConfirmationKey).toBe(undefined);
+     });
+  it('si j’envoie un formulaire alors je reçois un mail de confirmation en tant que structure coordinateur', async () => {
+    //GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure').send(envoiUtilisateur);
+
+    // THEN
+    expect(mockSendMail).toHaveBeenCalledWith({
+      from: expect.anything(),
+      html: expect.anything(),
+      list: expect.anything(),
+      replyTo: expect.anything(),
+      subject: "Confirmation de l’enregistrement de votre candidature",
+      to: "camlien_rousseau74@example.net"
+    });
   });
 
   it('si j’envoie un formulaire sans SIRET mais avec un RIDET alors il n’y a pas d’erreur de validation', async () => {
