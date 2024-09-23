@@ -551,4 +551,26 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.status).toBe(200);
     expect(response.body.motivation).toBe(motivation);
   });
+
+  it('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
+    // GIVEN
+    mockedAxios.post.mockResolvedValue({
+      data: { success: false },
+    });
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      'h-captcha-response': 'captcha-incorrect',
+    };
+
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-structure')
+      .send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
+  });
 });

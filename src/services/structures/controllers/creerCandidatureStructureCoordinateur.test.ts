@@ -140,7 +140,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
     };
-    
+
     // WHEN
     await request(app)
       .post('/candidature-structure-coordinateur')
@@ -386,14 +386,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       key: {
         aIdentifieCoordinateur: undefined,
       },
-      error: 'L’identification du coordinateur est requis',
+      error: 'L’identification du coordinateur est requise',
     },
     {
       testKey: 'coordinateurTypeContrat',
       key: {
         coordinateurTypeContrat: undefined,
       },
-      error: 'L’identification de la mission du coordinateur est requis',
+      error: 'L’identification de la mission du coordinateur est requise',
     },
     {
       testKey: 'h-captcha-response',
@@ -542,7 +542,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      message: 'L’identification de la mission du coordinateur est requis',
+      message: 'L’identification de la mission du coordinateur est requise',
     });
   });
 
@@ -632,7 +632,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(400);
     expect(response.body).toStrictEqual({
-      message: 'L’identification de la mission du coordinateur est requis',
+      message: 'L’identification de la mission du coordinateur est requise',
     });
   });
 
@@ -683,5 +683,27 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.body).toStrictEqual({
       message: 'Le type est invalide',
     });
+  });
+
+  it('si j’envoie un formulaire valide avec un captcha incorrect alors il y a une erreur de validation', async () => {
+    // GIVEN
+    mockedAxios.post.mockResolvedValue({
+      data: { success: false },
+    });
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      'h-captcha-response': 'captcha-incorrect',
+    };
+
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(400);
   });
 });

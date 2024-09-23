@@ -341,11 +341,11 @@ const validCandidatureStructureCoordinateur = Joi.object({
     .required()
     .valid('PT', 'FT')
     .error(
-      new Error('L’identification de la mission du coordinateur est requis'),
+      new Error('L’identification de la mission du coordinateur est requise'),
     ),
   aIdentifieCoordinateur: Joi.boolean()
     .required()
-    .error(new Error('L’identification du coordinateur est requis')),
+    .error(new Error('L’identification du coordinateur est requise')),
   motivation: Joi.string().max(2500).required().messages({
     'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
     'any.required': 'La motivation est requise',
