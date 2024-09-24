@@ -69,6 +69,9 @@ const extendContrat =
                 'demandesDeProlongation.$.dateDeFinSouhaitee': new Date(
                   dateFinDeContrat,
                 ),
+                'demandesDeProlongation.$.salaireActuelle':
+                  miseEnRelation.salaire,
+                'demandesDeProlongation.$.salaireSouhaitee': Number(salaire),
               },
             },
             {
