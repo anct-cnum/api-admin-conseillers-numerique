@@ -28,6 +28,9 @@ const validationRenouvellementContrat =
         miseEnRelationVerif.demandesDeProlongation?.find(
           (demande: IDemandeDeProlongation) => demande.statut === 'initiee',
         )?.dateDeFinSouhaitee;
+      const salaireSouhaitee = miseEnRelationVerif.demandesDeProlongation?.find(
+        (demande: IDemandeDeProlongation) => demande.statut === 'initiee',
+      )?.salaireSouhaitee;
       if (dateDeFinSouhaitee) {
         const miseEnRelationUpdated = await app
           .service(service.misesEnRelation)
@@ -38,6 +41,7 @@ const validationRenouvellementContrat =
             },
             {
               dateFinDeContrat: new Date(dateDeFinSouhaitee),
+              salaire: Number(salaireSouhaitee),
               $set: { 'demandesDeProlongation.$.statut': 'validee' },
             },
             { returnOriginal: false, new: true },

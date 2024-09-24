@@ -9,6 +9,8 @@ import { validCreationContrat } from '../../../schemas/contrat.schemas';
 interface IExtensionRequest {
   dateDeFinActuelle: Date;
   dateDeFinSouhaitee: Date;
+  salaireActuelle: Number;
+  salaireSouhaitee: Number;
   dateDeLaDemande: Date;
   statut: string;
 }
@@ -86,6 +88,8 @@ const extendContrat =
                 demandesDeProlongation: {
                   dateDeFinActuelle: miseEnRelation.dateFinDeContrat,
                   dateDeFinSouhaitee: new Date(dateFinDeContrat),
+                  salaireActuelle: miseEnRelation.salaire,
+                  salaireSouhaitee: Number(salaire),
                   dateDeLaDemande: new Date(),
                   statut: 'initiee',
                 },
