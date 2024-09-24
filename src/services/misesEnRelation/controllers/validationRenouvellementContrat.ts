@@ -41,7 +41,7 @@ const validationRenouvellementContrat =
             },
             {
               dateFinDeContrat: new Date(dateDeFinSouhaitee),
-              salaire: Number(salaireSouhaitee),
+              ...(salaireSouhaitee && { salaire: Number(salaireSouhaitee) }),
               $set: { 'demandesDeProlongation.$.statut': 'validee' },
             },
             { returnOriginal: false, new: true },
