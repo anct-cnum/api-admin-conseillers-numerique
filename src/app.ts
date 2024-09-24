@@ -75,7 +75,12 @@ app.use((req, res, next) => {
 });
 
 app.configure(mongoose);
-app.use(cors({ origin: config().dashboard_hostname, credentials: true }));
+app.use(
+  cors({
+    origin: [config().dashboard_hostname, config().public],
+    credentials: true,
+  }),
+);
 
 app.configure(authentication);
 // Set up our services (see `services/index.js`)
