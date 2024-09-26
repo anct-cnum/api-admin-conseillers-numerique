@@ -10,7 +10,7 @@ interface IExtensionRequest {
   dateDeFinActuelle: Date;
   dateDeFinSouhaitee: Date;
   salaireActuelle: Number;
-  salaireSouhaitee: Number;
+  salaireSouhaitee: String | Number;
   dateDeLaDemande: Date;
   statut: string;
 }
@@ -69,18 +69,11 @@ const extendContrat =
                 'demandesDeProlongation.$.dateDeFinSouhaitee': new Date(
                   dateFinDeContrat,
                 ),
-                ...(Number(salaire) !== 0 && {
-                  'demandesDeProlongation.$.salaireActuelle':
-                    miseEnRelation.salaire,
-                  'demandesDeProlongation.$.salaireSouhaitee': Number(salaire),
-                }),
+                'demandesDeProlongation.$.salaireActuelle':
+                  miseEnRelation.salaire ?? '',
+                'demandesDeProlongation.$.salaireSouhaitee':
+                  Number(salaire) === 0 ? '' : Number(salaire),
               },
-              ...(Number(salaire) === 0 && {
-                $unset: {
-                  'demandesDeProlongation.$.salaireActuelle': '',
-                  'demandesDeProlongation.$.salaireSouhaitee': '',
-                },
-              }),
             },
             {
               new: true,
@@ -99,10 +92,9 @@ const extendContrat =
                 demandesDeProlongation: {
                   dateDeFinActuelle: miseEnRelation.dateFinDeContrat,
                   dateDeFinSouhaitee: new Date(dateFinDeContrat),
-                  ...(Number(salaire) !== 0 && {
-                    salaireActuelle: miseEnRelation.salaire,
-                    salaireSouhaitee: Number(salaire),
-                  }),
+                  salaireActuelle: miseEnRelation.salaire ?? '',
+                  salaireSouhaitee:
+                    Number(salaire) === 0 ? '' : Number(salaire),
                   dateDeLaDemande: new Date(),
                   statut: 'initiee',
                 },
