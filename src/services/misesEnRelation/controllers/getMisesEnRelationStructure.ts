@@ -93,15 +93,6 @@ const getMisesEnRelationStructure =
               createdAt: -1,
             },
           },
-          {
-            $group: {
-              _id: '$conseillerObj._id',
-              miseEnRelation: { $first: '$$ROOT' },
-            },
-          },
-          {
-            $replaceRoot: { newRoot: '$miseEnRelation' },
-          },
         ]);
       return res.status(200).json(misesEnRelation);
     } catch (error) {
