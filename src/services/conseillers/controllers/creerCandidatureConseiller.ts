@@ -3,8 +3,7 @@ import { Response, NextFunction, Request } from 'express';
 import { validCandidatureConseiller } from '../../../schemas/conseillers.schemas';
 import service from '../../../helpers/services';
 import mailer from '../../../mailer';
-
-import verifyCaptcha from '../../../utils/verifyCaptcha';
+import verifyCaptcha from '../../../utils/captcha';
 
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
@@ -92,7 +91,7 @@ export const construireConseiller = async (
   body: CandidatureConseillerInput,
 ): Promise<Conseiller> => {
   const newDate = new Date();
-  return {
+  const conseiller = {
     ...body,
     idPG: (await getDernierIdPG(app)) + 1,
     createdAt: newDate,
@@ -102,6 +101,8 @@ export const construireConseiller = async (
     emailConfirmedAt: null,
     emailConfirmationKey: uuidv4(),
   };
+  delete conseiller['h-captcha-response'];
+  return conseiller;
 };
 
 export const envoyerConfirmationParMail = async (

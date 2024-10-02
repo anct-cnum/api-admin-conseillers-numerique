@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructure } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
-import verifyCaptcha from '../../../utils/verifyCaptcha';
+import verifyCaptcha from '../../../utils/captcha';
 import mailer from '../../../mailer';
 
 const { v4: uuidv4 } = require('uuid');
@@ -71,7 +71,7 @@ export const construireStructure = async (
   body: CandidatureStructureInput,
 ): Promise<Structure> => {
   const newDate = new Date();
-  return {
+  const structure = {
     ...body,
     idPG: (await getDernierIdPG(app)) + 1,
     createdAt: newDate,
@@ -87,6 +87,8 @@ export const construireStructure = async (
     emailConfirmedAt: null,
     emailConfirmationKey: uuidv4(),
   };
+  delete structure['h-captcha-response'];
+  return structure;
 };
 
 const stockerCandidatureStructure = async (

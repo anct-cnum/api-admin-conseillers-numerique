@@ -2,7 +2,7 @@ import { Application } from '@feathersjs/express';
 import { Response, NextFunction, Request } from 'express';
 import { validCandidatureStructureCoordinateur } from '../../../schemas/structures.schemas';
 import service from '../../../helpers/services';
-import verifyCaptcha from '../../../utils/verifyCaptcha';
+import verifyCaptcha from '../../../utils/captcha';
 import mailer from '../../../mailer';
 
 const { v4: uuidv4 } = require('uuid');
@@ -66,7 +66,7 @@ export const construireStructureCoordinateur = async (
   body: CandidatureStructureCoordinateurInput,
 ): Promise<Structure> => {
   const newDate = new Date();
-  return {
+  const structureCoordinateur = {
     ...body,
     idPG: (await getDernierIdPG(app)) + 1,
     createdAt: newDate,
@@ -83,6 +83,8 @@ export const construireStructureCoordinateur = async (
     emailConfirmedAt: null,
     emailConfirmationKey: uuidv4(),
   };
+  delete structureCoordinateur['h-captcha-response'];
+  return structureCoordinateur;
 };
 
 const stockerCandidatureStructureCoordinateur = async (
