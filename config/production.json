@@ -33,13 +33,20 @@
     "dsn": "SENTRY_DSN",
     "traceSampleRate": "SENTRY_TRACE_SAMPLE_RATE"
   },
-  "inclusion_connect": {
-    "keycloak_issuer": "INCLUSION_CONNECT_ISSUER",
-    "access_token_secret": "INCLUSION_CONNECT_ACCESSTOKENSECRET",
-    "refresh_token_secret": "INCLUSION_CONNECT_REFRESHTOKENSECRET",
-    "refresh_token_key": "INCLUSION_CONNECT_REFRESHTOKENKEY",
-    "access_token_duration": "INCLUSION_CONNECT_ACCESSTOKENDURATION",
-    "refresh_token_duration": "INCLUSION_CONNECT_REFRESHTOKENDURATION"
+  "pro_connect": {
+    "access_token_secret": "PRO_CONNECT_ACCESSTOKENSECRET",
+    "refresh_token_secret": "PRO_CONNECT_REFRESHTOKENSECRET",
+    "refresh_token_key": "PRO_CONNECT_REFRESHTOKENKEY",
+    "access_token_duration": "PRO_CONNECT_ACCESSTOKENDURATION",
+    "refresh_token_duration": "PRO_CONNECT_REFRESHTOKENDURATION",
+    "client_id": "PRO_CONNECT_CLIENT_ID",
+    "client_secret": "PRO_CONNECT_CLIENT_SECRET",
+    "redirect_uris": ["PRO_CONNECT_REDIRECT_URI"],
+    "scope": "PRO_CONNECT_SCOPE",
+    "issuer_url": "PRO_CONNECT_ISSUER_URL",
+    "token_endpoint": "PRO_CONNECT_TOKEN_ENDPOINT",
+    "userinfo_endpoint": "PRO_CONNECT_USERINFO",
+    "response_types": "code"
   },
   "demarche_simplifiee": {
     "endpoint": "DEMARCHE_SIMPLIFIEE_ENDPOINT",
