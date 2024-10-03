@@ -38,6 +38,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     keycloakUser.email = keycloakUser?.email?.trim()?.toLowerCase();
     let userInDB: IUser;
     // verification de la présence de l'utilisateur du serveur d'authentification en base de données
+    console.log('keycloakUser', keycloakUser);
     try {
       userInDB = await app
         .service(service.users)
@@ -46,6 +47,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           roles: { $in: ALLOWED_ROLES },
         })
         .select({ password: 0, refreshToken: 0 });
+      console.log('userInDB', userInDB);
       // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
       if (!userInDB) {
         if (req.query.verificationToken) {
