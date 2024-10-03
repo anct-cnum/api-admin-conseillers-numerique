@@ -82,8 +82,8 @@ const creerCandidatureConseiller =
 const getDernierIdPG = async (app: Application): Promise<number> => {
   const dernierConseiller = await app
     .service(service.conseillers)
-    .Model.findOne({}, { idPG: -1 });
-  return dernierConseiller?.idPG || 0;
+    .Model.aggregate([{ $sort: { idPG: -1 } }]);
+  return dernierConseiller[0]?.idPG || 0;
 };
 
 export const construireConseiller = async (

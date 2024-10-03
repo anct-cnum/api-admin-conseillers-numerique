@@ -257,6 +257,34 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
+  it('si j’envoie un formulaire, alors l’idPG s’incrémente de +1', async () => {
+    // GIVEN
+    const envoiUtilisateur1 = {
+      ...champsObligatoires,
+    };
+
+    const envoiUtilisateur2 = {
+      ...champsObligatoires,
+      siret: '00000'
+    };
+    const envoiUtilisateur3 = {
+      ...champsObligatoires,
+      siret: '11111'
+    };
+    // WHEN
+    const responseCandidature1 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur1);
+    const responseCandidature2 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur2);
+    const responseCandidature3 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur3);
+
+    // THEN
+    expect(responseCandidature1.status).toBe(200);
+    expect(responseCandidature1.body.idPG).toBe(1);
+    expect(responseCandidature2.status).toBe(200);
+    expect(responseCandidature2.body.idPG).toBe(2);
+    expect(responseCandidature3.status).toBe(200);
+    expect(responseCandidature3.body.idPG).toBe(3);
+  });
+
   it('si j’envoie un formulaire avec un ridet déjà existant alors il y a une erreur', async () => {
     // GIVEN
     const envoiUtilisateur = {

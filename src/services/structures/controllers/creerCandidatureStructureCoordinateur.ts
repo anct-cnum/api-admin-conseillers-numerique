@@ -57,8 +57,8 @@ type Structure = CandidatureStructureCoordinateurInput & {
 const getDernierIdPG = async (app: Application): Promise<number> => {
   const derniereStructure = await app
     .service(service.structures)
-    .Model.findOne({}, { idPG: -1 });
-  return derniereStructure?.idPG || 0;
+    .Model.aggregate([{ $sort: { idPG: -1 } }]);
+  return derniereStructure[0]?.idPG || 0;
 };
 
 export const construireStructureCoordinateur = async (
