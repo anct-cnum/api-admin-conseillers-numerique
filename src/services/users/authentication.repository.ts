@@ -18,7 +18,7 @@ async function getProConnectAccessToken(app: Application, code: string) {
     grant_type: 'authorization_code',
     client_id: app.get('pro_connect').client_id,
     client_secret: app.get('pro_connect').client_secret,
-    redirect_uri: app.get('pro_connect').redirect_uris[0],
+    redirect_uri: app.get('pro_connect').redirect_uri,
     code,
   };
 
