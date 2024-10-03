@@ -50,11 +50,11 @@ async function getProConnectUserInfo(app: Application, accessToken: string) {
 }
 
 async function createProConnectClient(app: Application): Promise<Client> {
-  const mcpIssuer = await Issuer.discover(app.get('pro_connect').issuerUrl);
+  const mcpIssuer = await Issuer.discover(app.get('pro_connect').issuer_url);
   return new mcpIssuer.Client({
     client_id: app.get('pro_connect').client_id,
     client_secret: app.get('pro_connect').client_secret,
-    redirect_uris: app.get('pro_connect').redirect_uris,
+    redirect_uris: [app.get('pro_connect').redirect_uri],
   });
 }
 
