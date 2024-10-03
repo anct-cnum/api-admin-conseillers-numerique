@@ -34,7 +34,10 @@ async function getProConnectAccessToken(app: Application, code: string) {
   if (tokenResponse.status !== 200) {
     throw new Error('Access denied');
   }
-  return tokenResponse.data.access_token;
+  return {
+    proConnectAccessToken: tokenResponse.data.access_token,
+    idToken: tokenResponse.data.id_token,
+  };
 }
 
 async function getProConnectUserInfo(app: Application, accessToken: string) {
@@ -50,11 +53,12 @@ async function getProConnectUserInfo(app: Application, accessToken: string) {
 }
 
 async function createProConnectClient(app: Application): Promise<Client> {
-  const mcpIssuer = await Issuer.discover(app.get('pro_connect').issuer_url);
+  const proConnectConfig = app.get('pro_connect');
+  const mcpIssuer = await Issuer.discover(proConnectConfig.issuer_url);
   return new mcpIssuer.Client({
-    client_id: app.get('pro_connect').client_id,
-    client_secret: app.get('pro_connect').client_secret,
-    redirect_uris: [app.get('pro_connect').redirect_uri],
+    client_id: proConnectConfig.client_id,
+    client_secret: proConnectConfig.client_secret,
+    redirect_uris: [proConnectConfig.redirect_uri],
   });
 }
 
@@ -79,10 +83,37 @@ function generateAuthorizationUrl(
   return { authorizationUrl };
 }
 
+async function disconnectProConnectUser(
+  app: Application,
+  idToken: string,
+  state: string,
+) {
+  const proConnectConfig = app.get('pro_connect');
+  const params = new URLSearchParams({
+    id_token_hint: idToken,
+    state,
+    post_logout_redirect_uri: proConnectConfig.post_logout_redirect_uri,
+  });
+
+  const logoutUrl = `${proConnectConfig.logout_endpoint}?${params.toString()}`;
+
+  try {
+    const response = await axios.get(logoutUrl, {
+      maxRedirects: 0,
+      validateStatus: (status) => status >= 200 && status < 400,
+    });
+
+    return response.headers.location || 'Logout successful';
+  } catch (error) {
+    throw new Error('Failed to disconnect user from ProConnect');
+  }
+}
+
 export {
   ALLOWED_ROLES,
   getProConnectAccessToken,
   getProConnectUserInfo,
   createProConnectClient,
   generateAuthorizationUrl,
+  disconnectProConnectUser,
 };

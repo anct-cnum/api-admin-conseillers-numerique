@@ -42,6 +42,7 @@
     "client_id": "PRO_CONNECT_CLIENT_ID",
     "client_secret": "PRO_CONNECT_CLIENT_SECRET",
     "redirect_uri": "PRO_CONNECT_REDIRECT_URI",
+    "post_logout_redirect_uri": "PRO_CONNECT_POST_LOGOUT_REDIRECT_URI",
     "scope": "PRO_CONNECT_SCOPE",
     "issuer_url": "PRO_CONNECT_ISSUER_URL",
     "token_endpoint": "PRO_CONNECT_TOKEN_ENDPOINT",

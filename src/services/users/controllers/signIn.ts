@@ -13,6 +13,7 @@ import {
 import service from '../../../helpers/services';
 import {
   ALLOWED_ROLES,
+  disconnectProConnectUser,
   getProConnectAccessToken,
   getProConnectUserInfo,
 } from '../authentication.repository';
@@ -20,12 +21,15 @@ import {
 const { v4: uuidv4 } = require('uuid');
 
 const signIn = (app: Application) => async (req: IRequest, res: Response) => {
-  const { code } = req.body;
+  const { code, state } = req.body;
   if (!code) {
     return res.status(400).json({ error: 'Requête invalide' });
   }
   try {
-    const proConnectAccessToken = await getProConnectAccessToken(app, code);
+    const { proConnectAccessToken, idToken } = await getProConnectAccessToken(
+      app,
+      code,
+    );
     const proConnectUser = await getProConnectUserInfo(
       app,
       proConnectAccessToken,
@@ -38,7 +42,6 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     keycloakUser.email = keycloakUser?.email?.trim()?.toLowerCase();
     let userInDB: IUser;
     // verification de la présence de l'utilisateur du serveur d'authentification en base de données
-    console.log('keycloakUser', keycloakUser);
     try {
       userInDB = await app
         .service(service.users)
@@ -47,7 +50,6 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           roles: { $in: ALLOWED_ROLES },
         })
         .select({ password: 0, refreshToken: 0 });
-      console.log('userInDB', userInDB);
       // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
       if (!userInDB) {
         if (req.query.verificationToken) {
@@ -92,6 +94,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         ip: req.feathers.ip,
         connexionError: true,
       });
+      await disconnectProConnectUser(app, idToken, state);
       return res.status(401).json('Connexion refusée');
     }
     try {
@@ -182,6 +185,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
               },
             },
           );
+          await disconnectProConnectUser(app, idToken, state);
           return res.status(401).json('Connexion refusée');
         }
       }
