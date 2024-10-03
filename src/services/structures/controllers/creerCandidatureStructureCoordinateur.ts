@@ -142,7 +142,7 @@ const envoyerConfirmationParMail = async (
       link: mailer(app).utils.getPublicUrl(
         `/candidature-confirmer-structure/${token}`,
       ),
-      linkDemarcheSimplifier: mailer(app).utils.getDemarcheSimplifierUrl(
+      linkDemarcheSimplifiees: mailer(app).utils.getDemarcheSimplifierUrl(
         `${idPG}`,
       ),
       emailContact: 'conseiller-numerique@anct.gouv.fr',
