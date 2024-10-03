@@ -48,6 +48,7 @@
     "issuer_url": "PRO_CONNECT_ISSUER_URL",
     "token_endpoint": "PRO_CONNECT_TOKEN_ENDPOINT",
     "userinfo_endpoint": "PRO_CONNECT_USERINFO",
+    "logout_endpoint": "PRO_CONNECT_LOGOUT_ENDPOINT",
     "response_types": "code"
   },
   "demarche_simplifiee": {
