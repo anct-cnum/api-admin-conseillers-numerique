@@ -18,12 +18,12 @@ async function getProConnectAccessToken(app: Application, code: string) {
     grant_type: 'authorization_code',
     client_id: app.get('pro_connect').client_id,
     client_secret: app.get('pro_connect').client_secret,
-    redirect_uri: app.get('pro_connect').redirect_uri,
+    redirect_uri: [app.get('pro_connect').redirect_uri],
     code,
   };
 
   const tokenResponse = await axios.post(
-    app.get('pro_connect').tokenEndpoint,
+    app.get('pro_connect').token_endpoint,
     querystring.stringify(tokenParams),
     {
       headers: {
@@ -38,7 +38,7 @@ async function getProConnectAccessToken(app: Application, code: string) {
 }
 
 async function getProConnectUserInfo(app: Application, accessToken: string) {
-  const response = await axios.get(app.get('pro_connect').userInfoEndpoint, {
+  const response = await axios.get(app.get('pro_connect').userinfo_endpoint, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
