@@ -157,7 +157,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it('si j’envoie un formulaire sans siret mais avec un ridet alors il n’y a pas d’erreur de validation', async () => {
+  it('si j’envoie un formulaire sans SIRET mais avec un RIDET alors il n’y a pas d’erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -175,6 +175,46 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
     expect(response.body.ridet).toBe('1234567');
+  });
+
+  it('si j’envoie un formulaire sans SIRET mais avec un RIDET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      siret: null,
+      ridet: '12 345 67',
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.siret).toBe(null);
+    expect(response.body.ridet).toBe('1234567');
+  });
+
+  it('si j’envoie un formulaire sans RIDET mais avec un SIRET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      siret: '12 345 67',
+      ridet: null,
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.ridet).toBe(null);
+    expect(response.body.siret).toBe('1234567');
   });
 
   it('si j’envoie un formulaire avec confirmation des engagements à false alors il y a une erreur de validation', async () => {

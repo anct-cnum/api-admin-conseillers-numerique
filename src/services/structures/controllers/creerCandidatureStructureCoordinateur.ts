@@ -158,6 +158,10 @@ const envoyerConfirmationParMail = async (
 
 const creerCandidatureStructureCoordinateur =
   (app: Application) => async (request: Request, response: Response) => {
+    request.body.siret =
+      request.body.siret?.replace(/\s/g, '') ?? request.body.siret;
+    request.body.ridet =
+      request.body.ridet?.replace(/\s/g, '') ?? request.body.ridet;
     const candidatureStructureCoordinateur =
       await construireStructureCoordinateur(app, request.body);
     try {

@@ -176,6 +176,46 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.body.ridet).toBe('1234567');
   });
 
+  it('si j’envoie un formulaire sans SIRET mais avec un RIDET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      siret: null,
+      ridet: '12 345 67',
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure').send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.siret).toBe(null);
+    expect(response.body.ridet).toBe('1234567');
+  });
+
+  it('si j’envoie un formulaire sans RIDET mais avec un SIRET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      siret: '12 345 67',
+      ridet: null,
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure').send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.ridet).toBe(null);
+    expect(response.body.siret).toBe('1234567');
+  });
+
   it.each([
     'COMMUNE',
     'DEPARTEMENT',
