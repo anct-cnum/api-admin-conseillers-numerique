@@ -134,6 +134,34 @@ describe('recevoir et valider une candidature conseiller', () => {
     });
   });
 
+  it('si j’envoie un formulaire, alors l’idPG s’incrémente de +1', async () => {
+    // GIVEN
+    const envoiUtilisateur1 = {
+      ...champsObligatoiresFormConseiller,
+    };
+
+    const envoiUtilisateur2 = {
+      ...champsObligatoiresFormConseiller,
+      email: 'jean.martin2@example.com'
+    };
+    const envoiUtilisateur3 = {
+      ...champsObligatoiresFormConseiller,
+      email: 'jean.martin3@example.com'
+    };
+    // WHEN
+    const responseCandidature1 = await request(app).post('/candidature-conseiller').send(envoiUtilisateur1);
+    const responseCandidature2 = await request(app).post('/candidature-conseiller').send(envoiUtilisateur2);
+    const responseCandidature3 = await request(app).post('/candidature-conseiller').send(envoiUtilisateur3);
+
+    // THEN
+    expect(responseCandidature1.status).toBe(200);
+    expect(responseCandidature1.body.idPG).toBe(1);
+    expect(responseCandidature2.status).toBe(200);
+    expect(responseCandidature2.body.idPG).toBe(2);
+    expect(responseCandidature3.status).toBe(200);
+    expect(responseCandidature3.body.idPG).toBe(3);
+  });
+
   it('si j’envoie un formulaire avec un email invalide alors j’ai une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {

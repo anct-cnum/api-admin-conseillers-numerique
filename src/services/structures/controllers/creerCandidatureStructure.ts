@@ -123,8 +123,8 @@ const stockerCandidatureStructure = async (
 const getDernierIdPG = async (app: Application): Promise<number> => {
   const derniereStructure = await app
     .service(service.structures)
-    .Model.findOne({}, { idPG: -1 });
-  return derniereStructure?.idPG || 0;
+    .Model.aggregate([{ $sort: { idPG: -1 } }]);
+  return derniereStructure[0]?.idPG || 0;
 };
 
 const envoyerConfirmationParMail = async (
@@ -154,6 +154,10 @@ const envoyerConfirmationParMail = async (
 
 const creerCandidatureStructure =
   (app: Application) => async (request: Request, response: Response) => {
+    request.body.siret =
+      request.body.siret?.replace(/\s/g, '') ?? request.body.siret;
+    request.body.ridet =
+      request.body.ridet?.replace(/\s/g, '') ?? request.body.ridet;
     const candidatureStructure = await construireStructure(app, request.body);
     try {
       const { contact, emailConfirmationKey } = candidatureStructure;

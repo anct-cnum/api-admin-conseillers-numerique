@@ -157,7 +157,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it('si j’envoie un formulaire sans siret mais avec un ridet alors il n’y a pas d’erreur de validation', async () => {
+  it('si j’envoie un formulaire sans SIRET mais avec un RIDET alors il n’y a pas d’erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -175,6 +175,46 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
     expect(response.body.ridet).toBe('1234567');
+  });
+
+  it('si j’envoie un formulaire sans SIRET mais avec un RIDET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      siret: null,
+      ridet: '12 345 67',
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.siret).toBe(null);
+    expect(response.body.ridet).toBe('1234567');
+  });
+
+  it('si j’envoie un formulaire sans RIDET mais avec un SIRET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      siret: '12 345 67',
+      ridet: null,
+    };
+
+    // WHEN
+    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.ridet).toBe(null);
+    expect(response.body.siret).toBe('1234567');
   });
 
   it('si j’envoie un formulaire avec confirmation des engagements à false alors il y a une erreur de validation', async () => {
@@ -215,6 +255,34 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.body).toStrictEqual({
       message: 'Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé',
     });
+  });
+
+  it('si j’envoie un formulaire, alors l’idPG s’incrémente de +1', async () => {
+    // GIVEN
+    const envoiUtilisateur1 = {
+      ...champsObligatoires,
+    };
+
+    const envoiUtilisateur2 = {
+      ...champsObligatoires,
+      siret: '00000'
+    };
+    const envoiUtilisateur3 = {
+      ...champsObligatoires,
+      siret: '11111'
+    };
+    // WHEN
+    const responseCandidature1 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur1);
+    const responseCandidature2 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur2);
+    const responseCandidature3 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur3);
+
+    // THEN
+    expect(responseCandidature1.status).toBe(200);
+    expect(responseCandidature1.body.idPG).toBe(1);
+    expect(responseCandidature2.status).toBe(200);
+    expect(responseCandidature2.body.idPG).toBe(2);
+    expect(responseCandidature3.status).toBe(200);
+    expect(responseCandidature3.body.idPG).toBe(3);
   });
 
   it('si j’envoie un formulaire avec un ridet déjà existant alors il y a une erreur', async () => {
