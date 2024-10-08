@@ -13,6 +13,7 @@ import {
 import service from '../../../helpers/services';
 import {
   ALLOWED_ROLES,
+  disconnectProConnectUser,
   getProConnectAccessToken,
   getProConnectUserInfo,
 } from '../authentication.repository';
@@ -20,12 +21,16 @@ import {
 const { v4: uuidv4 } = require('uuid');
 
 const signIn = (app: Application) => async (req: IRequest, res: Response) => {
-  const { code } = req.body;
+  const { code, state } = req.body;
   if (!code) {
     return res.status(400).json({ error: 'Requête invalide' });
   }
   try {
-    const { proConnectAccessToken } = await getProConnectAccessToken(app, code);
+    const { proConnectAccessToken, idToken } = await getProConnectAccessToken(
+      app,
+      code,
+    );
+
     const proConnectUser = await getProConnectUserInfo(
       app,
       proConnectAccessToken,
@@ -84,13 +89,17 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       return res.status(500).json(error);
     }
     if (!userInDB) {
+      const logoutUrl = await disconnectProConnectUser(app, idToken, state);
       await app.service('accessLogs').create({
         name: keycloakUser.email,
         createdAt: new Date(),
         ip: req.feathers.ip,
         connexionError: true,
       });
-      return res.status(401).json('Connexion refusée');
+      return res.status(401).json({
+        error: 'Connexion refusée',
+        logoutUrl,
+      });
     }
     try {
       // création de l'access token et du refresh token
@@ -195,8 +204,6 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
   } catch (error) {
     return res.status(500).json(error.message);
   }
-
-  return res.status(401).json('Accès refusé');
 };
 
 export default signIn;

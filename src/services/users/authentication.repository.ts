@@ -21,23 +21,23 @@ async function getProConnectAccessToken(app: Application, code: string) {
     redirect_uri: [app.get('pro_connect').redirect_uri],
     code,
   };
-
-  const tokenResponse = await axios.post(
-    app.get('pro_connect').token_endpoint,
-    querystring.stringify(tokenParams),
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+  try {
+    const tokenResponse = await axios.post(
+      app.get('pro_connect').token_endpoint,
+      querystring.stringify(tokenParams),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       },
-    },
-  );
-  if (tokenResponse.status !== 200) {
-    throw new Error('Access denied');
+    );
+    return {
+      proConnectAccessToken: tokenResponse.data.access_token,
+      idToken: tokenResponse.data.id_token,
+    };
+  } catch (error) {
+    throw new Error('Une erreur est survenue lors de la récupération du token');
   }
-  return {
-    proConnectAccessToken: tokenResponse.data.access_token,
-    idToken: tokenResponse.data.id_token,
-  };
 }
 
 async function getProConnectUserInfo(app: Application, accessToken: string) {
@@ -95,15 +95,15 @@ async function disconnectProConnectUser(
     post_logout_redirect_uri: proConnectConfig.post_logout_redirect_uri,
   });
 
-  const logoutUrl = `${proConnectConfig.logout_endpoint}?${params.toString()}`;
+  const logoutConfiguration = `${proConnectConfig.logout_endpoint}?${params.toString()}`;
 
   try {
-    const response = await axios.get(logoutUrl, {
+    const response = await axios.get(logoutConfiguration, {
       maxRedirects: 0,
       validateStatus: (status) => status >= 200 && status < 400,
     });
-
-    return response.headers.location || 'Logout successful';
+    const logoutUrl = response.config.url;
+    return logoutUrl;
   } catch (error) {
     throw new Error('Failed to disconnect user from ProConnect');
   }
