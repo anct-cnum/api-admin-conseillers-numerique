@@ -35,10 +35,18 @@ import {
   updateAvenantAvisPrefetPosteSupplementaire,
   updateCommentaireAvisPrefet,
   updateCommentaireAvenantAvisPrefet,
+  verifySiretOrRidetStructure,
 } from './controllers';
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
 import createAbilities from '../../middleware/createAbilities';
+import creerCandidatureStructure, {
+  validerCandidatureStructure,
+} from './controllers/creerCandidatureStructure';
+import creerCandidatureStructureCoordinateur, {
+  validerCandidatureStructureCoordinateur,
+} from './controllers/creerCandidatureStructureCoordinateur';
+import confirmationEmailCandidatureStructure from './controllers/confirmationEmailCandidatureStructure';
 
 export default class Structures extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
@@ -252,6 +260,24 @@ export default class Structures extends Service {
       authenticateMode(app),
       createAbilities(app),
       addRoleCoordinateur(app),
+    );
+    app.post(
+      '/candidature-structure',
+      validerCandidatureStructure(app),
+      creerCandidatureStructure(app),
+    );
+    app.post(
+      '/candidature-structure-coordinateur',
+      validerCandidatureStructureCoordinateur(app),
+      creerCandidatureStructureCoordinateur(app),
+    );
+    app.patch(
+      '/confirmation-email-inscription-structure/:id',
+      confirmationEmailCandidatureStructure(app),
+    );
+    app.get(
+      '/structure/verify-siret-or-ridet/:siretOrRidet',
+      verifySiretOrRidetStructure(app),
     );
   }
 }

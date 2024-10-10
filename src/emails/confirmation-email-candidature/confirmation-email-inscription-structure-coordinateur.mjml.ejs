@@ -1,0 +1,43 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+      <mj-wrapper css-class="wrapper">
+        <mj-section>
+          <mj-column>
+              <mj-text css-class="text-primary">
+                Confirmation d'inscription
+              </mj-text>
+              <mj-text>
+                Bonjour <%= prenom %> <%= nom %>,
+              </mj-text>
+              <mj-section>
+                  <mj-column vertical-align="middle" width="100%">
+                  <mj-text align="left">Vous avez déposé une candidature pour un poste de coordinateur.</mj-text>
+                  <mj-text align="left">Veuillez compléter le formulaire de motivation de votre candidature sur Démarches-simplifiées en <a href="<%= linkDemarcheSimplifiees %>">cliquant ici</a> ou alors copier/coller le lien suivant dans votre navigateur :</mj-text>
+                  <mj-text align="left"> <%= linkDemarcheSimplifiees %></mj-text>
+                </mj-column>
+                <mj-column vertical-align="middle" width="100%">
+                  <mj-text align="left" font-weight="bold">Cette étape est indispensable pour permettre au Préfet de donner un avis et à l'Agence Nationale de la Cohésion des Territoires de valider ou refuser votre demande.</mj-text>
+                  <mj-text align="left">Dans le cadre de la validation de votre demande, un mail vous sera envoyé pour vous confirmer l'attribution ou le refus du poste. Dans le cas où votre demande est validée, vous pourrez accéder à l'outil Tableau de pilotage pour recruter un conseiller coordinateur.</mj-text>
+                </mj-column>
+                <mj-column vertical-align="middle" width="100%">
+                  <mj-text align="left">Afin de recevoir les communications, cliquez <a href="<%= link %>">ici</a> pour confirmer votre e-mail de contact ou alors entrez le lien suivant dans votre navigateur : </mj-text>
+                  <mj-text align="left"> <%= link %></mj-text>
+                </mj-column>
+              </mj-section>
+            </mj-column>
+          </mj-section>
+        <mj-section>
+          <mj-column>
+            <%- include('../commun/signature.mjml.ejs'); %>
+            <mj-text css-class="text-secondary">
+              Nous contacter : <a href="<%= emailContact %>"><%= emailContact %></a>
+            </mj-text>
+          </mj-column>
+        </mj-section>
+      </mj-wrapper>
+  </mj-body>
+</mjml>

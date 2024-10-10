@@ -1,0 +1,40 @@
+<mjml>
+  <%- include('../commun/head.mjml.ejs'); %>
+
+  <mj-body background-color="#f0f0f0">
+    <%- include('../commun/header.mjml.ejs', { utils }); %>
+
+      <mj-wrapper css-class="wrapper">
+        <mj-section>
+          <mj-column>
+              <mj-text css-class="text-primary">
+                Confirmation d'inscription
+              </mj-text>
+              <mj-text>
+                Bonjour <%= prenom %> <%= nom %>,
+              </mj-text>
+              <mj-section>
+                  <mj-column vertical-align="middle" width="100%">
+                  <mj-text align="left">Vous venez de vous inscrire sur la plateforme Conseiller Numérique et nous vous en remercions.</mj-text>
+                  <mj-text align="left">Cliquez <a href="<%= link %>">ici</a>pour confirmer votre email et activer votre candidature, ou alors entrez le lien suivant dans votre navigateur :</mj-text>
+                  <mj-text align="left"> <%= link %></mj-text>
+                </mj-column>
+                <mj-column vertical-align="middle" width="100%">
+                <mj-text align="left">Votre candidature va être transmise au préfet de votre département qui l’examinera et transmettra un avis positif ou négatif sur celle-ci.</mj-text>
+                <mj-text align="left">Le Comité de sélection du dispositif Conseiller numérique validera ensuite ou non votre candidature. </mj-text>
+                <mj-text align="left">En cas d’avis positif, vous aurez accès à la liste des candidats et pourrez conduire les entretiens avec eux avant de déposer le dossier de demande de subvention.</mj-text>
+              </mj-column>
+            </mj-section>
+            </mj-column>
+          </mj-section>
+        <mj-section>
+          <mj-column>
+            <%- include('../commun/signature.mjml.ejs'); %>
+            <mj-text css-class="text-secondary">
+              Nous contacter : <a href="<%= emailContact %>"><%= emailContact %></a>
+            </mj-text>
+          </mj-column>
+        </mj-section>
+      </mj-wrapper>
+  </mj-body>
+</mjml>
