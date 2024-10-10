@@ -97,7 +97,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         connexionError: true,
       });
       return res.status(401).json({
-        error: 'Connexion refusée',
+        message: 'Connexion refusée',
         logoutUrl,
       });
     }
