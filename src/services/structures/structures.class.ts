@@ -40,12 +40,13 @@ import {
 import getStructuresMisesEnRelations from '../misesEnRelation/controllers/getStructuresMisesEnRelations';
 import getStructuresMisesEnRelationsStats from '../misesEnRelation/controllers/getStructuresMisesEnRelationsStats';
 import createAbilities from '../../middleware/createAbilities';
-import creerCandidatureStructure, {
-  validerCandidatureStructure,
-} from './controllers/creerCandidatureStructure';
-import creerCandidatureStructureCoordinateur, {
-  validerCandidatureStructureCoordinateur,
-} from './controllers/creerCandidatureStructureCoordinateur';
+// Temporaire : A remettre pour la livraison Formulaire
+// import creerCandidatureStructure, {
+//   validerCandidatureStructure,
+// } from './controllers/creerCandidatureStructure';
+// import creerCandidatureStructureCoordinateur, {
+//   validerCandidatureStructureCoordinateur,
+// } from './controllers/creerCandidatureStructureCoordinateur';
 import confirmationEmailCandidatureStructure from './controllers/confirmationEmailCandidatureStructure';
 
 export default class Structures extends Service {
@@ -261,16 +262,17 @@ export default class Structures extends Service {
       createAbilities(app),
       addRoleCoordinateur(app),
     );
-    app.post(
-      '/candidature-structure',
-      validerCandidatureStructure(app),
-      creerCandidatureStructure(app),
-    );
-    app.post(
-      '/candidature-structure-coordinateur',
-      validerCandidatureStructureCoordinateur(app),
-      creerCandidatureStructureCoordinateur(app),
-    );
+    // Temporaire : A remettre pour la livraison Formulaire
+    // app.post(
+    //   '/candidature-structure',
+    //   validerCandidatureStructure(app),
+    //   creerCandidatureStructure(app),
+    // );
+    // app.post(
+    //   '/candidature-structure-coordinateur',
+    //   validerCandidatureStructureCoordinateur(app),
+    //   creerCandidatureStructureCoordinateur(app),
+    // );
     app.patch(
       '/confirmation-email-inscription-structure/:id',
       confirmationEmailCandidatureStructure(app),
