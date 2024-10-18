@@ -7,7 +7,6 @@ import verifyToken from '../../../helpers/auth/verify';
 const getRefreshToken =
   (app: Application) => async (req: IRequest, res: Response) => {
     const { refreshToken } = req.cookies;
-    console.log('------->refreshToken', req.cookies);
     if (!refreshToken) return res.status(401).json('Accès refusé');
     let user: IUser;
     try {
