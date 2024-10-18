@@ -196,7 +196,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       res.cookie(app.get('pro_connect').refresh_token_key, refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         domain:
           process.env.NODE_ENV === 'production'
