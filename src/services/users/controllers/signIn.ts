@@ -195,6 +195,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       // envoi du refresh token dans un cookie
       res.cookie(app.get('pro_connect').refresh_token_key, refreshToken, {
         httpOnly: true,
+        sameSite: 'none',
       });
       // envoi de l'access token
       return res.status(200).json({ user: user._doc, accessToken });
