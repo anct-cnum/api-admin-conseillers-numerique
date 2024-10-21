@@ -30,7 +30,6 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       app,
       code,
     );
-
     const proConnectUser = await getProConnectUserInfo(
       app,
       proConnectAccessToken,
@@ -38,16 +37,15 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     if (!proConnectUser) {
       return res.status(401).json('Token invalide');
     }
-    const keycloakUser = proConnectUser as any;
 
-    keycloakUser.email = keycloakUser?.email?.trim()?.toLowerCase();
+    proConnectUser.email = proConnectUser?.email?.trim()?.toLowerCase();
     let userInDB: IUser;
     // verification de la présence de l'utilisateur du serveur d'authentification en base de données
     try {
       userInDB = await app
         .service(service.users)
         .Model.findOne({
-          sub: keycloakUser.sub,
+          sub: proConnectUser.sub,
           roles: { $in: ALLOWED_ROLES },
         })
         .select({ password: 0, refreshToken: 0 });
@@ -57,11 +55,11 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           userInDB = await app.service(service.users).Model.findOneAndUpdate(
             {
               token: req.query.verificationToken,
-              name: keycloakUser.email,
+              name: proConnectUser.email,
               roles: { $in: ALLOWED_ROLES },
             },
             {
-              sub: keycloakUser.sub,
+              sub: proConnectUser.sub,
               token: null,
               tokenCreatedAt: null,
               passwordCreated: true,
@@ -71,13 +69,13 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         if (!userInDB) {
           userInDB = await app.service(service.users).Model.findOneAndUpdate(
             {
-              name: keycloakUser.email,
+              name: proConnectUser.email,
               sub: { $exists: false },
               token: { $ne: null },
               roles: { $in: ALLOWED_ROLES },
             },
             {
-              sub: keycloakUser.sub,
+              sub: proConnectUser.sub,
               token: null,
               tokenCreatedAt: null,
               passwordCreated: true,
@@ -91,7 +89,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     if (!userInDB) {
       const logoutUrl = await disconnectProConnectUser(app, idToken, state);
       await app.service('accessLogs').create({
-        name: keycloakUser.email,
+        name: proConnectUser.email,
         createdAt: new Date(),
         ip: req.feathers.ip,
         connexionError: true,
@@ -174,7 +172,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           });
         if (
           coordinateur?.estCoordinateur !== true ||
-          coordinateur?.emailCN?.address !== keycloakUser.email
+          coordinateur?.emailCN?.address !== proConnectUser.email
         ) {
           await app.service(service.users).Model.updateOne(
             { _id: user._id },

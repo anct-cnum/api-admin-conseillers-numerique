@@ -107,6 +107,7 @@ export default class Users extends Service {
       createAbilities(app),
       postGestionnaireRelanceInvitation(app),
     );
+    app.post('/create-url', createAuthorizationUrl(app));
 
     /* Routes techniques */
 
@@ -119,7 +120,5 @@ export default class Users extends Service {
     app.get('/', (req, res) => {
       res.sendStatus(200);
     });
-
-    app.post('/create-url', createAuthorizationUrl(app));
   }
 }
