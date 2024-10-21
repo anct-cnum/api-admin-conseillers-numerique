@@ -47,7 +47,7 @@ async function getProConnectUserInfo(app: Application, accessToken: string) {
     },
   });
   if (response.status !== 200) {
-    throw new Error('Access denied');
+    throw new Error('Accès refusé');
   }
   return jwt.decode(response.data) as any;
 }
@@ -105,7 +105,7 @@ async function disconnectProConnectUser(
     const logoutUrl = response.config.url;
     return logoutUrl;
   } catch (error) {
-    throw new Error('Failed to disconnect user from ProConnect');
+    throw new Error('Une erreur est survenue lors de la déconnexion');
   }
 }
 
