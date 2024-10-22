@@ -10,13 +10,23 @@ import {
   IStructures,
   IUser,
 } from '../../../ts/interfaces/db.interfaces';
-import service from '../../../helpers/services';
 import {
-  ALLOWED_ROLES,
   disconnectProConnectUser,
   getProConnectAccessToken,
   getProConnectUserInfo,
 } from '../authentication.repository';
+import {
+  countCoordinators,
+  createAccessLog,
+  findAndUpdateUserByEmail,
+  findAndUpdateUserByVerificationToken,
+  findCoordinator,
+  findRefusedRecruitmentRelations,
+  findUserByProConnectSub,
+  getStructureInfo,
+  updateUserSubAndToken,
+  updateUserWithRefreshToken,
+} from '../users.repository';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -37,49 +47,25 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     if (!proConnectUser) {
       return res.status(401).json('Token invalide');
     }
-
-    proConnectUser.email = proConnectUser?.email?.trim()?.toLowerCase();
     let userInDB: IUser;
     // verification de la présence de l'utilisateur du serveur d'authentification en base de données
     try {
-      userInDB = await app
-        .service(service.users)
-        .Model.findOne({
-          sub: proConnectUser.sub,
-          roles: { $in: ALLOWED_ROLES },
-        })
-        .select({ password: 0, refreshToken: 0 });
+      userInDB = await findUserByProConnectSub(app, proConnectUser.sub);
       // si il s'agit de la première connexion (utilisateur sans sub) nous regardons si le token d'inscription est valide
       if (!userInDB) {
         if (req.query.verificationToken) {
-          userInDB = await app.service(service.users).Model.findOneAndUpdate(
-            {
-              token: req.query.verificationToken,
-              name: proConnectUser.email,
-              roles: { $in: ALLOWED_ROLES },
-            },
-            {
-              sub: proConnectUser.sub,
-              token: null,
-              tokenCreatedAt: null,
-              passwordCreated: true,
-            },
+          userInDB = await findAndUpdateUserByVerificationToken(
+            app,
+            req.query.verificationToken,
+            proConnectUser.email,
+            proConnectUser.sub,
           );
         }
         if (!userInDB) {
-          userInDB = await app.service(service.users).Model.findOneAndUpdate(
-            {
-              name: proConnectUser.email,
-              sub: { $exists: false },
-              token: { $ne: null },
-              roles: { $in: ALLOWED_ROLES },
-            },
-            {
-              sub: proConnectUser.sub,
-              token: null,
-              tokenCreatedAt: null,
-              passwordCreated: true,
-            },
+          userInDB = await findAndUpdateUserByEmail(
+            app,
+            proConnectUser.email,
+            proConnectUser.sub,
           );
         }
       }
@@ -88,12 +74,7 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     }
     if (!userInDB) {
       const logoutUrl = await disconnectProConnectUser(app, idToken, state);
-      await app.service('accessLogs').create({
-        name: proConnectUser.email,
-        createdAt: new Date(),
-        ip: req.feathers.ip,
-        connexionError: true,
-      });
+      await createAccessLog(app, proConnectUser.email, req.feathers.ip, true);
       return res.status(401).json({
         message: 'Connexion refusée',
         logoutUrl,
@@ -103,38 +84,22 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       // création de l'access token et du refresh token
       const accessToken = await createAccessToken(app)(userInDB);
       const refreshToken = await createRefreshToken(app)(userInDB);
-
       // création d'une entrée dans la collection accessLogs
-      await app.service('accessLogs').create({
-        name: userInDB.name,
-        createdAt: new Date(),
-        ip: req.feathers.ip,
-      });
-
+      await createAccessLog(app, proConnectUser.email, req.feathers.ip);
       // mise à jour de l'utilisateur avec son nouveau refresh token et sa dernière date de connexion
-      const user = await app
-        .service(service.users)
-        .Model.findOneAndUpdate(
-          { name: userInDB.name },
-          { refreshToken, lastLogin: Date.now() },
-          { new: true },
-        )
-        .select({ password: 0, refreshToken: 0 });
+      const user = await updateUserWithRefreshToken(
+        app,
+        userInDB.name,
+        refreshToken,
+      );
       if (user.roles.includes('structure')) {
-        const structure: IStructures = await app
-          .service(service.structures)
-          .Model.findOne(
-            { _id: user.entity.oid },
-            { nom: 1, demandesCoordinateur: 1 },
-          );
-        const miseEnRelationRefusRecrutement: IMisesEnRelation[] = await app
-          .service(service.misesEnRelation)
-          .Model.find({
-            statut: 'interessee',
-            'structure.$id': structure._id,
-            banniereRefusRecrutement: true,
-          });
-        const countDemandesCoordinateurValider =
+        const structure: IStructures = await getStructureInfo(
+          app,
+          user.entity.oid,
+        );
+        const miseEnRelationRefusRecrutement: IMisesEnRelation[] =
+          await findRefusedRecruitmentRelations(app, structure._id);
+        const countDemandesCoordinateurValidees =
           structure?.demandesCoordinateur?.filter(
             (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
           ).length;
@@ -143,16 +108,13 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
             (demandeCoordinateur) =>
               demandeCoordinateur?.banniereInformationAvisStructure === true,
           );
-        if (countDemandesCoordinateurValider > 0) {
-          const countCoordinateurs: number = await app
-            .service(service.conseillers)
-            .Model.countDocuments({
-              structureId: structure._id,
-              statut: 'RECRUTE',
-              estCoordinateur: true,
-            });
+        if (countDemandesCoordinateurValidees > 0) {
+          const countCoordinateurs: number = await countCoordinators(
+            app,
+            structure._id,
+          );
           user._doc.displayBannerPosteCoordinateurStructure =
-            countCoordinateurs < countDemandesCoordinateurValider;
+            countCoordinateurs < countDemandesCoordinateurValidees;
         }
         if (demandesCoordinateurBannerInformation?.length > 0) {
           user._doc.demandesCoordinateurBannerInformation =
@@ -165,28 +127,12 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
         user._doc.nomStructure = structure.nom;
       } else if (user.roles.includes('coordinateur')) {
         user._doc.roles = ['coordinateur']; // FIX ordre rôle
-        const coordinateur = await app
-          .service(service.conseillers)
-          .Model.findOne({
-            _id: user.entity.oid,
-          });
+        const coordinateur = await findCoordinator(app, user.entity.oid);
         if (
           coordinateur?.estCoordinateur !== true ||
           coordinateur?.emailCN?.address !== proConnectUser.email
         ) {
-          await app.service(service.users).Model.updateOne(
-            { _id: user._id },
-            {
-              $set: {
-                token: uuidv4(),
-                tokenCreatedAt: new Date(),
-              },
-              $unset: {
-                sub: '',
-                refreshToken: '',
-              },
-            },
-          );
+          await updateUserSubAndToken(app, user._id, uuidv4());
           return res.status(401).json('Connexion refusée');
         }
       }

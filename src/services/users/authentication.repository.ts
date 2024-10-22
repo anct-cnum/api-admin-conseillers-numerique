@@ -54,11 +54,12 @@ async function getProConnectUserInfo(app: Application, accessToken: string) {
 
 async function createProConnectClient(app: Application): Promise<Client> {
   const proConnectConfig = app.get('pro_connect');
-  const mcpIssuer = await Issuer.discover(proConnectConfig.issuer_url);
-  return new mcpIssuer.Client({
+  const monCompteProIssuer = await Issuer.discover(proConnectConfig.issuer_url);
+  return new monCompteProIssuer.Client({
     client_id: proConnectConfig.client_id,
     client_secret: proConnectConfig.client_secret,
     redirect_uris: [proConnectConfig.redirect_uri],
+    response_types: ['code'],
   });
 }
 
@@ -102,8 +103,7 @@ async function disconnectProConnectUser(
       maxRedirects: 0,
       validateStatus: (status) => status >= 200 && status < 400,
     });
-    const logoutUrl = response.config.url;
-    return logoutUrl;
+    return response.config.url;
   } catch (error) {
     throw new Error('Une erreur est survenue lors de la déconnexion');
   }
