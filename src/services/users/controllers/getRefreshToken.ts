@@ -22,7 +22,7 @@ const getRefreshToken =
       verifyToken(app)(
         res,
         refreshToken,
-        app.get('inclusion_connect').refresh_token_secret,
+        app.get('pro_connect').refresh_token_secret,
         user,
       );
     } catch (error) {

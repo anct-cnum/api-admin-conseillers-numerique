@@ -21,11 +21,12 @@ import {
   deleteAccount,
   postInvitationStructure,
 } from './controllers';
+import createAuthorizationUrl from './controllers/createAuthorizationUrl';
 
 export default class Users extends Service {
   constructor(options: Partial<MongooseServiceOptions>, app: Application) {
     super(options);
-    app.get('/login', signIn(app));
+    app.post('/login', signIn(app));
 
     app.post('/logout', signOut(app));
 
@@ -106,6 +107,7 @@ export default class Users extends Service {
       createAbilities(app),
       postGestionnaireRelanceInvitation(app),
     );
+    app.post('/create-url', createAuthorizationUrl(app));
 
     /* Routes techniques */
 

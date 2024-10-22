@@ -11,9 +11,9 @@ const verifyToken =
         return res.status(403).json('token expired');
       const accessToken = sign(
         user.toJSON(),
-        app.get('inclusion_connect').access_token_secret,
+        app.get('pro_connect').access_token_secret,
         {
-          expiresIn: app.get('inclusion_connect').access_token_duration,
+          expiresIn: app.get('pro_connect').access_token_duration,
         },
       );
       return res.status(200).json({ user, accessToken });
