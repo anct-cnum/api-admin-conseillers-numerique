@@ -3,7 +3,6 @@ import creationCompteConseiller from './conseillers/creationCompteConseiller';
 import relanceCreationCompteConseiller from './conseillers/relanceCreationCompteConseiller';
 import invitationActiveCompte from './invitations/invitationActiveCompte';
 import invitationMultiRoleCompte from './invitations/invitationMultiRoleCompte';
-import conseillerRupturePix from './pix/conseillerRupturePix';
 import conseillerRuptureStructure from './structures/conseillerRuptureStructure';
 import candidatSupprimePix from './pix/candidatSupprimePix';
 import informationValidationCoselec from './structures/informationValidationCoselec';
@@ -29,7 +28,6 @@ export {
   relanceCreationCompteConseiller,
   invitationActiveCompte,
   invitationMultiRoleCompte,
-  conseillerRupturePix,
   conseillerRuptureStructure,
   candidatSupprimePix,
   informationValidationCoselec,
