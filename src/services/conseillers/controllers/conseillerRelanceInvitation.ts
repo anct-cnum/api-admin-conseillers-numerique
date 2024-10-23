@@ -42,12 +42,6 @@ const conseillerRelanceInvitation =
         });
         return;
       }
-      if (conseillerUser.passwordCreated === true) {
-        res.status(409).json({
-          message: `Le compte de ${conseiller.nom} ${conseiller.prenom} est déjà activé`,
-        });
-        return;
-      }
       const users = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)

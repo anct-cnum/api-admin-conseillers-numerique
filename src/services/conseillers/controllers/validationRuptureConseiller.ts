@@ -12,7 +12,6 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
-import { deleteMailbox } from '../../../utils/gandi';
 import deleteAccount from '../../../utils/mattermost';
 import {
   conseillerRuptureStructure,
@@ -510,10 +509,6 @@ const validationRuptureConseiller =
           conseiller._id,
           updatedAt,
         );
-      }
-      // Suppression compte Gandi
-      if (login !== undefined) {
-        await deleteMailbox(app, req)(conseiller._id, login);
       }
       // Suppression compte Mattermost
       if (conseiller.mattermost?.id !== undefined) {
