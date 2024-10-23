@@ -15,7 +15,6 @@ import mailer from '../../../mailer';
 import { deleteMailbox } from '../../../utils/gandi';
 import deleteAccount from '../../../utils/mattermost';
 import {
-  conseillerRupturePix,
   conseillerRuptureStructure,
 } from '../../../emails';
 import canValidateTermination from '../../../helpers/accessControl/canValidateTermination';
@@ -555,16 +554,6 @@ const validationRuptureConseiller =
         }
       }
       const mailerInstance = mailer(app);
-      const messageRupturePix = conseillerRupturePix(mailerInstance);
-      const errorSmtpMailRupturePix = await messageRupturePix
-        .send(conseiller)
-        .catch((errSmtp: Error) => {
-          return errSmtp;
-        });
-      if (errorSmtpMailRupturePix instanceof Error) {
-        res.status(503).json({ message: errorSmtpMailRupturePix.message });
-        return;
-      }
       const messageRuptureStructure = conseillerRuptureStructure(
         app,
         mailerInstance,
