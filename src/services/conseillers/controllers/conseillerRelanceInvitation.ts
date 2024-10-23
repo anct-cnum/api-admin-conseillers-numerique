@@ -40,9 +40,20 @@ const conseillerRelanceInvitation =
         });
         return;
       }
-      if (conseillerUser.passwordCreated === true) {
+      const users = await app
+        .service(service.users)
+        .Model.accessibleBy(req.ability, action.update)
+        .findOneAndUpdate(
+          { _id: conseillerUser._id },
+          { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
+          {
+            returnOriginal: false,
+            includeResultMetadata: true,
+          },
+        );
+      if (users.lastErrorObject.n === 0) {
         res.status(409).json({
-          message: `Le compte de ${conseiller.nom} ${conseiller.prenom} est déjà activé`,
+          message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
         });
         return;
       }
@@ -73,3 +84,7 @@ const conseillerRelanceInvitation =
   };
 
 export default conseillerRelanceInvitation;
+function uuidv4() {
+  throw new Error('Function not implemented.');
+}
+
