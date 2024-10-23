@@ -65,7 +65,7 @@ const checkIfCcp1 = (statut) =>
   statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
 
 const generateCsvCandidat = async (misesEnRelations, response: Response) => {
-  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;Compte activé;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Date du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;email professionnel secondaire'];
+  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Date du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel'];
 
   const formatterDate = (date: Date): string => {
     if (date !== undefined && date !== null) {
@@ -86,10 +86,6 @@ const generateCsvCandidat = async (misesEnRelations, response: Response) => {
         };${miseEnrelation?.salaire ?? 'Non renseigné'
         };${miseEnrelation.conseiller?.prenom
         };${miseEnrelation.conseiller?.nom
-        };${miseEnrelation.conseiller?.emailCN?.address &&
-          miseEnrelation.conseiller?.mattermost?.id
-          ? 'oui'
-          : 'non'
         };${miseEnrelation.conseiller?.aUneExperienceMedNum ? 'oui' : 'non'
         };${miseEnrelation.conseiller?.telephone
         };${miseEnrelation.conseiller?.email
@@ -123,10 +119,6 @@ const generateCsvCandidat = async (misesEnRelations, response: Response) => {
         };${coselec?.nombreConseillersCoselec ? coselec.nombreConseillersCoselec : 0
         };${formatterDate(miseEnrelation.conseiller?.datePrisePoste)
         };${formatterDate(miseEnrelation.conseiller?.dateFinFormation)
-        };${miseEnrelation.conseiller?.mattermost?.id &&
-          miseEnrelation.conseiller?.emailCN?.address
-          ? miseEnrelation.conseiller?.emailCN?.address
-          : ''
         };${miseEnrelation.conseiller?.emailPro ?? ''
         }`
       );
@@ -761,8 +753,6 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
       'Nom',
       'Prénom',
       'Email professionnel',
-      'Email professionnel secondaire',
-      'Compte Coop activé',
       'Téléphone professionnel',
       'Email personnelle',
       'Statut',
@@ -796,16 +786,8 @@ const generateCsvConseillers = async (misesEnRelation, res: Response) => {
             miseEnRelation.structureObj.contact?.email,
             miseEnRelation.conseillerObj.nom,
             miseEnRelation.conseillerObj.prenom,
-            miseEnRelation.conseillerObj?.emailCN?.address ??
-            `compte COOP non créé (${formatStatutMisesEnRelation(
-              miseEnRelation.statut,
-              miseEnRelation?.dossierIncompletRupture,
-            )})`,
-            miseEnRelation.conseillerObj?.emailPro
-              ? miseEnRelation.conseillerObj.emailPro
-              : 'Non renseigné',
-            miseEnRelation.conseillerObj?.mattermost?.login ? 'Oui' : 'Non',
-            miseEnRelation.conseillerObj?.telephonePro,
+            miseEnRelation.conseillerObj?.emailPro ?? 'Non renseigné',
+            miseEnRelation.conseillerObj?.telephonePro ?? 'Non renseigné',
             miseEnRelation.conseillerObj?.email,
             formatStatutMisesEnRelation(
               miseEnRelation.statut,
@@ -849,13 +831,12 @@ const generateCsvConseillersCoordonnes = async (conseillers, res: Response) => {
       'Nom',
       'Prénom',
       'Mail personnel',
-      'Mail conseiller numérique',
+      'Mail professionnel',
       'Structure',
       'Code postal',
       'Date de début de contrat',
       'Date de fin de formation',
       'Certification',
-      'Activé',
       'CRA saisi',
       'Nom supérieur',
       'Prénom supérieur',
@@ -872,13 +853,12 @@ const generateCsvConseillersCoordonnes = async (conseillers, res: Response) => {
             conseiller.nom,
             conseiller.prenom,
             conseiller.emailPerso,
-            conseiller.emailCN,
+            conseiller?.emailPro ?? 'Non renseigné',
             conseiller.nomStructure,
             conseiller.codePostal,
             formatDate(conseiller.dateDebutDeContrat),
             formatDate(conseiller.dateFinDeFormation),
             conseiller.certificationPix ? 'Oui' : 'Non',
-            conseiller.compteCoopActif ? 'Oui' : 'Non',
             conseiller.craCount,
             conseiller.nomSuperieurHierarchique,
             conseiller.prenomSuperieurHierarchique,

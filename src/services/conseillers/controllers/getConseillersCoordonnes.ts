@@ -23,10 +23,8 @@ interface IConseillerCoordonne {
   _id: ObjectId;
   nom: string;
   prenom: string;
-  groupeCRA: string;
   codeDepartement: string;
   codeRegion: string;
-  emailCN?: string;
   mattermostId?: string;
 }
 
@@ -125,10 +123,8 @@ const getConseillersCoordonnes =
               _id: '$conseillerObj._id',
               nom: '$conseillerObj.nom',
               prenom: '$conseillerObj.prenom',
-              groupeCRA: '$conseillerObj.groupeCRA',
               codeDepartement: '$conseillerObj.codeDepartement',
               codeRegion: '$conseillerObj.codeRegion',
-              emailCN: '$conseillerObj.emailCN.address',
               mattermostId: '$conseillerObj.mattermost.id',
             },
           },
@@ -144,10 +140,8 @@ const getConseillersCoordonnes =
       const promises = coordonnes.map(
         async (coordonne: IConseillerCoordonne) => {
           const craCount = await getNombreCras(app, req)(coordonne._id);
-          const compteCoopActif = coordonne.emailCN && coordonne.mattermostId;
           return {
             ...coordonne,
-            compteCoopActif,
             craCount,
           };
         },

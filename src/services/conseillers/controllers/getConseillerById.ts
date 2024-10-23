@@ -141,8 +141,6 @@ const getConseillerById =
               sexe: 1,
               structureId: 1,
               certifie: 1,
-              groupeCRA: 1,
-              'emailCN.address': 1,
               pix: 1,
               distanceMax: 1,
               estCoordinateur: 1,

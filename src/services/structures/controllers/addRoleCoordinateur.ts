@@ -97,13 +97,6 @@ const addRoleCoordinateur =
         return;
       }
 
-      if (!conseillerUser?.passwordCreated) {
-        res.status(409).json({
-          message: "Le conseiller n'a pas encore activé son compte",
-        });
-        return;
-      }
-
       const user = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.update)

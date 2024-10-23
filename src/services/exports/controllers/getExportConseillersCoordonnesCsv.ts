@@ -21,7 +21,7 @@ interface IConseillerCoordonne {
   nom: string;
   prenom: string;
   emailPerso: string;
-  emailCN: string;
+  emailPro: string;
   mattermostId: string;
   nomStructure: string;
   codePostal: string;
@@ -85,8 +85,7 @@ const getExportConseillersCoordonnesCsv =
               nom: '$conseillerObj.nom',
               prenom: '$conseillerObj.prenom',
               emailPerso: '$conseillerObj.email',
-              emailCN: '$conseillerObj.emailCN.address',
-              mattermostId: '$conseillerObj.mattermost.id',
+              emailPro: '$conseillerObj.emailPro',
               nomStructure: '$structureObj.nom',
               codePostal: '$conseillerObj.codePostal',
               dateDebutDeContrat: 1,
@@ -111,10 +110,8 @@ const getExportConseillersCoordonnesCsv =
       const promises = coordonnes.map(
         async (coordonne: IConseillerCoordonne) => {
           const craCount = await getNombreCras(app, req)(coordonne._id);
-          const compteCoopActif = coordonne.emailCN && coordonne.mattermostId;
           return {
             ...coordonne,
-            compteCoopActif,
             craCount,
           };
         },

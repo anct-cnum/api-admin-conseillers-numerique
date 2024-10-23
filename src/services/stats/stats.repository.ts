@@ -204,7 +204,7 @@ const getConseillers = async (
           {
             $project: {
               _id: 1,
-              emailCN: '$emailCN.address',
+              emailPro: '$emailPro',
             },
           },
         ],
