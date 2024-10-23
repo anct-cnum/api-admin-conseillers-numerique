@@ -367,17 +367,16 @@ const validationRecrutementContrat =
       }
       const mailerInstance = mailer(app);
       const message = await creationCompteConseiller(app, mailerInstance);
-      const errorSmtpMail = await message
-        .send(user)
-        .catch((errSmtp: Error) => {
-          return errSmtp;
-        });
+      const errorSmtpMail = await message.send(user).catch((errSmtp: Error) => {
+        return errSmtp;
+      });
       if (errorSmtpMail instanceof Error) {
         res.status(500).json({
-          message: "Veuillez renvoyez manuellement l'invitation pour l'espace Coop",
+          message:
+            "Veuillez renvoyez manuellement l'invitation pour l'espace Coop",
         });
         return;
-      } 
+      }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {
       if (error.name === 'ForbiddenError') {
