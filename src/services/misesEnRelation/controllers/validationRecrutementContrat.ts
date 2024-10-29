@@ -14,6 +14,7 @@ import { checkStructurePhase2 } from '../../structures/repository/structures.rep
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 import creationCompteConseiller from '../../../emails/conseillers/creationCompteConseiller';
 import mailer from '../../../mailer';
+import { invitationMattermostParMail } from '../../../utils/mattermost';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -364,6 +365,9 @@ const validationRecrutementContrat =
               ),
             },
           });
+      }
+      if (!conseillerUpdated.value?.mattermost?.invitationCreateAccount) {
+        await invitationMattermostParMail(app, req)(conseillerUpdated.value);
       }
       const mailerInstance = mailer(app);
       const message = await creationCompteConseiller(app, mailerInstance);
