@@ -77,8 +77,8 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       await createAccessLog(
         app,
         proConnectUser.email,
-        req.feathers.ip,
         proConnectUser.sub,
+        req.feathers.ip,
         true,
       );
       return res.status(401).json({
