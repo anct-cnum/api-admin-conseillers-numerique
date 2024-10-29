@@ -26,7 +26,7 @@ const gestionnaireRelanceInvitation =
       if (!gestionnaire) {
         res.status(404).json({
           message:
-            "Le gestionnaire a déjà activé son compte, s'il a oublié son mot de passe, il pourra le réinitialiser via inclusion connect",
+            "Le gestionnaire a déjà activé son compte, s'il a oublié son mot de passe, il pourra le réinitialiser via ProConnect",
         });
         return;
       }

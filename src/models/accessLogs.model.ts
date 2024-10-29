@@ -16,6 +16,7 @@ export default function (app: Application): Model<any> {
       createdAt: { type: Date },
       ip: { type: String },
       connexionError: { type: Boolean },
+      proConnectSub: { type: String },
     },
     { strict: false, collection: 'accessLogs', versionKey: false },
   );

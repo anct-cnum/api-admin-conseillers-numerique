@@ -24,7 +24,7 @@ const authenticateMode =
 
         jwt.verify(
           accessToken,
-          app.get('inclusion_connect').access_token_secret,
+          app.get('pro_connect').access_token_secret,
           (err, userDecoded: IUser) => {
             if (err) res.status(403).json('Jeton invalide');
             const connect = app.get('mongodb');

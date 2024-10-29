@@ -54,6 +54,7 @@
     "mongoose-dbref": "^0.0.4",
     "nodemailer": "^6.9.9",
     "nodemailer-html-to-text": "^3.2.0",
+    "openid-client": "^5.7.0",
     "pg": "^8.11.3",
     "serve-favicon": "^2.5.0",
     "shx": "^0.3.4",
