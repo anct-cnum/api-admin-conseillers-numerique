@@ -52,4 +52,45 @@ const deleteAccount = (app, req) => async (conseiller) => {
   }
 };
 
-export default deleteAccount;
+const invitationMattermostParMail = (app, req) => async (conseiller) => {
+  const mattermost = app.get('mattermost');
+  try {
+    const token = await loginApi({ mattermost });
+
+    await axios({
+      method: 'post',
+      url: `${mattermost.endPoint}/api/v4/teams/${mattermost.teamId}/invite/email`,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      data: [conseiller.email],
+    });
+    await app
+      .service(service.conseillers)
+      .Model.accessibleBy(req.ability, action.update)
+      .updateOne(
+        { _id: conseiller._id },
+        {
+          $set: { 'mattermost.invitationCreateAccount': true },
+        },
+      );
+  } catch (error) {
+    await app
+      .service(service.conseillers)
+      .Model.accessibleBy(req.ability, action.update)
+      .updateOne(
+        { _id: conseiller._id },
+        {
+          $set: {
+            'mattermost.invitationCreateAccount': false,
+            'mattermost.error': true,
+            'mattermost.errorMessage': error.message,
+          },
+        },
+      );
+    throw new Error(error);
+  }
+};
+
+export { deleteAccount, invitationMattermostParMail };

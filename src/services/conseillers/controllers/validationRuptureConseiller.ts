@@ -12,7 +12,7 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
-import deleteAccount from '../../../utils/mattermost';
+import { deleteAccount } from '../../../utils/mattermost';
 import { conseillerRuptureStructure } from '../../../emails';
 import canValidateTermination from '../../../helpers/accessControl/canValidateTermination';
 
