@@ -28,10 +28,6 @@ execute(__filename, async ({ app, logger, exit, Sentry }) => {
       let newSub: string;
       try {
         newSub = SUB_MAPPING[user.sub];
-        if (!newSub) {
-          logger.warn(`L'utilisateur ${user._id} n'a pas de nouveau sub`);
-          return;
-        }
         await app.service(service.users).Model.updateOne(
           { _id: user._id },
           {
