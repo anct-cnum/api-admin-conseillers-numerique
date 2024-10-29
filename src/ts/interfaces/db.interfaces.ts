@@ -658,6 +658,7 @@ export interface AccessLogs {
   name: string;
   ip: string;
   connexionError: boolean;
+  proConnectSub: string;
 }
 
 export interface IStatsTerritoires {

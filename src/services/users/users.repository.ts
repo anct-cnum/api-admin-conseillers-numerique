@@ -102,6 +102,7 @@ const findAndUpdateUserByEmail = async (
 const createAccessLog = async (
   app: Application,
   name: string,
+  proConnectSub: string,
   ip: string,
   connexionError = false,
 ) => {
@@ -109,6 +110,7 @@ const createAccessLog = async (
     name,
     createdAt: new Date(),
     ip,
+    proConnectSub,
     connexionError,
   });
 };

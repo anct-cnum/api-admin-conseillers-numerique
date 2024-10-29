@@ -74,7 +74,13 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
     }
     if (!userInDB) {
       const logoutUrl = await disconnectProConnectUser(app, idToken, state);
-      await createAccessLog(app, proConnectUser.email, req.feathers.ip, true);
+      await createAccessLog(
+        app,
+        proConnectUser.email,
+        req.feathers.ip,
+        proConnectUser.sub,
+        true,
+      );
       return res.status(401).json({
         message: 'Connexion refusée',
         logoutUrl,
@@ -85,7 +91,12 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
       const accessToken = await createAccessToken(app)(userInDB);
       const refreshToken = await createRefreshToken(app)(userInDB);
       // création d'une entrée dans la collection accessLogs
-      await createAccessLog(app, proConnectUser.email, req.feathers.ip);
+      await createAccessLog(
+        app,
+        proConnectUser.email,
+        proConnectUser.sub,
+        req.feathers.ip,
+      );
       // mise à jour de l'utilisateur avec son nouveau refresh token et sa dernière date de connexion
       const user = await updateUserWithRefreshToken(
         app,
