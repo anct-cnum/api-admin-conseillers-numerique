@@ -87,7 +87,6 @@ const findAndUpdateUserByEmail = async (
     {
       name: email,
       sub: { $exists: false },
-      token: { $ne: null },
       roles: { $in: ALLOWED_ROLES },
     },
     {
