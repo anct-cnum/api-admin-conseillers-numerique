@@ -8,10 +8,9 @@ export default function (app: Application, mailer, req: IRequest) {
   const { utils } = mailer;
   const templateName = 'creationCompteConseiller';
 
-  const render = async (user: IUser) => {
+  const render = async () => {
     return mailer.render(__dirname, templateName, {
-      user,
-      link: utils.getEspaceCoopUrl(`/inscription/${user.token}`),
+      link: utils.getEspaceCoopUrl(''),
     });
   };
 
@@ -57,7 +56,7 @@ export default function (app: Application, mailer, req: IRequest) {
         .sendEmail(user.name, {
           subject:
             'Veuillez activer votre compte Coop des conseillers numériques',
-          body: await render(user),
+          body: await render(),
         })
         .then(onSuccess)
         .catch(onError);

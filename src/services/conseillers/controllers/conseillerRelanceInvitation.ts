@@ -8,8 +8,6 @@ import { IConseillers } from '../../../ts/interfaces/db.interfaces';
 import mailer from '../../../mailer';
 import { relanceCreationCompteConseiller } from '../../../emails';
 
-const { v4: uuidv4 } = require('uuid');
-
 const conseillerRelanceInvitation =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
@@ -48,27 +46,10 @@ const conseillerRelanceInvitation =
         });
         return;
       }
-      const users = await app
-        .service(service.users)
-        .Model.accessibleBy(req.ability, action.update)
-        .findOneAndUpdate(
-          { _id: conseillerUser._id },
-          { $set: { token: uuidv4(), tokenCreatedAt: new Date() } },
-          {
-            returnOriginal: false,
-            includeResultMetadata: true,
-          },
-        );
-      if (users.lastErrorObject.n === 0) {
-        res.status(409).json({
-          message: "La mise à jour de l'utilisateur n'a pas pu être réalisé !",
-        });
-        return;
-      }
       const mailerInstance = mailer(app);
       const message = relanceCreationCompteConseiller(app, mailerInstance, req);
       const errorSmtpMail = await message
-        .send(users.value)
+        .send(conseillerUser)
         .catch((errSmtp: Error) => {
           return errSmtp;
         });
