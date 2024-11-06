@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import { IUser } from '../../ts/interfaces/db.interfaces';
 import { IRequest } from '../../ts/interfaces/global.interfaces';
 import { action } from '../../helpers/accessControl/accessList';
 
