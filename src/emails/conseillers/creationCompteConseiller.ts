@@ -1,6 +1,5 @@
 import { Application } from '@feathersjs/express';
 import service from '../../helpers/services';
-import { IUser } from '../../ts/interfaces/db.interfaces';
 
 export default function (app: Application, mailer) {
   const { utils } = mailer;
