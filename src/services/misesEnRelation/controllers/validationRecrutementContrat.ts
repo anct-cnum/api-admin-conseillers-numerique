@@ -13,6 +13,7 @@ import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
 import creationCompteConseiller from '../../../emails/conseillers/creationCompteConseiller';
+import creationCompteCandidat from '../../../emails/candidats/creationCompteCandidat';
 import mailer from '../../../mailer';
 import { invitationMattermostParMail } from '../../../utils/mattermost';
 
@@ -218,11 +219,8 @@ const validationRecrutementContrat =
               $set: {
                 prenom: miseEnRelationVerif.conseillerObj?.prenom, // nécessaire si compte candidat pas sur le même doublon avec renseignements différents
                 nom: miseEnRelationVerif.conseillerObj?.nom,
-                password: passwordHash,
                 roles: Array('conseiller'),
                 token: uuidv4(),
-                mailSentDate: null,
-                passwordCreated: false,
                 entity: new DBRef(
                   'conseillers',
                   miseEnRelationVerif.conseillerObj._id,
@@ -380,6 +378,19 @@ const validationRecrutementContrat =
             "Veuillez renvoyez manuellement l'invitation pour l'espace Coop",
         });
         return;
+      }
+      if (user.passwordCreated === false && user.token) {
+        const messageEnvoiMailCandidat = await creationCompteCandidat(app, mailerInstance, req);
+        const errorSmtpMailCandidat = await messageEnvoiMailCandidat.send(user).catch((errSmtp: Error) => {
+          return errSmtp;
+        });
+        if (errorSmtpMailCandidat instanceof Error) {
+          res.status(500).json({
+            message:
+              "Veuillez renvoyez manuellement l'invitation pour l'espace Candidat",
+          });
+          return;
+        }
       }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {
