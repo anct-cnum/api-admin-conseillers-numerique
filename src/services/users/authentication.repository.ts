@@ -10,7 +10,6 @@ const ALLOWED_ROLES = [
   'prefet',
   'hub',
   'grandReseau',
-  'coordinateur',
 ];
 
 async function getProConnectAccessToken(app: Application, code: string) {
