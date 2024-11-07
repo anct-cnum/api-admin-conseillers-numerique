@@ -12,12 +12,8 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
-import { deleteMailbox } from '../../../utils/gandi';
-import deleteAccount from '../../../utils/mattermost';
-import {
-  conseillerRupturePix,
-  conseillerRuptureStructure,
-} from '../../../emails';
+import { deleteAccount } from '../../../utils/mattermost';
+import { conseillerRuptureStructure } from '../../../emails';
 import canValidateTermination from '../../../helpers/accessControl/canValidateTermination';
 
 const { Pool } = require('pg');
@@ -464,11 +460,6 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "L'utilisateur n'existe pas" });
         return;
       }
-      const login = conseiller?.emailCN?.address?.substring(
-        0,
-        conseiller.emailCN?.address?.lastIndexOf('@'),
-      );
-
       if (!canValidateTermination(req.user, miseEnRelation)) {
         res.status(403).json({
           message: `Accès refusé, vous n'êtes pas autorisé à valider la rupture d'un conseiller`,
@@ -512,10 +503,6 @@ const validationRuptureConseiller =
           updatedAt,
         );
       }
-      // Suppression compte Gandi
-      if (login !== undefined) {
-        await deleteMailbox(app, req)(conseiller._id, login);
-      }
       // Suppression compte Mattermost
       if (conseiller.mattermost?.id !== undefined) {
         await deleteAccount(app, req)(conseiller);
@@ -555,16 +542,6 @@ const validationRuptureConseiller =
         }
       }
       const mailerInstance = mailer(app);
-      const messageRupturePix = conseillerRupturePix(mailerInstance);
-      const errorSmtpMailRupturePix = await messageRupturePix
-        .send(conseiller)
-        .catch((errSmtp: Error) => {
-          return errSmtp;
-        });
-      if (errorSmtpMailRupturePix instanceof Error) {
-        res.status(503).json({ message: errorSmtpMailRupturePix.message });
-        return;
-      }
       const messageRuptureStructure = conseillerRuptureStructure(
         app,
         mailerInstance,

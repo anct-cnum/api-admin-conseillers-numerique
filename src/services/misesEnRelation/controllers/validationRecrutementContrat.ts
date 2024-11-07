@@ -12,6 +12,9 @@ import { countConseillersRecrutees } from '../misesEnRelation.repository';
 import { PhaseConventionnement } from '../../../ts/enum';
 import { checkStructurePhase2 } from '../../structures/repository/structures.repository';
 import { checkQuotaRecrutementCoordinateur } from '../../conseillers/repository/coordinateurs.repository';
+import creationCompteConseiller from '../../../emails/conseillers/creationCompteConseiller';
+import mailer from '../../../mailer';
+import { invitationMattermostParMail } from '../../../utils/mattermost';
 
 const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
@@ -362,6 +365,21 @@ const validationRecrutementContrat =
               ),
             },
           });
+      }
+      if (!conseillerUpdated.value?.mattermost?.invitationCreateAccount) {
+        await invitationMattermostParMail(app, req)(conseillerUpdated.value);
+      }
+      const mailerInstance = mailer(app);
+      const message = await creationCompteConseiller(app, mailerInstance);
+      const errorSmtpMail = await message.send(user).catch((errSmtp: Error) => {
+        return errSmtp;
+      });
+      if (errorSmtpMail instanceof Error) {
+        res.status(500).json({
+          message:
+            "Veuillez renvoyez manuellement l'invitation pour l'espace Coop",
+        });
+        return;
       }
       res.status(200).json({ miseEnRelation: miseEnRelationUpdated.value });
     } catch (error) {

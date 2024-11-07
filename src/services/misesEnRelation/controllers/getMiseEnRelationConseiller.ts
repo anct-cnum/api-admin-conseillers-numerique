@@ -71,8 +71,6 @@ const getMiseEnRelationConseiller =
               estEnEmploi: '$conseiller.estEnEmploi',
               telephonePro: '$conseiller.telephonePro',
               emailPro: '$conseiller.emailPro',
-              emailCN: '$conseiller.emailCN',
-              groupeCRA: '$conseiller.groupeCRA',
               dateDisponibilite: '$conseiller.dateDisponibilite',
               distanceMax: '$conseiller.distanceMax',
               codePostal: '$conseiller.codePostal',
