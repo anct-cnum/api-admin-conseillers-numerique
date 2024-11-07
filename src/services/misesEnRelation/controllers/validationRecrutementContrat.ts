@@ -380,10 +380,16 @@ const validationRecrutementContrat =
         return;
       }
       if (user.passwordCreated === false && user.token) {
-        const messageEnvoiMailCandidat = await creationCompteCandidat(app, mailerInstance, req);
-        const errorSmtpMailCandidat = await messageEnvoiMailCandidat.send(user).catch((errSmtp: Error) => {
-          return errSmtp;
-        });
+        const messageEnvoiMailCandidat = await creationCompteCandidat(
+          app,
+          mailerInstance,
+          req,
+        );
+        const errorSmtpMailCandidat = await messageEnvoiMailCandidat
+          .send(user)
+          .catch((errSmtp: Error) => {
+            return errSmtp;
+          });
         if (errorSmtpMailCandidat instanceof Error) {
           res.status(500).json({
             message:

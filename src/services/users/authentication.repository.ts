@@ -4,13 +4,7 @@ import jwt from 'jsonwebtoken';
 import { Issuer, Client } from 'openid-client';
 import { Application } from '../../declarations';
 
-const ALLOWED_ROLES = [
-  'admin',
-  'structure',
-  'prefet',
-  'hub',
-  'grandReseau',
-];
+const ALLOWED_ROLES = ['admin', 'structure', 'prefet', 'hub', 'grandReseau'];
 
 async function getProConnectAccessToken(app: Application, code: string) {
   const tokenParams = {
