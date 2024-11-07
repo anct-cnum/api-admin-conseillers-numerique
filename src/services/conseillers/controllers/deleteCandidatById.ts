@@ -46,8 +46,8 @@ const verificationCandidaturesRecrutee =
               .findOne({ _id: misesEnRelationsFinalisees.structure.oid });
             const idConvertString = JSON.stringify(profil._id);
             const messageDoublon =
-              idConvertString === `"${id}"`
-                ? `est ${statut} par`
+              idConvertString === `${JSON.stringify(id)}`
+                ? `est ${statut}`
                 : `a un doublon qui est ${statut}`;
             const messageSiret = structure?.siret ?? `non renseigné`;
             throw new Error(
