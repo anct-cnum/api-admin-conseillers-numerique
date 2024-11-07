@@ -510,12 +510,12 @@ const validationRuptureConseiller =
       const userToUpdate = {
         name: conseiller.email,
         roles: ['candidat'],
-        ...((!userCoop.passwordCreated) && {
+        ...(!userCoop.passwordCreated && {
           token: uuidv4(),
           tokenCreatedAt: new Date(),
           mailSentDate: null, // pour le mécanisme de relance d'invitation candidat
           passwordCreated: false,
-        })
+        }),
       };
       if (userCoop !== null && userCandidatAlreadyPresent === null) {
         // Maj name si le compte coop a été activé
