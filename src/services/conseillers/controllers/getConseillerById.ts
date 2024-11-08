@@ -139,12 +139,12 @@ const getConseillerById =
                   $project: {
                     _id: 0,
                     name: 1,
-                    passwordCreated: true
+                    passwordCreated: true,
                   },
                 },
               ],
-            }
-        },
+            },
+          },
           {
             $project: {
               idPG: 1,
@@ -172,7 +172,7 @@ const getConseillerById =
               emailPro: 1,
               misesEnRelation: '$misesEnRelation',
               permanences: '$permanences',
-              usersActived: '$users'
+              usersActived: '$users',
             },
           },
         ]);
