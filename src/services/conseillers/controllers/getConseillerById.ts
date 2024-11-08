@@ -121,6 +121,31 @@ const getConseillerById =
             },
           },
           {
+            $lookup: {
+              from: 'users',
+              let: {
+                idConseiller: '$email',
+              },
+              as: 'users',
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: ['$$idConseiller', '$name'],
+                    },
+                  },
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    name: 1,
+                    passwordCreated: true
+                  },
+                },
+              ],
+            }
+        },
+          {
             $project: {
               idPG: 1,
               prenom: 1,
@@ -147,6 +172,7 @@ const getConseillerById =
               emailPro: 1,
               misesEnRelation: '$misesEnRelation',
               permanences: '$permanences',
+              usersActived: '$users'
             },
           },
         ]);
