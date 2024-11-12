@@ -11,9 +11,12 @@ export default function (app: Application, mailer, req: IRequest = null) {
     const templateName = user?.roles.includes('coordinateur')
       ? 'invitationActiveCompteCoordo'
       : 'invitationActiveCompte';
+    const link = user?.roles.includes('coordinateur')
+      ? utils.getEspaceCoopUrl('')
+      : utils.getDashboardUrl(`/invitation/${user.token}`);
     return mailer.render(__dirname, templateName, {
       user,
-      link: utils.getDashboardUrl(`/invitation/${user.token}`),
+      link,
       mail: app.get('smtp').replyTo,
     });
   };
