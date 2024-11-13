@@ -87,8 +87,8 @@ export default function (app: Application, mailer, req: IRequest = null) {
       return mailer
         .createMailer()
         .sendEmail(user.name, {
-          subject:
-            'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique',
+          subject: user?.roles.includes('coordinateur')
+          ? 'Bienvenue parmi les coordinateurs conseillers numériques' : 'Bienvenue sur votre nouveau tableau de pilotage Conseiller numérique',
           body: await render(user),
         })
         .then(onSuccess)

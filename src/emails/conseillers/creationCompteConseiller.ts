@@ -46,7 +46,7 @@ export default function (app: Application, mailer) {
         .createMailer()
         .sendEmail(user.name, {
           subject:
-            'Veuillez activer votre compte Coop des conseillers numériques',
+            'Bienvenue parmi les Conseillers Numériques',
           body: await render(),
         })
         .then(onSuccess)
