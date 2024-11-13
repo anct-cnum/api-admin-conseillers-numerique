@@ -45,8 +45,7 @@ export default function (app: Application, mailer) {
       return mailer
         .createMailer()
         .sendEmail(user.name, {
-          subject:
-            'Bienvenue parmi les Conseillers Numériques',
+          subject: 'Bienvenue parmi les Conseillers Numériques',
           body: await render(),
         })
         .then(onSuccess)
