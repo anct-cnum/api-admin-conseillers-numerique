@@ -502,8 +502,8 @@ describe('recevoir et valider une candidature conseiller', () => {
       error: 'La motivation est requise',
     },
     {
-      testKey: 'h-captcha-response',
-      key: { 'h-captcha-response': undefined },
+      testKey: 'cf-turnstile-response',
+      key: { 'cf-turnstile-response': undefined },
       error: 'Le captcha est obligatoire',
     },
   ])(
@@ -666,7 +666,7 @@ describe('recevoir et valider une candidature conseiller', () => {
     });
     const envoiUtilisateur = {
       ...champsObligatoiresFormConseiller,
-      'h-captcha-response': 'captcha-incorrect',
+      'cf-turnstile-response': 'captcha-incorrect',
     };
 
     // WHEN

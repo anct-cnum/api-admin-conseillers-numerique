@@ -32,7 +32,7 @@ const champsObligatoires = {
   coordinateurTypeContrat: 'PT',
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
-  "h-captcha-response": "captcha"
+  "cf-turnstile-response": "captcha"
 };
 
 vi.mock("axios")
@@ -511,9 +511,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       error: 'L’identification de la mission du coordinateur est requise',
     },
     {
-      testKey: 'h-captcha-response',
+      testKey: 'cf-turnstile-response',
       key: {
-        'h-captcha-response': undefined
+        'cf-turnstile-response': undefined
       },
       error: 'Le captcha est obligatoire',
     },
@@ -881,7 +881,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
     const envoiUtilisateur = {
       ...champsObligatoires,
-      'h-captcha-response': 'captcha-incorrect',
+      'cf-turnstile-response': 'captcha-incorrect',
     };
 
     // WHEN

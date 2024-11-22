@@ -182,7 +182,7 @@ const validCandidatureConseiller = Joi.object({
     'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
     'any.required': 'La motivation est requise',
   }),
-  'h-captcha-response': Joi.string()
+  'cf-turnstile-response': Joi.string()
     .required()
     .error(new Error('Le captcha est obligatoire')),
 }).when(
