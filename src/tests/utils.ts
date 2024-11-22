@@ -51,7 +51,7 @@ const champsObligatoiresFormConseiller: CandidatureConseillerInput = {
   estEnFormation: false,
   estDiplomeMedNum: false,
   nomDiplomeMedNum: '',
-  'h-captcha-response': 'captcha',
+  'cf-turnstile-response': 'captcha',
 };
 
 const champsObligatoireStructure: CandidatureStructureInput = {
@@ -81,7 +81,7 @@ const champsObligatoireStructure: CandidatureStructureInput = {
   nombreConseillersSouhaites: 1,
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
-  'h-captcha-response': 'captcha',
+  'cf-turnstile-response': 'captcha',
 };
 
 const champsObligatoireStructureCoordinateur: CandidatureStructureCoordinateurInput =
@@ -112,7 +112,7 @@ const champsObligatoireStructureCoordinateur: CandidatureStructureCoordinateurIn
     coordinateurTypeContrat: 'PT',
     motivation: 'Je suis motivé.',
     confirmationEngagement: true,
-    'h-captcha-response': 'captcha',
+    'cf-turnstile-response': 'captcha',
   };
 
 export {

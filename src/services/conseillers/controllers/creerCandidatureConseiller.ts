@@ -32,7 +32,7 @@ export type CandidatureConseillerInput = {
   estEnFormation: boolean;
   estDiplomeMedNum: boolean;
   nomDiplomeMedNum: string;
-  'h-captcha-response': string;
+  'cf-turnstile-response': string;
 };
 
 type Conseiller = CandidatureConseillerInput & {
@@ -53,7 +53,7 @@ export const validerCandidatureConseiller =
         request.body,
       );
       request.body = result;
-      await verifyCaptcha(app, request.body['h-captcha-response']);
+      await verifyCaptcha(app, request.body['cf-turnstile-response']);
       return next();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
@@ -104,7 +104,7 @@ export const construireConseiller = async (
     emailConfirmedAt: null,
     emailConfirmationKey: uuidv4(),
   };
-  delete conseiller['h-captcha-response'];
+  delete conseiller['cf-turnstile-response'];
   return conseiller;
 };
 
