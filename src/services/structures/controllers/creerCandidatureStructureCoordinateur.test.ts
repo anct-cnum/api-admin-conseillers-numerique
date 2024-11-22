@@ -8,7 +8,7 @@ import app from '../../../app';
 const champsObligatoires = {
   type: 'PRIVATE',
   nom: 'MAIRIE',
-  siret: '12345678910',
+  siret: '12345678901234',
   ridet: null,
   contact: {
     prenom: 'camélien',
@@ -62,7 +62,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.nom).toBe('MAIRIE');
-    expect(response.body.siret).toBe('12345678910');
+    expect(response.body.siret).toBe('12345678901234');
     expect(response.body.ridet).toBe(null);
     expect(response.body.dateDebutMission).toBe('3024-09-01T11:00:00.000Z');
     expect(response.body.contact.prenom).toBe('camélien');
@@ -100,7 +100,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.nom).toBe('MAIRIE');
-    expect(response.body.siret).toBe('12345678910');
+    expect(response.body.siret).toBe('12345678901234');
     expect(response.body.ridet).toBe(null);
     expect(response.body.dateDebutMission).toBe('3024-09-01T11:00:00.000Z');
     expect(response.body.contact.prenom).toBe('camélien');
@@ -162,7 +162,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '1234567',
+      ridet: '123456789',
     };
 
     // WHEN
@@ -174,7 +174,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
-    expect(response.body.ridet).toBe('1234567');
+    expect(response.body.ridet).toBe('123456789');
   });
 
   it('si j’envoie un formulaire sans SIRET mais avec un RIDET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
@@ -182,7 +182,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '12 345 67',
+      ridet: '12 345 67 89',
     };
 
     // WHEN
@@ -194,14 +194,14 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
-    expect(response.body.ridet).toBe('1234567');
+    expect(response.body.ridet).toBe('123456789');
   });
 
   it('si j’envoie un formulaire sans RIDET mais avec un SIRET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
-      siret: '12 345 67',
+      siret: '12 345 67 89 01234',
       ridet: null,
     };
 
@@ -214,7 +214,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.ridet).toBe(null);
-    expect(response.body.siret).toBe('1234567');
+    expect(response.body.siret).toBe('12345678901234');
   });
 
   it('si j’envoie un formulaire avec confirmation des engagements à false alors il y a une erreur de validation', async () => {
@@ -257,6 +257,53 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
+  it.each([1, 12345678910, 123456789012345])(
+    'si j’envoie un formulaire avec un siret différent de 14 caractères alors il y a une erreur',
+    async (siret) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        siret
+      };
+
+      // WHEN
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: 'Le siret est requis',
+      });
+    },
+  );
+
+  it.each([1, 123456789, 123456789012345])(
+    'si j’envoie un formulaire avec un siret différent de 9 caractères alors il y a une erreur',
+    async (ridet) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        siret: null,
+        ridet
+      };
+
+      // WHEN
+      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(400);
+      expect(response.body).toStrictEqual({
+        message: 'Le SIRET ou le RIDET est requis',
+      });
+    },
+  );
+
   it('si j’envoie un formulaire, alors l’idPG s’incrémente de +1', async () => {
     // GIVEN
     const envoiUtilisateur1 = {
@@ -265,11 +312,11 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
 
     const envoiUtilisateur2 = {
       ...champsObligatoires,
-      siret: '00000'
+      siret: '12345678900000'
     };
     const envoiUtilisateur3 = {
       ...champsObligatoires,
-      siret: '11111'
+      siret: '12345678901111'
     };
     // WHEN
     const responseCandidature1 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur1);
@@ -290,7 +337,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '123',
+      ridet: '123456789',
     };
     await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
 
@@ -353,7 +400,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     {
       testKey: 'ridet',
       key: { siret: null, ridet: undefined },
-      error: 'Le siret ou le ridet est requis',
+      error: 'Le SIRET ou le RIDET est requis',
     },
     {
       testKey: 'dateDebutMission',
@@ -492,6 +539,80 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       });
     },
   );
+
+  it.each([
+    {
+      test: 'nom',
+      key: { nom: 'MAIRIE ' },
+      result: "MAIRIE"
+    },
+    {
+      test: 'siret',
+      key: { siret: ' 12345678901234  ' },
+      result: "12345678901234"
+    },
+    {
+      test: 'ridet',
+      key: { ridet: ' 123456789  ', siret: null },
+      result: "123456789"
+    },
+    {
+      test: 'contact.prenom',
+      keyContact: 'prenom',
+      key: { contact: { ...champsObligatoires.contact, prenom: ' camélien ' } },
+      result: 'camélien',
+    },
+    {
+      test: 'contact.nom',
+      keyContact: 'nom',
+      key: { contact: { ...champsObligatoires.contact, nom: ' rousseau ' } },
+      result: 'rousseau',
+    },
+    {
+      test: 'contact.fonction',
+      keyContact: 'fonction',
+      key: { contact: { ...champsObligatoires.contact, fonction: ' PRESIDENTE ' } },
+      result: 'PRESIDENTE',
+    },
+    {
+      test: 'contact.email',
+      keyContact: 'email',
+      key: { contact: { ...champsObligatoires.contact, email: ' camlien_rousseau74@example.net ' } },
+      result: 'camlien_rousseau74@example.net',
+    },
+    {
+      test: 'contact.telephone',
+      keyContact: 'telephone',
+      key: { contact: { ...champsObligatoires.contact, telephone: ' +33751756469 ' } },
+      result: '+33751756469',
+    },
+    {
+      test: 'motivation',
+      key: { motivation: ' Je suis motivé. ' },
+      result: "Je suis motivé."
+    },
+  ])(
+    'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutile alors j’ai pas d’erreur de validation',
+    async ({ test, keyContact, key, result }) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoires,
+        ...key,
+      };
+      const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+
+      expect(response.body[test] ?? response.body.contact[keyContact]).toBe(result);
+    },
+  );
+
   it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {

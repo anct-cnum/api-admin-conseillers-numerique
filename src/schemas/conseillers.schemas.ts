@@ -107,16 +107,21 @@ const validCandidatsStructure = Joi.object({
 });
 
 const validCandidatureConseiller = Joi.object({
-  prenom: Joi.string().required().error(new Error('Le prénom est requis')),
-  nom: Joi.string().required().error(new Error('Le nom est requis')),
+  prenom: Joi.string()
+    .trim()
+    .required()
+    .error(new Error('Le prénom est requis')),
+  nom: Joi.string().trim().required().error(new Error('Le nom est requis')),
   email: Joi.string()
     .email()
+    .trim()
     .required()
     .error(new Error('L’adresse e-mail est invalide')),
   telephone: Joi.string()
     .optional()
+    .trim()
     .allow('', null)
-    .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
+    .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
     .error(new Error('Le numéro de téléphone est invalide')),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
   codePostal: Joi.string()
@@ -173,7 +178,7 @@ const validCandidatureConseiller = Joi.object({
     .required()
     .valid(5, 10, 15, 20, 40, 100, 2000)
     .error(new Error('La distance est invalide')),
-  motivation: Joi.string().max(2500).required().messages({
+  motivation: Joi.string().trim().max(2500).required().messages({
     'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
     'any.required': 'La motivation est requise',
   }),
