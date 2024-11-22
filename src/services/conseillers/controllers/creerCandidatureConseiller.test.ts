@@ -592,7 +592,7 @@ describe('recevoir et valider une candidature conseiller', () => {
       result: "Ma motivation"
     },
   ])(
-    'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutile alors j’ai pas d’erreur de validation',
+    'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutiles alors il n’y a pas d’espace inutile',
     async ({ test, key, result }) => {
       // GIVEN
       const envoiUtilisateur = {
