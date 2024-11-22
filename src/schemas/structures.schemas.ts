@@ -164,15 +164,19 @@ const validCandidatureStructure = Joi.object({
       'PRIVATE',
     )
     .error(new Error('Le type est invalide')),
-  nom: Joi.string().required().error(new Error('Le nom est requis')),
+  nom: Joi.string().trim().required().error(new Error('Le nom est requis')),
   siret: Joi.string()
+    .trim()
+    .replace(/\s/g, '')
+    .min(14)
+    .max(14)
     .allow(null)
     .required()
     .error(new Error('Le SIRET est requis')),
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
-      then: Joi.string().required(),
+      then: Joi.string().trim().replace(/\s/g, '').min(9).max(9).required(),
       otherwise: Joi.valid(null),
     })
     .error(new Error('Le SIRET ou le RIDET est requis')),
@@ -187,18 +191,24 @@ const validCandidatureStructure = Joi.object({
       'any.required': 'La date de début de mission est invalide',
     }),
   contact: Joi.object({
-    prenom: Joi.string().required().error(new Error('Le prénom est requis')),
-    nom: Joi.string().required().error(new Error('Le nom est requis')),
+    prenom: Joi.string()
+      .trim()
+      .required()
+      .error(new Error('Le prénom est requis')),
+    nom: Joi.string().trim().required().error(new Error('Le nom est requis')),
     fonction: Joi.string()
+      .trim()
       .required()
       .error(new Error('La fonction est requise')),
     email: Joi.string()
+      .trim()
       .email()
       .required()
       .error(new Error('L’adresse e-mail est invalide')),
     telephone: Joi.string()
       .required()
-      .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
+      .trim()
+      .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
       .error(new Error('Le numéro de téléphone est invalide')),
   })
     .required()
@@ -241,7 +251,7 @@ const validCandidatureStructure = Joi.object({
     .min(1)
     .required()
     .error(new Error('Le nombre de conseillers souhaités est invalide')),
-  motivation: Joi.string().max(2500).required().messages({
+  motivation: Joi.string().trim().max(2500).required().messages({
     'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
     'any.required': 'La motivation est requise',
   }),
@@ -267,18 +277,22 @@ const validCandidatureStructureCoordinateur = Joi.object({
       'PRIVATE',
     )
     .error(new Error('Le type est invalide')),
-  nom: Joi.string().required().error(new Error('Le nom est requis')),
+  nom: Joi.string().trim().required().error(new Error('Le nom est requis')),
   siret: Joi.string()
+    .trim()
+    .replace(/\s/g, '')
+    .min(14)
+    .max(14)
     .allow(null)
     .required()
     .error(new Error('Le siret est requis')),
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
-      then: Joi.string().required(),
+      then: Joi.string().min(9).max(9).trim().replace(/\s/g, '').required(),
       otherwise: Joi.valid(null),
     })
-    .error(new Error('Le siret ou le ridet est requis')),
+    .error(new Error('Le SIRET ou le RIDET est requis')),
   dateDebutMission: Joi.date()
     .min(new Date().toISOString().slice(0, 10))
     .required()
@@ -287,18 +301,24 @@ const validCandidatureStructureCoordinateur = Joi.object({
       'any.required': 'La date de début mission est requise',
     }),
   contact: Joi.object({
-    prenom: Joi.string().required().error(new Error('Le prénom est requis')),
-    nom: Joi.string().required().error(new Error('Le nom est requis')),
+    prenom: Joi.string()
+      .trim()
+      .required()
+      .error(new Error('Le prénom est requis')),
+    nom: Joi.string().trim().required().error(new Error('Le nom est requis')),
     fonction: Joi.string()
+      .trim()
       .required()
       .error(new Error('La fonction est requise')),
     email: Joi.string()
+      .trim()
       .email()
       .required()
       .error(new Error('L’adresse e-mail est invalide')),
     telephone: Joi.string()
+      .trim()
       .required()
-      .pattern(/^(?:(?:\+)(33|590|596|594|262|269|687))(?:[\s.-]*\d{3}){3,4}$/)
+      .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
       .error(new Error('Le numéro de téléphone est invalide')),
   })
     .required()
@@ -346,7 +366,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
   aIdentifieCoordinateur: Joi.boolean()
     .required()
     .error(new Error('L’identification du coordinateur est requise')),
-  motivation: Joi.string().max(2500).required().messages({
+  motivation: Joi.string().trim().max(2500).required().messages({
     'string.max': 'La motivation ne doit pas dépasser 2500 caractères',
     'any.required': 'La motivation est requise',
   }),
