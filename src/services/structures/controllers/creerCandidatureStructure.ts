@@ -35,7 +35,7 @@ export type CandidatureStructureInput = {
   nombreConseillersSouhaites: number;
   motivation: string;
   confirmationEngagement: boolean;
-  'h-captcha-response': string;
+  'cf-turnstile-response': string;
 };
 
 type Structure = CandidatureStructureInput & {
@@ -62,7 +62,7 @@ export const validerCandidatureStructure =
         request.body,
       );
       request.body = result;
-      await verifyCaptcha(app, request.body['h-captcha-response']);
+      await verifyCaptcha(app, request.body['cf-turnstile-response']);
       return next();
     } catch (error) {
       return response.status(400).json({ message: error.message }).end();
@@ -90,7 +90,7 @@ export const construireStructure = async (
     emailConfirmedAt: null,
     emailConfirmationKey: uuidv4(),
   };
-  delete structure['h-captcha-response'];
+  delete structure['cf-turnstile-response'];
   return structure;
 };
 
