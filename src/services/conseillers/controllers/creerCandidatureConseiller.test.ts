@@ -565,6 +565,55 @@ describe('recevoir et valider une candidature conseiller', () => {
     },
   );
 
+  it.each([
+    {
+      test: 'prenom',
+      key: { prenom: ' Jean ' },
+      result: "Jean"
+    },
+    {
+      test: 'nom',
+      key: { nom: 'Martin ' },
+      result: "Martin"
+    },
+    {
+      test: 'email',
+      key: { email: ' jean.martin@example.com  ' },
+      result: "jean.martin@example.com"
+    },
+    {
+      test: 'telephone',
+      key: { telephone: ' +33123456789 ' },
+      result: "+33123456789"
+    },
+    {
+      test: 'motivation',
+      key: { motivation: ' Ma motivation ' },
+      result: "Ma motivation"
+    },
+  ])(
+    'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutile alors j’ai pas d’erreur de validation',
+    async ({ test, key, result }) => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoiresFormConseiller,
+        ...key,
+      };
+
+      // WHEN
+      const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.body[test]).toBe(result);
+    },
+  );
+
   it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
     // GIVEN
     const lettreA = 'a';

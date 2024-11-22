@@ -49,7 +49,10 @@ export const validerCandidatureConseiller =
   (app: Application) =>
   async (request: Request, response: Response, next: NextFunction) => {
     try {
-      await validCandidatureConseiller.validateAsync(request.body);
+      const result = await validCandidatureConseiller.validateAsync(
+        request.body,
+      );
+      request.body = result;
       await verifyCaptcha(app, request.body['h-captcha-response']);
       return next();
     } catch (error) {

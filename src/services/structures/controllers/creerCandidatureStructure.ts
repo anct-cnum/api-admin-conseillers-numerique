@@ -58,7 +58,10 @@ export const validerCandidatureStructure =
   (app: Application) =>
   async (request: Request, response: Response, next: NextFunction) => {
     try {
-      await validCandidatureStructure.validateAsync(request.body);
+      const result = await validCandidatureStructure.validateAsync(
+        request.body,
+      );
+      request.body = result;
       await verifyCaptcha(app, request.body['h-captcha-response']);
       return next();
     } catch (error) {
@@ -154,10 +157,6 @@ const envoyerConfirmationParMail = async (
 
 const creerCandidatureStructure =
   (app: Application) => async (request: Request, response: Response) => {
-    request.body.siret =
-      request.body.siret?.replace(/\s/g, '') ?? request.body.siret;
-    request.body.ridet =
-      request.body.ridet?.replace(/\s/g, '') ?? request.body.ridet;
     const candidatureStructure = await construireStructure(app, request.body);
     try {
       const { contact, emailConfirmationKey } = candidatureStructure;

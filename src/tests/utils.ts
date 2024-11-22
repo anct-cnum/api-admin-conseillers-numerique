@@ -57,7 +57,7 @@ const champsObligatoiresFormConseiller: CandidatureConseillerInput = {
 const champsObligatoireStructure: CandidatureStructureInput = {
   type: 'PRIVATE',
   nom: 'MAIRIE',
-  siret: '12345678910',
+  siret: '12345678901234',
   ridet: null,
   aIdentifieCandidat: false,
   dateDebutMission: new Date(),
@@ -88,7 +88,7 @@ const champsObligatoireStructureCoordinateur: CandidatureStructureCoordinateurIn
   {
     type: 'PRIVATE',
     nom: 'MAIRIE',
-    siret: '12345678910',
+    siret: '12345678901234',
     ridet: null,
     contact: {
       prenom: 'camélien',
