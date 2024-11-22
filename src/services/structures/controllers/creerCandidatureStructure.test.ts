@@ -240,7 +240,7 @@ describe('recevoir et valider une candidature structure', () => {
   );
 
   it.each([1, 123456789, 123456789012345])(
-    'si j’envoie un formulaire avec un siret différent de 9 caractères alors il y a une erreur',
+    'si j’envoie un formulaire avec un ridet différent de 9 caractères alors il y a une erreur',
     async (ridet) => {
       // GIVEN
       const envoiUtilisateur = {
@@ -658,7 +658,7 @@ describe('recevoir et valider une candidature structure', () => {
       result: "Je suis motivé."
     },
   ])(
-    'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutile alors j’ai pas d’erreur de validation',
+    'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutiles alors il n’y a pas d’espace inutile',
     async ({ test, keyContact, key, result }) => {
       // GIVEN
       const envoiUtilisateur = {
@@ -723,7 +723,7 @@ describe('recevoir et valider une candidature structure', () => {
   it('si j’envoie un formulaire avec une motivation strictement égale à 2500 caractères alors il est validé', async () => {
     // GIVEN
     const lettreA = 'a';
-    const motivation = lettreA.repeat(2400);
+    const motivation = lettreA.repeat(2500);
     const envoiUtilisateur = {
       ...champsObligatoires,
       motivation,
