@@ -169,7 +169,7 @@ describe('recevoir et valider une candidature structure', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '123456789',
+      ridet: '1234567',
     };
 
     // WHEN
@@ -183,7 +183,7 @@ describe('recevoir et valider une candidature structure', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
-    expect(response.body.ridet).toBe('123456789');
+    expect(response.body.ridet).toBe('1234567');
   });
 
   it('si j’envoie un formulaire sans SIRET mais avec un RIDET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
@@ -191,7 +191,7 @@ describe('recevoir et valider une candidature structure', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '12 345 67 89 ',
+      ridet: '12 345 67 ',
     };
 
     // WHEN
@@ -205,7 +205,7 @@ describe('recevoir et valider une candidature structure', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
-    expect(response.body.ridet).toBe('123456789');
+    expect(response.body.ridet).toBe('1234567');
   });
 
   it('si j’envoie un formulaire sans RIDET mais avec un SIRET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
@@ -405,7 +405,7 @@ describe('recevoir et valider une candidature structure', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '123456789',
+      ridet: '1234567',
     };
     await request(app).post('/candidature-structure').send(envoiUtilisateur);
 
@@ -659,8 +659,8 @@ describe('recevoir et valider une candidature structure', () => {
     },
     {
       test: 'ridet',
-      key: { ridet: ' 123456789  ', siret: null },
-      result: '123456789',
+      key: { ridet: ' 1234567  ', siret: null },
+      result: '1234567',
     },
     {
       test: 'contact.prenom',
