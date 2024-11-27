@@ -230,7 +230,7 @@ describe('recevoir et valider une candidature structure', () => {
     expect(response.body.siret).toBe('12345678901234');
   });
 
-  it.each([1, 12345678910, 123456789012345])(
+  it.each(['1', '12345678910', '123456789012345','1234567'])(
     'si j’envoie un formulaire avec un siret différent de 14 caractères alors il y a une erreur',
     async (siret) => {
       // GIVEN
@@ -255,7 +255,7 @@ describe('recevoir et valider une candidature structure', () => {
     },
   );
 
-  it.each([1, 123456789, 123456789012345])(
+  it.each(['1', '123456789', '123456789012345', '1234567890', '12345678'])(
     'si j’envoie un formulaire avec un ridet de taille invalide alors il y a une erreur',
     async (ridet) => {
       // GIVEN
