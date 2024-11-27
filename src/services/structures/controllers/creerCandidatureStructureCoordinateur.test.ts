@@ -276,7 +276,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it.each([1, 12345678910, 123456789012345])(
+  it.each(['1', '12345678910', '123456789012345'])(
     'si j’envoie un formulaire avec un siret différent de 14 caractères alors il y a une erreur',
     async (siret) => {
       // GIVEN
@@ -301,7 +301,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     },
   );
 
-  it.each([1, 123456789, 12345678901, 123456789012345])(
+  it.each(['1', '123456789', '12345678901', '123456789012345'])(
     'si j’envoie un formulaire avec un ridet de taille invalide alors il y a une erreur',
     async (ridet) => {
       // GIVEN
