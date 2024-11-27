@@ -302,7 +302,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
   );
 
   it.each([1, 123456789, 12345678901, 123456789012345])(
-    'si j’envoie un formulaire avec un ridet différent de 9 caractères alors il y a une erreur',
+    'si j’envoie un formulaire avec un ridet de taille invalide alors il y a une erreur',
     async (ridet) => {
       // GIVEN
       const envoiUtilisateur = {
