@@ -1,7 +1,7 @@
-import request from "supertest";
+import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections } from '../../../tests/utils';
-import axios from "axios"
+import axios from 'axios';
 import nodemailer from 'nodemailer';
 
 import app from '../../../app';
@@ -32,10 +32,10 @@ const champsObligatoires = {
   coordinateurTypeContrat: 'PT',
   motivation: 'Je suis motivé.',
   confirmationEngagement: true,
-  "cf-turnstile-response": "captcha"
+  'cf-turnstile-response': 'captcha',
 };
 
-vi.mock("axios")
+vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 const mockSendMail = vi.fn();
 
@@ -45,7 +45,10 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     mockedAxios.post.mockResolvedValue({
       data: { success: true },
     });
-    vi.spyOn(nodemailer, 'createTransport').mockReturnValue({ sendMail: mockSendMail, use: vi.fn() });
+    vi.spyOn(nodemailer, 'createTransport').mockReturnValue({
+      sendMail: mockSendMail,
+      use: vi.fn(),
+    });
   });
 
   it('si j’envoie un formulaire avec tous les champs obligatoires alors il est validé', async () => {
@@ -54,7 +57,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       ...champsObligatoires,
     };
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -92,7 +97,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -152,8 +159,8 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       html: expect.anything(),
       list: expect.anything(),
       replyTo: expect.anything(),
-      subject: "Candidature pour un poste de coordinateur",
-      to: "camlien_rousseau74@example.net"
+      subject: 'Candidature pour un poste de coordinateur',
+      to: 'camlien_rousseau74@example.net',
     });
   });
 
@@ -162,11 +169,13 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '123456789',
+      ridet: '123456',
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -174,7 +183,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.siret).toBe(null);
-    expect(response.body.ridet).toBe('123456789');
+    expect(response.body.ridet).toBe('123456');
   });
 
   it('si j’envoie un formulaire sans SIRET mais avec un RIDET contenant des espaces, enregistrement en BDD sans espace et aucune erreur de validation', async () => {
@@ -186,7 +195,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -206,7 +217,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -225,7 +238,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -244,8 +259,12 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -263,11 +282,13 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       // GIVEN
       const envoiUtilisateur = {
         ...champsObligatoires,
-        siret
+        siret,
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -280,18 +301,20 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     },
   );
 
-  it.each([1, 123456789, 123456789012345])(
-    'si j’envoie un formulaire avec un ridet différent de 9 caractères alors il y a une erreur',
+  it.each([1, 123456789, 12345678901, 123456789012345])(
+    'si j’envoie un formulaire avec un ridet de taille invalide alors il y a une erreur',
     async (ridet) => {
       // GIVEN
       const envoiUtilisateur = {
         ...champsObligatoires,
         siret: null,
-        ridet
+        ridet,
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -312,16 +335,22 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
 
     const envoiUtilisateur2 = {
       ...champsObligatoires,
-      siret: '12345678900000'
+      siret: '12345678900000',
     };
     const envoiUtilisateur3 = {
       ...champsObligatoires,
-      siret: '12345678901111'
+      siret: '12345678901111',
     };
     // WHEN
-    const responseCandidature1 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur1);
-    const responseCandidature2 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur2);
-    const responseCandidature3 = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur3);
+    const responseCandidature1 = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur1);
+    const responseCandidature2 = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur2);
+    const responseCandidature3 = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur3);
 
     // THEN
     expect(responseCandidature1.status).toBe(200);
@@ -337,12 +366,16 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     const envoiUtilisateur = {
       ...champsObligatoires,
       siret: null,
-      ridet: '123456789',
+      ridet: '1234567',
     };
-    await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -367,7 +400,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -513,7 +548,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     {
       testKey: 'cf-turnstile-response',
       key: {
-        'cf-turnstile-response': undefined
+        'cf-turnstile-response': undefined,
       },
       error: 'Le captcha est obligatoire',
     },
@@ -527,7 +562,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -544,17 +581,17 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     {
       test: 'nom',
       key: { nom: 'MAIRIE ' },
-      result: "MAIRIE"
+      result: 'MAIRIE',
     },
     {
       test: 'siret',
       key: { siret: ' 12345678901234  ' },
-      result: "12345678901234"
+      result: '12345678901234',
     },
     {
       test: 'ridet',
       key: { ridet: ' 123456789  ', siret: null },
-      result: "123456789"
+      result: '123456789',
     },
     {
       test: 'contact.prenom',
@@ -571,25 +608,34 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     {
       test: 'contact.fonction',
       keyContact: 'fonction',
-      key: { contact: { ...champsObligatoires.contact, fonction: ' PRESIDENTE ' } },
+      key: {
+        contact: { ...champsObligatoires.contact, fonction: ' PRESIDENTE ' },
+      },
       result: 'PRESIDENTE',
     },
     {
       test: 'contact.email',
       keyContact: 'email',
-      key: { contact: { ...champsObligatoires.contact, email: ' camlien_rousseau74@example.net ' } },
+      key: {
+        contact: {
+          ...champsObligatoires.contact,
+          email: ' camlien_rousseau74@example.net ',
+        },
+      },
       result: 'camlien_rousseau74@example.net',
     },
     {
       test: 'contact.telephone',
       keyContact: 'telephone',
-      key: { contact: { ...champsObligatoires.contact, telephone: ' +33751756469 ' } },
+      key: {
+        contact: { ...champsObligatoires.contact, telephone: ' +33751756469 ' },
+      },
       result: '+33751756469',
     },
     {
       test: 'motivation',
       key: { motivation: ' Je suis motivé. ' },
-      result: "Je suis motivé."
+      result: 'Je suis motivé.',
     },
   ])(
     'si j’envoie un formulaire avec la valeur de la key $test contenant des espaces inutiles alors il n’y a pas d’espace inutile',
@@ -600,8 +646,8 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
         ...key,
       };
       const response = await request(app)
-      .post('/candidature-structure-coordinateur')
-      .send(envoiUtilisateur);
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -609,7 +655,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       );
       expect(response.status).toBe(200);
 
-      expect(response.body[test] ?? response.body.contact[keyContact]).toBe(result);
+      expect(response.body[test] ?? response.body.contact[keyContact]).toBe(
+        result,
+      );
     },
   );
 
@@ -621,7 +669,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -642,7 +692,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -664,7 +716,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -682,7 +736,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -704,14 +760,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.body.coordinateurTypeContrat).toBe(coordinateurTypeContrat);
+      expect(response.body.coordinateurTypeContrat).toBe(
+        coordinateurTypeContrat,
+      );
     },
   );
 
@@ -723,7 +783,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -753,7 +815,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -772,7 +836,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -794,14 +860,18 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
         'application/json; charset=utf-8',
       );
       expect(response.status).toBe(200);
-      expect(response.body.coordinateurTypeContrat).toBe(coordinateurTypeContrat);
+      expect(response.body.coordinateurTypeContrat).toBe(
+        coordinateurTypeContrat,
+      );
     },
   );
 
@@ -813,7 +883,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
@@ -843,7 +915,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
       };
 
       // WHEN
-      const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+      const response = await request(app)
+        .post('/candidature-structure-coordinateur')
+        .send(envoiUtilisateur);
 
       // THEN
       expect(response.headers['content-type']).toBe(
@@ -862,7 +936,9 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     };
 
     // WHEN
-    const response = await request(app).post('/candidature-structure-coordinateur').send(envoiUtilisateur);
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
 
     // THEN
     expect(response.headers['content-type']).toBe(
