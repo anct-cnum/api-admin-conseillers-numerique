@@ -176,7 +176,7 @@ const validCandidatureStructure = Joi.object({
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
-      then: Joi.string().trim().replace(/\s/g, '').min(9).max(9).required(),
+      then: Joi.string().trim().replace(/\s/g, '').min(6).max(10).required(),
       otherwise: Joi.valid(null),
     })
     .error(new Error('Le SIRET ou le RIDET est requis')),
@@ -289,7 +289,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
   ridet: Joi.string()
     .when('siret', {
       is: Joi.valid(null),
-      then: Joi.string().min(9).max(9).trim().replace(/\s/g, '').required(),
+      then: Joi.string().min(6).max(10).trim().replace(/\s/g, '').required(),
       otherwise: Joi.valid(null),
     })
     .error(new Error('Le SIRET ou le RIDET est requis')),
