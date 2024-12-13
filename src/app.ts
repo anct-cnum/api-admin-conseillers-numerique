@@ -77,7 +77,11 @@ app.use((req, res, next) => {
 app.configure(mongoose);
 app.use(
   cors({
-    origin: [config().dashboard_hostname, config().public],
+    origin: [
+      config().dashboard_hostname,
+      config().public,
+      config().public_site_vitrine,
+    ],
     credentials: true,
   }),
 );
