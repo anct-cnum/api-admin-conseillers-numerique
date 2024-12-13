@@ -5,6 +5,7 @@
   "espace_coop_hostname": "ESPACE_COOP_HOSTNAME",
   "port": 8080,
   "public": "https://www.conseiller-numerique.gouv.fr",
+  "public_site_vitrine": "https://conseiller-numerique.gouv.fr",
   "demarche_simplifier_coordinateur-hostname": "DEMARCHE_SIMPLIFIER_COORDINATEUR_HOSTNAME",
   "paginate": {
     "default": 50,
