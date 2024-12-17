@@ -91,26 +91,6 @@ const stockerCandidatureStructureCoordinateur = async (
   candidatureStructure: Structure,
   app: Application,
 ): Promise<Structure> => {
-  const siretOuRidetExists =
-    (await app.service(service.structures).Model.countDocuments({
-      $or: [
-        {
-          $and: [
-            { siret: { $ne: null } },
-            { siret: candidatureStructure.siret },
-          ],
-        },
-        {
-          $and: [
-            { ridet: { $ne: null } },
-            { ridet: candidatureStructure.ridet },
-          ],
-        },
-      ],
-    })) !== 0;
-  if (siretOuRidetExists) {
-    throw new Error('Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé');
-  }
   const result = await app
     .service(service.structures)
     .create(candidatureStructure);
