@@ -252,7 +252,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     });
   });
 
-  it('si j’envoie un formulaire avec un siret déjà existant alors il y a une erreur', async () => {
+  it('si j’envoie un formulaire avec un siret déjà existant alors il est validé', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -270,10 +270,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
-    expect(response.status).toBe(400);
-    expect(response.body).toStrictEqual({
-      message: 'Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé',
-    });
+    expect(response.status).toBe(200);
   });
 
   it.each(['1', '12345678910', '123456789012345'])(
@@ -361,7 +358,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(responseCandidature3.body.idPG).toBe(3);
   });
 
-  it('si j’envoie un formulaire avec un ridet déjà existant alors il y a une erreur', async () => {
+  it('si j’envoie un formulaire avec un ridet déjà existant alors alors il est validé', async () => {
     // GIVEN
     const envoiUtilisateur = {
       ...champsObligatoires,
@@ -381,10 +378,7 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     expect(response.headers['content-type']).toBe(
       'application/json; charset=utf-8',
     );
-    expect(response.status).toBe(400);
-    expect(response.body).toStrictEqual({
-      message: 'Vous êtes déjà inscrit : SIRET/RIDET déjà utilisé',
-    });
+    expect(response.status).toBe(200);
   });
 
   it.each([33, 590, 596, 594, 262, 269, 687])(
