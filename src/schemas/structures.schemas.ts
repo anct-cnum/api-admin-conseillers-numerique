@@ -208,7 +208,7 @@ const validCandidatureStructure = Joi.object({
     telephone: Joi.string()
       .required()
       .trim()
-      .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
+      .pattern(/^(\+\d{11,12}|\d{10})$/)
       .error(new Error('Le numéro de téléphone est invalide')),
   })
     .required()
@@ -318,7 +318,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
     telephone: Joi.string()
       .trim()
       .required()
-      .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
+      .pattern(/^(\+\d{11,12}|\d{10})$/)
       .error(new Error('Le numéro de téléphone est invalide')),
   })
     .required()

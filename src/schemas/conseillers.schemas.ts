@@ -121,7 +121,7 @@ const validCandidatureConseiller = Joi.object({
     .optional()
     .trim()
     .allow('', null)
-    .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
+    .pattern(/^(\+\d{11,12}|\d{10})$/)
     .error(new Error('Le numéro de téléphone est invalide')),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
   codePostal: Joi.string()
