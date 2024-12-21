@@ -51,7 +51,7 @@
     "lodash.merge": "^4.6.2",
     "mjml": "^4.15.3",
     "mongodb": "^6.9.0",
-    "mongoose": "^8.6.3",
+    "mongoose": "^8.8.3",
     "mongoose-dbref": "^0.0.4",
     "nodemailer": "^6.9.15",
     "nodemailer-html-to-text": "^3.2.0",
