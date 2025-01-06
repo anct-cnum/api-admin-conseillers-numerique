@@ -115,6 +115,7 @@ const validCandidatureConseiller = Joi.object({
   email: Joi.string()
     .email()
     .trim()
+    .lowercase()
     .required()
     .error(new Error('L’adresse e-mail est invalide')),
   telephone: Joi.string()
