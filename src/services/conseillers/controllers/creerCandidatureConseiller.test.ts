@@ -614,6 +614,27 @@ describe('recevoir et valider une candidature conseiller', () => {
     },
   );
 
+  it('si j’envoie un formulaire avec un email contenant une majuscule alors j’ai pas d’erreur de validation', async () => {
+      // GIVEN
+      const envoiUtilisateur = {
+        ...champsObligatoiresFormConseiller,
+        email: 'Jean.martin@example.com',
+      };
+
+      // WHEN
+      const response = await request(app)
+      .post('/candidature-conseiller')
+      .send(envoiUtilisateur);
+
+      // THEN
+      expect(response.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+      expect(response.status).toBe(200);
+      expect(response.body.email).toBe('jean.martin@example.com');
+    },
+  );
+
   it('si j’envoie un formulaire avec une motivation à plus de 2500 caractères alors j’ai une erreur de validation', async () => {
     // GIVEN
     const lettreA = 'a';

@@ -202,6 +202,7 @@ const validCandidatureStructure = Joi.object({
       .error(new Error('La fonction est requise')),
     email: Joi.string()
       .trim()
+      .lowercase()
       .email()
       .required()
       .error(new Error('L’adresse e-mail est invalide')),
@@ -312,6 +313,7 @@ const validCandidatureStructureCoordinateur = Joi.object({
       .error(new Error('La fonction est requise')),
     email: Joi.string()
       .trim()
+      .lowercase()
       .email()
       .required()
       .error(new Error('L’adresse e-mail est invalide')),

@@ -655,6 +655,29 @@ describe('recevoir et valider une candidature structure coordinateur', () => {
     },
   );
 
+  it('si j’envoie un formulaire avec un email contenant une majuscule alors j’ai pas d’erreur de validation', async () => {
+    // GIVEN
+    const envoiUtilisateur = {
+      ...champsObligatoires,
+      contact: {
+        ...champsObligatoires.contact,
+        email: 'Camlien_rousseau74@example.net',
+      },
+    };
+
+    // WHEN
+    const response = await request(app)
+      .post('/candidature-structure-coordinateur')
+      .send(envoiUtilisateur);
+
+    // THEN
+    expect(response.headers['content-type']).toBe(
+      'application/json; charset=utf-8',
+    );
+    expect(response.status).toBe(200);
+    expect(response.body.contact.email).toBe('camlien_rousseau74@example.net');
+  });
+
   it('si j’envoie un formulaire avec un numéro téléphone incorrecte alors il y a une erreur de validation', async () => {
     // GIVEN
     const envoiUtilisateur = {
