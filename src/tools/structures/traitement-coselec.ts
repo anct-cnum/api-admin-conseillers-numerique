@@ -3,15 +3,12 @@
 // ts-node src/tools/structures/traitement-coselec.ts -id XXX -q XXX -nc XXX -fs XXX
 
 import { program } from 'commander';
-import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
 import { getCoselec } from '../../utils';
-
-const { Pool } = require('pg');
 
 program.option('-id, --idPG <idPG>', 'idPG de la structure');
 program.option('-q, --quota <quota>', 'quota');
@@ -23,23 +20,8 @@ program.option(
 );
 program.parse(process.argv);
 
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_hostorganization
-      SET updated = $2
-      WHERE id = $1`,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 execute(__filename, async ({ app, logger, exit }) => {
   const options = program.opts();
-  const pool = new Pool();
   if (Number.isNaN(Number(options.idPG))) {
     logger.error(`Veuillez renseigner un idPG valide.`);
     return;
@@ -75,7 +57,6 @@ execute(__filename, async ({ app, logger, exit }) => {
     }
   }
   const updatedAt = new Date();
-  const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
   const objectUpdated = {
     $set: {
       updatedAt,
@@ -218,7 +199,6 @@ execute(__filename, async ({ app, logger, exit }) => {
       phaseConventionnement: PhaseConventionnement.PHASE_2,
     });
   }
-  await updateStructurePG(pool)(structure.idPG, datePG);
   const structureUpdated = await app
     .service(service.structures)
     .Model.updateOne({ _id: structure._id }, objectUpdated);

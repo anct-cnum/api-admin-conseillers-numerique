@@ -10,8 +10,6 @@ import mailer from '../../../mailer';
 import { candidatSupprimePix } from '../../../emails';
 import { checkAccessReadRequestMisesEnRelation } from '../../misesEnRelation/misesEnRelation.repository';
 
-const { Pool } = require('pg');
-
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 const verificationCandidaturesRecrutee =
@@ -134,47 +132,32 @@ const echangeUserCreation = (app, req) => async (email) => {
     );
 };
 
-const suppressionTotalCandidat =
-  (app, req, pool) => async (tableauCandidat) => {
-    try {
-      await Promise.all(
-        tableauCandidat.map(async (profil) => {
-          try {
-            await pool.query(
-              `
-          DELETE FROM djapp_matching WHERE coach_id = $1`,
-              [profil.idPG],
-            );
-            await pool.query(
-              `
-          DELETE FROM djapp_coach WHERE id = $1`,
-              [profil.idPG],
-            );
-          } catch (error) {
-            throw new Error(error);
-          }
-          try {
-            await app
-              .service(service.misesEnRelation)
-              .Model.accessibleBy(req.ability, action.delete)
-              .deleteMany({ 'conseiller.$id': profil._id });
-            await app
-              .service(service.users)
-              .Model.accessibleBy(req.ability, action.delete)
-              .deleteOne({ 'entity.$id': profil._id });
-            await app
-              .service(service.conseillers)
-              .Model.accessibleBy(req.ability, action.delete)
-              .deleteOne({ _id: profil._id });
-          } catch (error) {
-            throw new Error(error);
-          }
-        }),
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
+const suppressionTotalCandidat = (app, req) => async (tableauCandidat) => {
+  try {
+    await Promise.all(
+      tableauCandidat.map(async (profil) => {
+        try {
+          await app
+            .service(service.misesEnRelation)
+            .Model.accessibleBy(req.ability, action.delete)
+            .deleteMany({ 'conseiller.$id': profil._id });
+          await app
+            .service(service.users)
+            .Model.accessibleBy(req.ability, action.delete)
+            .deleteOne({ 'entity.$id': profil._id });
+          await app
+            .service(service.conseillers)
+            .Model.accessibleBy(req.ability, action.delete)
+            .deleteOne({ _id: profil._id });
+        } catch (error) {
+          throw new Error(error);
+        }
+      }),
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 const suppressionCv = async (cv, app) => {
   try {
@@ -212,7 +195,6 @@ const deleteCandidatById =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     const { motif } = req.query;
-    const pool = new Pool();
     try {
       const conseiller: IConseillers = await app
         .service(service.conseillers)
@@ -321,7 +303,7 @@ const deleteCandidatById =
         motif,
         misesEnRelation,
       );
-      await suppressionTotalCandidat(app, req, pool)(tableauCandidat);
+      await suppressionTotalCandidat(app, req)(tableauCandidat);
       if (estDoublon && aDoublonRecrute === 0) {
         await echangeUserCreation(app, req)(email);
       }

@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import {
   IConseillers,
@@ -16,27 +15,7 @@ import { deleteAccount } from '../../../utils/mattermost';
 import { conseillerRuptureStructure } from '../../../emails';
 import canValidateTermination from '../../../helpers/accessControl/canValidateTermination';
 
-const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
-
-const updateConseillersPG = (pool) => async (email, disponible, datePG) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-      [email, disponible, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
 
 const conseillerRecruteReinscription =
   (app, req) =>
@@ -338,7 +317,6 @@ const validationRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
     const { dateFinDeContrat, motifRupture } = req.body.payload;
-    const pool = new Pool();
     try {
       if (!dateFinDeContrat) {
         res.status(400).json({
@@ -468,9 +446,6 @@ const validationRuptureConseiller =
       }
 
       const updatedAt = new Date();
-      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
-      // Mise à jour de la disponibilité du conseiller dans la base de données Postgres
-      await updateConseillersPG(pool)(conseiller.email, true, datePG);
       // Création du conseillers dans la table conseillers_ruptures et mise à jour du conseiller en statut RUPTURE dans la collection conseillers
       // Suppression des permanences du conseiller dans la collection permanences et dans les CRAs
       // Passage du statut de la mise en relation de nouvelle_rupture en finalisée_rupture
