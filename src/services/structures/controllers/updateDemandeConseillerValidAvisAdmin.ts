@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
@@ -13,27 +12,10 @@ import {
 import mailer from '../../../mailer';
 import { validationCandidaturePosteConseillerPrefet } from '../../../emails';
 
-const { Pool } = require('pg');
-
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_hostorganization
-      SET updated = $2
-      WHERE id = $1`,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 const updateDemandeConseillerValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { nombreConseillersCoselec } = req.body;
-    const pool = new Pool();
     if (!ObjectId.isValid(idStructure)) {
       res.status(400).json({ message: 'Id incorrect' });
       return;
@@ -63,8 +45,6 @@ const updateDemandeConseillerValidAvisAdmin =
         return;
       }
       const updatedAt = new Date();
-      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
-      await updateStructurePG(pool)(structure.idPG, datePG);
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)

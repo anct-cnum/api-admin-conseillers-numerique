@@ -56,7 +56,6 @@
     "nodemailer": "^6.9.15",
     "nodemailer-html-to-text": "^3.2.0",
     "openid-client": "^5.7.0",
-    "pg": "^8.13.0",
     "serve-favicon": "^2.5.0",
     "shx": "^0.3.4",
     "sib-api-v3-sdk": "^8.4.2",

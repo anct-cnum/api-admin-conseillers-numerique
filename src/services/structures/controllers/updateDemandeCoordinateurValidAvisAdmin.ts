@@ -2,7 +2,6 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { GraphQLClient } from 'graphql-request';
-import dayjs from 'dayjs';
 import {
   IConfigurationDemarcheSimplifiee,
   IRequest,
@@ -31,26 +30,9 @@ interface RequestBody {
   idDemandeCoordinateur: string;
 }
 
-const { Pool } = require('pg');
-
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-      UPDATE djapp_hostorganization
-      SET updated = $2
-      WHERE id = $1`,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 const updateDemandeCoordinateurValidAvisAdmin =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const pool = new Pool();
     const { idDemandeCoordinateur }: RequestBody = req.body;
     if (
       !ObjectId.isValid(idStructure) ||
@@ -242,7 +224,6 @@ const updateDemandeCoordinateurValidAvisAdmin =
         });
       }
       const updatedAt = new Date();
-      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
       Object.assign(updatedDemandeCoordinateur.$set, {
         ...(structure.statut === 'CREEE' && {
           'conventionnement.statut':
@@ -261,7 +242,6 @@ const updateDemandeCoordinateurValidAvisAdmin =
         'structureObj.coselecAt': updatedAt,
         'structureObj.updatedAt': updatedAt,
       });
-      await updateStructurePG(pool)(structure.idPG, datePG);
       const structureUpdated = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)

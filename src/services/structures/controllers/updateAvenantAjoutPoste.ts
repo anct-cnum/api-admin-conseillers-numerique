@@ -1,7 +1,6 @@
 import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
-import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
@@ -16,8 +15,6 @@ import {
   refusAttributionPostePrefet,
   refusAttributionPoste,
 } from '../../../emails';
-
-const { Pool } = require('pg');
 
 interface IUpdateStructureAvenant {
   $push?: {
@@ -57,25 +54,9 @@ interface IUpdateMiseEnRelationAvenant {
   };
 }
 
-const updateStructurePG = (pool) => async (idPG: number, datePG: string) => {
-  try {
-    await pool.query(
-      `
-        UPDATE djapp_hostorganization
-        SET updated = $2
-        WHERE id = $1
-      `,
-      [idPG, datePG],
-    );
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 const updateAvenantAjoutPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const pool = new Pool();
     const { statut, nbDePosteAccorder, nbDePosteCoselec } = req.body;
     const paramsUpdateCollectionStructure: IUpdateStructureAvenant = {};
     const paramsUpdateCollectionMiseEnRelation: IUpdateMiseEnRelationAvenant =
@@ -112,7 +93,6 @@ const updateAvenantAjoutPoste =
       }
       const dateCoselec = new Date();
       if (statut === 'POSITIF') {
-        const datePG = dayjs(dateCoselec).format('YYYY-MM-DD');
         paramsUpdateCollectionStructure.$set = {
           coselecAt: dateCoselec,
           updatedAt: dateCoselec,
@@ -152,7 +132,6 @@ const updateAvenantAjoutPoste =
             insertedAt: dateCoselec,
           },
         };
-        await updateStructurePG(pool)(structure.idPG, datePG);
       }
       if (statut === 'NÉGATIF') {
         paramsUpdateCollectionStructure.$set = {
