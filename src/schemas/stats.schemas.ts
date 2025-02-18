@@ -9,6 +9,17 @@ const validStatNationales = Joi.object({
     .error(new Error('La date de fin est invalide')),
 });
 
+const validStatNationalesNouvelleCoop = Joi.object({
+  dateDebut: Joi.date()
+    .required()
+    .error(new Error('La date de début est invalide')),
+  dateFin: Joi.date()
+    .required()
+    .error(new Error('La date de fin est invalide')),
+  type: Joi.string().valid('individuel', 'demarche', 'collectif').optional(),
+  mediateur: Joi.string().optional(),
+});
+
 const validStatConseiller = Joi.object({
   dateDebut: Joi.date()
     .required()
@@ -91,6 +102,7 @@ const validStatCsv = Joi.object({
 
 export {
   validStatNationales,
+  validStatNationalesNouvelleCoop,
   validStatGrandReseau,
   validStatStructure,
   validStatConseiller,
