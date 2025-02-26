@@ -91,7 +91,7 @@ const getConseillersNouvelleCoop =
         });
         initialMediateursOptionsResult = initialMediateursOptions.data.data.map(
           (mediateur) => ({
-            label: `${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
+            label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
             value: {
               mediateurId: mediateur.attributes.mediateur?.id,
               email: mediateur.attributes.email,

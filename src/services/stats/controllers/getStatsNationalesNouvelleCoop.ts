@@ -69,11 +69,11 @@ const getStatsNationalesNouvelleCoop =
                 mediateur.attributes.mediateur?.id === req.query.mediateur,
             )?.attributes?.conseiller_numerique;
             const checkAuthorisedFiltreMediateur = idPGConseller.includes(
-              mediateurRechercher.id_pg.toString(),
+              mediateurRechercher?.id_pg.toString(),
             );
             if (!checkAuthorisedFiltreMediateur) {
               return res.status(403).json({
-                message: `Non autorisé pour accéder aux statistiques de ${mediateurRechercher.id_pg}`,
+                message: `Non autorisé à accéder aux statistiques de ${req.query.mediateur}`,
               });
             }
           }
