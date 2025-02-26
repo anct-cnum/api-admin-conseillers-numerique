@@ -45,37 +45,37 @@ const getStatsNationalesNouvelleCoop =
           .find()
           .distinct('idPG');
         const idPGConseller = conseillersIds.map((i) => i.toString());
-        const idsConseillerFilter = `?filter[conseiller_numerique_id_pg]=${idPGConseller.join(',')}`;
-
-        const initialMediateursOptions = await axios({
-          method: 'get',
-          url: `${coop.domain}${coop.endPointUtilisateur}${idsConseillerFilter}`,
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${coop.token}`,
-          },
-        });
-        donneesStats.data.initialMediateursOptions =
-          initialMediateursOptions.data.data.map((mediateur) => ({
-            label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
-            value: {
-              mediateurId: mediateur.attributes.mediateur?.id,
-              email: mediateur.attributes.email,
+        if (idPGConseller) {
+          const idsConseillerFilter = `?filter[conseiller_numerique_id_pg]=${idPGConseller.join(',')}`;
+          const initialMediateursOptions = await axios({
+            method: 'get',
+            url: `${coop.domain}${coop.endPointUtilisateur}${idsConseillerFilter}`,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${coop.token}`,
             },
-          }));
-
-        if (req.query.mediateur) {
-          const mediateurRechercher = initialMediateursOptions.data.data.find(
-            (mediateur) =>
-              mediateur.attributes.mediateur?.id === req.query.mediateur,
-          )?.attributes?.conseiller_numerique;
-          const checkAuthorisedFiltreMediateur = idPGConseller.includes(
-            mediateurRechercher.id_pg,
-          );
-          if (!checkAuthorisedFiltreMediateur) {
-            return res.status(403).json({
-              message: `Non autorisé pour accéder aux statistiques de ${mediateurRechercher.id_pg}`,
-            });
+          });
+          donneesStats.data.initialMediateursOptions =
+            initialMediateursOptions.data.data.map((mediateur) => ({
+              label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
+              value: {
+                mediateurId: mediateur.attributes.mediateur?.id,
+                email: mediateur.attributes.email,
+              },
+            }));
+          if (req.query.mediateur) {
+            const mediateurRechercher = initialMediateursOptions.data.data.find(
+              (mediateur) =>
+                mediateur.attributes.mediateur?.id === req.query.mediateur,
+            )?.attributes?.conseiller_numerique;
+            const checkAuthorisedFiltreMediateur = idPGConseller.includes(
+              mediateurRechercher.id_pg.toString(),
+            );
+            if (!checkAuthorisedFiltreMediateur) {
+              return res.status(403).json({
+                message: `Non autorisé pour accéder aux statistiques de ${mediateurRechercher.id_pg}`,
+              });
+            }
           }
         }
       }
