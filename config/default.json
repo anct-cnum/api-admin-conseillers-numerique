@@ -121,5 +121,11 @@
   "sib_api_key": "SIB_API_KEY",
   "contrat_smic": "CONTRAT_SMIC",
   "api_authorization_secret": "API_AUTHORIZATION_SECRET",
-  "captcha_secret": "CAPTCHA_SECRET"
+  "captcha_secret": "CAPTCHA_SECRET",
+    "coop": {
+    "token": "COOP_TOKEN",
+    "endPointStatistique": "COOP_ENDPOINT_STATISTIQUE",
+    "endPointUtilisateur": "COOP_ENDPOINT_UTILISATEUR",
+    "domain": "COOP_DOMAIN"
+  }
 }
