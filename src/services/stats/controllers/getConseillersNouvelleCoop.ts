@@ -47,8 +47,8 @@ const getConseillersNouvelleCoop =
         .service(service.conseillers)
         .Model.accessibleBy(req.ability, action.read)
         .find(filterNomAndPrenomConseiller(req.query.search))
-        .distinct('_id');
-      const idsConseillerFilter = `?filter[conseiller_numerique_id]=${conseillersIds.map((i) => i.toString()).join(',')}`;
+        .distinct('idPG');
+      const idsConseillerFilter = `?filter[conseiller_numerique_id_pg]=${conseillersIds.map((i) => i.toString()).join(',')}`;
       const initialMediateursOptions = await axios({
         method: 'get',
         url: `${coop.domain}${coop.endPointUtilisateur}${idsConseillerFilter}`,

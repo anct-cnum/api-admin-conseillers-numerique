@@ -43,8 +43,9 @@ const getStatsNationalesNouvelleCoop =
           .service(service.conseillers)
           .Model.accessibleBy(req.ability, action.read)
           .find()
-          .distinct('_id');
-        const idsConseillerFilter = `?filter[conseiller_numerique_id]=${conseillersIds.map((i) => i.toString()).join(',')}`;
+          .distinct('idPG');
+        const idPGConseller = conseillersIds.map((i) => i.toString());
+        const idsConseillerFilter = `?filter[conseiller_numerique_id_pg]=${idPGConseller.join(',')}`;
 
         const initialMediateursOptions = await axios({
           method: 'get',
@@ -68,9 +69,9 @@ const getStatsNationalesNouvelleCoop =
             (mediateur) =>
               mediateur.attributes.mediateur?.id === req.query.mediateur,
           )?.attributes?.conseiller_numerique;
-          const checkAuthorisedFiltreMediateur = conseillersIds
-            .map((id) => id.toString())
-            .includes(mediateurRechercher.id);
+          const checkAuthorisedFiltreMediateur = idPGConseller.includes(
+            mediateurRechercher.id_pg,
+          );
           if (!checkAuthorisedFiltreMediateur) {
             return res.status(403).json({
               message: `Non autorisé pour accéder aux statistiques de ${mediateurRechercher.id_pg}`,
