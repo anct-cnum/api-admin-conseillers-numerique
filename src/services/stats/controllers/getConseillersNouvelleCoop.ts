@@ -69,6 +69,7 @@ const getConseillersNouvelleCoop =
                 $and: [checkAccessConseiller],
               },
             },
+            { $limit: 25 },
             {
               $group: {
                 _id: '$idPG',
