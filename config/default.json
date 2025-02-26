@@ -124,7 +124,8 @@
   "captcha_secret": "CAPTCHA_SECRET",
     "coop": {
     "token": "COOP_TOKEN",
-    "endPoint": "COOP_ENDPOINT",
+    "endPointStatistique": "COOP_ENDPOINT_STATISTIQUE",
+    "endPointUtilisateur": "COOP_ENDPOINT_UTILISATEUR",
     "domain": "COOP_DOMAIN"
   }
 }

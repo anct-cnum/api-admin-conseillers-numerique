@@ -49,7 +49,7 @@
     "issuer_url": "PRO_CONNECT_ISSUER_URL",
     "token_endpoint": "PRO_CONNECT_TOKEN_ENDPOINT",
     "userinfo_endpoint": "PRO_CONNECT_USERINFO",
-    "logout_endpoint": "PRO_CONNECT_LOGOUT_ENDPOINT",
+    "logout_endpoint": "PRO_CONNECT_LOGOUT_ENDPOINT"
   },
   "demarche_simplifiee": {
     "endpoint": "DEMARCHE_SIMPLIFIEE_ENDPOINT",
@@ -102,7 +102,8 @@
   "captcha_secret": "CAPTCHA_SECRET",
     "coop": {
     "token": "COOP_TOKEN",
-    "endPoint": "COOP_ENDPOINT",
+    "endPointStatistique": "COOP_ENDPOINT_STATISTIQUE",
+    "endPointUtilisateur": "COOP_ENDPOINT_UTILISATEUR",
     "domain": "COOP_DOMAIN"
   }
 }

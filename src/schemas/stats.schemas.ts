@@ -20,6 +20,10 @@ const validStatNationalesNouvelleCoop = Joi.object({
   mediateur: Joi.string().optional(),
 });
 
+const validSearchConseiller = Joi.object({
+  search: Joi.string().allow('').required(),
+});
+
 const validStatConseiller = Joi.object({
   dateDebut: Joi.date()
     .required()
@@ -107,4 +111,5 @@ export {
   validStatStructure,
   validStatConseiller,
   validStatCsv,
+  validSearchConseiller,
 };
