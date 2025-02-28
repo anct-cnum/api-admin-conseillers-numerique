@@ -46,7 +46,7 @@ const getStatsNationalesNouvelleCoop =
           .distinct('idPG');
         const idPGConseller = conseillersIds.map((i) => i.toString());
         if (idPGConseller) {
-          const idsConseillerFilter = `?filter[conseiller_numerique_id_pg]=${idPGConseller.join(',')}`;
+          const idsConseillerFilter = `?filter[soft_deleted]=0&filter[conseiller_numerique_id_pg]=${idPGConseller.join(',')}`;
           const initialMediateursOptions = await axios({
             method: 'get',
             url: `${coop.domain}${coop.endPointUtilisateur}${idsConseillerFilter}`,
@@ -56,13 +56,18 @@ const getStatsNationalesNouvelleCoop =
             },
           });
           donneesStats.data.initialMediateursOptions =
-            initialMediateursOptions.data.data.map((mediateur) => ({
-              label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
-              value: {
-                mediateurId: mediateur.attributes.mediateur?.id,
-                email: mediateur.attributes.email,
-              },
-            }));
+            initialMediateursOptions.data.data
+              .map(
+                (mediateur) =>
+                  mediateur.attributes.mediateur?.id && {
+                    label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
+                    value: {
+                      mediateurId: mediateur.attributes.mediateur.id,
+                      email: mediateur.attributes.email,
+                    },
+                  },
+              )
+              .filter((mediateur) => mediateur);
           if (req.query.mediateur) {
             const mediateurRechercher = initialMediateursOptions.data.data.find(
               (mediateur) =>

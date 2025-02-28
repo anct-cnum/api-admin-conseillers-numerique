@@ -24,6 +24,7 @@ const filterNomAndPrenomConseiller = (search: string) => {
           $options: 'i',
         },
       },
+      { idPGStr: { $regex: `(?'name'${inputSearchBar}.*$)`, $options: 'i' } },
     ],
   };
 };
@@ -63,13 +64,14 @@ const getConseillersNouvelleCoop =
                 prenomNomStr: { $concat: ['$prenom', ' ', '$nom'] },
               },
             },
+            { $addFields: { idPGStr: { $toString: '$idPG' } } },
             {
               $match: {
                 ...filterNomAndPrenomConseiller(req.query.search),
                 $and: [checkAccessConseiller],
               },
             },
-            { $limit: 25 },
+            { $limit: 100 },
             {
               $group: {
                 _id: '$idPG',
@@ -81,7 +83,7 @@ const getConseillersNouvelleCoop =
         .map((i) => i._id.toString())
         .join(',');
       if (formatIdQueryParams) {
-        const idsConseillerFilter = `?filter[conseiller_numerique_id_pg]=${formatIdQueryParams}`;
+        const idsConseillerFilter = `?filter[soft_deleted]=0&filter[conseiller_numerique_id_pg]=${formatIdQueryParams}`;
         const initialMediateursOptions = await axios({
           method: 'get',
           url: `${coop.domain}${coop.endPointUtilisateur}${idsConseillerFilter}`,
@@ -90,17 +92,19 @@ const getConseillersNouvelleCoop =
             Authorization: `Bearer ${coop.token}`,
           },
         });
-        initialMediateursOptionsResult = initialMediateursOptions.data.data.map(
-          (mediateur) => ({
-            label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
-            value: {
-              mediateurId: mediateur.attributes.mediateur?.id,
-              email: mediateur.attributes.email,
-            },
-          }),
-        );
+        initialMediateursOptionsResult = initialMediateursOptions.data.data
+          .map(
+            (mediateur) =>
+              mediateur.attributes.mediateur?.id && {
+                label: `${mediateur.attributes.conseiller_numerique.id_pg} - ${mediateur.attributes.prenom} ${mediateur.attributes.nom}`,
+                value: {
+                  mediateurId: mediateur.attributes.mediateur.id,
+                  email: mediateur.attributes.email,
+                },
+              },
+          )
+          .filter((mediateur) => mediateur);
       }
-
       return res.status(200).json({ result: initialMediateursOptionsResult });
     } catch (error) {
       res.status(500).json({ message: error.message });
