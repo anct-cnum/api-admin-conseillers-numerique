@@ -18,6 +18,7 @@ const validStatNationalesNouvelleCoop = Joi.object({
     .error(new Error('La date de fin est invalide')),
   type: Joi.string().valid('individuel', 'demarche', 'collectif').optional(),
   mediateur: Joi.string().optional(),
+  departement: Joi.string().regex(/^\d*$/).min(2).max(3).allow('').optional(),
 });
 
 const validSearchConseiller = Joi.object({

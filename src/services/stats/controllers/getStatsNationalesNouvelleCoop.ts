@@ -28,9 +28,12 @@ const getStatsNationalesNouvelleCoop =
       const filterMediateur = req.query.mediateur
         ? `&filter[mediateur]=${req.query.mediateur}`
         : '';
+      const filterDepartement = req.query.departement
+        ? `&filter[departement]=${req.query.departement}`
+        : '';
       const donneesStats = await axios({
         method: 'get',
-        url: `${coop.domain}${coop.endPointStatistique}?${filterDate}${filterType}${filterMediateur}`,
+        url: `${coop.domain}${coop.endPointStatistique}?${filterDate}${filterType}${filterMediateur}${filterDepartement}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${coop.token}`,
@@ -44,12 +47,12 @@ const getStatsNationalesNouvelleCoop =
           .Model.accessibleBy(req.ability, action.read)
           .find()
           .distinct('idPG');
-        const idPGConseller = conseillersIds.map((i) => i.toString());
-        if (idPGConseller) {
-          const idsConseillerFilter = `?filter[soft_deleted]=0&filter[conseiller_numerique_id_pg]=${idPGConseller.join(',')}`;
+        const idPGConseiller = conseillersIds.map((i) => i.toString());
+        if (idPGConseiller.length >= 1) {
+          const filters = `?filter[soft_deleted]=0&filter[conseiller_numerique_id_pg]=${idPGConseiller.join(',')}`;
           const initialMediateursOptions = await axios({
             method: 'get',
-            url: `${coop.domain}${coop.endPointUtilisateur}${idsConseillerFilter}`,
+            url: `${coop.domain}${coop.endPointUtilisateur}${filters}`,
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${coop.token}`,
@@ -73,7 +76,7 @@ const getStatsNationalesNouvelleCoop =
               (mediateur) =>
                 mediateur.attributes.mediateur?.id === req.query.mediateur,
             )?.attributes?.conseiller_numerique;
-            const checkAuthorisedFiltreMediateur = idPGConseller.includes(
+            const checkAuthorisedFiltreMediateur = idPGConseiller.includes(
               mediateurRechercher?.id_pg.toString(),
             );
             if (!checkAuthorisedFiltreMediateur) {
