@@ -10,6 +10,9 @@ const axios = require('axios');
 
 const formatDate = (date) => dayjs(date).format('YYYY-MM-DD');
 
+const sortByName = (a, b) =>
+  a.attributes.nom.toLowerCase().localeCompare(b.attributes.nom.toLowerCase());
+
 const getStatsNationalesNouvelleCoop =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
@@ -21,7 +24,7 @@ const getStatsNationalesNouvelleCoop =
       if (statsValidation.error) {
         return res.status(400).json({ message: statsValidation.error.message });
       }
-      const filterDate = `filter[du]=${formatDate(req.query.dateDebut)}&filter[au]=${formatDate(req.query.dateFin)}`;
+      const filterDate = `&filter[du]=${formatDate(req.query.dateDebut)}&filter[au]=${formatDate(req.query.dateFin)}`;
       const filterType = req.query.type
         ? `&filter[type]=${req.query.type}`
         : '';
@@ -33,7 +36,7 @@ const getStatsNationalesNouvelleCoop =
         : '';
       const donneesStats = await axios({
         method: 'get',
-        url: `${coop.domain}${coop.endPointStatistique}?${filterDate}${filterType}${filterMediateur}${filterDepartement}`,
+        url: `${coop.domain}${coop.endPointStatistique}?filter[conseiller_numerique]=1${filterDate}${filterType}${filterMediateur}${filterDepartement}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${coop.token}`,
@@ -45,7 +48,7 @@ const getStatsNationalesNouvelleCoop =
         const conseillersIds = await app
           .service(service.conseillers)
           .Model.accessibleBy(req.ability, action.read)
-          .find()
+          .find({})
           .distinct('idPG');
         const idPGConseiller = conseillersIds.map((i) => i.toString());
         if (idPGConseiller.length >= 1) {
@@ -60,6 +63,7 @@ const getStatsNationalesNouvelleCoop =
           });
           donneesStats.data.initialMediateursOptions =
             initialMediateursOptions.data.data
+              .sort(sortByName)
               .map(
                 (mediateur) =>
                   mediateur.attributes.mediateur?.id && {

@@ -7,6 +7,9 @@ import { checkAccessReadRequestConseillers } from '../../conseillers/repository/
 
 const axios = require('axios');
 
+const sortByName = (a, b) =>
+  a.attributes.nom.toLowerCase().localeCompare(b.attributes.nom.toLowerCase());
+
 const filterNomAndPrenomConseiller = (search: string) => {
   const inputSearchBar = search?.trim();
   return {
@@ -93,6 +96,7 @@ const getConseillersNouvelleCoop =
           },
         });
         initialMediateursOptionsResult = initialMediateursOptions.data.data
+          .sort(sortByName)
           .map(
             (mediateur) =>
               mediateur.attributes.mediateur?.id && {
