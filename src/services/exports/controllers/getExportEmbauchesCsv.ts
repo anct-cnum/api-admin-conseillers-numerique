@@ -64,6 +64,10 @@ const getExportEmbauchesCsv =
                 dateFinDeContrat: 1,
                 typeDeContrat: 1,
                 salaire: 1,
+                demandesDeProlongation: 1,
+                dateDeRebond: {
+                  $arrayElemAt: ['$demandesDeProlongation', 0],
+                },
                 'conseiller.idPG': 1,
                 'conseiller._id': 1,
                 'conseiller.createdAt': 1,
