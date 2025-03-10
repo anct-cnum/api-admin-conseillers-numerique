@@ -65,7 +65,7 @@ const checkIfCcp1 = (statut) =>
   statut === 'RECRUTE' || statut === 'RUPTURE' ? 'oui' : 'non';
 
 const generateCsvCandidat = async (misesEnRelations, response: Response) => {
-  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Date du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel'];
+  const csv = ['Date candidature;Date de début de contrat;Date de fin de contrat;Type de contrat;Salaire;prenom;nom;expérience;téléphone;email;coordinateur;Code Postal;Nom commune;Département;diplômé;palier pix;Formation CCP1;SIRET structure;ID Structure;ID long Structure;Dénomination;Type;Adresse de la structure;Code postal;Code commune;Code département;Code région;Prénom contact SA;Nom contact SA;Téléphone contact SA;Email contact SA;ID conseiller;ID long conseiller;Nom du comité de sélection;Date du comité de sélection;Nombre de conseillers attribués en comité de sélection;Date d’entrée en formation;Date de sortie de formation;email professionnel;Date rebond'];
 
   const formatterDate = (date: Date): string => {
     if (date !== undefined && date !== null) {
@@ -120,6 +120,7 @@ const generateCsvCandidat = async (misesEnRelations, response: Response) => {
         };${formatterDate(miseEnrelation.conseiller?.datePrisePoste)
         };${formatterDate(miseEnrelation.conseiller?.dateFinFormation)
         };${miseEnrelation.conseiller?.emailPro ?? ''
+        };${miseEnrelation?.dateDeRebond ? formatterDate(miseEnrelation.dateDeRebond.dateDeFinActuelle): ''
         }`
       );
     }
