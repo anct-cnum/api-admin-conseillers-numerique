@@ -25,18 +25,19 @@ const getStatsNationalesNouvelleCoop =
         return res.status(400).json({ message: statsValidation.error.message });
       }
       const filterDate = `&filter[du]=${formatDate(req.query.dateDebut)}&filter[au]=${formatDate(req.query.dateFin)}`;
-      const filterType = req.query.type
-        ? `&filter[type]=${req.query.type}`
+      const filterTypes = req.query.types
+        ? `&filter[types]=${req.query.types}`
         : '';
-      const filterMediateur = req.query.mediateur
-        ? `&filter[mediateur]=${req.query.mediateur}`
-        : '';
-      const filterDepartement = req.query.departement
-        ? `&filter[departement]=${req.query.departement}`
+      const filterMediateurs =
+        req.query.mediateurs && req.query.mediateurs !== '[object Object]'
+          ? `&filter[mediateurs]=${req.query.mediateurs}`
+          : '';
+      const filterDepartements = req.query.departements
+        ? `&filter[departements]=${req.query.departements}`
         : '';
       const donneesStats = await axios({
         method: 'get',
-        url: `${coop.domain}${coop.endPointStatistique}?filter[conseiller_numerique]=1${filterDate}${filterType}${filterMediateur}${filterDepartement}`,
+        url: `${coop.domain}${coop.endPointStatistique}?filter[conseiller_numerique]=1${filterDate}${filterTypes}${filterMediateurs}${filterDepartements}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${coop.token}`,
