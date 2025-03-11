@@ -19,6 +19,7 @@ const validStatNationalesNouvelleCoop = Joi.object({
     .required()
     .error(new Error('La date de fin est invalide')),
   types: Joi.string()
+    .allow('')
     .optional()
     .pattern(
       /^(individuel|demarche|collectif)(,(individuel|demarche|collectif)){0,2}$/,
@@ -37,9 +38,11 @@ const validStatNationalesNouvelleCoop = Joi.object({
     .messages({
       'custom.invalid_mediateurs': `Médiateurs :"{{#value}}" contient un ou plusieurs mediateursUuid invalides.`,
     })
+    .allow('')
     .optional(),
   departements: Joi.string()
     .pattern(/^(\d{1,3})(,\d{1,3})*$/)
+    .allow('')
     .optional(),
 });
 
