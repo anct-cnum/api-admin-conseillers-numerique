@@ -15,7 +15,6 @@ const validStatNationalesNouvelleCoop = Joi.object({
     .required()
     .error(new Error('La date de début est invalide')),
   dateFin: Joi.date()
-    .max(new Date())
     .required()
     .error(new Error('La date de fin est invalide')),
   types: Joi.string()
