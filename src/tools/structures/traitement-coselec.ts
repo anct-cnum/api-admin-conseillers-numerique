@@ -14,6 +14,7 @@ program.option('-id, --idPG <idPG>', 'idPG de la structure');
 program.option('-q, --quota <quota>', 'quota');
 program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
 program.option('-fs, --franceService', 'label France Service');
+program.option('-c, --coordinateur', 'type coordinateur');
 program.option(
   '-st, --statut <statut>',
   'nouveau statut de la structure (ANNULEE, ABANDON)',
@@ -74,6 +75,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         avisCoselec: 'POSITIF',
         insertedAt: updatedAt,
         numero: `COSELEC ${options.numeroCoselec}`,
+        ...(options.coordinateur && { type: 'coordinateur' }),
       },
     },
   };
@@ -94,6 +96,7 @@ execute(__filename, async ({ app, logger, exit }) => {
         avisCoselec: 'POSITIF',
         insertedAt: updatedAt,
         numero: `COSELEC ${options.numeroCoselec}`,
+        ...(options.coordinateur && { type: 'coordinateur' }),
       },
     },
   };
@@ -189,7 +192,8 @@ execute(__filename, async ({ app, logger, exit }) => {
     });
   }
   if (
-    checkStructurePhase2(structure?.conventionnement?.statut) ||
+    (checkStructurePhase2(structure?.conventionnement?.statut) &&
+      !options.coordinateur) ||
     structure?.statut === 'CREEE'
   ) {
     Object.assign(objectUpdated.$push.coselec, {
