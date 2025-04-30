@@ -30,7 +30,7 @@
     "@feathersjs/transport-commons": "^4.5.15",
     "@sentry/node": "^7.101.1",
     "@sentry/tracing": "7.101.1",
-    "@turf/circle": "^6.5.0",
+    "@turf/circle": "^7.1.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "commander": "^12.0.0",
