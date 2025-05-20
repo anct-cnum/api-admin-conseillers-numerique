@@ -9,6 +9,46 @@ const validStatNationales = Joi.object({
     .error(new Error('La date de fin est invalide')),
 });
 
+const validStatNationalesNouvelleCoop = Joi.object({
+  dateDebut: Joi.date()
+    .min(new Date('2024-11-15'))
+    .required()
+    .error(new Error('La date de début est invalide')),
+  dateFin: Joi.date()
+    .required()
+    .error(new Error('La date de fin est invalide')),
+  types: Joi.string()
+    .allow('')
+    .optional()
+    .pattern(
+      /^(individuel|demarche|collectif)(,(individuel|demarche|collectif)){0,2}$/,
+    ),
+  mediateurs: Joi.string()
+    .custom((mediateursUuid, helpers) => {
+      const invalidMediateurs = mediateursUuid
+        .split(',')
+        .map((m) => m.trim())
+        .find((m) => Joi.string().uuid().validate(m).error);
+      if (invalidMediateurs) {
+        return helpers.error('custom.invalid_mediateurs');
+      }
+      return mediateursUuid;
+    })
+    .messages({
+      'custom.invalid_mediateurs': `Médiateurs :"{{#value}}" contient un ou plusieurs mediateursUuid invalides.`,
+    })
+    .allow('')
+    .optional(),
+  departements: Joi.string()
+    .pattern(/^(\d{1,3})(,\d{1,3})*$/)
+    .allow('')
+    .optional(),
+});
+
+const validSearchConseiller = Joi.object({
+  search: Joi.string().allow('').required(),
+});
+
 const validStatConseiller = Joi.object({
   dateDebut: Joi.date()
     .required()
@@ -91,8 +131,10 @@ const validStatCsv = Joi.object({
 
 export {
   validStatNationales,
+  validStatNationalesNouvelleCoop,
   validStatGrandReseau,
   validStatStructure,
   validStatConseiller,
   validStatCsv,
+  validSearchConseiller,
 };

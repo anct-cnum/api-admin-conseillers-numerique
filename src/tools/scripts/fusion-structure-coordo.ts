@@ -3,13 +3,10 @@
 // ts-node src/tools/scripts/fusion-structure-coordo.ts --structureActif XidPGX --structureDoublon XidPGX
 
 import { program } from 'commander';
-import dayjs from 'dayjs';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { getCoselec } from '../../utils';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
-
-const { Pool } = require('pg');
 
 program.option(
   '-sa, --structureActif <structureActif>',
@@ -31,15 +28,6 @@ const misesEnRelationStructure = (app) => (structureDoublon) =>
     'structure.$id': structureDoublon._id,
     statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
   });
-
-const updateStructurePG = (pool) => async (idPG, datePG) =>
-  pool.query(
-    `
-          UPDATE djapp_hostorganization
-          SET updated = $2
-          WHERE id = $1`,
-    [idPG, datePG],
-  );
 
 const miseEnRelationMajCache = (app) => (structureObj: any) =>
   app
@@ -68,7 +56,6 @@ const userUpdatedStructureDoublon = (app) => async (structureDoublon) => {
 execute(__filename, async ({ app, logger, exit }) => {
   try {
     const options = program.opts();
-    const pool = new Pool();
     const today = new Date();
 
     if (
@@ -108,11 +95,6 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
       return;
     }
-    await updateStructurePG(pool)(
-      structureActif.idPG,
-      dayjs(structureDoublon.updatedAt).format('YYYY-MM-DD'),
-    );
-
     const structureAConserver = await app
       .service(service.structures)
       .Model.findOneAndUpdate(
@@ -151,10 +133,6 @@ execute(__filename, async ({ app, logger, exit }) => {
       );
       return;
     }
-    await updateStructurePG(pool)(
-      structureDoublon.idPG,
-      dayjs(today).format('YYYY-MM-DD'),
-    );
     const structureDoublonSuiteFusion = await app
       .service(service.structures)
       .Model.findOneAndUpdate(

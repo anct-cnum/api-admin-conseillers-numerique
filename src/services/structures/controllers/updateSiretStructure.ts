@@ -6,14 +6,11 @@ import { action } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
 import { IStructures } from '../../../ts/interfaces/db.interfaces';
 
-const { Pool } = require('pg');
-
 const updateSiretStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const { siret } = req.body;
     const idUser = req.user?._id;
-    const pool = new Pool();
 
     try {
       const structure: IStructures = await app
@@ -24,13 +21,6 @@ const updateSiretStructure =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      await pool.query(
-        `
-      UPDATE djapp_hostorganization
-      SET siret = $2
-      WHERE id = $1`,
-        [structure.idPG, siret],
-      );
       const structureUpdated: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)

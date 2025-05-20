@@ -2,7 +2,6 @@ import { Application } from '@feathersjs/express';
 import { Response } from 'express';
 import { DBRef, ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
-import dayjs from 'dayjs';
 import { IRequest } from '../../../ts/interfaces/global.interfaces';
 import { action, ressource } from '../../../helpers/accessControl/accessList';
 import service from '../../../helpers/services';
@@ -18,27 +17,6 @@ import mailer from '../../../mailer';
 import { invitationMattermostParMail } from '../../../utils/mattermost';
 
 const { v4: uuidv4 } = require('uuid');
-const { Pool } = require('pg');
-
-const updateConseillersPG =
-  (pool) => async (email: string, disponible: boolean, datePG: string) => {
-    try {
-      await pool.query(
-        `
-      UPDATE djapp_coach
-      SET (
-        disponible,
-        updated
-      )
-      =
-      ($2,$3)
-      WHERE LOWER(email) = LOWER($1)`,
-        [email, disponible, datePG],
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
 
 const validationRecrutementContrat =
   (app: Application) => async (req: IRequest, res: Response) => {
@@ -47,7 +25,6 @@ const validationRecrutementContrat =
       res.status(400).json({ message: 'Id incorrect' });
       return;
     }
-    const pool = new Pool();
     let user: IUser | null = null;
     const connect = app.get('mongodb');
     const database = connect.substr(connect.lastIndexOf('/') + 1);
@@ -160,12 +137,6 @@ const validationRecrutementContrat =
         }
       }
       const updatedAt = new Date();
-      const datePG = dayjs(updatedAt).format('YYYY-MM-DD');
-      await updateConseillersPG(pool)(
-        miseEnRelationVerif.conseillerObj.email,
-        false,
-        datePG,
-      );
       const userAccount = await app
         .service(service.users)
         .Model.accessibleBy(req.ability, action.read)

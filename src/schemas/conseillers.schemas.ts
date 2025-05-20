@@ -115,13 +115,14 @@ const validCandidatureConseiller = Joi.object({
   email: Joi.string()
     .email()
     .trim()
+    .lowercase()
     .required()
     .error(new Error('L’adresse e-mail est invalide')),
   telephone: Joi.string()
     .optional()
     .trim()
     .allow('', null)
-    .pattern(/^(\+[\d]{11,12}|[\d]{10})$/)
+    .pattern(/^(\+\d{11,12}|\d{10})$/)
     .error(new Error('Le numéro de téléphone est invalide')),
   nomCommune: Joi.string().required().error(new Error('La ville est requise')),
   codePostal: Joi.string()

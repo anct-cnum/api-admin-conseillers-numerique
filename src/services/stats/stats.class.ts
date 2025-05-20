@@ -17,7 +17,9 @@ import {
   getStatsConseiller,
   getStatsTerritoireCra,
   getStatsNationalesGrandReseau,
+  getStatsNationalesNouvelleCoop,
   getStatsConseillerParcoursRecrutement,
+  getConseillersNouvelleCoop,
 } from './controllers';
 
 interface Data {}
@@ -39,6 +41,18 @@ export class Stats implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getStatsNationales(app),
+    );
+    app.get(
+      '/stats/nationales/cras/nouvelle-coop',
+      authenticateMode(app),
+      createAbilities(app),
+      getStatsNationalesNouvelleCoop(app),
+    );
+    app.get(
+      '/admin/conseillers/nouvelle-coop',
+      authenticateMode(app),
+      createAbilities(app),
+      getConseillersNouvelleCoop(app),
     );
     app.get(
       '/stats/nationales/cras/grand-reseau',

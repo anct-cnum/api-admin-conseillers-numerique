@@ -10,13 +10,11 @@ import { envoiEmailInvit } from '../../../utils/email';
 import mailer from '../../../mailer';
 
 const { v4: uuidv4 } = require('uuid');
-const { Pool } = require('pg');
 
 const updateEmailStructure =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
     const idUser = req.user?._id;
-    const pool = new Pool();
 
     if (!ObjectId.isValid(idStructure)) {
       res.status(400).json({
@@ -76,13 +74,6 @@ const updateEmailStructure =
         impactUser = false;
       }
 
-      await pool.query(
-        `
-      UPDATE djapp_hostorganization
-      SET contact_email = $2
-      WHERE id = $1`,
-        [structure.idPG, email],
-      );
       const structureUpdated: IStructures = await app
         .service(service.structures)
         .Model.accessibleBy(req.ability, action.update)
