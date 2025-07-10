@@ -16,7 +16,10 @@ const authenticateMode =
         authenticate('jwt')(req, res, () => {
           const { user } = req;
           req.user = user;
-          if (!req.user.roles.includes(req.query.role)) {
+          if (
+            !req.user.roles.includes(req.query.role) &&
+            req.query.role !== 'anonyme'
+          ) {
             res.status(401).json('Accès refusé');
           } else {
             next();
@@ -45,7 +48,10 @@ const authenticateMode =
             } else {
               req.user = userDecoded;
             }
-            if (!userDecoded.roles.includes(req.query.role)) {
+            if (
+              !userDecoded.roles.includes(req.query.role) &&
+              req.query.role !== 'anonyme'
+            ) {
               res.status(401).json('Accès refusé');
             } else {
               next();
