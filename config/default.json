@@ -33,6 +33,7 @@
       "passwordField": "password"
     }
   },
+  "user_support": "prenom.nom@exemple.fr",
   "smtp": {
     "host": "localhost",
     "port": "1025",
