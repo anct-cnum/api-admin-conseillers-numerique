@@ -17,6 +17,7 @@ const authenticateMode =
           const { user } = req;
           req.user = user;
           if (
+            req.query.role &&
             !req.user.roles.includes(req.query.role) &&
             req.query.role !== 'anonyme'
           ) {
@@ -49,6 +50,7 @@ const authenticateMode =
               req.user = userDecoded;
             }
             if (
+              req.query.role &&
               !userDecoded.roles.includes(req.query.role) &&
               req.query.role !== 'anonyme'
             ) {
