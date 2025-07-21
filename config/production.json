@@ -17,6 +17,7 @@
       "audience": "AUTHENTICATION_JWTOPTIONS_AUDIENCE"
     }
   },
+  "user_support": "USER_SUPPORT",
   "smtp": {
     "host": "SMTP_HOST",
     "port": "SMTP_PORT",
