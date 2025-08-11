@@ -93,4 +93,4 @@ const invitationMattermostParMail = (app, req) => async (conseiller) => {
   }
 };
 
-export { deleteAccount, invitationMattermostParMail };
+export { loginApi, deleteAccount, invitationMattermostParMail };

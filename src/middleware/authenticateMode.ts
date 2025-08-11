@@ -16,7 +16,15 @@ const authenticateMode =
         authenticate('jwt')(req, res, () => {
           const { user } = req;
           req.user = user;
-          next();
+          if (
+            req.query.role &&
+            !req.user.roles.includes(req.query.role) &&
+            req.query.role !== 'anonyme'
+          ) {
+            res.status(401).json('Accès refusé');
+          } else {
+            next();
+          }
         });
       } else {
         const accessToken = req.headers?.authorization?.split(' ')[1];
@@ -41,7 +49,15 @@ const authenticateMode =
             } else {
               req.user = userDecoded;
             }
-            next();
+            if (
+              req.query.role &&
+              !userDecoded.roles.includes(req.query.role) &&
+              req.query.role !== 'anonyme'
+            ) {
+              res.status(401).json('Accès refusé');
+            } else {
+              next();
+            }
           },
         );
       }
