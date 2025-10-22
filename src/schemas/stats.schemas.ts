@@ -11,7 +11,7 @@ const validStatNationales = Joi.object({
 
 const validStatNationalesNouvelleCoop = Joi.object({
   dateDebut: Joi.date()
-    .min(new Date('2024-11-15'))
+    .min(new Date('2020-11-17'))
     .required()
     .error(new Error('La date de début est invalide')),
   dateFin: Joi.date()

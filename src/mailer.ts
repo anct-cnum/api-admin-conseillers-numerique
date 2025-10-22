@@ -70,15 +70,14 @@ export default function (app: Application) {
       app.use(Sentry.Handlers.errorHandler());
     }
   };
-  const getPixContactMail = () => app.get('pix').contactMailing;
-  const getPixSupportMail = () => app.get('pix').supportMailing;
+
+  const getEmailSupport = () => app.get('replyTo');
 
   const utils = {
     getPublicUrl,
     getDashboardUrl,
     initSentry,
-    getPixContactMail,
-    getPixSupportMail,
+    getEmailSupport,
     getEspaceCandidatUrl,
     getEspaceCoopUrl,
     getDemarcheSimplifierUrl,

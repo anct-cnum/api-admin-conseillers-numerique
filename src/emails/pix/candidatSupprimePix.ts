@@ -22,7 +22,7 @@ export default function (mailer) {
 
       return mailer
         .createMailer()
-        .sendEmail(utils.getPixContactMail(), {
+        .sendEmail(utils.getEmailSupport(), {
           subject: "Demande de Suppression d'un candidat",
           body: await render(candidat),
         })
