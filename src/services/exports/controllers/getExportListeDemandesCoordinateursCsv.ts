@@ -42,12 +42,43 @@ const getDemandesCoordo =
         },
       },
       {
+        $unwind: '$demandesCoordinateur',
+      },
+      {
+        $lookup: {
+          from: 'structures',
+          localField: 'demandesCoordinateur.idStructureTransfert',
+          foreignField: '_id',
+          as: 'idStructureTransfert',
+        },
+      },
+      {
+        $unwind: {
+          path: '$idStructureTransfert',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
-          _id: 0,
+          _id: 1,
           nom: 1,
           codePostal: 1,
           idPG: 1,
-          demandesCoordinateur: 1,
+          demandesCoordinateur: {
+            $mergeObjects: [
+              '$demandesCoordinateur',
+              { idStructureTransfert: '$idStructureTransfert.idPG' },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id',
+          nom: { $first: '$nom' },
+          codePostal: { $first: '$codePostal' },
+          idPG: { $first: '$idPG' },
+          demandesCoordinateur: { $push: '$demandesCoordinateur' },
         },
       },
     ]);
