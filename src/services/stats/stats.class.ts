@@ -9,16 +9,8 @@ import authenticateMode from '../../middleware/authenticateMode';
 import { Application } from '../../declarations';
 import createAbilities from '../../middleware/createAbilities';
 import {
-  getStatsNationales,
-  getDatasStructures,
-  getStatsStructure,
-  getStatsTerritoires,
-  getStatsTerritoire,
-  getStatsConseiller,
-  getStatsTerritoireCra,
   getStatsNationalesGrandReseau,
   getStatsNationalesNouvelleCoop,
-  getStatsConseillerParcoursRecrutement,
   getConseillersNouvelleCoop,
 } from './controllers';
 
@@ -37,12 +29,6 @@ export class Stats implements ServiceMethods<Data> {
     this.options = options;
 
     app.get(
-      '/stats/nationales/cras',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsNationales(app),
-    );
-    app.get(
       '/stats/nationales/cras/nouvelle-coop',
       authenticateMode(app),
       createAbilities(app),
@@ -59,48 +45,6 @@ export class Stats implements ServiceMethods<Data> {
       authenticateMode(app),
       createAbilities(app),
       getStatsNationalesGrandReseau(app),
-    );
-    app.get(
-      '/stats/structure/cras',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsStructure(app),
-    );
-    app.get(
-      '/stats/conseiller/cras',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsConseiller(app),
-    );
-    app.get(
-      '/stats/recrutement/conseiller/cras',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsConseillerParcoursRecrutement(app),
-    );
-    app.get(
-      '/stats/datas/structures',
-      authenticateMode(app),
-      createAbilities(app),
-      getDatasStructures(app, options),
-    );
-    app.get(
-      '/stats/territoires',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsTerritoires(app, options),
-    );
-    app.get(
-      '/stats/territoire',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsTerritoire(app),
-    );
-    app.get(
-      '/stats/territoire/cra',
-      authenticateMode(app),
-      createAbilities(app),
-      getStatsTerritoireCra(app),
     );
   }
 
