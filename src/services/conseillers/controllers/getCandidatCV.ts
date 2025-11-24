@@ -100,7 +100,7 @@ const getCandidatCV =
           const bufferDecrypt = Buffer.concat([
             // @ts-ignore: Unreachable code error
             decipher.update(file.slice(16)),
-            decipher.final(),
+            decipher.final() as unknown as Uint8Array,
           ]);
 
           return bufferDecrypt;

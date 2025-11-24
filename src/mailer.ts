@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
 import { Application } from './declarations';
 
 const path = require('path');
@@ -61,7 +60,7 @@ export default function (app: Application) {
         environment: config().sentry.environment,
         integrations: [
           new Sentry.Integrations.Http({ tracing: true }),
-          new Tracing.Integrations.Express({ app }),
+          new Sentry.Integrations.Express({ app }),
         ],
         tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
       });

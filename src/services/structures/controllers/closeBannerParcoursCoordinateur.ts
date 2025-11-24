@@ -30,8 +30,7 @@ const closeBannerParcoursCoordinateur =
             'demandesCoordinateur.$.banniereInformationAvisStructure': false,
           };
           objectUpdatedMiseEnRelation = {
-            'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
-              false,
+            'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure': false,
           };
           break;
         case 'banniereValidationAvisPrefet':
@@ -39,8 +38,7 @@ const closeBannerParcoursCoordinateur =
             'demandesCoordinateur.$.banniereValidationAvisPrefet': false,
           };
           objectUpdatedMiseEnRelation = {
-            'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-              false,
+            'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet': false,
           };
           break;
         case 'banniereValidationAvisAdmin':
@@ -48,8 +46,7 @@ const closeBannerParcoursCoordinateur =
             'demandesCoordinateur.$.banniereValidationAvisAdmin': false,
           };
           objectUpdatedMiseEnRelation = {
-            'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin':
-              false,
+            'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': false,
           };
           break;
         default:

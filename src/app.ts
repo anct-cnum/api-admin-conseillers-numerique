@@ -7,7 +7,6 @@ import configuration from '@feathersjs/configuration';
 import express from '@feathersjs/express';
 import socketio from '@feathersjs/socketio';
 import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
 import cookieParser from 'cookie-parser';
 import favicon from 'serve-favicon';
 import logger from './logger';
@@ -29,7 +28,7 @@ if (config().sentry.enabled === 'true') {
       // enable HTTP calls tracing
       new Sentry.Integrations.Http({ tracing: true }),
       // enable Express.js middleware tracing
-      new Tracing.Integrations.Express({ app }),
+      new Sentry.Integrations.Express({ app }),
     ],
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.

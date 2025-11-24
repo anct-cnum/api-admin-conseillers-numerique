@@ -78,8 +78,7 @@ const updateDemandeCoordinateurRefusAvisAdmin =
           'demandesCoordinateur.$.banniereInformationAvisStructure': true,
         });
         Object.assign(updatedDemandeCoordinateurMiseEnRelation.$set, {
-          'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
-            true,
+          'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure': true,
         });
       }
       const structureUpdated = await app

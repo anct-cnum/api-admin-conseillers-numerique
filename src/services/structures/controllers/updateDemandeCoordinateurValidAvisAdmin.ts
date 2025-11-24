@@ -60,8 +60,7 @@ const updateDemandeCoordinateurValidAvisAdmin =
           date: new Date(),
         },
         'structureObj.demandesCoordinateur.$.banniereValidationAvisAdmin': true,
-        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure':
-          true,
+        'structureObj.demandesCoordinateur.$.banniereInformationAvisStructure': true,
       },
     };
     try {

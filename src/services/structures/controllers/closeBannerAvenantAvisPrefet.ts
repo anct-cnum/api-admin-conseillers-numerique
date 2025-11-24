@@ -43,8 +43,7 @@ const closeBannerAvenantAvisPrefet =
           },
           {
             $set: {
-              'structureObj.demandesCoselec.$.prefet.banniereValidationAvis':
-                false,
+              'structureObj.demandesCoselec.$.prefet.banniereValidationAvis': false,
             },
           },
         );

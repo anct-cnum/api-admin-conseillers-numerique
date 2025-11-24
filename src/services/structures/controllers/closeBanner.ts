@@ -41,8 +41,7 @@ const closeBanner =
             },
             {
               $set: {
-                'conventionnement.dossierReconventionnement.banniereValidation':
-                  false,
+                'conventionnement.dossierReconventionnement.banniereValidation': false,
               },
             },
           );
@@ -61,8 +60,7 @@ const closeBanner =
             },
             {
               $set: {
-                'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
-                  false,
+                'structureObj.conventionnement.dossierReconventionnement.banniereValidation': false,
               },
             },
           );
@@ -131,8 +129,7 @@ const closeBanner =
             { 'structureObj._id': new ObjectId(req.params.id) },
             {
               $set: {
-                'structureObj.demandesCoselec.$[elem].banniereValidationAvenant':
-                  false,
+                'structureObj.demandesCoselec.$[elem].banniereValidationAvenant': false,
               },
             },
             {

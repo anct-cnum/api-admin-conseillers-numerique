@@ -93,8 +93,7 @@ const updateDossierReconventionnement =
               new Date(),
           },
           ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
-            'conventionnement.dossierReconventionnement.banniereValidation':
-              true,
+            'conventionnement.dossierReconventionnement.banniereValidation': true,
           }),
         };
         const objectConventionnementMiseEnRelation = {
@@ -104,8 +103,7 @@ const updateDossierReconventionnement =
               new Date(),
           },
           ...(statut === StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ && {
-            'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
-              true,
+            'structureObj.conventionnement.dossierReconventionnement.banniereValidation': true,
           }),
         };
         const structureUpdated = await app

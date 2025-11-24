@@ -40,16 +40,14 @@ execute(__filename, async ({ app, logger, exit }) => {
           objectConventionnement.$set = {
             'conventionnement.statut':
               StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-            'conventionnement.dossierReconventionnement.banniereValidation':
-              true,
+            'conventionnement.dossierReconventionnement.banniereValidation': true,
             'conventionnement.dossierReconventionnement.dateDerniereModification':
               new Date(),
           };
           objectConventionnementMiseEnRelation.$set = {
             'structureObj.conventionnement.statut':
               StatutConventionnement.RECONVENTIONNEMENT_VALIDÉ,
-            'structureObj.conventionnement.dossierReconventionnement.banniereValidation':
-              true,
+            'structureObj.conventionnement.dossierReconventionnement.banniereValidation': true,
             'structureObj.conventionnement.dossierReconventionnement.dateDerniereModification':
               new Date(),
           };

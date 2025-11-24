@@ -37,8 +37,7 @@ const updateDemandeCoordinateurAvisPrefet =
     const updatedDemandeCoordinateurMiseEnRelation = {
       $set: {
         'structureObj.demandesCoordinateur.$.avisPrefet': avisPrefet,
-        'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet':
-          true,
+        'structureObj.demandesCoordinateur.$.banniereValidationAvisPrefet': true,
         'structureObj.demandesCoordinateur.$.commentaire': commentaire,
       },
     };
