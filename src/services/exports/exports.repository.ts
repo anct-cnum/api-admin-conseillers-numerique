@@ -120,7 +120,7 @@ const generateCsvCandidat = async (misesEnRelations, response: Response) => {
         };${formatterDate(miseEnrelation.conseiller?.datePrisePoste)
         };${formatterDate(miseEnrelation.conseiller?.dateFinFormation)
         };${miseEnrelation.conseiller?.emailPro ?? ''
-        };${miseEnrelation?.dateDeRebond ? formatterDate(miseEnrelation.dateDeRebond.dateDeFinActuelle): ''
+        };${miseEnrelation?.dateDeRebond ? formatterDate(miseEnrelation.dateDeRebond.dateDeFinActuelle) : ''
         }`
       );
     }
@@ -997,6 +997,7 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Département',
       'Région',
       'Type de conventionnement',
+      'Poste de coordinateur',
     ];
 
     res.write(
@@ -1018,8 +1019,9 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.departement,
             structure.region,
             structure.phaseConventionnement === PhaseConventionnement.PHASE_2
-              ? AffichagePhaseConventionnement.PHASE_2
-              : AffichagePhaseConventionnement.PHASE_1,
+            ? AffichagePhaseConventionnement.PHASE_2
+            : AffichagePhaseConventionnement.PHASE_1,
+            structure.estPosteCoordinateur ? 'Oui' : 'Non',
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

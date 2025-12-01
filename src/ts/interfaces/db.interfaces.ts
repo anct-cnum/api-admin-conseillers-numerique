@@ -412,6 +412,7 @@ interface IDemandesCoselec {
     email: string;
   };
   prefet: IPrefetAvenant;
+  estPosteCoordinateur?: boolean;
 }
 
 interface ICoselec {
@@ -446,6 +447,7 @@ interface IPrefetAvenant {
 export interface IDemandesCoordinateur {
   id: ObjectId;
   statut: string;
+  estRendu?: string;
   avisPrefet?: string;
   banniereInformationAvisStructure?: boolean;
   banniereValidationAvisPrefet?: boolean;

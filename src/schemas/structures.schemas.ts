@@ -70,6 +70,9 @@ const validCreationAvenant = Joi.object({
     .required()
     .error(new Error('Le nombre de postes est invalide')),
   motif: Joi.string().required().error(new Error('Le motif est invalide')),
+  estPosteCoordinateur: Joi.boolean()
+    .required()
+    .error(new Error('L’identification du poste coordinateur est requise')),
 });
 
 const avenantAjoutPoste = Joi.object({
@@ -89,6 +92,9 @@ const avenantRenduPoste = Joi.object({
   nbDePosteCoselec: Joi.number()
     .required()
     .error(new Error('Le nombre de postes coselec est invalide')),
+  estPosteCoordinateur: Joi.boolean()
+    .required()
+    .error(new Error('L’identification du poste coordinateur est requise')),
 });
 
 const validExportCandidatsCoordinateurs = Joi.object({

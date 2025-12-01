@@ -19,11 +19,12 @@ interface ICoselecObject {
 const updateAvenantRenduPoste =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idStructure = req.params.id;
-    const { nbDePosteRendu, nbDePosteCoselec } = req.body;
+    const { nbDePosteRendu, nbDePosteCoselec, estPosteCoordinateur } = req.body;
     const dateValidation = new Date();
     const avenantAJoutPosteValidation = avenantRenduPoste.validate({
       nbDePosteRendu,
       nbDePosteCoselec,
+      estPosteCoordinateur,
     });
 
     if (avenantAJoutPosteValidation.error) {
@@ -71,22 +72,29 @@ const updateAvenantRenduPoste =
           Number(nbDePosteCoselec) - Number(nbDePosteRendu),
         avisCoselec: 'POSITIF',
         insertedAt: dateValidation,
+        ...(estPosteCoordinateur && { type: 'coordinateur-rendu' }),
       };
       const structureObject = {
-        'demandesCoselec.$.statut': 'validee',
-        'demandesCoselec.$.banniereValidationAvenant': true,
-        'demandesCoselec.$.validateurAvenant': {
+        'demandesCoselec.$[elem].statut': 'validee',
+        'demandesCoselec.$[elem].banniereValidationAvenant': true,
+        'demandesCoselec.$[elem].validateurAvenant': {
           email: req.user?.name,
           date: dateValidation,
         },
+        ...(estPosteCoordinateur && {
+          'demandesCoordinateur.$[coordo].estRendu': true,
+        }),
       };
       const structureObjectMiseEnRelation = {
-        'structureObj.demandesCoselec.$.statut': 'validee',
-        'structureObj.demandesCoselec.$.banniereValidationAvenant': true,
-        'structureObj.demandesCoselec.$.validateurAvenant': {
+        'structureObj.demandesCoselec.$[elem].statut': 'validee',
+        'structureObj.demandesCoselec.$[elem].banniereValidationAvenant': true,
+        'structureObj.demandesCoselec.$[elem].validateurAvenant': {
           email: req.user?.name,
           date: dateValidation,
         },
+        ...(estPosteCoordinateur && {
+          'structureObj.demandesCoordinateur.$[coordo].estRendu': true,
+        }),
       };
       if (checkStructurePhase2(structure?.conventionnement?.statut)) {
         coselecObject.phaseConventionnement = PhaseConventionnement.PHASE_2;
@@ -137,12 +145,12 @@ const updateAvenantRenduPoste =
         .updateOne(
           {
             _id: new ObjectId(idStructure),
-            demandesCoselec: {
-              $elemMatch: {
-                statut: { $eq: 'en_cours' },
-                type: { $eq: 'retrait' },
-              },
-            },
+            'demandesCoselec.statut': 'en_cours',
+            'demandesCoselec.type': 'retrait',
+            ...(estPosteCoordinateur && {
+              'demandesCoordinateur.statut': 'validee',
+              'demandesCoordinateur.estRendu': { $exists: false },
+            }),
             statut: 'VALIDATION_COSELEC',
           },
           {
@@ -150,6 +158,18 @@ const updateAvenantRenduPoste =
             $push: {
               coselec: coselecObject,
             },
+          },
+          {
+            arrayFilters: [
+              {
+                'elem.statut': 'en_cours',
+                'elem.type': 'retrait',
+              },
+              {
+                'coordo.statut': 'validee',
+                'coordo.estRendu': { $exists: false },
+              },
+            ],
           },
         );
       if (structureUpdated.modifiedCount === 0) {
@@ -162,12 +182,12 @@ const updateAvenantRenduPoste =
         .updateMany(
           {
             'structure.$id': new ObjectId(idStructure),
-            'structureObj.demandesCoselec': {
-              $elemMatch: {
-                statut: { $eq: 'en_cours' },
-                type: { $eq: 'retrait' },
-              },
-            },
+            'structure.demandesCoselec.statut': 'en_cours',
+            'structure.demandesCoselec.type': 'retrait',
+            ...(estPosteCoordinateur && {
+              'structureObj.demandesCoordinateur.statut': 'validee',
+              'structureObj.demandesCoordinateur.estRendu': { $exists: false },
+            }),
             'structureObj.statut': 'VALIDATION_COSELEC',
           },
           {
@@ -175,6 +195,18 @@ const updateAvenantRenduPoste =
             $push: {
               'structureObj.coselec': coselecObject,
             },
+          },
+          {
+            arrayFilters: [
+              {
+                'elem.statut': 'en_cours',
+                'elem.type': 'retrait',
+              },
+              {
+                'coordo.statut': 'validee',
+                'coordo.estRendu': { $exists: false },
+              },
+            ],
           },
         );
       res.status(200).json({

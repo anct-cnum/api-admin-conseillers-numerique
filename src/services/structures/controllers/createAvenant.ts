@@ -16,7 +16,7 @@ import { demandePosteSupplementaireConseiller } from '../../../emails';
 const createAvenant =
   (app: Application) => async (req: IRequest, res: Response) => {
     const {
-      body: { type, nombreDePostes, motif },
+      body: { type, nombreDePostes, motif, estPosteCoordinateur },
       params: { id },
     } = req;
 
@@ -29,6 +29,7 @@ const createAvenant =
       type,
       nombreDePostes,
       motif,
+      estPosteCoordinateur,
     });
 
     if (createAvenantValidation.error) {
@@ -72,6 +73,20 @@ const createAvenant =
       }
     }
 
+    if (
+      getStructure.demandesCoordinateur.filter(
+        (poste) =>
+          poste.statut === 'validee' &&
+          !poste?.estRendu &&
+          !poste.miseEnRelationId,
+      ).length === 0 &&
+      estPosteCoordinateur
+    ) {
+      res.status(409).json({
+        message: `Le retrait d’un poste coordinateur n’est pas autorisé avant la déclaration de la rupture.`,
+      });
+      return;
+    }
     const demandeCoselec = {
       id: new ObjectId(),
       ...(type === 'retrait'
@@ -85,6 +100,7 @@ const createAvenant =
       phaseConventionnement,
       nbPostesAvantDemande:
         getCoselec(getStructure).nombreConseillersCoselec ?? 0,
+      ...(estPosteCoordinateur ? { estPosteCoordinateur } : {}),
     };
 
     try {

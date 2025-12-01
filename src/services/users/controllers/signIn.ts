@@ -112,7 +112,9 @@ const signIn = (app: Application) => async (req: IRequest, res: Response) => {
           await findRefusedRecruitmentRelations(app, structure._id);
         const countDemandesCoordinateurValidees =
           structure?.demandesCoordinateur?.filter(
-            (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
+            (demandeCoordinateur) =>
+              demandeCoordinateur.statut === 'validee' &&
+              !demandeCoordinateur.estRendu,
           ).length;
         const demandesCoordinateurBannerInformation =
           structure?.demandesCoordinateur?.filter(

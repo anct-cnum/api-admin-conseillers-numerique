@@ -29,7 +29,9 @@ const addRoleCoordinateur =
       }
       const demandesCoordinateurValider =
         structure?.demandesCoordinateur?.filter(
-          (demandeCoordinateur) => demandeCoordinateur.statut === 'validee',
+          (demandeCoordinateur) =>
+            demandeCoordinateur.statut === 'validee' &&
+            !demandeCoordinateur.estRendu,
         );
 
       if (demandesCoordinateurValider.length === 0) {
