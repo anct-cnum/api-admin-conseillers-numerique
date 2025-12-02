@@ -19,6 +19,7 @@ const createAvenant =
       body: { type, nombreDePostes, motif, estPosteCoordinateur },
       params: { id },
     } = req;
+    console.log('req: >>>>>>>>>>>>>>>>>>', req.body);
 
     if (!ObjectId.isValid(id)) {
       res.status(400).json({ message: 'Id incorrect' });
@@ -74,7 +75,7 @@ const createAvenant =
     }
 
     if (
-      getStructure.demandesCoordinateur.filter(
+      getStructure?.demandesCoordinateur?.filter(
         (poste) =>
           poste.statut === 'validee' &&
           !poste?.estRendu &&
