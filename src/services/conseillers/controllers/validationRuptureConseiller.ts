@@ -11,7 +11,6 @@ import {
 import service from '../../../helpers/services';
 import { action } from '../../../helpers/accessControl/accessList';
 import mailer from '../../../mailer';
-import { deleteAccount } from '../../../utils/mattermost';
 import { conseillerRuptureStructure } from '../../../emails';
 import canValidateTermination from '../../../helpers/accessControl/canValidateTermination';
 
@@ -477,10 +476,6 @@ const validationRuptureConseiller =
           conseiller._id,
           updatedAt,
         );
-      }
-      // Suppression compte Mattermost
-      if (conseiller.mattermost?.id !== undefined) {
-        await deleteAccount(app, req)(conseiller);
       }
       const userToUpdate = {
         name: conseiller.email,

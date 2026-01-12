@@ -5,7 +5,6 @@ import axios from 'axios';
 import path from 'path';
 import fs from 'fs';
 import execute from '../utils';
-import service from '../../helpers/services';
 import { loginApi } from '../../utils/mattermost';
 
 // node_modules/.bin/ts-node src/tools/scripts/remove-utilisateurs-mattermost-inactif.ts --suppression
@@ -33,11 +32,9 @@ execute(__filename, async ({ logger, app, exit }) => {
     const mattermost = app.get('mattermost');
     // eslint-disable-next-line no-await-in-loop
     const token = await loginApi({ mattermost });
-    const idIgnored = app.get('mattermost').idIgnored
-      ? app.get('mattermost').idIgnored.split('|')
-      : [];
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    oneYearAgo.setHours(23, 59, 59, 999);
     const reportsUsers = [];
 
     const countUtilisateurMattermost = await axios({
@@ -70,49 +67,34 @@ execute(__filename, async ({ logger, app, exit }) => {
     logger.info(
       `Nombre total d'utilisateurs récupérés: ${reportsUsers.length} \u2705`,
     );
-    const conseillersIdMattermost = await app
-      .service(service.conseillers)
-      .Model.find({
-        statut: 'RECRUTE',
-        'mattermost.id': { $exists: true, $ne: null },
-      })
-      .distinct('mattermost.id');
+    const ONE_YEAR_AGO = oneYearAgo.getTime();
+    const UTILISATEUR_INACTIF_1_AN = reportsUsers.filter((utilisateur) => {
+      const lastStatusAt = utilisateur.last_status_at ?? 0;
+      const lastPostDate = utilisateur.last_post_date ?? 0;
+      const lastLogin = utilisateur.last_login ?? 0;
 
-    const utilisateursSansLesConseillersActif = reportsUsers.filter(
-      (user) => !conseillersIdMattermost.includes(user.id.toString()),
-    );
-    logger.info(
-      `Utilisateurs ignorés car le conseiller est en RECRUTE et l’ID Mattermost provient de l’ancien espace Coop : ${reportsUsers.length - utilisateursSansLesConseillersActif.length} \u26A0️`,
-    );
-
-    const UTILISATEUR_INACTIF_1_AN = utilisateursSansLesConseillersActif.filter(
-      (utilisateur) =>
-        utilisateur.last_login
-          ? utilisateur.last_login < oneYearAgo.getTime()
-          : utilisateur.update_at < oneYearAgo.getTime(),
-    );
+      const lastActivity = Math.max(lastStatusAt, lastPostDate, lastLogin);
+      return lastActivity === 0 || lastActivity < ONE_YEAR_AGO;
+    });
     logger.info(
       `Nombre d'utilisateurs à supprimer : ${UTILISATEUR_INACTIF_1_AN.length} \u2705`,
     );
-    const csvFilePath = path.join(
-      __dirname,
-      `../../../datas/exports/utilisateurs-mattermost-a-supprimer-${new Date().toLocaleDateString('fr').replace(/\//g, '-')}.csv`,
-    );
-    const utilisateurActifARelancerPath = path.join(
-      __dirname,
-      `../../../datas/exports/utilisateurs-restante-domain-conum-${new Date().toLocaleDateString('fr').replace(/\//g, '-')}.csv`,
-    );
-
-    const dir = path.dirname(csvFilePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    const csvFilePath = (name) =>
+      path.join(
+        __dirname,
+        `../../../datas/exports/${name}-${new Date().toLocaleDateString('fr').replace(/\//g, '-')}.csv`,
+      );
+    if (!fs.existsSync(path.join(__dirname, '../../../datas/exports'))) {
+      fs.mkdirSync(path.join(__dirname, '../../../datas/exports'), {
+        recursive: true,
+      });
     }
 
     const generateCsv = (utilisateurs) => {
       let csv =
-        "ID Utilisateur; Nom d'utilisateur; Email; Role; Dernière connexion\n";
+        "ID Utilisateur; Nom d'utilisateur; Email; Role; Dernière activité; last_login; last_post_date; last_status_at\n";
       for (const utilisateur of utilisateurs) {
-        csv += `${utilisateur.id};${utilisateur.username};${utilisateur.email};${utilisateur.roles};${new Date(utilisateur.last_login ?? utilisateur.update_at).toLocaleDateString('fr')}\n`;
+        csv += `${utilisateur.id};${utilisateur.username};${utilisateur.email};${utilisateur.roles};${new Date(Math.max(utilisateur.last_status_at ?? 0, utilisateur.last_post_date ?? 0, utilisateur.last_login ?? 0)).toLocaleDateString('fr')};${new Date(utilisateur.last_login ?? 0).toLocaleDateString('fr')};${new Date(utilisateur.last_post_date ?? 0).toLocaleDateString('fr')};${new Date(utilisateur.last_status_at ?? 0).toLocaleDateString('fr')}\n`;
       }
       return csv;
     };
@@ -124,9 +106,12 @@ execute(__filename, async ({ logger, app, exit }) => {
         ) && u.email.endsWith('@conseiller-numerique.fr'),
     );
 
-    fs.writeFileSync(csvFilePath, generateCsv(UTILISATEUR_INACTIF_1_AN));
     fs.writeFileSync(
-      utilisateurActifARelancerPath,
+      csvFilePath('utilisateurs-mattermost-a-supprimer'),
+      generateCsv(UTILISATEUR_INACTIF_1_AN),
+    );
+    fs.writeFileSync(
+      csvFilePath('utilisateurs-restante-domain-conum'),
       generateCsv(utilisateurActifARelancer),
     );
 
@@ -136,9 +121,9 @@ execute(__filename, async ({ logger, app, exit }) => {
 
     for (const utilisateur of UTILISATEUR_INACTIF_1_AN) {
       try {
-        if (suppression && !idIgnored.includes(utilisateur.id.toString())) {
+        if (suppression) {
           // eslint-disable-next-line no-await-in-loop
-          const result = await axios({
+          await axios({
             method: 'delete',
             url: `${mattermost.endPoint}/api/v4/users/${utilisateur?.id}?permanent=true`,
             headers: {
@@ -146,16 +131,6 @@ execute(__filename, async ({ logger, app, exit }) => {
               Authorization: `Bearer ${token}`,
             },
           });
-          logger.info(
-            `Suppresion OK - ${result.status}: ${utilisateur.id} (${utilisateur.username} - ${utilisateur.email})`,
-          );
-        } else if (
-          suppression &&
-          idIgnored.includes(utilisateur.id.toString())
-        ) {
-          logger.info(
-            `Suppression annulée - ${utilisateur.id} (${utilisateur.username} - ${utilisateur.email}) \uD83D\uDEE1 \uD83D\uDEE1 \uD83D\uDEE1`,
-          );
         }
         // eslint-disable-next-line no-plusplus
         successCount++;
@@ -169,9 +144,7 @@ execute(__filename, async ({ logger, app, exit }) => {
       }
     }
 
-    logger.info(
-      `\nRESULTAT de la suppression des utilisateurs mattermost inactifs`,
-    );
+    logger.info(`\nRESULTAT \n---------------------`);
     logger.info(`Succès: ${successCount} / ${UTILISATEUR_INACTIF_1_AN.length}`);
     logger.info(`Erreurs: ${errorCount} / ${UTILISATEUR_INACTIF_1_AN.length}`);
   } catch (error) {
