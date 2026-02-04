@@ -10,6 +10,9 @@ const axios = require('axios');
 const sortByName = (a, b) =>
   a.attributes.nom.toLowerCase().localeCompare(b.attributes.nom.toLowerCase());
 
+const ignoredMediateur = (mediateur) =>
+  mediateur.attributes.conseiller_numerique !== null;
+
 const filterNomAndPrenomConseiller = (search: string) => {
   const inputSearchBar = search?.trim();
   return {
@@ -97,6 +100,7 @@ const getConseillersNouvelleCoop =
         });
         initialMediateursOptionsResult = initialMediateursOptions.data.data
           .sort(sortByName)
+          .filter(ignoredMediateur)
           .map(
             (mediateur) =>
               mediateur.attributes.mediateur?.id && {

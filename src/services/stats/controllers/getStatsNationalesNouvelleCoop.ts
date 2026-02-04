@@ -13,6 +13,9 @@ const formatDate = (date) => dayjs(date).format('YYYY-MM-DD');
 const sortByName = (a, b) =>
   a.attributes.nom.toLowerCase().localeCompare(b.attributes.nom.toLowerCase());
 
+const ignoredMediateur = (mediateur) =>
+  mediateur.attributes.conseiller_numerique !== null;
+
 const getStatsNationalesNouvelleCoop =
   (app: Application) => async (req: IRequest, res: Response) => {
     try {
@@ -65,6 +68,7 @@ const getStatsNationalesNouvelleCoop =
           donneesStats.data.initialMediateursOptions =
             initialMediateursOptions.data.data
               .sort(sortByName)
+              .filter(ignoredMediateur)
               .map(
                 (mediateur) =>
                   mediateur.attributes.mediateur?.id && {
