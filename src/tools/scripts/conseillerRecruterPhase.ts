@@ -6,6 +6,7 @@ import { program } from 'commander';
 import { ObjectId } from 'mongodb';
 import dayjs from 'dayjs';
 import execute from '../utils';
+import { formatDateGMT } from '../../utils';
 import service from '../../helpers/services';
 import { PhaseConventionnement, StatutConventionnement } from '../../ts/enum';
 
@@ -91,10 +92,10 @@ execute(__filename, async ({ app, logger, exit }) => {
     // Pour n'importe qu'elle phase
     if (contrats.length === 2) {
       const dateDebutDeContrat = contrats.map((d) =>
-        dayjs(d.dateDebutDeContrat).format('DD/MM/YYYY'),
+        dayjs(formatDateGMT(d.dateDebutDeContrat)).format('DD/MM/YYYY'),
       );
       const dateFinDeContrat = contrats.map((d) =>
-        dayjs(d?.dateFinDeContrat).format('DD/MM/YYYY'),
+        dayjs(formatDateGMT(d?.dateFinDeContrat)).format('DD/MM/YYYY'),
       );
       if (
         dateDebutDeContrat[0]?.toString() ===

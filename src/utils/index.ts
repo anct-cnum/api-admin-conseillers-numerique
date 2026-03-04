@@ -144,10 +144,10 @@ const deleteRoleUser = async (
 
 const formatDateGMT = (date: Date) => {
   const dateTodayTimezoneParis = new Date(
-    new Date().toLocaleString('en', { timeZone: 'Europe/Paris' }),
+    date.toLocaleString('en', { timeZone: 'Europe/Paris' }),
   );
   const dateTodayTimezoneUTC = new Date(
-    new Date().toLocaleString('en', { timeZone: 'UTC' }),
+    date.toLocaleString('en', { timeZone: 'UTC' }),
   );
   const offsetTimezone =
     dateTodayTimezoneParis.getTime() - dateTodayTimezoneUTC.getTime();

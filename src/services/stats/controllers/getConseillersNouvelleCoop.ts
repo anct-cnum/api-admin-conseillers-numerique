@@ -98,6 +98,7 @@ const getConseillersNouvelleCoop =
             Authorization: `Bearer ${coop.token}`,
           },
         });
+
         initialMediateursOptionsResult = initialMediateursOptions.data.data
           .sort(sortByName)
           .filter(ignoredMediateur)

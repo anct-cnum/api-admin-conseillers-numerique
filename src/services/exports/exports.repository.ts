@@ -69,7 +69,7 @@ const generateCsvCandidat = async (misesEnRelations, response: Response) => {
 
   const formatterDate = (date: Date): string => {
     if (date !== undefined && date !== null) {
-      return date.toLocaleDateString('fr-FR');
+      return dayjs(formatDateGMT(date)).format('DD/MM/YYYY');
     }
     return 'non renseignée';
   }
@@ -961,7 +961,7 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
             gestionnaire.nom,
             gestionnaire.prenom,
             gestionnaire.mailSentDate
-              ? dayjs(gestionnaire.mailSentDate).format('DD/MM/YYYY')
+              ? formatDate(gestionnaire.mailSentDate)
               : '-',
             compteActif(gestionnaire),
           ].join(csvCellSeparator),
