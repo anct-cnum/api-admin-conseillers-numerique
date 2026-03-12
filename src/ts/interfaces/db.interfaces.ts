@@ -465,6 +465,7 @@ export interface IDemandesCoordinateur {
     dateDeCreation: Date;
     dateDerniereModification: Date;
   };
+  idStructureTransfert?: number;
 }
 
 interface Iinsee {
