@@ -33,7 +33,7 @@
     "@turf/circle": "^6.5.0",
     "axios": "^1.13.2",
     "bcrypt": "^5.1.1",
-    "commander": "^12.0.0",
+    "commander": "^14.0.3",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "copyfiles": "^2.4.1",
