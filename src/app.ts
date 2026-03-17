@@ -25,10 +25,9 @@ if (config().sentry.enabled === 'true') {
     dsn: config().sentry.dsn,
     environment: config().sentry.environment,
     integrations: [
-      // enable HTTP calls tracing
-      new Sentry.Integrations.Http({ tracing: true }),
+      Sentry.httpIntegration(),
       // enable Express.js middleware tracing
-      new Sentry.Integrations.Express({ app }),
+      Sentry.expressIntegration(),
     ],
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
@@ -36,11 +35,16 @@ if (config().sentry.enabled === 'true') {
     tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
     // Ne doit partir en erreur si le client ferme le navigateur avant la fin de la requête
     ignoreErrors: [/request aborted/i],
+    beforeSend(event, hint) {
+      const error = hint.originalException as any;
+      // No capture 401 (invalid login) and 404 (not found de feathers)
+      if (error?.code === 401 || error?.code === 404) {
+        return null;
+      }
+      return event;
+    },
   });
-  // transaction/span/breadcrumb is attached to its own Hub instance
-  app.use(Sentry.Handlers.requestHandler());
-  // TracingHandler creates a trace for every incoming request
-  app.use(Sentry.Handlers.tracingHandler());
+  Sentry.setupExpressErrorHandler(app);
 }
 
 app.use(cookieParser());
@@ -91,23 +95,14 @@ app.configure(services);
 // Set up event channels (see channels.js)
 app.configure(channels);
 
+// Debug Sentry - à supprimer après validation
+app.get('/debug-sentry', () => {
+  throw new Error('Test Sentry migration v8');
+});
+
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
 
-if (config().sentry.enabled === 'true') {
-  // The error handler must be before any other error middleware and after all controllers
-  app.use(
-    Sentry.Handlers.errorHandler({
-      shouldHandleError(error: any) {
-        // No capture 401 (invalid login) and 404 (not found de feathers)
-        if (error.code === 401 || error.code === 404) {
-          return false;
-        }
-        return true;
-      },
-    }),
-  );
-}
 app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);

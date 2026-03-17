@@ -9,7 +9,10 @@ const departementRegionTom = require('../../datas/imports/departements-region-to
 
 // Récupération du hub correspondant (département ou région) dans la liste des hubs (fichier hub.json)
 const findDepartementOrRegion = (nomHub: string) => {
-  return hubs.find((hub: IHub) => `${hub.name}` === nomHub);
+  return (
+    // TODO(sentry): Could not automatically migrate - see https://github.com/getsentry/sentry-javascript/blob/develop/MIGRATION.md#deprecate-hub
+    hubs.find((hub: IHub) => `${hub.name}` === nomHub)
+  );
 };
 
 // Récuperation du departement par le nom de la région dans le tableau des régions du hub
@@ -17,6 +20,7 @@ const findDepartementOrRegion = (nomHub: string) => {
 const findNumDepartementsByRegion = (hubRegion: string[]): Array<string> => {
   return departements
     .filter((departement: IDepartement) =>
+      // TODO(sentry): Could not automatically migrate - see https://github.com/getsentry/sentry-javascript/blob/develop/MIGRATION.md#deprecate-hub
       hubRegion.includes(departement.region_name),
     )
     .map((departement: IDepartement) => departement.num_dep);

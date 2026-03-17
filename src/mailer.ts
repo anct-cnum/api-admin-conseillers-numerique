@@ -58,15 +58,10 @@ export default function (app: Application) {
       Sentry.init({
         dsn: config().sentry.dsn,
         environment: config().sentry.environment,
-        integrations: [
-          new Sentry.Integrations.Http({ tracing: true }),
-          new Sentry.Integrations.Express({ app }),
-        ],
+        integrations: [Sentry.httpIntegration(), Sentry.expressIntegration()],
         tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
       });
-      app.use(Sentry.Handlers.requestHandler());
-      app.use(Sentry.Handlers.tracingHandler());
-      app.use(Sentry.Handlers.errorHandler());
+      Sentry.setupExpressErrorHandler(app);
     }
   };
 
