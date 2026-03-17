@@ -94,12 +94,6 @@ app.configure(services);
 // Set up event channels (see channels.js)
 app.configure(channels);
 
-// Debug Sentry - à supprimer après validation
-app.get('/debug-sentry-capture', (_req, res) => {
-  Sentry.captureException(new Error('Test Sentry migration 10'));
-  res.status(200).json({ message: 'Erreur envoyée à Sentry' });
-});
-
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
 
