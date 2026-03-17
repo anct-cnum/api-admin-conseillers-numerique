@@ -22,6 +22,7 @@
       "WithStatement"
     ],
     "func-names": "off",
-    "@typescript-eslint/no-use-before-define": "off"
+    "@typescript-eslint/no-use-before-define": "off",
+    "import/no-unresolved": ["error", { "ignore": ["uuid"] }]
   }
 }
