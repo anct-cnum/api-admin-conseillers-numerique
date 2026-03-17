@@ -40,11 +40,10 @@ const execute = async (name: string, job: any) => {
       // We recommend adjusting this value in production
       tracesSampleRate: parseFloat(config().sentry.traceSampleRate),
     });
-    transaction = // TODO(sentry): Use `startInactiveSpan()` instead - see https://github.com/getsentry/sentry-javascript/blob/develop/docs/v8-new-performance-apis.md
-      Sentry.startInactiveSpan({
-        op: 'Lancement de script',
-        name,
-      });
+    transaction = Sentry.startInactiveSpan({
+      op: 'Lancement de script',
+      name,
+    });
     Sentry.setupExpressErrorHandler(app);
     process.on('unhandledRejection', (e) => Sentry.captureException(e));
     process.on('uncaughtException', (e) => Sentry.captureException(e));

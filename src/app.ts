@@ -96,7 +96,7 @@ app.configure(channels);
 
 // Debug Sentry - à supprimer après validation
 app.get('/debug-sentry-capture', (_req, res) => {
-  Sentry.captureException(new Error('Test Sentry migration v8'));
+  Sentry.captureException(new Error('Test Sentry migration 10'));
   res.status(200).json({ message: 'Erreur envoyée à Sentry' });
 });
 
