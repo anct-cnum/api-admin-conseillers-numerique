@@ -16,7 +16,7 @@
     "test:coverage": "npm run test -- --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.937.0",
+    "@aws-sdk/client-s3": "^3.1014.0",
     "@casl/ability": "^6.7.3",
     "@casl/mongoose": "^7.2.2",
     "@feathersjs/authentication": "^4.5.15",
@@ -27,7 +27,7 @@
     "@feathersjs/feathers": "^4.5.15",
     "@feathersjs/socketio": "^4.5.15",
     "@feathersjs/transport-commons": "^4.5.15",
-    "@sentry/node": "^10.43.0",
+    "@sentry/node": "^10.45.0",
     "@turf/circle": "^7.3.4",
     "axios": "^1.13.2",
     "bcrypt": "^5.1.1",
@@ -51,7 +51,7 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.12.1",
     "mongoose-dbref": "^0.0.4",
-    "nodemailer": "^8.0.2",
+    "nodemailer": "^8.0.3",
     "nodemailer-html-to-text": "^3.2.0",
     "openid-client": "^5.7.0",
     "serve-favicon": "^2.5.1",
