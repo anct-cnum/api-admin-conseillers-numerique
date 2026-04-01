@@ -69,7 +69,16 @@ const validCreationAvenant = Joi.object({
   nombreDePostes: Joi.number()
     .required()
     .error(new Error('Le nombre de postes est invalide')),
-  motif: Joi.string().required().error(new Error('Le motif est invalide')),
+  motif: Joi.string()
+    .valid(
+      "Le besoin n'est pas ou plus justifié",
+      'Ma structure rencontre des difficultés de recrutement',
+      "Ma structure n'a pas ou plus les capacités financières nécessaires",
+      'Je ne sais pas encore si je souhaite me reconventionner car je manque de visibilité sur les prochains mois',
+      'Fin de conventionnement',
+    )
+    .required()
+    .error(new Error('Le motif est invalide')),
   estPosteCoordinateur: Joi.boolean()
     .required()
     .error(new Error('L’identification du poste coordinateur est requise')),
