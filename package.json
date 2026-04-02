@@ -38,7 +38,7 @@
     "cors": "^2.8.6",
     "csvtojson": "^2.0.14",
     "dayjs": "^1.11.19",
-    "ejs": "^3.1.10",
+    "ejs": "^5.0.1",
     "express": "^4.21.2",
     "feathers-mongoose": "^8.5.1",
     "graphql": "^16.12.0",
