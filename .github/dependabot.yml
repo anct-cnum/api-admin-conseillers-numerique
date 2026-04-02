@@ -6,10 +6,15 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    cooldown:
+      default-days: 7
     ignore:
       - dependency-name: "eslint*"
       - dependency-name: "@typescript-eslint/*"
       - dependency-name: "@feathersjs/*"
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       minor-and-patch:
         update-types:
