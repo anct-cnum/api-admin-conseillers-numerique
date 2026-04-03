@@ -12,6 +12,7 @@ updates:
       - dependency-name: "eslint*"
       - dependency-name: "@typescript-eslint/*"
       - dependency-name: "@feathersjs/*"
+      - dependency-name: "mongoose"
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
