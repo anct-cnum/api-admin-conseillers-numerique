@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// ts-node src/tools/scripts/reconventionnementStructure.ts -s XXX -st XXX
+// ts-node src/tools/scripts/reconventionnementStructure.ts -s XXX -t XXX
 
 import { program } from 'commander';
 import { ObjectId } from 'mongodb';
@@ -14,7 +14,7 @@ interface Options {
 }
 
 program.option('-s, --structureId <structureId>', 'id structure');
-program.option('-st, --statut <statut>', 'statut');
+program.option('-t, --statut <statut>', 'statut');
 program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {

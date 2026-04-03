@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// ts-node src/tools/structures/traitement-coselec.ts -id XXX -q XXX -nc XXX -fs XXX
+// ts-node src/tools/structures/traitement-coselec.ts -i XXX -q XXX -n XXX -f XXX
 
 import { program } from 'commander';
 import execute from '../utils';
@@ -10,12 +10,12 @@ import { IStructures, IUser } from '../../ts/interfaces/db.interfaces';
 import { checkStructurePhase2 } from '../../services/structures/repository/structures.repository';
 import { getCoselec } from '../../utils';
 
-program.option('-id, --idPG <idPG>', 'idPG de la structure');
+program.option('-i, --idPG <idPG>', 'idPG de la structure');
 program.option('-q, --quota <quota>', 'quota');
-program.option('-nc, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
-program.option('-fs, --franceService', 'label France Service');
+program.option('-n, --numeroCoselec <numeroCoselec>', 'numero COSELEC');
+program.option('-f, --franceService', 'label France Service');
 program.option(
-  '-st, --statut <statut>',
+  '-s, --statut <statut>',
   'nouveau statut de la structure (ANNULEE, ABANDON)',
 );
 program.parse(process.argv);

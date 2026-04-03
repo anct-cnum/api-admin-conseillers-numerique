@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-// ts-node src/tools/structures/traitement-doublon.ts -id XXX
+// ts-node src/tools/structures/traitement-doublon.ts -i XXX
 
 import { program } from 'commander';
 import execute from '../utils';
 import service from '../../helpers/services';
 import { IStructures } from '../../ts/interfaces/db.interfaces';
 
-program.option('-id, --idPG <idPG>', 'idPG de la structure');
+program.option('-i, --idPG <idPG>', 'idPG de la structure');
 program.parse(process.argv);
 
 execute(__filename, async ({ app, logger, exit }) => {
