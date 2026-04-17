@@ -75,7 +75,7 @@ const validCreationAvenant = Joi.object({
       'Ma structure rencontre des difficultés de recrutement',
       "Ma structure n'a pas ou plus les capacités financières nécessaires",
       'Je ne sais pas encore si je souhaite me reconventionner car je manque de visibilité sur les prochains mois',
-      'Fin de conventionnement',
+      'Fin de subventionnement',
     )
     .required()
     .error(new Error('Le motif est invalide')),
