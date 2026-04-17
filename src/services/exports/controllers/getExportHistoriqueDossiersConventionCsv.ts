@@ -153,7 +153,7 @@ const getExportHistoriqueDossiersConventionCsv =
         ordre,
         structures,
       );
-      generateCsvHistoriqueDossiersConvention(structuresFormat, res);
+      generateCsvHistoriqueDossiersConvention(structuresFormat, type, res);
     } catch (error) {
       if (error.name === 'ForbiddenError') {
         res.status(403).json({ message: 'Accès refusé' });

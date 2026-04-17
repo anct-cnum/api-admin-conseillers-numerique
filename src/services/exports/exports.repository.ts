@@ -979,9 +979,11 @@ const generateCsvListeGestionnaires = async (gestionnaires, res: Response) => {
 
 const generateCsvHistoriqueDossiersConvention = async (
   structures: any[],
+  type: string,
   res: Response,
 ) => {
   try {
+    const ajoutMotifAvenant = ["avenantRenduPoste", "avenantAjoutPoste", "toutes"].includes(type);
     const fileHeaders = [
       'ID',
       'Nom de la structure',
@@ -991,6 +993,7 @@ const generateCsvHistoriqueDossiersConvention = async (
       'Nombre de postes après COSELEC',
       'Variation',
       'Type de la demande',
+      ...(ajoutMotifAvenant ? ['Motif'] : []),
       'ID structure transfert',
       'N° DS',
       'Code département',
@@ -1013,6 +1016,7 @@ const generateCsvHistoriqueDossiersConvention = async (
             structure.nbPostesApresDemande,
             structure.variation,
             structure.type,
+            ...(ajoutMotifAvenant ? [structure.motif ?? ''] : []),
             structure.transfertStructure?.idPG,
             structure.numeroDossierDS,
             structure.codeDepartement,
