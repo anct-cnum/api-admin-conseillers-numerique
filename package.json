@@ -59,7 +59,7 @@
     "sib-api-v3-sdk": "^8.4.2",
     "slugify": "^1.6.8",
     "ts-node": "^10.9.2",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "winston": "^3.18.3"
   },
   "devDependencies": {
