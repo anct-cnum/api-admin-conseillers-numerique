@@ -1057,6 +1057,7 @@ const generateCsvHistoriqueContrats = async (
       'Date de fin de contrat',
       'Type de contrat',
       'Motif de rupture',
+      'Date de validation'
     ];
 
     res.write(
@@ -1076,6 +1077,7 @@ const generateCsvHistoriqueContrats = async (
             formatDate(contrat?.dateFinDeContrat),
             contrat?.typeDeContrat ?? 'Non renseigné',
             contrat?.motifRupture ?? 'Non renseigné',
+            formatDate(contrat?.dateDeValidation),
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

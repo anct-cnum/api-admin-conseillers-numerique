@@ -29,6 +29,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
     'Commentaire',
     'Conventionnement',
     'Coordinateur',
+    'Date de validation',
   ];
   try {
     res.write(
@@ -54,6 +55,7 @@ const generateCsvHistoriqueRuptures = async (ruptures: any, res: Response) => {
               ? AffichagePhaseConventionnement.PHASE_2
               : AffichagePhaseConventionnement.PHASE_1,
             rupture?.miseEnRelation?.contratCoordinateur ? 'Oui' : 'Non',
+            formatDate(rupture?.miseEnRelation?.validateurRupture?.date),
           ].join(csvCellSeparator),
         ),
       ].join(csvLineSeparator),

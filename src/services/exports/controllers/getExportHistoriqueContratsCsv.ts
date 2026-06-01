@@ -184,6 +184,7 @@ const getExportHistoriqueContratsCsv =
               'structureObj.idPG': 1,
               'conseillerObj.idPG': 1,
               'conseillerObj.email': 1,
+              'validateurRupture.date': 1,
               typeDeContrat: 1,
               motifRupture: 1,
               dateDebutDeContrat: 1,
@@ -206,6 +207,7 @@ const getExportHistoriqueContratsCsv =
         if (contrat.statut === 'finalisee_rupture') {
           item.statut = 'Rupture de contrat';
           item.dateDeLaDemande = contrat?.emetteurRupture?.date;
+          item.dateDeValidation = contrat?.validateurRupture?.date;
         }
         if (
           contrat.statut === 'finalisee' &&

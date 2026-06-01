@@ -112,6 +112,7 @@ const getExportHistoriqueRuptureCsv =
               'miseEnRelation.dateFinDeContrat': 1,
               'miseEnRelation.typeDeContrat': 1,
               'miseEnRelation.contratCoordinateur': 1,
+              'miseEnRelation.validateurRupture.date': 1,
             },
           },
         ]);
