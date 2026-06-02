@@ -315,7 +315,7 @@ const updateConseillerRupture =
 const validationRuptureConseiller =
   (app: Application) => async (req: IRequest, res: Response) => {
     const idConseiller = req.params.id;
-    const { dateFinDeContrat, motifRupture } = req.body.payload;
+    const { dateFinDeContrat } = req.body.payload;
     try {
       if (!dateFinDeContrat) {
         res.status(400).json({
@@ -346,55 +346,19 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
-      // Si CDIsation passer la mise en relation en nouvelle_rupture et motifRupture CDIsation
-      let miseEnRelation = null;
-      if (
-        motifRupture === 'CDIsation' &&
-        req.user.entity?.oid.toString() === structure._id.toString()
-      ) {
-        miseEnRelation = await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.update)
-          .findOneAndUpdate(
-            {
-              'conseiller.$id': conseiller._id,
-              'structure.$id': structure._id,
-              statut: { $eq: 'finalisee' },
-            },
-            {
-              $set: {
-                statut: 'nouvelle_rupture',
-                motifRupture: 'CDIsation',
-                emetteurRupture: {
-                  email: req.user.name,
-                  date: new Date(),
-                },
-              },
-            },
-            { returnOriginal: false },
-          );
-        // Si il y a une erreure lors de l'initialisation de la rupture on ne continue pas on renvoie une erreur
-        if (!miseEnRelation) {
-          res.status(409).json({
-            message:
-              'Une erreur est survenue lors de l initialisation de la rupture',
-          });
-        }
-      } else {
-        miseEnRelation = await app
-          .service(service.misesEnRelation)
-          .Model.accessibleBy(req.ability, action.read)
-          .findOne({
-            'conseiller.$id': conseiller._id,
-            'structure.$id': structure._id,
-            statut: { $eq: 'nouvelle_rupture' },
-          });
-        if (!miseEnRelation) {
-          res.status(404).json({
-            message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
-          });
-          return;
-        }
+      const miseEnRelation = await app
+        .service(service.misesEnRelation)
+        .Model.accessibleBy(req.ability, action.read)
+        .findOne({
+          'conseiller.$id': conseiller._id,
+          'structure.$id': structure._id,
+          statut: { $eq: 'nouvelle_rupture' },
+        });
+      if (!miseEnRelation) {
+        res.status(404).json({
+          message: `Aucune mise en relation finalisée entre la structure id ${structure.idPG} et le conseiller id ${conseiller.idPG}`,
+        });
+        return;
       }
 
       const miseEnRelationRenouvellementEnCours: IMisesEnRelation = await app
@@ -437,7 +401,7 @@ const validationRuptureConseiller =
         res.status(404).json({ message: "L'utilisateur n'existe pas" });
         return;
       }
-      if (!canValidateTermination(req.user, miseEnRelation)) {
+      if (!canValidateTermination(req.user!)) {
         res.status(403).json({
           message: `Accès refusé, vous n'êtes pas autorisé à valider la rupture d'un conseiller`,
         });
