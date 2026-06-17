@@ -27,7 +27,7 @@
     "@feathersjs/feathers": "^4.5.15",
     "@feathersjs/socketio": "^4.5.15",
     "@feathersjs/transport-commons": "^4.5.15",
-    "@sentry/node": "^10.45.0",
+    "@sentry/node": "^10.58.0",
     "@turf/circle": "^7.3.4",
     "axios": "^1.15.2",
     "bcrypt": "^5.1.1",
