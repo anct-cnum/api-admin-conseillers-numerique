@@ -87,7 +87,7 @@ export default function (app: Application) {
           utils: { dayjs, ...utils },
         },
       );
-      return mjml(mjmlTemplate, {}).html;
+      return (await mjml(mjmlTemplate, {})).html;
     },
     createMailer: () => {
       return {
