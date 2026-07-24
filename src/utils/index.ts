@@ -93,6 +93,9 @@ const getLastCoselec = (structure) =>
  * Sinon, on récupère le dernier avis
  */
 const getCoselec = (structure) => {
+  if (structure.statut === 'REFUS_COSELEC') {
+    return null;
+  }
   if (structure.statut === 'VALIDATION_COSELEC') {
     return getCoselecPositif(structure);
   }
@@ -104,6 +107,9 @@ const getCoselecLabel = (structure) => {
 };
 
 const getCoselecConventionnement = (structure) => {
+  if (structure.statut === 'REFUS_COSELEC') {
+    return null;
+  }
   if (structure.statut === 'VALIDATION_COSELEC') {
     return getCoselecPositifConventionnement(structure);
   }

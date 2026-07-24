@@ -59,7 +59,7 @@ execute(__filename, async ({ app, logger, exit }) => {
       getStructure.conventionnement?.statut,
     );
     const nbPostesAvantDemande =
-      getCoselec(getStructure).nombreConseillersCoselec ?? 0;
+      getCoselec(getStructure)?.nombreConseillersCoselec ?? 0;
 
     const demandeCoselec = {
       id: new ObjectId(),

@@ -99,7 +99,7 @@ const createAvenant =
       banniereValidationAvenant: false,
       phaseConventionnement,
       nbPostesAvantDemande:
-        getCoselec(getStructure).nombreConseillersCoselec ?? 0,
+        getCoselec(getStructure)?.nombreConseillersCoselec ?? 0,
       ...(estPosteCoordinateur ? { estPosteCoordinateur } : {}),
     };
 

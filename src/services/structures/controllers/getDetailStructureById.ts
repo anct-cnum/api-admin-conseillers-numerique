@@ -168,9 +168,9 @@ const getDetailStructureById =
       );
       const coselec = getCoselec(structure[0]);
       const coselecConventionnement = getCoselecConventionnement(structure[0]);
-      structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec;
+      structure[0].posteValiderCoselec = coselec?.nombreConseillersCoselec ?? 0;
       structure[0].posteValiderCoselecConventionnement =
-        coselecConventionnement?.nombreConseillersCoselec;
+        coselecConventionnement?.nombreConseillersCoselec ?? 0;
       structure[0].qpvStatut = formatQpv(structure[0].qpvStatut);
       structure[0].estZRR = formatZrr(structure[0].estZRR);
       structure[0].type = formatType(structure[0].type);
