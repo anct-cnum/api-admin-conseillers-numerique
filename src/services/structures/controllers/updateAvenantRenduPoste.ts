@@ -14,6 +14,7 @@ interface ICoselecObject {
   avisCoselec: string;
   insertedAt: Date;
   phaseConventionnement?: string;
+  type?: string;
 }
 
 const updateAvenantRenduPoste =
@@ -45,21 +46,55 @@ const updateAvenantRenduPoste =
           {
             _id: new ObjectId(idStructure),
           },
-          { _id: 0, conventionnement: 1 },
+          { _id: 0, conventionnement: 1, coselec: 1 },
         );
       if (!structure) {
         res.status(404).json({ message: "La structure n'existe pas" });
         return;
       }
+
+      // Le quota coordinateur et le quota conseiller sont suivis par des entrées
+      // coselec distinctes (tag `type`) : il faut prendre la dernière entrée du
+      // bon type, pas la dernière entrée toutes catégories confondues (getCoselec).
+      const dernierCoselecDuType = (
+        (structure.coselec ?? []) as ICoselecObject[]
+      )
+        .filter((c: ICoselecObject) => c.avisCoselec === 'POSITIF')
+        .filter((c: ICoselecObject) =>
+          estPosteCoordinateur
+            ? c.type === 'coordinateur' || c.type === 'coordinateur-rendu'
+            : c.type === undefined,
+        )
+        .sort(
+          (a: ICoselecObject, b: ICoselecObject) =>
+            new Date(a.insertedAt).getTime() - new Date(b.insertedAt).getTime(),
+        )
+        .pop();
+      const nbDePosteCoselecActuel =
+        dernierCoselecDuType?.nombreConseillersCoselec ?? 0;
+
       const nbMiseEnRelationRecruter = await app
         .service(service.misesEnRelation)
         .Model.accessibleBy(req.ability, action.read)
         .countDocuments({
           statut: { $in: ['recrutee', 'finalisee', 'nouvelle_rupture'] },
           'structure.$id': new ObjectId(idStructure),
+          ...(estPosteCoordinateur
+            ? {
+                $or: [
+                  { contratCoordinateur: true },
+                  { 'conseillerObj.estCoordinateur': true },
+                ],
+              }
+            : {
+                $nor: [
+                  { contratCoordinateur: true },
+                  { 'conseillerObj.estCoordinateur': true },
+                ],
+              }),
         });
       const nbDePosteLibre =
-        Number(nbDePosteCoselec) - Number(nbMiseEnRelationRecruter);
+        nbDePosteCoselecActuel - Number(nbMiseEnRelationRecruter);
       if (nbDePosteLibre < Number(nbDePosteRendu)) {
         res.status(400).json({
           message:
@@ -69,7 +104,7 @@ const updateAvenantRenduPoste =
       }
       const coselecObject: ICoselecObject = {
         nombreConseillersCoselec:
-          Number(nbDePosteCoselec) - Number(nbDePosteRendu),
+          nbDePosteCoselecActuel - Number(nbDePosteRendu),
         avisCoselec: 'POSITIF',
         insertedAt: dateValidation,
         ...(estPosteCoordinateur && { type: 'coordinateur-rendu' }),
