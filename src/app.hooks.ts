@@ -1,11 +1,13 @@
+import preventPrototypePollution from './hooks/preventPrototypePollution';
+
 export default {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [],
-    update: [],
-    patch: [],
+    create: [preventPrototypePollution()],
+    update: [preventPrototypePollution()],
+    patch: [preventPrototypePollution()],
     remove: [],
   },
 
