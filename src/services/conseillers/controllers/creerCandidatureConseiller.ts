@@ -118,7 +118,7 @@ export const envoyerConfirmationParMail = async (
     path.join(__dirname, '../../../emails/confirmation-email-candidature'),
     'confirmation-email-inscription-conseiller',
     {
-      link: mailer(app).utils.getPublicUrl(
+      link: mailer(app).utils.getPublicUrlCandidature(
         `/candidature-confirmer-conseiller/${token}`,
       ),
       prenom,

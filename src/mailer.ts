@@ -50,6 +50,8 @@ export default function (app: Application) {
     `${app.get('espace_coop_hostname')}${pathUrl}`;
 
   const getPublicUrl = (pathUrl: string) => `${app.get('public')}${pathUrl}`;
+  const getPublicUrlCandidature = (pathUrl: string) =>
+    `${app.get('public_candidature')}${pathUrl}`;
   const getDemarcheSimplifierUrl = (id: string) =>
     `${app.get('demarche_simplifier_coordinateur-hostname')}${id}`;
 
@@ -69,6 +71,7 @@ export default function (app: Application) {
 
   const utils = {
     getPublicUrl,
+    getPublicUrlCandidature,
     getDashboardUrl,
     initSentry,
     getEmailSupport,
