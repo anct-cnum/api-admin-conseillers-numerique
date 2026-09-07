@@ -83,6 +83,7 @@ app.use(
       config().dashboard_hostname,
       config().public,
       config().public_site_vitrine,
+      config().public_candidature,
     ],
     credentials: true,
   }),
