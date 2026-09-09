@@ -108,5 +108,6 @@
     "endPointStatistique": "COOP_ENDPOINT_STATISTIQUE",
     "endPointUtilisateur": "COOP_ENDPOINT_UTILISATEUR",
     "domain": "COOP_DOMAIN"
-  }
+  },
+  "ENABLE_EXPORT_TERRITORIAL": "ENABLE_EXPORT_TERRITORIAL"
 }

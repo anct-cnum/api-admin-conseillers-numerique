@@ -2,8 +2,8 @@
 
 cd ${APP_HOME}
 
-if [ "$NODE_ENV" != "production" ]; then
-  echo "Environnement non production ($NODE_ENV) : exports (fiches territoriales) désactivés\n"
+if [ "$ENABLE_EXPORT_TERRITORIAL" != "true" ]; then
+  echo "Export (fiches territoriales) désactivé (ENABLE_EXPORT_TERRITORIAL != true)\n"
   exit 0
 fi
 
