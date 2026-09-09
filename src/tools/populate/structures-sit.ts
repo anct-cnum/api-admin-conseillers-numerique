@@ -43,7 +43,10 @@ execute(__filename, async ({ logger, app }: { logger: any; app: any }) => {
     const { coselec, ...rest } = structure;
     return {
       ...rest,
-      dernierCoselec: getCoselec(structure).nombreConseillersCoselec,
+      dernierCoselec: {
+        nombreConseillersCoselec:
+          getCoselec(structure).nombreConseillersCoselec,
+      },
     };
   });
 
