@@ -65,8 +65,8 @@ const preSelectionnerCandidat =
           structure: new DBRef('structures', structure._id, database),
           createdAt: new Date(),
           conseillerCreatedAt: conseiller.createdAt,
-          conseillerObj: conseiller,
-          structureObj: structure,
+          conseillerObj: (conseiller as any).toObject(),
+          structureObj: (structure as any).toObject(),
           type: 'MANUEL',
         });
 
