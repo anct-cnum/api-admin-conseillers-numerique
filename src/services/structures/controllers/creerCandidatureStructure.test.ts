@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections } from '../../../tests/utils';
 import request from 'supertest';
 import axios from 'axios';
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 import app from '../../../app';
 

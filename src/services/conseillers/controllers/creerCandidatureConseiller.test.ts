@@ -7,7 +7,7 @@ import {
 import app from '../../../app';
 import request from "supertest";
 import axios from "axios";
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);

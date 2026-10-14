@@ -2,7 +2,7 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { viderLesCollections } from '../../../tests/utils';
 import axios from 'axios';
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 import app from '../../../app';
 const champsObligatoires = {
